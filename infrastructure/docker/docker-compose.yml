@@ -3,8 +3,7 @@ services:
   app:
     build:
       context: ../../frontend
-      dockerfile: ./Dockerfile
-      target: deps
+      dockerfile: ../infrastructure/docker/Dockerfile
     ports:
       - "3000:3000"
     volumes:
