@@ -18,6 +18,7 @@ import { PlanChangeLayout } from "./plan-change-layout"
 import { CouponListPopup } from "../molecules/coupon-list-popup"
 import { CouponConfirmationPopup } from "../molecules/coupon-confirmation-popup"
 import { CouponUsedSuccessModal } from "../molecules/coupon-used-success-modal"
+import { LoginRequiredModal } from "../molecules/login-required-modal"
 import { StoreDetailPopup } from "../molecules/store-detail-popup"
 import { EmailConfirmationLayout } from "./email-confirmation-layout"
 import type { Store } from "../../types/store"
@@ -128,10 +129,14 @@ interface HomeLayoutProps {
   onCouponListClose: () => void
   onCouponListBack: () => void
   onUseCoupon: (couponId: string) => void
+  onUseSameCoupon?: (couponId: string) => void
   onConfirmCoupon: () => void
   onCancelCoupon: () => void
   isSuccessModalOpen: boolean
   onSuccessModalClose?: () => void
+  isLoginRequiredModalOpen?: boolean
+  onLoginRequiredModalClose?: () => void
+  onLoginRequiredModalLogin?: () => void
   onStoreClick: (store: Store) => void
   onProfileEditSubmit?: (data: any) => void
   onEmailChangeSubmit?: (currentPassword: string, newEmail: string) => void
@@ -230,10 +235,14 @@ export function HomeLayout({
   onCouponListClose,
   onCouponListBack,
   onUseCoupon,
+  onUseSameCoupon = () => {},
   onConfirmCoupon,
   onCancelCoupon = () => {},
   isSuccessModalOpen,
   onSuccessModalClose,
+  isLoginRequiredModalOpen = false,
+  onLoginRequiredModalClose = () => {},
+  onLoginRequiredModalLogin = () => {},
   onProfileEditSubmit = () => {},
   onEmailChangeSubmit = () => {},
   onPasswordChangeSubmit = () => {},
@@ -321,7 +330,7 @@ export function HomeLayout({
         onLogout={onLogout}
         onBack={onBackToHome}
         onShowStoreOnHome={onBackToHome}
-        onUseSameCoupon={() => {}}
+        onUseSameCoupon={onUseSameCoupon}
         onLogoClick={onLogoClick}
         onProfileEditSubmit={onProfileEditSubmit || (() => {})}
         onEmailChangeSubmit={onEmailChangeSubmit}
@@ -466,6 +475,13 @@ export function HomeLayout({
         isOpen={isSuccessModalOpen}
         coupon={selectedCoupon}
         onClose={onSuccessModalClose}
+      />
+      
+      {/* ログインが必要なモーダル */}
+      <LoginRequiredModal
+        isOpen={isLoginRequiredModalOpen}
+        onClose={onLoginRequiredModalClose}
+        onLogin={onLoginRequiredModalLogin}
       />
       
     </div>

@@ -56,6 +56,9 @@ export default function HomePage() {
 
   // クーポン使用完了モーダルの状態
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  
+  // ログインが必要なモーダルの状態
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(false)
 
   // パスワード再設定関連の状態
   const [passwordResetStep, setPasswordResetStep] = useState<"form" | "complete">("form")
@@ -486,6 +489,12 @@ export default function HomePage() {
   }
 
   const handleUseSameCoupon = (couponId: string) => {
+    // 認証チェック
+    if (!isAuthenticated) {
+      setIsLoginRequiredModalOpen(true)
+      return
+    }
+    
     console.log("同じクーポンを利用:", couponId)
     // クーポン利用画面に遷移
     // 実際の実装では、該当クーポンの利用画面を表示
@@ -509,6 +518,12 @@ export default function HomePage() {
   }
 
   const handleUseCoupon = (couponId: string) => {
+    // 認証チェック
+    if (!isAuthenticated) {
+      setIsLoginRequiredModalOpen(true)
+      return
+    }
+    
     const storeCoupons = selectedStore ? mockCoupons[selectedStore.id] || [] : []
     const coupon = storeCoupons.find((c) => c.id === couponId)
     if (coupon) {
@@ -534,6 +549,15 @@ export default function HomePage() {
     setSelectedCoupon(null)
     setSelectedStore(null)
     // 不要な状態変更を削除してモーダルの重複表示を防ぐ
+  }
+
+  const handleLoginRequiredModalClose = () => {
+    setIsLoginRequiredModalOpen(false)
+  }
+
+  const handleLoginRequiredModalLogin = () => {
+    setIsLoginRequiredModalOpen(false)
+    setCurrentView("login")
   }
 
   const handleCancelCoupon = () => {
@@ -776,6 +800,7 @@ export default function HomePage() {
       onCouponListClose={handleCouponListClose}
       onCouponListBack={handleCouponListBack}
       onUseCoupon={handleUseCoupon}
+      onUseSameCoupon={handleUseSameCoupon}
       onConfirmCoupon={handleConfirmCoupon}
       onCancelCoupon={handleCancelCoupon}
       onProfileEditSubmit={handleProfileEditSubmit}
@@ -785,6 +810,9 @@ export default function HomePage() {
       emailChangeStep={emailChangeStep}
       isSuccessModalOpen={isSuccessModalOpen}
       onSuccessModalClose={handleSuccessModalClose}
+      isLoginRequiredModalOpen={isLoginRequiredModalOpen}
+      onLoginRequiredModalClose={handleLoginRequiredModalClose}
+      onLoginRequiredModalLogin={handleLoginRequiredModalLogin}
       passwordChangeStep={passwordChangeStep}
       newEmail={newEmail}
     />
