@@ -19,7 +19,7 @@ export function EmailConfirmationContainer({
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-center">
-          <Logo size="sm" onClick={onLogoClick} />
+          <Logo size="lg" onClick={onLogoClick} />
         </div>
         <div className="w-full max-w-md">
           <EmailConfirmationComplete

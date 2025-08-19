@@ -179,7 +179,7 @@ export function MyPageContainer({
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="flex items-center justify-center">
-            <Logo size="sm" onClick={onLogoClick} />
+            <Logo size="lg" onClick={onLogoClick} />
           </div>
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
@@ -206,7 +206,7 @@ export function MyPageContainer({
           <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
             ← 戻る
           </button>
-          <Logo size="sm" onClick={onLogoClick} />
+          <Logo size="lg" onClick={onLogoClick} />
           <div className="w-12"></div>
         </div>
       </div>

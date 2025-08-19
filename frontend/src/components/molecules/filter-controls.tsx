@@ -114,8 +114,7 @@ export function FilterControls({
 
         {/* 中央: ロゴ */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Logo size="sm" onClick={onLogoClick} />
-          <div className="text-xs text-gray-500 font-medium mt-0.5 text-center">さいたま市グルメマップ</div>
+          <Logo size="lg" onClick={onLogoClick} />
         </div>
 
         {/* 右側: お気に入りとログイン */}

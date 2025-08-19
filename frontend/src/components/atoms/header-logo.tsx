@@ -31,7 +31,7 @@ export function HeaderLogo({
         )}
         
         {/* 中央のロゴ */}
-        <Logo size="sm" onClick={onLogoClick} />
+        <Logo size="lg" onClick={onLogoClick} />
         
         {/* 右側のタイトル（必要に応じて） */}
         {title && (
