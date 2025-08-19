@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MapLayout } from "@/components/templates/map-layout"
+import { HomeLayout } from "@/components/templates/home-layout"
 import { mockStores } from "@/data/mock-stores"
 import { mockNotifications } from "@/data/mock-notifications"
 import type { Store } from "@/types/store"
@@ -15,16 +15,17 @@ import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 export default function HomePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [selectedArea, setSelectedArea] = useState<string>("")
-  const [activeTab, setActiveTab] = useState("map")
+  const [isFavoritesFilter, setIsFavoritesFilter] = useState(false)
+  const [activeTab, setActiveTab] = useState("home")
   const [currentView, setCurrentView] = useState<
-    "map" | "login" | "email-registration" | "signup" | "confirmation" | "subscription" | "mypage" | "password-reset" | "email-confirmation"
-  >("map")
+    "home" | "login" | "email-registration" | "signup" | "confirmation" | "subscription" | "mypage" | "password-reset" | "email-confirmation"
+  >("home")
   const [loginStep, setLoginStep] = useState<"email" | "otp">("email")
   const [loginEmail, setLoginEmail] = useState("")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [signupData, setSignupData] = useState<any>(null)
-  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false)
+
   const [stores, setStores] = useState<Store[]>(mockStores)
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications)
 
@@ -75,6 +76,15 @@ export default function HomePage() {
 
   // 店舗詳細関連の状態
   const favoriteStores = stores.filter((store) => store.isFavorite)
+  
+  // フィルタリングされた店舗データ
+  const filteredStores = stores.filter((store) => {
+    // お気に入りフィルター
+    if (isFavoritesFilter && !store.isFavorite) {
+      return false
+    }
+    return true
+  })
 
   const hasNotification = notifications.some((n) => !n.isRead)
 
@@ -82,23 +92,24 @@ export default function HomePage() {
     console.log("全て表示ボタンがクリックされました - フィルターをクリア")
     setSelectedGenres([])
     setSelectedArea("")
+    setIsFavoritesFilter(false)
   }
 
   const handleTabChange = (tab: string) => {
-    if (tab === "mypage") {
-      if (!isAuthenticated) {
-        setCurrentView("login")
+          if (tab === "mypage") {
+        if (!isAuthenticated) {
+          setCurrentView("login")
+        } else {
+          setCurrentView("mypage")
+          setActiveTab(tab)
+          setMyPageView("main")
+        }
       } else {
-        setCurrentView("mypage")
         setActiveTab(tab)
-        setMyPageView("main")
+        if (currentView !== "home") {
+          setCurrentView("home")
+        }
       }
-    } else {
-      setActiveTab(tab)
-      if (currentView !== "map") {
-        setCurrentView("map")
-      }
-    }
   }
 
   const handleLogin = async (email: string, otp: string) => {
@@ -121,8 +132,8 @@ export default function HomePage() {
         setPlan(mockPlan)
         setUsageHistory(mockUsageHistory)
         setPaymentHistory(mockPaymentHistory)
-        setCurrentView("map") // トップ画面（マップ）に遷移
-        setActiveTab("map")
+        setCurrentView("home") // トップ画面（ホーム）に遷移
+        setActiveTab("home")
         setMyPageView("main")
         setLoginStep("email") // リセット
         setLoginEmail("") // リセット
@@ -141,9 +152,9 @@ export default function HomePage() {
     setCurrentView("password-reset")
   }
 
-  const handleBackToMap = () => {
-    setCurrentView("map")
-    setActiveTab("map")
+  const handleBackToHome = () => {
+    setCurrentView("home")
+    setActiveTab("home")
     setMyPageView("main")
     setSignupData(null)
   }
@@ -230,8 +241,8 @@ export default function HomePage() {
     setTimeout(() => {
       console.log("サブスクリプション登録:", planId)
       setIsLoading(false)
-      setCurrentView("map")
-      setActiveTab("map")
+      setCurrentView("home")
+      setActiveTab("home")
     }, 2000)
   }
 
@@ -284,16 +295,14 @@ export default function HomePage() {
   }
 
   const handleFavoritesClick = () => {
-    setIsFavoritesOpen(true)
+    setIsFavoritesFilter(!isFavoritesFilter)
   }
 
   const handleHistoryClick = () => {
     console.log("履歴ボタンがクリックされました")
   }
 
-  const handleFavoritesClose = () => {
-    setIsFavoritesOpen(false)
-  }
+
 
   const handleHistoryClose = () => {
     console.log("履歴パネルを閉じる")
@@ -448,8 +457,8 @@ export default function HomePage() {
     setPlan(undefined)
     setUsageHistory([])
     setPaymentHistory([])
-    setCurrentView("map")
-    setActiveTab("map")
+    setCurrentView("home")
+    setActiveTab("home")
     setMyPageView("main")
   }
 
@@ -460,20 +469,20 @@ export default function HomePage() {
     setUsageHistory([])
     setPaymentHistory([])
     
-    setCurrentView("map")
-    setActiveTab("map")
+    setCurrentView("home")
+    setActiveTab("home")
     setMyPageView("main")
     console.log("ログアウト")
   }
 
   // 利用履歴関連のハンドラー
-  const handleShowStoreOnMap = (storeId: string) => {
-    console.log("マップで店舗を表示:", storeId)
-    // マップ画面に戻って該当店舗を表示
-    setCurrentView("map")
-    setActiveTab("map")
+  const handleShowStoreOnHome = (storeId: string) => {
+    console.log("ホームで店舗を表示:", storeId)
+    // ホーム画面に戻って該当店舗を表示
+    setCurrentView("home")
+    setActiveTab("home")
     setMyPageView("main")
-    // 実際の実装では、店舗IDに基づいてマップの位置を調整
+    // 実際の実装では、店舗IDに基づいてホームの位置を調整
   }
 
   const handleUseSameCoupon = (couponId: string) => {
@@ -483,9 +492,9 @@ export default function HomePage() {
   }
 
   const handleLogoClick = () => {
-    console.log("ロゴクリック - マップに遷移")
-    setCurrentView("map")
-    setActiveTab("map")
+    console.log("ロゴクリック - ホームに遷移")
+    setCurrentView("home")
+    setActiveTab("home")
     setMyPageView("main")
   }
 
@@ -524,8 +533,8 @@ export default function HomePage() {
     // 成功モーダルを閉じる時に全ての状態をクリア
     setSelectedCoupon(null)
     setSelectedStore(null)
-    setCurrentView("map")
-    setActiveTab("map")
+    setCurrentView("home")
+    setActiveTab("home")
   }
 
   const handleCancelCoupon = () => {
@@ -680,9 +689,10 @@ export default function HomePage() {
   }
 
   return (
-    <MapLayout
+    <HomeLayout
       selectedGenres={selectedGenres}
       selectedArea={selectedArea}
+      isFavoritesFilter={isFavoritesFilter}
       activeTab={activeTab}
       currentView={currentView}
       isAuthenticated={isAuthenticated}
@@ -690,7 +700,7 @@ export default function HomePage() {
       signupData={signupData}
       hasNotification={hasNotification}
       favoriteStores={favoriteStores}
-      isFavoritesOpen={isFavoritesOpen}
+
       notifications={notifications}
       user={user}
       plan={plan}
@@ -708,7 +718,7 @@ export default function HomePage() {
       onTabChange={handleTabChange}
       onFavoritesClick={handleFavoritesClick}
       onHistoryClick={handleHistoryClick}
-      onFavoritesClose={handleFavoritesClose}
+
       onHistoryClose={handleHistoryClose}
       onHistoryClose={handleHistoryClose}
       onFavoriteToggle={handleFavoriteToggle}
@@ -735,7 +745,7 @@ export default function HomePage() {
       onLogin={handleLogin}
       onSignup={handleSignup}
       onForgotPassword={handleForgotPassword}
-      onBackToMap={handleBackToMap}
+      onBackToHome={handleBackToHome}
       onBackToLogin={handleBackToLogin}
       onEmailSubmit={handleEmailSubmit}
       onEmailRegistrationBackToLogin={handleEmailRegistrationBackToLogin}
@@ -752,7 +762,7 @@ export default function HomePage() {
       onNotificationItemClick={handleNotificationItemClick}
       onMarkAllNotificationsRead={handleMarkAllNotificationsRead}
       onMenuItemClick={handleMenuItemClick}
-      onShowStoreOnMap={handleShowStoreOnMap}
+              onShowStoreOnHome={handleShowStoreOnHome}
       onUseSameCoupon={handleUseSameCoupon}
       onLogoClick={handleLogoClick}
       loginStep={loginStep}

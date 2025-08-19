@@ -43,7 +43,7 @@ interface MyPageContainerProps {
   onWithdrawComplete: () => void
   onLogout: () => void
   onBack: () => void
-  onShowStoreOnMap: (storeId: string) => void
+  onShowStoreOnHome: (storeId: string) => void
   onUseSameCoupon: (couponId: string) => void
   onLogoClick: () => void
   onProfileEditSubmit: (data: any) => void
@@ -76,7 +76,7 @@ export function MyPageContainer({
   onWithdrawComplete,
   onLogout,
   onBack,
-  onShowStoreOnMap,
+  onShowStoreOnHome,
   onUseSameCoupon,
   onLogoClick,
   onProfileEditSubmit,

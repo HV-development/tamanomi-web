@@ -30,7 +30,7 @@ interface MyPageLayoutProps {
   onWithdrawComplete: () => void
   onLogout: () => void
   onBack: () => void
-  onShowStoreOnMap: (storeId: string) => void
+  onShowStoreOnHome: (storeId: string) => void
   onUseSameCoupon: (couponId: string) => void
   onLogoClick: () => void
   onProfileEditSubmit: (data: any) => void
@@ -59,7 +59,7 @@ export function MyPageLayout({
   onCancelSubscription,
   onLogout,
   onBack,
-  onShowStoreOnMap,
+  onShowStoreOnHome,
   onUseSameCoupon,
   onWithdraw,
   onWithdrawConfirm,
@@ -96,7 +96,7 @@ export function MyPageLayout({
       onWithdrawComplete={onWithdrawComplete}
       onLogout={onLogout}
       onBack={onBack}
-      onShowStoreOnMap={onShowStoreOnMap}
+              onShowStoreOnHome={onShowStoreOnHome}
       onUseSameCoupon={onUseSameCoupon}
       onLogoClick={onLogoClick}
       onProfileEditSubmit={onProfileEditSubmit}

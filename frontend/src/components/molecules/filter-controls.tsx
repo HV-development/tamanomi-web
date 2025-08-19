@@ -14,6 +14,7 @@ import type { Notification } from "../../types/notification"
 interface FilterControlsProps {
   selectedGenres: string[]
   selectedArea: string
+  isFavoritesFilter: boolean
   notifications: Notification[]
   isAuthenticated: boolean
   onGenresChange: (genres: string[]) => void
@@ -30,6 +31,7 @@ interface FilterControlsProps {
 export function FilterControls({
   selectedGenres,
   selectedArea,
+  isFavoritesFilter,
   notifications,
   isAuthenticated,
   onGenresChange,
@@ -120,10 +122,14 @@ export function FilterControls({
         <div className="flex items-center gap-2">
           <button
             onClick={onFavoritesClick}
-            className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className={`relative p-2 rounded-full transition-colors ${
+              isFavoritesFilter
+                ? "bg-red-50 text-red-600 hover:bg-red-100"
+                : "hover:bg-gray-100 text-gray-600 hover:text-red-500"
+            }`}
             aria-label="お気に入り"
           >
-            <Heart className="w-5 h-5 text-gray-600 hover:text-red-500" />
+            <Heart className={`w-5 h-5 ${isFavoritesFilter ? "fill-current" : ""}`} />
           </button>
           <button
             onClick={() => isAuthenticated ? onTabChange("mypage") : onMenuItemClick("login")}

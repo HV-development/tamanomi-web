@@ -4,18 +4,26 @@ import { StoreList } from "../molecules/store-list";
 import type { Store } from "../../types/store";
 import { mockStores } from "../../data/mock-stores";
 
-interface MapContainerProps {
+interface HomeContainerProps {
   selectedGenres: string[]
+  isFavoritesFilter: boolean
   onStoreClick: (store: Store) => void
   onCouponsClick?: (storeId: string) => void
   isModalOpen?: boolean
 }
 
-export function MapContainer({ selectedGenres, onStoreClick, onCouponsClick, isModalOpen = false }: MapContainerProps) {
+export function HomeContainer({ selectedGenres, isFavoritesFilter, onStoreClick, onCouponsClick, isModalOpen = false }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = mockStores.filter(store => {
-    if (selectedGenres.length === 0) return true
-    return selectedGenres.includes(store.genre)
+    // ジャンルフィルター
+    if (selectedGenres.length > 0 && !selectedGenres.includes(store.genre)) {
+      return false
+    }
+    // お気に入りフィルター
+    if (isFavoritesFilter && !store.isFavorite) {
+      return false
+    }
+    return true
   })
 
   const handleFavoriteToggle = (storeId: string) => {

@@ -29,7 +29,7 @@ export function NavigationBar({
   }
 
   const tabs = [
-    { id: "map", label: "マップ", icon: Map, color: "text-green-500" },
+    { id: "home", label: "ホーム", icon: Map, color: "text-green-500" },
     { id: "favorites", label: "お気に入り", icon: Heart, color: "text-green-500" },
     {
       id: "mypage",

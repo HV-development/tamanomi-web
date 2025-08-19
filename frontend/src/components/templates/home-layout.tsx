@@ -2,7 +2,7 @@
 
 import { FilterControls } from "../molecules/filter-controls"
 import { NavigationBar } from "../molecules/navigation-bar"
-import { MapContainer } from "../organisms/map-container"
+import { HomeContainer } from "../organisms/home-container"
 import { MapPin, Phone, Globe, Ticket } from "lucide-react"
 import { LoginLayout } from "./login-layout"
 import { EmailRegistrationLayout } from "./email-registration-layout"
@@ -10,7 +10,7 @@ import { SignupLayout } from "./signup-layout"
 import { ConfirmationLayout } from "./confirmation-layout"
 import { SubscriptionLayout } from "./subscription-layout"
 import { PasswordResetLayout } from "./password-reset-layout"
-import { FavoritesPopup } from "../molecules/favorites-popup"
+
 import { HistoryPopup } from "../molecules/history-popup"
 import { MyPageLayout } from "./mypage-layout"
 import { PlanManagementLayout } from "./plan-management-layout"
@@ -25,12 +25,13 @@ import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
 import type { Notification } from "../../types/notification"
 import type { Coupon } from "../../types/coupon"
 
-interface MapLayoutProps {
+interface HomeLayoutProps {
   selectedGenres: string[]
   selectedArea: string
+  isFavoritesFilter: boolean
   activeTab: string
   currentView:
-    | "map"
+    | "home"
     | "email-confirmation"
     | "login"
     | "email-registration"
@@ -46,7 +47,6 @@ interface MapLayoutProps {
   hasNotification?: boolean
   favoriteStores: Store[]
   historyStores: Store[]
-  isFavoritesOpen: boolean
   isHistoryOpen: boolean
   notifications: Notification[]
   user?: User
@@ -80,7 +80,6 @@ interface MapLayoutProps {
   onTabChange: (tab: string) => void
   onFavoritesClick: () => void
   onHistoryClick?: () => void
-  onFavoritesClose: () => void
   onHistoryClose?: () => void
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
@@ -102,7 +101,7 @@ interface MapLayoutProps {
   onLogin: (email: string, otp: string) => void
   onSignup: () => void
   onForgotPassword: () => void
-  onBackToMap: () => void
+  onBackToHome: () => void
   onBackToLogin: () => void
   onEmailSubmit: (email: string) => void
   onEmailRegistrationBackToLogin: () => void
@@ -146,9 +145,10 @@ interface MapLayoutProps {
   isStoreDetailPopupOpen?: boolean
 }
 
-export function MapLayout({
+export function HomeLayout({
   selectedGenres,
   selectedArea,
+  isFavoritesFilter,
   activeTab,
   currentView,
   isAuthenticated,
@@ -157,7 +157,6 @@ export function MapLayout({
   hasNotification = false,
   favoriteStores,
   historyStores,
-  isFavoritesOpen,
   isHistoryOpen,
   notifications,
   user,
@@ -181,7 +180,6 @@ export function MapLayout({
   onTabChange,
   onFavoritesClick,
   onHistoryClick,
-  onFavoritesClose,
   onHistoryClose,
   onFavoriteToggle,
   onCouponsClick,
@@ -203,7 +201,7 @@ export function MapLayout({
   onLogin,
   onSignup,
   onForgotPassword,
-  onBackToMap,
+  onBackToHome,
   onBackToLogin,
   onEmailSubmit,
   onEmailRegistrationBackToLogin,
@@ -244,8 +242,8 @@ export function MapLayout({
   onStoreDetailClose,
   isStoreDetailOpen,
   isStoreDetailPopupOpen,
-}: MapLayoutProps) {
-  console.log("MapLayout render - currentView:", currentView, "selectedStore:", selectedStore?.name)
+}: HomeLayoutProps) {
+  console.log("HomeLayout render - currentView:", currentView, "selectedStore:", selectedStore?.name)
   
   if (currentView === "email-confirmation") {
     return (
@@ -319,8 +317,8 @@ export function MapLayout({
         onWithdrawCancel={onWithdrawCancel}
         onWithdrawComplete={onWithdrawComplete}
         onLogout={onLogout}
-        onBack={onBackToMap}
-        onShowStoreOnMap={onBackToMap}
+        onBack={onBackToHome}
+        onShowStoreOnHome={onBackToHome}
         onUseSameCoupon={() => {}}
         onLogoClick={onLogoClick}
         onProfileEditSubmit={onProfileEditSubmit || (() => {})}
@@ -358,7 +356,7 @@ export function MapLayout({
         onLogin={onLogin}
         onSignup={onSignup}
         onForgotPassword={onForgotPassword}
-        onBack={loginStep === "email" ? onBackToMap : onBackToEmailLogin}
+        onBack={loginStep === "email" ? onBackToHome : onBackToEmailLogin}
         onLogoClick={onLogoClick}
         isLoading={isLoading}
         loginStep={loginStep}
@@ -374,7 +372,7 @@ export function MapLayout({
         currentStep={emailRegistrationStep}
         email={emailRegistrationEmail}
         onSubmit={onEmailSubmit}
-        onBack={onBackToMap}
+        onBack={onBackToHome}
         onBackToLogin={onEmailRegistrationBackToLogin}
         onResend={onEmailRegistrationResend}
         onLogoClick={onLogoClick}
@@ -397,10 +395,11 @@ export function MapLayout({
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100 w-full">
       <FilterControls
         selectedGenres={selectedGenres}
         selectedArea={selectedArea}
+        isFavoritesFilter={isFavoritesFilter}
         notifications={notifications}
         isAuthenticated={isAuthenticated}
         onGenresChange={onGenresChange}
@@ -416,21 +415,15 @@ export function MapLayout({
         onTabChange={onTabChange}
         favoriteCount={favoriteStores.length}
       />
-      <MapContainer
-        selectedGenres={selectedGenres} 
+      <HomeContainer
+        selectedGenres={selectedGenres}
+        isFavoritesFilter={isFavoritesFilter}
         onStoreClick={onStoreClick}
         onCouponsClick={onCouponsClick}
-        isModalOpen={isCouponListOpen || isConfirmationOpen || isSuccessModalOpen || isFavoritesOpen || isHistoryOpen || isStoreDetailPopupOpen}
+        isModalOpen={isCouponListOpen || isConfirmationOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
       />
 
-      {/* ポップアップ */}
-      <FavoritesPopup
-        isOpen={isFavoritesOpen}
-        stores={favoriteStores}
-        onClose={onFavoritesClose}
-        onFavoriteToggle={onFavoriteToggle}
-        onCouponsClick={onCouponsClick}
-      />
+
       <HistoryPopup
         isOpen={isHistoryOpen}
         stores={historyStores}
