@@ -115,9 +115,10 @@ out
 .nuxt
 dist
 
+# bolt
+.bolt
 # Gatsby files
 .cache/
-public
 
 # Storybook build outputs
 .out
