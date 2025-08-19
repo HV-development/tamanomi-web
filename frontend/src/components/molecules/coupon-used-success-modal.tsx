@@ -15,17 +15,24 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
 
   useEffect(() => {
     if (isOpen) {
+      // モーダルが開かれた時にアニメーション段階をリセット
       setAnimationPhase("filling")
 
       // アニメーションの段階的実行（2秒で注ぎ終わる）
-      const timer = setTimeout(() => setAnimationPhase("complete"), 2000)
+      const timer = setTimeout(() => {
+        setAnimationPhase("complete")
+      }, 2000)
 
       return () => {
         clearTimeout(timer)
       }
+    } else {
+      // モーダルが閉じられた時にアニメーション段階をリセット
+      setAnimationPhase("filling")
     }
   }, [isOpen])
 
+  // モーダルが閉じられている場合は何も表示しない
   if (!isOpen || !coupon) return null
 
   return (
@@ -85,8 +92,6 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
                   <div className="absolute top-3 left-3 w-1.5 h-10 bg-white/40 rounded-full"></div>
                   <div className="absolute top-5 right-6 w-1 h-6 bg-white/30 rounded-full"></div>
                 </div>
-
-
               </div>
             </div>
 

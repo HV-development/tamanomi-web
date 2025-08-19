@@ -252,18 +252,20 @@ export function MyPageContainer({
 
           <div className="space-y-2">
             {/* 現在のメンバーランク */}
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-12">
               <div className="text-center">
-                <div className="text-base text-gray-600 font-medium">現在のメンバーランク</div>
+                <div className="text-base text-left text-gray-600 font-medium">現在のメンバーランク</div>
                 <div className={`text-base font-bold ${currentRankInfo.color}`}>{currentRankInfo.label}</div>
               </div>
-              <RankBadge rank={currentRank} size="md" showLabel={false} />
+              <div>
+                <RankBadge rank={currentRank} size="lg" showLabel={false} />
+              </div>
             </div>
 
             {/* 次のランク情報 */}
             {nextRank && monthsToNext !== null ? (
               <div className="space-y-2">
-                <div className="bg-green-600 text-white text-center py-1.5 px-4 rounded-full text-sm font-medium">
+                <div className="bg-green-600 text-white text-center py-1 px-4 rounded-full text-xs font-medium">
                   次のランクアップまで
                 </div>
                 <div className="text-center">
@@ -272,7 +274,9 @@ export function MyPageContainer({
                       <div className="text-base">あと{monthsToNext}ヶ月で</div>
                       <div className={`text-base font-bold ${nextRank.color}`}>{nextRank.label}にランクアップ！</div>
                     </div>
-                    <RankBadge rank={nextRank.rank} size="sm" showLabel={false} />
+                    <div>
+                      <RankBadge rank={nextRank.rank} size="lg" showLabel={false} />
+                    </div>
                   </div>
                 </div>
               </div>

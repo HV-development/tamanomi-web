@@ -530,11 +530,10 @@ export default function HomePage() {
   const handleSuccessModalClose = () => {
     console.log("成功モーダルを閉じる")
     setIsSuccessModalOpen(false)
-    // 成功モーダルを閉じる時に全ての状態をクリア
+    // 成功モーダルを閉じる時に必要な状態のみクリア
     setSelectedCoupon(null)
     setSelectedStore(null)
-    setCurrentView("home")
-    setActiveTab("home")
+    // 不要な状態変更を削除してモーダルの重複表示を防ぐ
   }
 
   const handleCancelCoupon = () => {
@@ -701,7 +700,8 @@ export default function HomePage() {
       signupData={signupData}
       hasNotification={hasNotification}
       favoriteStores={favoriteStores}
-
+      historyStores={historyStores}
+      isHistoryOpen={isHistoryOpen}
       notifications={notifications}
       user={user}
       plan={plan}
@@ -720,7 +720,6 @@ export default function HomePage() {
       onFavoritesClick={handleFavoritesClick}
       onHistoryClick={handleHistoryClick}
 
-      onHistoryClose={handleHistoryClose}
       onHistoryClose={handleHistoryClose}
       onFavoriteToggle={handleFavoriteToggle}
       onCouponsClick={handleCouponsClick}
@@ -763,8 +762,7 @@ export default function HomePage() {
       onNotificationItemClick={handleNotificationItemClick}
       onMarkAllNotificationsRead={handleMarkAllNotificationsRead}
       onMenuItemClick={handleMenuItemClick}
-              onShowStoreOnHome={handleShowStoreOnHome}
-      onUseSameCoupon={handleUseSameCoupon}
+
       onLogoClick={handleLogoClick}
       loginStep={loginStep}
       loginEmail={loginEmail}
@@ -783,10 +781,8 @@ export default function HomePage() {
       onProfileEditSubmit={handleProfileEditSubmit}
       onEmailChangeSubmit={handleEmailChangeSubmit}
       onPasswordChangeSubmit={handlePasswordChangeSubmit}
-      onPasswordChangeBackToLogin={handlePasswordChangeBackToLogin}
       onEmailChangeResend={handleEmailChangeResend}
       emailChangeStep={emailChangeStep}
-      onBackToLogin={handlePasswordChangeBackToLogin}
       isSuccessModalOpen={isSuccessModalOpen}
       onSuccessModalClose={handleSuccessModalClose}
       passwordChangeStep={passwordChangeStep}
