@@ -18,7 +18,6 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       bgColor: "bg-amber-100",
       borderColor: "border-amber-300",
       image: "/bronze.png",
-      fallbackEmoji: "🥉",
     },
     silver: {
       label: "シルバー",
@@ -26,7 +25,6 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       bgColor: "bg-gray-100",
       borderColor: "border-gray-300",
       image: "/silver.png",
-      fallbackEmoji: "🥈",
     },
     gold: {
       label: "ゴールド",
@@ -34,15 +32,13 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       bgColor: "bg-yellow-100",
       borderColor: "border-yellow-300",
       image: "/gold.png",
-      fallbackEmoji: "🥇",
     },
     diamond: {
       label: "ダイヤモンド",
       color: "text-blue-700",
       bgColor: "bg-blue-100",
       borderColor: "border-blue-300",
-      image: "",
-      fallbackEmoji: "💎",
+      image: "/diamond.png",
     },
   }
 
@@ -79,10 +75,10 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
 
   return (
     <div
-      className={`inline-flex items-center gap-2 ${sizeClass.container} ${className}`}
+        className={`inline-flex items-center justify-start gap-2 text-left ${sizeClass.container} ${className}`}
     >
       {/* ランク画像または絵文字アイコン表示 */}
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center flex-shrink-0">
         {config.image && rank !== "diamond" ? (
           <img
             src={config.image}
@@ -93,14 +89,20 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
               height: sizeClass.imageHeight,
               minWidth: sizeClass.imageWidth,
               minHeight: sizeClass.imageHeight,
+              maxWidth: sizeClass.imageWidth,
+              maxHeight: sizeClass.imageHeight,
             }}
           />
         ) : (
-          <span className={`${sizeClass.emoji}`}>{config.fallbackEmoji}</span>
+          <span className={`${sizeClass.emoji} flex-shrink-0`}>🥉</span>
         )}
       </div>
 
-      {showLabel && <span className={`font-bold ${config.color} ${sizeClass.text}`}>{config.label}</span>}
+      {showLabel && (
+        <span className={`font-bold ${config.color} ${sizeClass.text} flex-shrink-0 text-left`}>
+          {config.label}
+        </span>
+      )}
     </div>
   )
 }
