@@ -125,11 +125,6 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
     onVerifyOtp(otpArray.join(""))
   }
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    handleSubmit()
-  }
-
   const handleClear = () => {
     setOtp(["", "", "", "", "", ""])
     setError("")
@@ -137,7 +132,7 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
   }
 
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-6">
+    <div className="space-y-6">
       <div className="text-center mb-6">
         <h3 className="text-lg font-bold text-gray-900 mb-3">ワンタイムパスワード入力</h3>
         <div className="text-gray-600 space-y-2">
@@ -158,7 +153,9 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
           {otp.map((digit, index) => (
             <input
               key={index}
-              ref={(el) => (inputRefs.current[index] = el)}
+              ref={(el) => {
+                inputRefs.current[index] = el
+              }}
               type="text"
               value={digit}
               onChange={(e) => handleInputChange(index, e.target.value)}
@@ -204,15 +201,6 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
 
       <div className="space-y-3">
         <Button
-          type="submit"
-          disabled={isLoading || otp.some(digit => digit === "")}
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base font-medium disabled:bg-gray-300"
-        >
-          {isLoading ? "認証中..." : "ログイン"}
-        </Button>
-
-        <Button
-          type="button"
           onClick={onResendOtp}
           variant="secondary"
           className="w-full py-3 text-base font-medium"
@@ -221,7 +209,6 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
         </Button>
 
         <Button
-          type="button"
           onClick={onBack}
           variant="secondary"
           className="w-full py-3 text-base font-medium"
@@ -229,6 +216,6 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
           メールアドレス入力に戻る
         </Button>
       </div>
-    </form>
+    </div>
   )
 }
