@@ -17,6 +17,7 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       color: "text-amber-700",
       bgColor: "bg-amber-100",
       borderColor: "border-amber-300",
+      image: "/bronze.png",
       fallbackEmoji: "🥉",
     },
     silver: {
@@ -24,6 +25,7 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       color: "text-gray-700",
       bgColor: "bg-gray-100",
       borderColor: "border-gray-300",
+      image: "/silver.png",
       fallbackEmoji: "🥈",
     },
     gold: {
@@ -31,6 +33,7 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       color: "text-yellow-700",
       bgColor: "bg-yellow-100",
       borderColor: "border-yellow-300",
+      image: "/gold.png",
       fallbackEmoji: "🥇",
     },
     diamond: {
@@ -38,6 +41,7 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       color: "text-blue-700",
       bgColor: "bg-blue-100",
       borderColor: "border-blue-300",
+      image: "",
       fallbackEmoji: "💎",
     },
   }
@@ -49,16 +53,25 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       container: "px-2 py-1",
       text: "text-xs",
       emoji: "text-lg",
+      imageSize: "w-4 h-4",
+      imageWidth: "16px",
+      imageHeight: "16px",
     },
     md: {
       container: "px-3 py-1.5",
       text: "text-sm",
       emoji: "text-2xl",
+      imageSize: "w-6 h-6",
+      imageWidth: "24px",
+      imageHeight: "24px",
     },
     lg: {
       container: "px-4 py-2",
       text: "text-base",
       emoji: "text-3xl",
+      imageSize: "w-12 h-12",
+      imageWidth: "48px",
+      imageHeight: "48px",
     },
   }
 
@@ -68,9 +81,23 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
     <div
       className={`inline-flex items-center gap-2 ${sizeClass.container} ${className}`}
     >
-      {/* 絵文字アイコン表示 */}
+      {/* ランク画像または絵文字アイコン表示 */}
       <div className="flex items-center justify-center">
-        <span className={`${sizeClass.emoji}`}>{config.fallbackEmoji}</span>
+        {config.image && rank !== "diamond" ? (
+          <img
+            src={config.image}
+            alt={`${config.label}ランク`}
+            className={`${sizeClass.imageSize} object-contain`}
+            style={{
+              width: sizeClass.imageWidth,
+              height: sizeClass.imageHeight,
+              minWidth: sizeClass.imageWidth,
+              minHeight: sizeClass.imageHeight,
+            }}
+          />
+        ) : (
+          <span className={`${sizeClass.emoji}`}>{config.fallbackEmoji}</span>
+        )}
       </div>
 
       {showLabel && <span className={`font-bold ${config.color} ${sizeClass.text}`}>{config.label}</span>}

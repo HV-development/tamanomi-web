@@ -11,21 +11,17 @@ interface CouponUsedSuccessModalProps {
 }
 
 export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSuccessModalProps) {
-  const [animationPhase, setAnimationPhase] = useState<"filling" | "drinking" | "empty" | "complete">("filling")
+  const [animationPhase, setAnimationPhase] = useState<"filling" | "complete">("filling")
 
   useEffect(() => {
     if (isOpen) {
       setAnimationPhase("filling")
 
-      // アニメーションの段階的実行
-      const timer1 = setTimeout(() => setAnimationPhase("drinking"), 500)
-      const timer2 = setTimeout(() => setAnimationPhase("empty"), 2500)
-      const timer3 = setTimeout(() => setAnimationPhase("complete"), 3500)
+      // アニメーションの段階的実行（2秒で注ぎ終わる）
+      const timer = setTimeout(() => setAnimationPhase("complete"), 2000)
 
       return () => {
-        clearTimeout(timer1)
-        clearTimeout(timer2)
-        clearTimeout(timer3)
+        clearTimeout(timer)
       }
     }
   }, [isOpen])
@@ -43,20 +39,9 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
           {/* ヘッダー */}
           <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-green-600/20"></div>
-            <div className="absolute top-2 right-2 animate-spin">
-              <Sparkles className="w-6 h-6 text-yellow-300" />
-            </div>
             <div className="relative">
-              <div className="flex items-center justify-center mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-white/20 rounded-full animate-bounce">
-                    <CheckCircle className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold">クーポン使用完了！</h3>
-                </div>
-              </div>
               <div className="text-center">
-                <div className="text-white/90 text-sm font-medium">お疲れさまでした！</div>
+                <h3 className="text-2xl font-bold">使用完了</h3>
               </div>
             </div>
           </div>
@@ -66,57 +51,49 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
             {/* ドリンクアニメーション */}
             <div className="mb-6 flex justify-center">
               <div className="relative">
-                {/* グラス */}
-                <div className="w-24 h-32 relative">
-                  {/* グラスの外枠 */}
-                  <div className="absolute inset-0 border-4 border-gray-300 rounded-b-3xl bg-transparent"></div>
-
-                  {/* ドリンク */}
+                {/* ビールジョッキ */}
+                <div className="w-36 h-48 relative">
+                  {/* ジョッキの外枠 */}
+                  <div className="absolute inset-0 border-4 border-amber-800 rounded-b-3xl bg-transparent"></div>
+                  
+                  {/* ジョッキの取っ手 */}
+                  <div className="absolute right-0 top-6 w-5 h-12 border-4 border-amber-800 rounded-l-full bg-transparent"></div>
+                  
+                  {/* ビールの液体 */}
                   <div
-                    className={`absolute bottom-1 left-1 right-1 bg-gradient-to-t from-amber-400 to-amber-200 rounded-b-3xl transition-all duration-2000 ease-in-out ${
+                    className={`absolute bottom-2 left-2 right-2 bg-gradient-to-t from-amber-600 via-amber-500 to-amber-400 rounded-b-3xl transition-all duration-2000 ease-out ${
                       animationPhase === "filling"
-                        ? "h-28"
-                        : animationPhase === "drinking"
-                          ? "h-14"
-                          : animationPhase === "empty"
-                            ? "h-0"
-                            : "h-0"
+                        ? "h-0"
+                        : "h-40"
                     }`}
+                    style={{
+                      transition: 'height 2s cubic-bezier(0.4, 0.0, 0.2, 1)'
+                    }}
                   ></div>
-
+                  
                   {/* 泡エフェクト */}
                   {animationPhase === "filling" && (
-                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
-                      <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+                    <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
+                      <div className="w-2.5 h-2.5 bg-white/80 rounded-full animate-ping"></div>
+                      <div className="absolute top-1 left-1.5 w-1.5 h-1.5 bg-white/70 rounded-full animate-ping" style={{ animationDelay: '0.3s' }}></div>
+                      <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-white/90 rounded-full animate-ping" style={{ animationDelay: '0.6s' }}></div>
+                      <div className="absolute top-0 left-1/2 w-1 h-1 bg-white/60 rounded-full animate-ping" style={{ animationDelay: '0.9s' }}></div>
                     </div>
                   )}
-
-                  {/* グラスのハイライト */}
-                  <div className="absolute top-2 left-2 w-1 h-8 bg-white/30 rounded-full"></div>
+                  
+                  {/* ジョッキのハイライト */}
+                  <div className="absolute top-3 left-3 w-1.5 h-10 bg-white/40 rounded-full"></div>
+                  <div className="absolute top-5 right-6 w-1 h-6 bg-white/30 rounded-full"></div>
                 </div>
 
-                {/* 飲んでいるエフェクト */}
-                {animationPhase === "drinking" && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="text-2xl animate-bounce">🍻</div>
-                  </div>
-                )}
 
-                {/* 完了エフェクト */}
-                {animationPhase === "complete" && (
-                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                    <div className="text-3xl animate-pulse">✨</div>
-                  </div>
-                )}
               </div>
             </div>
 
             {/* メッセージ */}
             <div className="mb-6">
               <h4 className="text-xl font-bold text-green-900 mb-2">
-                {animationPhase === "filling" && "ドリンクを準備中..."}
-                {animationPhase === "drinking" && "美味しくいただいています！"}
-                {animationPhase === "empty" && "ごちそうさまでした！"}
+                {animationPhase === "filling" && "ドリンクの到着をお待ちください。"}
                 {animationPhase === "complete" && "クーポンを使用しました！"}
               </h4>
 
@@ -126,9 +103,7 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
                   <p className="text-sm text-gray-600">{coupon.storeName}</p>
                   <div className="mt-4 p-3 bg-green-50 rounded-xl border border-green-200">
                     <p className="text-sm text-green-800 font-medium">
-                      🎉 ありがとうございました！
-                      <br />
-                      またのご利用をお待ちしております
+                      ドリンクの到着をお待ちください
                     </p>
                   </div>
                 </div>
@@ -139,15 +114,14 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
             <div className="mb-6">
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className={`bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-1000 ${
+                  className={`bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-2000 ease-out ${
                     animationPhase === "filling"
-                      ? "w-1/4"
-                      : animationPhase === "drinking"
-                        ? "w-2/3"
-                        : animationPhase === "empty"
-                          ? "w-5/6"
-                          : "w-full"
+                      ? "w-0"
+                      : "w-full"
                   }`}
+                  style={{
+                    transition: 'width 2s cubic-bezier(0.4, 0.0, 0.2, 1)'
+                  }}
                 ></div>
               </div>
             </div>

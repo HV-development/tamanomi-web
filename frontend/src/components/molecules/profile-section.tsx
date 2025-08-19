@@ -67,12 +67,12 @@ export function ProfileSection({ user, onEdit, className = "" }: ProfileSectionP
           {/* 次のランク情報 */}
           {nextRank && monthsToNext !== null && (
             <div className="mb-4 p-3 bg-white/70 rounded-lg border border-purple-100">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-600">次のランクまで</span>
-                <RankBadge rank={nextRank.rank} size="sm" />
-              </div>
-              <div className="text-xs text-purple-700 font-medium">
-                あと{monthsToNext}ヶ月で{nextRank.label}にランクアップ！
+              <div className="text-center mb-2">
+                <div className="text-xs text-gray-600 mb-2">あと{monthsToNext}ヶ月で</div>
+                <div className="flex items-center justify-center gap-2">
+                  <RankBadge rank={nextRank.rank} size="lg" showLabel={false} />
+                  <span className="text-xs text-purple-700 font-medium">{nextRank.label}にランクアップ！</span>
+                </div>
               </div>
             </div>
           )}

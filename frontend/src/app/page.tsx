@@ -693,6 +693,7 @@ export default function HomePage() {
       selectedGenres={selectedGenres}
       selectedArea={selectedArea}
       isFavoritesFilter={isFavoritesFilter}
+      stores={filteredStores}
       activeTab={activeTab}
       currentView={currentView}
       isAuthenticated={isAuthenticated}

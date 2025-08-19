@@ -39,8 +39,7 @@ const nextConfig = {
       },
     ]
   },
-  // srcディレクトリの設定
-  outputFileTracingRoot: undefined,
+
 }
 
 export default nextConfig

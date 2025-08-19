@@ -257,7 +257,7 @@ export function MyPageContainer({
                 <div className="text-base text-gray-600 font-medium">現在のメンバーランク</div>
                 <div className={`text-base font-bold ${currentRankInfo.color}`}>{currentRankInfo.label}</div>
               </div>
-             <RankBadge rank={currentRank} size="md" showLabel={false} />
+              <RankBadge rank={currentRank} size="md" showLabel={false} />
             </div>
 
             {/* 次のランク情報 */}

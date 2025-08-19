@@ -29,6 +29,7 @@ interface HomeLayoutProps {
   selectedGenres: string[]
   selectedArea: string
   isFavoritesFilter: boolean
+  stores: Store[]
   activeTab: string
   currentView:
     | "home"
@@ -149,6 +150,7 @@ export function HomeLayout({
   selectedGenres,
   selectedArea,
   isFavoritesFilter,
+  stores,
   activeTab,
   currentView,
   isAuthenticated,
@@ -418,7 +420,9 @@ export function HomeLayout({
       <HomeContainer
         selectedGenres={selectedGenres}
         isFavoritesFilter={isFavoritesFilter}
+        stores={stores}
         onStoreClick={onStoreClick}
+        onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
         isModalOpen={isCouponListOpen || isConfirmationOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
       />
