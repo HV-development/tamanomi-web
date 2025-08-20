@@ -283,19 +283,14 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
         {errors.postalCode && <p className="mt-1 text-sm text-red-500">{errors.postalCode}</p>}
       </div>
 
-      {/* 検索結果の住所表示 */}
+      {/* 住所表示（表示のみ） */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           住所
         </label>
-        <input
-          ref={addressInputRef}
-          type="text"
-          placeholder="住所を入力するか、上記の住所検索ボタンをご利用ください"
-          value={formData.address}
-          onChange={(e) => updateFormData("address", e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
-        />
+        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 min-h-[48px] flex items-center">
+          {formData.address || "住所検索ボタンで住所を取得してください"}
+        </div>
         {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
       </div>
 
