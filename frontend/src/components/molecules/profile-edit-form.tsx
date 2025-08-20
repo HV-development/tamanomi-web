@@ -239,7 +239,8 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
 
   const updateFormData = (field: keyof ProfileEditFormData, value: string) => {
     setFormData({ ...formData, [field]: value })
-    if (errors[field]) {
+    // 住所フィールドは編集不可なので、住所以外のフィールドのエラーをクリア
+    if (field !== 'address' && errors[field]) {
       setErrors({ ...errors, [field]: undefined })
     }
   }
