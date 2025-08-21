@@ -126,7 +126,7 @@ export function FilterControls({
           
           {/* メンバーランク画像（ログイン時のみ） */}
           {isAuthenticated && userRank && (
-            <div className="flex-shrink-0 w-8 h-8 bg-green-50 rounded-full flex items-center justify-center border-2 border-green-200">
+            <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center border-2 border-green-600">
               <img
                 src={`/${userRank}.png`}
                 alt={`${userRank}ランク`}
