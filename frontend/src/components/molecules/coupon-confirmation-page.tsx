@@ -26,7 +26,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
           <div className="bg-green-600 p-3 text-white">
             <div className="flex items-center justify-center">
               <div className="flex items-center gap-0.5 w-fit">
-                <div className="w-3 h-3 text-white flex-shrink-0 flex items-center justify-center">
+                <div className="w-2 h-2 text-white flex-shrink-0 flex items-center justify-center">
                   🍷
                 </div>
                 <div className="flex flex-col w-fit">
