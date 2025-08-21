@@ -112,7 +112,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       </div>
 
       {/* 店舗写真3枚横並び */}
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-3 gap-1 relative">
         <div className="aspect-square overflow-hidden">
           <img
             src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg"}
@@ -133,6 +133,22 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             alt={`${store.name} 料理`}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
+        </div>
+        
+        {/* 営業時間・定休日オーバーレイ */}
+        <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">
+          <div className="text-white text-center px-2">
+            {store.businessHours && (
+              <div className="text-xs font-medium mb-1">
+                営業: {store.businessHours}
+              </div>
+            )}
+            {store.closedDays && (
+              <div className="text-xs font-medium">
+                定休: {store.closedDays}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
