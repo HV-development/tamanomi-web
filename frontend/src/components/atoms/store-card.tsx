@@ -112,12 +112,12 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
 
         {/* 営業時間・定休日情報 */}
         {store.businessHours && (
-          <div className="text-xs font-medium text-gray-700 mt-3">
+          <div className="text-sm font-medium text-gray-700 mt-3">
             営業時間: {store.businessHours}
           </div>
         )}
         {store.closedDays && (
-          <div className="text-xs font-medium text-gray-700 mt-1">
+          <div className="text-sm font-medium text-gray-700 mt-1">
             定休日: {store.closedDays}
           </div>
         )}
