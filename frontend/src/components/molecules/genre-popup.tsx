@@ -2,6 +2,7 @@
 
 import { GenreButton } from "../atoms/genre-button"
 import { Button } from "../atoms/button"
+import { getGenreColor } from "../../utils/genre-colors"
 
 interface GenrePopupProps {
   isOpen: boolean
@@ -63,15 +64,30 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
 
           <div className="grid grid-cols-2 gap-3 mb-6 max-h-80 overflow-y-auto">
             {GENRES.map((genre) => (
-              <GenreButton
-                key={genre.value}
-                label={genre.label}
-                genre={genre.value}
-                isSelected={selectedGenres.includes(genre.value)}
-                onClick={() => onGenreToggle(genre.value)}
-                className="text-sm py-4 px-3 min-h-[48px] flex items-center justify-center w-full font-medium"
-              />
-            ))}
+              const genreColors = getGenreColor(genre.value)
+              const isSelected = selectedGenres.includes(genre.value)
+              
+              return (
+                <button
+                  key={genre.value}
+                  onClick={() => onGenreToggle(genre.value)}
+                  className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-4 px-3 min-h-[48px] flex items-center justify-center font-medium ${
+                    isSelected
+                      ? `${genreColors.border} ${genreColors.bg} ${genreColors.text} shadow-md`
+                      : `border-gray-300 bg-white text-gray-700 hover:border-gray-400 ${genreColors.hover}`
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="absolute -top-1 -right-1">
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center ${genreColors.text.replace('text-', 'bg-')}`}>
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    </div>
+                  )}
+                  <span className="block">{genre.label}</span>
+                </button>
+              )
+            })}
           </div>
 
           <div className="flex gap-3">
