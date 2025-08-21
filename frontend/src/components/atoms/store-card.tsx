@@ -111,20 +111,14 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
         </div>
 
         {/* 営業時間・定休日情報 */}
-        {(store.businessHours || store.closedDays) && (
-          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 mt-3">
-            <div className="space-y-1">
-              {store.businessHours && (
-                <div className="text-xs font-medium text-gray-700">
-                  営業時間: {store.businessHours}
-                </div>
-              )}
-              {store.closedDays && (
-                <div className="text-xs font-medium text-gray-700">
-                  定休日: {store.closedDays}
-                </div>
-              )}
-            </div>
+        {store.businessHours && (
+          <div className="text-xs font-medium text-gray-700 mt-3">
+            営業時間: {store.businessHours}
+          </div>
+        )}
+        {store.closedDays && (
+          <div className="text-xs font-medium text-gray-700 mt-1">
+            定休日: {store.closedDays}
           </div>
         )}
       </div>
