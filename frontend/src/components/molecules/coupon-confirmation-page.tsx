@@ -23,8 +23,18 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
         {/* メインカード */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-300 overflow-hidden">
           {/* ヘッダー */}
-          <div className="bg-green-600 p-4 text-white text-center">
-            <h3 className="text-lg font-bold">クーポン使用確認</h3>
+          <div className="bg-green-600 p-3 text-white">
+            <div className="flex items-center justify-center">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 text-white">
+                  🍷
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-white text-sm leading-tight">TAMAYOI</span>
+                  <span className="text-xs text-green-100 font-medium -mt-1">たまよい</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* クーポン内容 */}
