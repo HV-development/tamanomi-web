@@ -3,6 +3,7 @@
 import { MapPin, Phone, Globe, Ticket, Info } from "lucide-react"
 import { FavoriteButton } from "./favorite-button"
 import type { Store } from "../../types/store"
+import { getGenreColor } from "../../utils/genre-colors"
 
 interface StoreCardProps {
   store: Store
@@ -86,7 +87,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
         {/* ジャンルバッジと連絡先アイコン */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="inline-block bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-medium">
+            <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
             <span className="text-green-600 font-medium text-sm">350m</span>
