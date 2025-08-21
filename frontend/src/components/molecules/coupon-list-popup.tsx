@@ -60,35 +60,33 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
                 {coupons.map((coupon) => (
                   <div
                     key={coupon.id}
-                    className="bg-white rounded-2xl border-2 border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
+                    className="bg-white rounded-2xl border-2 border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                   >
-                    <div className="flex gap-4">
-                      {/* クーポン画像 */}
-                      <div className="flex-shrink-0 flex items-center">
-                        <img
-                          src={coupon.imageUrl || "/placeholder.svg"}
-                          alt={coupon.name}
-                          className="w-24 h-24 object-cover rounded-xl border-2 border-gray-200 shadow-sm"
-                        />
-                      </div>
+                    {/* クーポン画像 */}
+                    <div className="w-full h-48 overflow-hidden">
+                      <img
+                        src={coupon.imageUrl || "/placeholder.svg"}
+                        alt={coupon.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    
+                    {/* クーポン情報 */}
+                    <div className="p-4">
+                      <h4 className="font-bold text-lg text-gray-900 mb-2 text-center">
+                        {coupon.name}
+                      </h4>
+                      <p className="text-sm text-gray-600 leading-relaxed mb-4 text-center">
+                        {coupon.description}
+                      </p>
                       
-                      {/* クーポン情報 */}
-                      <div className="flex-1 flex flex-col min-w-0">
-                        <h4 className="font-bold text-lg text-gray-900 mb-2 leading-tight">
-                          {coupon.name}
-                        </h4>
-                        <p className="text-sm text-gray-600 leading-relaxed mb-3 flex-1 line-clamp-3">
-                          {coupon.description}
-                        </p>
-                        
-                        {/* 利用ボタン */}
-                        <button
-                          onClick={() => onUseCoupon(coupon.id)}
-                          className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 rounded-xl font-bold text-sm transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
-                        >
-                          利用する
-                        </button>
-                      </div>
+                      {/* 利用ボタン */}
+                      <button
+                        onClick={() => onUseCoupon(coupon.id)}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                      >
+                        利用する
+                      </button>
                     </div>
                   </div>
                 ))}
