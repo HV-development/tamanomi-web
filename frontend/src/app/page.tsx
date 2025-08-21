@@ -18,7 +18,7 @@ export default function HomePage() {
   const [isFavoritesFilter, setIsFavoritesFilter] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
   const [currentView, setCurrentView] = useState<
-    "home" | "login" | "email-registration" | "signup" | "confirmation" | "subscription" | "mypage" | "password-reset" | "email-confirmation"
+    "home" | "login" | "email-registration" | "signup" | "confirmation" | "subscription" | "mypage" | "password-reset" | "email-confirmation" | "coupon-confirmation"
   >("home")
   const [loginStep, setLoginStep] = useState<"email" | "otp">("email")
   const [loginEmail, setLoginEmail] = useState("")
@@ -528,7 +528,8 @@ export default function HomePage() {
     const coupon = storeCoupons.find((c) => c.id === couponId)
     if (coupon) {
       setSelectedCoupon(coupon)
-      setIsConfirmationOpen(true)
+      setCurrentView("coupon-confirmation")
+      setIsCouponListOpen(false)
     }
   }
 
@@ -536,10 +537,8 @@ export default function HomePage() {
     console.log("クーポン使用確定:", selectedCoupon?.id)
     // 大きい成功モーダルを表示（selectedCouponとselectedStoreをクリアする前に）
     setIsSuccessModalOpen(true)
-    // 確認ポップアップを閉じる
-    setIsConfirmationOpen(false)
-    // クーポン一覧は閉じるが、selectedStoreとselectedCouponは成功モーダルで使用するため保持
-    setIsCouponListOpen(false)
+    // 確認ページを閉じてホームに戻る
+    setCurrentView("home")
   }
 
   const handleSuccessModalClose = () => {
@@ -561,46 +560,10 @@ export default function HomePage() {
   }
 
   const handleCancelCoupon = () => {
-    console.log("🔍 handleCancelCoupon function START")
-    console.log("handleCancelCoupon called - closing confirmation modal and returning to store detail")
-    console.log("Current state before cancel:", {
-      isConfirmationOpen,
-      isCouponListOpen,
-      isStoreDetailOpen,
-      selectedStore: selectedStore?.name
-    })
-    
-    // 重複実行を防ぐ
-    if (!isConfirmationOpen) {
-      console.log("Confirmation modal already closed, skipping")
-      return
-    }
-    
-    console.log("🔍 About to execute state changes...")
-    console.log("Step 1: Setting isConfirmationOpen to false...")
-    // キャンセル時は確認モーダルだけを閉じる
-    setIsConfirmationOpen(false)
-    console.log("🔍 setIsConfirmationOpen(false) executed")
-    
-    console.log("Step 2: Setting selectedCoupon to null...")
+    console.log("クーポン確認をキャンセル - クーポン一覧に戻る")
+    setCurrentView("home")
+    setIsCouponListOpen(true)
     setSelectedCoupon(null)
-    console.log("🔍 setSelectedCoupon(null) executed")
-    
-    // 状態変更後の確認（非同期で実行）
-    setTimeout(() => {
-      console.log("🔍 setTimeout callback executing...")
-      console.log("State after cancel:", {
-        isConfirmationOpen: false, // 期待値
-        isCouponListOpen,
-        isStoreDetailOpen,
-        selectedStore: selectedStore?.name,
-        selectedCoupon: null
-      })
-      console.log("✅ キャンセル完了: 確認モーダルのみ閉じました")
-    }, 100)
-    
-    console.log("🔍 handleCancelCoupon function END")
-    console.log("✅ キャンセル完了: 確認モーダルのみ閉じました")
   }
 
   const handleStoreClick = (store: Store) => {
@@ -793,7 +756,6 @@ export default function HomePage() {
       onResendOtp={handleResendOtp}
       onBackToEmailLogin={handleBackToEmailLogin}
       isCouponListOpen={isCouponListOpen}
-      isConfirmationOpen={isConfirmationOpen}
       selectedStore={selectedStore}
       selectedCoupon={selectedCoupon}
       storeCoupons={selectedStore ? mockCoupons[selectedStore.id] || [] : []}

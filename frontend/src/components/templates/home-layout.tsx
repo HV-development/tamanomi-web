@@ -21,6 +21,7 @@ import { CouponUsedSuccessModal } from "../molecules/coupon-used-success-modal"
 import { LoginRequiredModal } from "../molecules/login-required-modal"
 import { StoreDetailPopup } from "../molecules/store-detail-popup"
 import { EmailConfirmationLayout } from "./email-confirmation-layout"
+import { CouponConfirmationPage } from "../molecules/coupon-confirmation-page"
 import type { Store } from "../../types/store"
 import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
 import type { Notification } from "../../types/notification"
@@ -43,6 +44,7 @@ interface HomeLayoutProps {
     | "mypage"
     | "password-reset"
     | "store-detail"
+    | "coupon-confirmation"
   isAuthenticated: boolean
   isLoading?: boolean
   signupData?: any
@@ -67,7 +69,6 @@ interface HomeLayoutProps {
     | "withdrawal"
     | "withdrawal-complete"
   isCouponListOpen: boolean
-  isConfirmationOpen: boolean
   selectedStore: Store | null
   selectedCoupon: Coupon | null
   storeCoupons: Coupon[]
@@ -172,7 +173,6 @@ export function HomeLayout({
   paymentHistory = [],
   myPageView = "main",
   isCouponListOpen,
-  isConfirmationOpen,
   selectedStore,
   selectedCoupon,
   storeCoupons,
@@ -256,6 +256,17 @@ export function HomeLayout({
 }: HomeLayoutProps) {
   console.log("HomeLayout render - currentView:", currentView, "selectedStore:", selectedStore?.name)
   
+  if (currentView === "coupon-confirmation") {
+    return (
+      <CouponConfirmationPage
+        coupon={selectedCoupon}
+        onConfirm={onConfirmCoupon}
+        onCancel={onCancelCoupon}
+        onLogoClick={onLogoClick}
+      />
+    )
+  }
+
   if (currentView === "email-confirmation") {
     return (
       <EmailConfirmationLayout
@@ -433,7 +444,7 @@ export function HomeLayout({
         onStoreClick={onStoreClick}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
-        isModalOpen={isCouponListOpen || isConfirmationOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
+        isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
       />
 
 
@@ -453,21 +464,6 @@ export function HomeLayout({
         onClose={onCouponListClose}
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
-      />
-      {console.log("CouponConfirmationPopup render check:", {
-        isConfirmationOpen,
-        selectedCoupon: selectedCoupon?.name,
-        timestamp: new Date().toISOString()
-      })}
-      <CouponConfirmationPopup
-        isOpen={isConfirmationOpen}
-        coupon={selectedCoupon}
-        onConfirm={onConfirmCoupon}
-        onCancel={() => {
-          console.log("Cancel coupon called - closing confirmation and returning to store detail")
-          console.log("CouponConfirmationPopup onCancel triggered")
-          onCancelCoupon()
-        }}
       />
       
       {/* クーポン使用成功モーダル */}
