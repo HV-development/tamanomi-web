@@ -15,10 +15,10 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
   if (!coupon) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-8">
+        <div className="w-full max-w-md mx-auto">
           {/* 店員への指示 */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-2">店員の方に画面をお見せください</h2>
           </div>
 
@@ -30,9 +30,9 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
             </div>
 
             {/* クーポン情報 */}
-            <div className="p-6">
+            <div className="p-8">
               {/* クーポン画像とテキスト */}
-              <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden mb-6">
+              <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden mb-8">
                 {/* クーポン画像 */}
                 <div className="w-full h-48 overflow-hidden">
                   <img
@@ -43,18 +43,18 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
                 </div>
                 
                 {/* クーポン情報 */}
-                <div className="p-4 text-center">
+                <div className="p-6 text-center">
                   <h4 className="font-bold text-xl text-gray-900 mb-2">
                     {coupon.name}
                   </h4>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm text-gray-600 leading-relaxed mb-2">
                     {coupon.description}
                   </p>
                 </div>
               </div>
 
               {/* リンクセクション */}
-              <div className="space-y-3 mb-6">
+              <div className="space-y-4 mb-8">
                 <button className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors">
                   使用方法についてはこちら
                 </button>
@@ -64,7 +64,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
               </div>
 
               {/* ボタン */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <button
                   onClick={onConfirm}
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
