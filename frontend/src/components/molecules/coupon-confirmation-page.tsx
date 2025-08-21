@@ -25,13 +25,13 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
           {/* ヘッダー */}
           <div className="bg-green-600 p-3 text-white">
             <div className="flex items-center justify-center">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 text-white">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 text-white flex-shrink-0 flex items-center justify-center">
                   🍷
                 </div>
                 <div className="flex flex-col">
                   <span className="font-bold text-white text-xs leading-tight">TAMAYOI</span>
-                  <span className="text-[10px] text-green-100 font-medium -mt-1">たまよい</span>
+                  <span className="text-[10px] text-green-100 font-medium -mt-0.5">たまよい</span>
                 </div>
               </div>
             </div>
