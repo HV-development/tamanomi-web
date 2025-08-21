@@ -121,7 +121,7 @@ export function FilterControls({
       {/* ヘッダー */}
       <div className="flex items-center justify-between px-4 py-3">
         {/* 左側: ハンバーガーメニュー */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <HamburgerMenu onMenuItemClick={onMenuItemClick} />
           
           {/* メンバーランク画像（ログイン時のみ） */}
@@ -135,8 +135,9 @@ export function FilterControls({
             </div>
           )}
         </div>
+        
         {/* 中央: ロゴ */}
-        <div className="absolute left-1/2 transform -translate-x-1/2">
+        <div className="flex-1 flex justify-center">
           <Logo size="lg" onClick={onLogoClick} />
         </div>
 
