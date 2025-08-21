@@ -1,7 +1,5 @@
 "use client"
 
-import { ArrowLeft } from "lucide-react"
-import { Logo } from "../atoms/logo"
 import type { Coupon } from "../../types/coupon"
 
 interface CouponConfirmationPageProps {
@@ -15,29 +13,24 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
   if (!coupon) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col justify-center p-3">
-      <div className="w-full max-w-xs mx-auto">
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-sm mx-auto">
         {/* 店員への指示 */}
-        <div className="text-center mb-4">
-          <h2 className="text-sm font-bold text-gray-900">店員の方に画面をお見せください</h2>
+        <div className="text-center mb-6">
+          <h2 className="text-lg font-bold text-gray-900">店員の方に画面をお見せください</h2>
         </div>
 
-        {/* クーポン使用確認カード */}
-        <div className="bg-white rounded-2xl shadow-xl border-4 border-green-400 overflow-hidden">
+        {/* クーポンカード */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           {/* ヘッダー */}
-          <div className="bg-green-600 p-3 text-white text-center">
+          <div className="bg-green-600 p-4 text-white text-center">
             <h3 className="text-lg font-bold">クーポン使用確認</h3>
           </div>
 
-          {/* 店舗名 */}
-          <div className="bg-green-50 p-3 text-center border-b border-green-200">
-            <h4 className="text-base font-bold text-green-900">{coupon.storeName}</h4>
-          </div>
-
-          {/* クーポン情報 */}
-          <div className="p-4">
+          {/* クーポン内容 */}
+          <div className="p-6">
             {/* クーポン画像 */}
-            <div className="w-full h-32 overflow-hidden rounded-xl mb-4">
+            <div className="w-full aspect-square overflow-hidden rounded-lg mb-4">
               <img
                 src={coupon.imageUrl || "/placeholder.svg"}
                 alt={coupon.name}
@@ -45,22 +38,26 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
               />
             </div>
             
-            {/* クーポン詳細 */}
-            <div className="text-center mb-4">
-              <h4 className="font-bold text-lg text-gray-900 mb-2">
+            {/* クーポン名 */}
+            <div className="text-center mb-3">
+              <h4 className="font-bold text-xl text-gray-900">
                 {coupon.name}
               </h4>
+            </div>
+
+            {/* クーポン説明 */}
+            <div className="text-center mb-6">
               <p className="text-sm text-gray-900 leading-relaxed">
                 {coupon.description}
               </p>
             </div>
 
             {/* リンクセクション */}
-            <div className="space-y-2 mb-4">
-              <button className="w-full text-blue-600 hover:text-blue-700 text-xs font-medium underline transition-colors">
+            <div className="space-y-2 mb-6">
+              <button className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors">
                 使用方法についてはこちら
               </button>
-              <button className="w-full text-red-600 hover:text-red-700 text-xs font-medium underline transition-colors">
+              <button className="w-full text-red-600 hover:text-red-700 text-sm font-medium underline transition-colors">
                 注意事項についてはこちら
               </button>
             </div>
@@ -69,13 +66,13 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
             <div className="space-y-3">
               <button
                 onClick={onConfirm}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold text-base transition-colors shadow-md hover:shadow-lg"
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
               >
                 確定する
               </button>
               <button
                 onClick={onCancel}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-xl font-medium transition-colors border border-gray-300"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium transition-colors border border-gray-300"
               >
                 キャンセル
               </button>
