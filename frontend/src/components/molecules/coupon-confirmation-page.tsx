@@ -13,7 +13,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
   if (!coupon) return null
 
   return (
-    <div className="min-h-screen bg-gray-200 flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-xs mx-auto">
         {/* 店員への指示 */}
         <div className="text-center mb-6">
