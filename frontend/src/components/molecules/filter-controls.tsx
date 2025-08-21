@@ -9,7 +9,10 @@ import { GenrePopup } from "./genre-popup"
 import { AreaPopup } from "./area-popup"
 import { Heart, LogIn } from "lucide-react"
 import { User } from "lucide-react"
+import { RankBadge } from "../atoms/rank-badge"
+import { calculateUserRank } from "../../utils/rank-calculator"
 import type { Notification } from "../../types/notification"
+import type { User as UserType } from "../../types/user"
 
 interface FilterControlsProps {
   selectedGenres: string[]
@@ -17,6 +20,7 @@ interface FilterControlsProps {
   isFavoritesFilter: boolean
   notifications: Notification[]
   isAuthenticated: boolean
+  user?: UserType
   onGenresChange: (genres: string[]) => void
   onAreaChange: (area: string) => void
   onCurrentLocationClick: () => void
@@ -34,6 +38,7 @@ export function FilterControls({
   isFavoritesFilter,
   notifications,
   isAuthenticated,
+  user,
   onGenresChange,
   onAreaChange,
   onCurrentLocationClick,
@@ -105,6 +110,12 @@ export function FilterControls({
     console.log("すべての通知を既読にする")
   }
 
+  // ユーザーのランクを計算
+  const userRank = user && user.contractStartDate 
+    ? calculateUserRank(user.contractStartDate) 
+    : user && user.createdAt 
+    ? calculateUserRank(user.createdAt)
+    : null
   return (
     <div className="bg-white shadow-sm border-b border-gray-100">
       {/* ヘッダー */}
@@ -112,6 +123,12 @@ export function FilterControls({
         {/* 左側: ハンバーガーメニュー */}
         <HamburgerMenu onMenuItemClick={onMenuItemClick} />
 
+        {/* 左中央: メンバーランク（ログイン時のみ） */}
+        {isAuthenticated && userRank && (
+          <div className="flex-shrink-0">
+            <RankBadge rank={userRank} size="sm" />
+          </div>
+        )}
         {/* 中央: ロゴ */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <Logo size="lg" onClick={onLogoClick} />
