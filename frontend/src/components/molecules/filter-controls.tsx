@@ -121,14 +121,20 @@ export function FilterControls({
       {/* ヘッダー */}
       <div className="flex items-center justify-between px-4 py-3">
         {/* 左側: ハンバーガーメニュー */}
-        <HamburgerMenu onMenuItemClick={onMenuItemClick} />
-
-        {/* 左中央: メンバーランク（ログイン時のみ） */}
-        {isAuthenticated && userRank && (
-          <div className="flex-shrink-0">
-            <RankBadge rank={userRank} size="sm" />
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <HamburgerMenu onMenuItemClick={onMenuItemClick} />
+          
+          {/* メンバーランク画像（ログイン時のみ） */}
+          {isAuthenticated && userRank && (
+            <div className="flex-shrink-0">
+              <img
+                src={`/${userRank}.png`}
+                alt={`${userRank}ランク`}
+                className="w-6 h-6 object-contain"
+              />
+            </div>
+          )}
+        </div>
         {/* 中央: ロゴ */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <Logo size="lg" onClick={onLogoClick} />
