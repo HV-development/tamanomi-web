@@ -139,7 +139,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       {/* 営業時間・定休日情報 */}
       {(store.businessHours || store.closedDays) && (
         <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-          <div className="text-center space-y-1">
+          <div className="space-y-1">
             {store.businessHours && (
               <div className="text-xs font-medium text-gray-700">
                 営業時間: {store.businessHours}
