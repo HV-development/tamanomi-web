@@ -15,23 +15,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
   if (!coupon) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
-      {/* ヘッダー */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
-          <button 
-            onClick={onCancel} 
-            className="text-green-600 hover:text-green-700 transition-colors"
-          >
-            ← 戻る
-          </button>
-          <Logo size="lg" onClick={onLogoClick} />
-          <div className="w-12"></div>
-        </div>
-      </div>
-
-      {/* メインコンテンツ */}
-      <div className="flex-1 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* 店員への指示 */}
           <div className="text-center mb-6">
@@ -98,6 +82,5 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
           </div>
         </div>
       </div>
-    </div>
   )
 }
