@@ -32,7 +32,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
             {/* クーポンカード */}
             <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-6">
               {/* クーポン画像 */}
-              <div className="w-full h-32 overflow-hidden rounded-lg mb-4">
+              <div className="w-full h-32 overflow-hidden rounded-t-xl mb-3">
                 <img
                   src={coupon.imageUrl || "/placeholder.svg"}
                   alt={coupon.name}
