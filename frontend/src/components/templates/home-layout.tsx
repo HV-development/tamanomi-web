@@ -424,6 +424,7 @@ export function HomeLayout({
         isFavoritesFilter={isFavoritesFilter}
         notifications={notifications}
         isAuthenticated={isAuthenticated}
+        user={user}
         onGenresChange={onGenresChange}
         onAreaChange={onAreaChange}
         onCurrentLocationClick={() => {
