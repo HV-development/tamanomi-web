@@ -92,23 +92,41 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             </span>
             <span className="text-green-600 font-medium text-sm">350m</span>
           </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={handlePhoneClick}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="電話をかける"
-              >
-                <Phone className="w-4 h-4 text-gray-600 hover:text-green-600" />
-              </button>
-              <button
-                onClick={handleMapClick}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="Googleマップで表示"
-              >
-                <MapPin className="w-4 h-4 text-gray-600 hover:text-blue-600" />
-              </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handlePhoneClick}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="電話をかける"
+            >
+              <Phone className="w-4 h-4 text-gray-600 hover:text-green-600" />
+            </button>
+            <button
+              onClick={handleMapClick}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Googleマップで表示"
+            >
+              <MapPin className="w-4 h-4 text-gray-600 hover:text-blue-600" />
+            </button>
+          </div>
+        </div>
+
+        {/* 営業時間・定休日情報 */}
+        {(store.businessHours || store.closedDays) && (
+          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 mt-3">
+            <div className="space-y-1">
+              {store.businessHours && (
+                <div className="text-xs font-medium text-gray-700">
+                  営業時間: {store.businessHours}
+                </div>
+              )}
+              {store.closedDays && (
+                <div className="text-xs font-medium text-gray-700">
+                  定休日: {store.closedDays}
+                </div>
+              )}
             </div>
           </div>
+        )}
       </div>
 
       {/* 店舗写真3枚横並び */}
@@ -135,24 +153,6 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           />
         </div>
       </div>
-
-      {/* 営業時間・定休日情報 */}
-      {(store.businessHours || store.closedDays) && (
-        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-          <div className="space-y-1">
-            {store.businessHours && (
-              <div className="text-xs font-medium text-gray-700">
-                営業時間: {store.businessHours}
-              </div>
-            )}
-            {store.closedDays && (
-              <div className="text-xs font-medium text-gray-700">
-                定休日: {store.closedDays}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* 店舗紹介 */}
       <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
