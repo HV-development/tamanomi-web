@@ -74,7 +74,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                   className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-4 px-3 min-h-[48px] flex items-center justify-center font-medium ${
                     isSelected
                       ? `${genreColors.border} ${genreColors.bg} ${genreColors.text} shadow-md`
-                      : `border-gray-300 bg-white text-gray-700 hover:border-gray-400 ${genreColors.hover}`
+                      : `border-gray-300 ${genreColors.bg} ${genreColors.text} hover:border-gray-400 ${genreColors.hover} hover:shadow-sm`
                   }`}
                 >
                   {isSelected && (
