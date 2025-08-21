@@ -15,26 +15,26 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
   if (!coupon) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-8">
-        <div className="w-full max-w-md mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col justify-center p-4">
+        <div className="w-full max-w-sm mx-auto">
           {/* 店員への指示 */}
-          <div className="text-center mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">店員の方に画面をお見せください</h2>
+          <div className="text-center mb-4">
+            <h2 className="text-lg font-bold text-gray-900">店員の方に画面をお見せください</h2>
           </div>
 
           {/* クーポン使用確認カード */}
           <div className="bg-white rounded-3xl shadow-xl border-4 border-green-400 overflow-hidden">
             {/* ヘッダー */}
-            <div className="bg-green-600 p-4 text-white text-center">
-              <h3 className="text-xl font-bold">クーポン使用確認</h3>
+            <div className="bg-green-600 p-3 text-white text-center">
+              <h3 className="text-lg font-bold">クーポン使用確認</h3>
             </div>
 
             {/* クーポン情報 */}
-            <div className="p-8">
+            <div className="p-4">
               {/* クーポン画像とテキスト */}
-              <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden mb-8">
+              <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden mb-4">
                 {/* クーポン画像 */}
-                <div className="w-full h-48 overflow-hidden">
+                <div className="w-full h-32 overflow-hidden">
                   <img
                     src={coupon.imageUrl || "/placeholder.svg"}
                     alt={coupon.name}
@@ -43,37 +43,37 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
                 </div>
                 
                 {/* クーポン情報 */}
-                <div className="p-6 text-center">
-                  <h4 className="font-bold text-xl text-gray-900 mb-2">
+                <div className="p-4 text-center">
+                  <h4 className="font-bold text-lg text-gray-900 mb-2">
                     {coupon.name}
                   </h4>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-2">
+                  <p className="text-sm text-gray-900 leading-relaxed">
                     {coupon.description}
                   </p>
                 </div>
               </div>
 
               {/* リンクセクション */}
-              <div className="space-y-4 mb-8">
-                <button className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors">
+              <div className="space-y-2 mb-4">
+                <button className="w-full text-blue-600 hover:text-blue-700 text-xs font-medium underline transition-colors">
                   使用方法についてはこちら
                 </button>
-                <button className="w-full text-red-600 hover:text-red-700 text-sm font-medium underline transition-colors">
+                <button className="w-full text-red-600 hover:text-red-700 text-xs font-medium underline transition-colors">
                   注意事項についてはこちら
                 </button>
               </div>
 
               {/* ボタン */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <button
                   onClick={onConfirm}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold text-base transition-colors shadow-md hover:shadow-lg"
                 >
                   確定する
                 </button>
                 <button
                   onClick={onCancel}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium transition-colors border border-gray-300"
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-xl font-medium transition-colors border border-gray-300"
                 >
                   キャンセル
                 </button>
