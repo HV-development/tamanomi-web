@@ -63,7 +63,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
           <div className="text-sm text-gray-600 mb-4">複数選択可能です</div>
 
           <div className="grid grid-cols-2 gap-3 mb-6 max-h-80 overflow-y-auto">
-            {GENRES.map((genre) => (
+            {GENRES.map((genre) => {
               const genreColors = getGenreColor(genre.value)
               const isSelected = selectedGenres.includes(genre.value)
               
