@@ -17,14 +17,14 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
       <div className="w-full max-w-sm mx-auto">
         {/* 店員への指示 */}
         <div className="text-center mb-6">
-          <h2 className="text-lg font-bold text-gray-900">店員の方に画面をお見せください</h2>
+          <h2 className="text-sm font-bold text-gray-900">店員の方に画面をお見せください</h2>
         </div>
 
         {/* クーポンカード */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           {/* ヘッダー */}
           <div className="bg-green-600 p-4 text-white text-center">
-            <h3 className="text-lg font-bold">クーポン使用確認</h3>
+            <h3 className="text-sm font-bold">クーポン使用確認</h3>
           </div>
 
           {/* クーポン内容 */}
@@ -40,14 +40,14 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
             
             {/* クーポン名 */}
             <div className="text-center mb-3">
-              <h4 className="font-bold text-xl text-gray-900">
+              <h4 className="font-bold text-lg text-gray-900">
                 {coupon.name}
               </h4>
             </div>
 
             {/* クーポン説明 */}
             <div className="text-center mb-6">
-              <p className="text-sm text-gray-900 leading-relaxed">
+              <p className="text-xs text-gray-900 leading-relaxed">
                 {coupon.description}
               </p>
             </div>
@@ -66,13 +66,13 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
             <div className="space-y-3">
               <button
                 onClick={onConfirm}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold text-base transition-colors shadow-md hover:shadow-lg"
               >
                 確定する
               </button>
               <button
                 onClick={onCancel}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium transition-colors border border-gray-300"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-xl font-medium text-sm transition-colors border border-gray-300"
               >
                 キャンセル
               </button>
