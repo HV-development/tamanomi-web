@@ -66,6 +66,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
               <GenreButton
                 key={genre.value}
                 label={genre.label}
+                genre={genre.value}
                 isSelected={selectedGenres.includes(genre.value)}
                 onClick={() => onGenreToggle(genre.value)}
                 className="text-sm py-4 px-3 min-h-[48px] flex items-center justify-center w-full font-medium"
