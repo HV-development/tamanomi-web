@@ -28,9 +28,9 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
           </div>
 
           {/* クーポン内容 */}
-          <div className="p-6">
+          <div className="p-4">
             {/* クーポン画像 */}
-            <div className="w-full aspect-square overflow-hidden rounded-lg mb-4">
+            <div className="w-full h-32 overflow-hidden rounded-lg mb-3">
               <img
                 src={coupon.imageUrl || "/placeholder.svg"}
                 alt={coupon.name}
@@ -39,21 +39,21 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
             </div>
             
             {/* クーポン名 */}
-            <div className="text-center mb-3">
-              <h4 className="font-bold text-lg text-gray-900">
+            <div className="text-center mb-2">
+              <h4 className="font-bold text-base text-gray-900">
                 {coupon.name}
               </h4>
             </div>
 
             {/* クーポン説明 */}
-            <div className="text-center mb-6">
+            <div className="text-center mb-4">
               <p className="text-xs text-gray-900 leading-relaxed">
                 {coupon.description}
               </p>
             </div>
 
             {/* リンクセクション */}
-            <div className="space-y-2 mb-6">
+            <div className="space-y-1 mb-4">
               <button className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors">
                 使用方法についてはこちら
               </button>
@@ -63,16 +63,16 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
             </div>
 
             {/* ボタン */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <button
                 onClick={onConfirm}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold text-base transition-colors shadow-md hover:shadow-lg"
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-xl font-bold text-sm transition-colors shadow-md hover:shadow-lg"
               >
                 確定する
               </button>
               <button
                 onClick={onCancel}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-xl font-medium text-sm transition-colors border border-gray-300"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 px-4 rounded-xl font-medium text-xs transition-colors border border-gray-300"
               >
                 キャンセル
               </button>
