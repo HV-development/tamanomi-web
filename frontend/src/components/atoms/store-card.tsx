@@ -134,8 +134,6 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
         </div>
-        
-        {/* 営業時間・定休日オーバーレイ */}
       </div>
 
       {/* 営業時間・定休日情報 */}
