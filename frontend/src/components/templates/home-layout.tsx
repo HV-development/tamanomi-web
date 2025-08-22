@@ -45,6 +45,7 @@ interface HomeLayoutProps {
     | "password-reset"
     | "store-detail"
     | "coupon-confirmation"
+    | "usage-guide"
   isAuthenticated: boolean
   isLoading?: boolean
   signupData?: any
@@ -133,6 +134,8 @@ interface HomeLayoutProps {
   onUseSameCoupon?: (couponId: string) => void
   onConfirmCoupon: () => void
   onCancelCoupon: () => void
+  onUsageGuideClick: () => void
+  onUsageGuideBack: () => void
   isSuccessModalOpen: boolean
   onSuccessModalClose?: () => void
   isLoginRequiredModalOpen?: boolean
@@ -238,6 +241,8 @@ export function HomeLayout({
   onUseSameCoupon = () => {},
   onConfirmCoupon,
   onCancelCoupon = () => {},
+  onUsageGuideClick,
+  onUsageGuideBack,
   isSuccessModalOpen,
   onSuccessModalClose,
   isLoginRequiredModalOpen = false,
@@ -262,6 +267,16 @@ export function HomeLayout({
         coupon={selectedCoupon}
         onConfirm={onConfirmCoupon}
         onCancel={onCancelCoupon}
+        onUsageGuideClick={onUsageGuideClick}
+        onLogoClick={onLogoClick}
+      />
+    )
+  }
+
+  if (currentView === "usage-guide") {
+    return (
+      <UsageGuidePage
+        onBack={onUsageGuideBack}
         onLogoClick={onLogoClick}
       />
     )

@@ -18,7 +18,7 @@ export default function HomePage() {
   const [isFavoritesFilter, setIsFavoritesFilter] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
   const [currentView, setCurrentView] = useState<
-    "home" | "login" | "email-registration" | "signup" | "confirmation" | "subscription" | "mypage" | "password-reset" | "email-confirmation" | "coupon-confirmation"
+    "home" | "login" | "email-registration" | "signup" | "confirmation" | "subscription" | "mypage" | "password-reset" | "email-confirmation" | "coupon-confirmation" | "usage-guide"
   >("home")
   const [loginStep, setLoginStep] = useState<"email" | "otp">("email")
   const [loginEmail, setLoginEmail] = useState("")
@@ -566,6 +566,14 @@ export default function HomePage() {
     setSelectedCoupon(null)
   }
 
+  const handleUsageGuideClick = () => {
+    setCurrentView("usage-guide")
+  }
+
+  const handleUsageGuideBack = () => {
+    setCurrentView("coupon-confirmation")
+  }
+
   const handleStoreClick = (store: Store) => {
     console.log("店舗詳細ポップアップを表示:", store.name)
     setSelectedStore(store)
@@ -765,6 +773,8 @@ export default function HomePage() {
       onUseSameCoupon={handleUseSameCoupon}
       onConfirmCoupon={handleConfirmCoupon}
       onCancelCoupon={handleCancelCoupon}
+      onUsageGuideClick={handleUsageGuideClick}
+      onUsageGuideBack={handleUsageGuideBack}
       onProfileEditSubmit={handleProfileEditSubmit}
       onEmailChangeSubmit={handleEmailChangeSubmit}
       onPasswordChangeSubmit={handlePasswordChangeSubmit}
