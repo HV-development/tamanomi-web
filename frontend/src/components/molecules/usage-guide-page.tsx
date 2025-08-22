@@ -77,12 +77,7 @@ export function UsageGuidePage({ onBack, onLogoClick }: UsageGuidePageProps) {
                       </div>
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-green-600 text-white text-sm px-2 py-1 rounded-full font-bold">
-                          {index + 1}
-                        </span>
-                        <h5 className="text-lg font-bold text-gray-900">{step.title}</h5>
-                      </div>
+                      <h5 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h5>
                       <p className="text-gray-700 mb-3 leading-relaxed">{step.description}</p>
                       <ul className="space-y-1">
                         {step.details.map((detail, detailIndex) => (
