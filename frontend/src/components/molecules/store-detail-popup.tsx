@@ -19,9 +19,11 @@ export function StoreDetailPopup({
   onFavoriteToggle, 
   onCouponsClick 
 }: StoreDetailPopupProps) {
+  console.log("StoreDetailPopup render:", { isOpen, storeName: store?.name })
+  
   if (!isOpen || !store) return null
 
-  // ジャンルに応じた店内画像を取得
+  console.log("StoreDetailPopup rendering:", { isOpen, storeName: store.name })
   const getStoreInteriorImage = (genre: string) => {
     const interiorImages: Record<string, string> = {
       izakaya: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg",
@@ -90,7 +92,8 @@ export function StoreDetailPopup({
   return (
     <>
       {/* オーバーレイ */}
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={onClose}></div>
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={onClose}>
+      </div>
 
       {/* ポップアップ */}
       <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
