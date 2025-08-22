@@ -580,7 +580,7 @@ export default function HomePage() {
     setIsStoreDetailPopupOpen(true)
   }
 
-  const handleStoreDetailClose = () => {
+  const handleStoreDetailPopupClose = () => {
     setIsStoreDetailPopupOpen(false)
     setSelectedStore(null)
   }
@@ -720,7 +720,7 @@ export default function HomePage() {
       onCouponsClick={handleCouponsClick}
       onStoreClick={handleStoreClick}
       isStoreDetailOpen={isStoreDetailOpen}
-      onStoreDetailClose={handleStoreDetailClose}
+      onStoreDetailClose={handleStoreDetailPopupClose}
       onMyPageViewChange={handleMyPageViewChange}
       onEditProfile={handleEditProfile}
       onChangeEmail={handleChangeEmail}
