@@ -11,6 +11,7 @@ interface CouponConfirmationPageProps {
 }
 
 export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClick }: CouponConfirmationPageProps) {
+}
 export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick = () => {}, onLogoClick }: CouponConfirmationPageProps) {
   if (!coupon) return null
 
