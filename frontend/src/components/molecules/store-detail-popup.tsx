@@ -169,14 +169,13 @@ export function StoreDetailPopup({
               {/* 店舗紹介文 */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <h4 className="text-lg font-bold text-gray-900 mb-3">店舗紹介</h4>
-                  <JapaneseYen className="w-5 h-5 text-green-600" />
               </div>
 
               {/* 予算情報 */}
               {store.budget && (
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Yen className="w-5 h-5 text-green-600" />
+                    <JapaneseYen className="w-5 h-5 text-green-600" />
                     <h4 className="text-lg font-bold text-gray-900">予算</h4>
                   </div>
                   <div className="space-y-2">
