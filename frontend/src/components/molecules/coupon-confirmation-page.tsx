@@ -38,7 +38,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
                 <img
                   src={coupon.imageUrl || "/placeholder.svg"}
                   alt={coupon.name}
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-center"
                 />
               </div>
               
