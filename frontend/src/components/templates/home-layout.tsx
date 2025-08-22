@@ -476,7 +476,7 @@ export function HomeLayout({
       <StoreDetailPopup
         isOpen={isStoreDetailPopupOpen}
         store={selectedStore}
-        onClose={handleStoreDetailClose}
+        onClose={onStoreDetailClose}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
       />
