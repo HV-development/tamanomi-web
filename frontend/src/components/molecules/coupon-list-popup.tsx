@@ -67,7 +67,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
                       <img
                         src={coupon.imageUrl || "/placeholder.svg"}
                         alt={coupon.name}
-                        className="w-full h-full object-contain object-center bg-gray-100"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     
