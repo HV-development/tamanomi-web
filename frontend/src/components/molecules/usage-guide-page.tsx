@@ -43,6 +43,11 @@ export function UsageGuidePage({ onBack, onLogoClick }: UsageGuidePageProps) {
   const importantNotes = [
     "クーポンは1日1回まで利用可能です",
     "一度使用したクーポンはキャンセルできません",
+    "有効期限をご確認ください"
+  ]
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onBack} />
 
       {/* メインコンテンツ */}
@@ -85,6 +90,11 @@ export function UsageGuidePage({ onBack, onLogoClick }: UsageGuidePageProps) {
                             <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                             <span>{detail}</span>
                           </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
 
