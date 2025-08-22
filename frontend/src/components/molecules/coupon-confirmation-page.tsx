@@ -10,7 +10,7 @@ interface CouponConfirmationPageProps {
   onLogoClick: () => void
 }
 
-export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick, onLogoClick }: CouponConfirmationPageProps) {
+export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClick }: CouponConfirmationPageProps) {
   if (!coupon) return null
 
   return (
@@ -64,7 +64,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGui
             {/* リンクセクション */}
             <div className="space-y-2 mb-6">
               <button 
-                onClick={() => window.open('/usage-guide', '_blank')}
+                onClick={onUsageGuideClick}
                 className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
               >
                 使用方法についてはこちら
