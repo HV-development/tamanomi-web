@@ -62,7 +62,10 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClic
 
             {/* リンクセクション */}
             <div className="space-y-2 mb-6">
-              <button className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors">
+              <button 
+                onClick={() => window.open('/usage-guide', '_blank')}
+                className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
+              >
                 使用方法についてはこちら
               </button>
               <button className="w-full text-red-600 hover:text-red-700 text-sm font-medium underline transition-colors">
