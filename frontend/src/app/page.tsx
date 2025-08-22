@@ -576,14 +576,21 @@ export default function HomePage() {
 
   const handleStoreClick = (store: Store) => {
     console.log("店舗詳細ポップアップを表示:", store.name)
+    console.log("現在のisStoreDetailPopupOpen:", isStoreDetailPopupOpen)
     setSelectedStore(store)
+    console.log("setSelectedStore実行完了")
     setIsStoreDetailPopupOpen(true)
+    console.log("setIsStoreDetailPopupOpen(true)実行完了")
+    console.log("更新後のisStoreDetailPopupOpen:", true)
   }
 
   const handleStoreDetailPopupClose = () => {
     console.log("店舗詳細ポップアップを閉じる")
+    console.log("現在のisStoreDetailPopupOpen:", isStoreDetailPopupOpen)
     setIsStoreDetailPopupOpen(false)
+    console.log("setIsStoreDetailPopupOpen(false)実行完了")
     setSelectedStore(null)
+    console.log("setSelectedStore(null)実行完了")
   }
 
   const handleProfileEditSubmit = async (data: any) => {
