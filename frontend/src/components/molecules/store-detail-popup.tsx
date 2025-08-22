@@ -37,12 +37,12 @@ export function StoreDetailPopup({
   // ジャンルに応じた料理画像を取得
   const getStoreFoodImage = (genre: string) => {
     const foodImages: Record<string, string> = {
-      izakaya: "https://images.pexels.com/photos/1552630/pexels-photo-1552630.jpeg",
+      izakaya: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg",
       italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg",
       yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg",
       japanese: "https://images.pexels.com/photos/1283219/pexels-photo-1283219.jpeg",
       bar: "https://images.pexels.com/photos/1407846/pexels-photo-1407846.jpeg",
-      default: "https://images.pexels.com/photos/1552630/pexels-photo-1552630.jpeg"
+      default: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg"
     }
     return foodImages[genre] || foodImages.default
   }
