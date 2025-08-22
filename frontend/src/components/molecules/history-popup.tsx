@@ -27,7 +27,7 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
           <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
             <div className="flex items-center justify-between">
               <div className="w-8"></div>
-              <h3 className="text-xl font-bold">閲覧履歴</h3>
+              <h3 className="text-xl font-bold">お気に入り</h3>
               <button 
                 onClick={onClose} 
                 className="p-2 hover:bg-green-700 rounded-full transition-colors"
@@ -40,7 +40,7 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
           {/* 店舗数表示 */}
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
-              <h4 className="text-lg font-bold text-green-900">最近チェックしたお店</h4>
+              <h4 className="text-lg font-bold text-green-900">{stores.length} 件のお気に入り</h4>
             </div>
           </div>
 
