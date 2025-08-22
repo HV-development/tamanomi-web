@@ -54,6 +54,7 @@ interface HomeLayoutProps {
   favoriteStores: Store[]
   historyStores: Store[]
   isHistoryOpen: boolean
+  isFavoritesOpen: boolean
   notifications: Notification[]
   user?: User
   plan?: Plan
@@ -84,6 +85,7 @@ interface HomeLayoutProps {
   onCurrentLocationClick: () => void
   onTabChange: (tab: string) => void
   onFavoritesClick: () => void
+  onFavoritesClose: () => void
   onHistoryClick?: () => void
   onHistoryClose?: () => void
   onFavoriteToggle: (storeId: string) => void
@@ -170,6 +172,7 @@ export function HomeLayout({
   favoriteStores,
   historyStores,
   isHistoryOpen,
+  isFavoritesOpen,
   notifications,
   user,
   plan,
@@ -190,6 +193,7 @@ export function HomeLayout({
   onCurrentLocationClick,
   onTabChange,
   onFavoritesClick,
+  onFavoritesClose,
   onHistoryClick,
   onHistoryClose,
   onFavoriteToggle,
@@ -464,7 +468,16 @@ export function HomeLayout({
         isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
       />
 
-
+      {/* お気に入り一覧ポップアップ */}
+      <HistoryPopup
+        isOpen={isFavoritesOpen}
+        stores={favoriteStores}
+        onClose={onFavoritesClose}
+        onFavoriteToggle={onFavoriteToggle}
+        onCouponsClick={onCouponsClick}
+      />
+      
+      {/* 閲覧履歴ポップアップ */}
       <HistoryPopup
         isOpen={isHistoryOpen}
         stores={historyStores}
