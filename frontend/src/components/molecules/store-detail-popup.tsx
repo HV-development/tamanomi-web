@@ -99,43 +99,37 @@ export function StoreDetailPopup({
       <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
-          <div className="bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 p-4 text-white flex-shrink-0 relative overflow-hidden">
-            {/* 背景装飾 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10"></div>
-            <div className="absolute -top-2 -right-2 w-16 h-16 bg-white/10 rounded-full blur-xl"></div>
-            <div className="absolute -bottom-1 -left-1 w-12 h-12 bg-white/5 rounded-full blur-lg"></div>
-            
-            <div className="relative">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div>
-                    <h3 className="text-xl font-bold tracking-tight">店舗詳細</h3>
-                    <p className="text-green-100 text-sm font-medium opacity-90">詳細情報</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FavoriteButton
-                    isFavorite={store.isFavorite}
-                    onToggle={() => onFavoriteToggle(store.id)}
-                    className="scale-90"
-                  />
-                  <button
-                    onClick={onClose}
-                    className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-110 hover:rotate-90"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+          <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FavoriteButton
+                  isFavorite={store.isFavorite}
+                  onToggle={() => onFavoriteToggle(store.id)}
+                  className="scale-90"
+                />
               </div>
+              <h3 className="text-xl font-bold">店舗詳細</h3>
+              <button 
+                onClick={onClose} 
+                className="p-2 hover:bg-green-700 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* 店舗名表示 */}
+          <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
+            <div className="text-center">
+              <h4 className="text-lg font-bold text-green-900">{store.name}</h4>
             </div>
           </div>
 
           {/* コンテンツ */}
           <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
             <div className="space-y-6">
-              {/* 店舗名 */}
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{store.name}</h2>
+              {/* ジャンルバッジ */}
+              <div className="text-center">
                 <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 border border-green-200">
                   {store.genreLabel}
                 </span>
