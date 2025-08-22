@@ -76,6 +76,7 @@ export default function HomePage() {
 
   const [historyStores, setHistoryStores] = useState<Store[]>([])
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false)
 
   // 店舗詳細関連の状態
   const favoriteStores = stores.filter((store) => store.isFavorite)
@@ -298,14 +299,18 @@ export default function HomePage() {
   }
 
   const handleFavoritesClick = () => {
-    setIsFavoritesFilter(!isFavoritesFilter)
+    console.log("お気に入り一覧を表示")
+    setIsFavoritesOpen(true)
   }
 
   const handleHistoryClick = () => {
     console.log("履歴ボタンがクリックされました")
   }
 
-
+  const handleFavoritesClose = () => {
+    console.log("お気に入りパネルを閉じる")
+    setIsFavoritesOpen(false)
+  }
 
   const handleHistoryClose = () => {
     console.log("履歴パネルを閉じる")
@@ -705,6 +710,7 @@ export default function HomePage() {
       favoriteStores={favoriteStores}
       historyStores={historyStores}
       isHistoryOpen={isHistoryOpen}
+      isFavoritesOpen={isFavoritesOpen}
       notifications={notifications}
       user={user}
       plan={plan}
@@ -721,6 +727,7 @@ export default function HomePage() {
       onCurrentLocationClick={handleCurrentLocationClick}
       onTabChange={handleTabChange}
       onFavoritesClick={handleFavoritesClick}
+      onFavoritesClose={handleFavoritesClose}
       onHistoryClick={handleHistoryClick}
 
       onHistoryClose={handleHistoryClose}
