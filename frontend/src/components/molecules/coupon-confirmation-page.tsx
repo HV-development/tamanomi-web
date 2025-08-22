@@ -67,10 +67,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGui
                 onClick={onUsageGuideClick}
                 className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
               >
-                使用方法についてはこちら
-              </button>
-              <button className="w-full text-red-600 hover:text-red-700 text-sm font-medium underline transition-colors">
-                注意事項についてはこちら
+                使用方法、注意事項についてはこちら
               </button>
             </div>
 
