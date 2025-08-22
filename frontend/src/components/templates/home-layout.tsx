@@ -474,10 +474,12 @@ export function HomeLayout({
       />
       
       <StoreDetailPopup
-        isOpen={!!isStoreDetailPopupOpen && !!selectedStore}
+        isOpen={isStoreDetailPopupOpen}
         store={selectedStore}
         onClose={() => {
           console.log("StoreDetailPopup onClose called")
+          console.log("isStoreDetailPopupOpen:", isStoreDetailPopupOpen)
+          console.log("selectedStore:", selectedStore?.name)
           onStoreDetailClose?.()
         }}
         onFavoriteToggle={onFavoriteToggle}
