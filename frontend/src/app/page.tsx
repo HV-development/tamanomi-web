@@ -727,7 +727,7 @@ export default function HomePage() {
       onFavoriteToggle={handleFavoriteToggle}
       onCouponsClick={handleCouponsClick}
       onStoreClick={handleStoreClick}
-      isStoreDetailOpen={isStoreDetailOpen}
+      isStoreDetailPopupOpen={isStoreDetailPopupOpen}
       onStoreDetailClose={handleStoreDetailPopupClose}
       onMyPageViewChange={handleMyPageViewChange}
       onEditProfile={handleEditProfile}
