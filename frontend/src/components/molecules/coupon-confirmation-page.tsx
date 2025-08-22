@@ -6,10 +6,11 @@ interface CouponConfirmationPageProps {
   coupon: Coupon | null
   onConfirm: () => void
   onCancel: () => void
+  onUsageGuideClick: () => void
   onLogoClick: () => void
 }
 
-export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onLogoClick }: CouponConfirmationPageProps) {
+export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick, onLogoClick }: CouponConfirmationPageProps) {
   if (!coupon) return null
 
   return (
