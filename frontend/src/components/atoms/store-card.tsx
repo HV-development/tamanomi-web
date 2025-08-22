@@ -63,8 +63,11 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
     if (target.closest('button')) {
       return
     }
+    e.preventDefault()
+    e.stopPropagation()
     onStoreClick(store)
   }
+
   return (
     <div
       onClick={handleStoreClick}

@@ -581,6 +581,7 @@ export default function HomePage() {
   }
 
   const handleStoreDetailPopupClose = () => {
+    console.log("店舗詳細ポップアップを閉じる")
     setIsStoreDetailPopupOpen(false)
     setSelectedStore(null)
   }
