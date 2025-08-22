@@ -1,6 +1,6 @@
 "use client"
 
-import { X, MapPin, Phone, Globe, Ticket, Clock, Calendar } from "lucide-react"
+import { X, MapPin, Phone, Globe, Ticket, Clock, Calendar, Yen, Cigarette, CreditCard, Users } from "lucide-react"
 import { FavoriteButton } from "../atoms/favorite-button"
 import type { Store } from "../../types/store"
 
@@ -64,6 +64,29 @@ export function StoreDetailPopup({
     window.open(googleMapsUrl, "_blank")
   }
 
+  // 喫煙ポリシーのテキスト変換
+  const getSmokingPolicyText = (policy: string) => {
+    switch (policy) {
+      case 'NON_SMOKING':
+        return '禁煙席'
+      case 'SMOKING':
+        return '喫煙席'
+      case 'SEPARATED':
+        return '分煙／エリア分け'
+      case 'HEATED_TOBACCO':
+        return '加熱式専用'
+      case 'UNKNOWN':
+      case 'UNSPECIFIED':
+      default:
+        return '未設定／不明'
+    }
+  }
+
+  // 予算のフォーマット
+  const formatBudget = (budget: { min: number; max: number }) => {
+    return `¥${budget.min.toLocaleString()} 〜 ¥${budget.max.toLocaleString()}`
+  }
+
   return (
     <>
       {/* オーバーレイ */}
@@ -87,12 +110,19 @@ export function StoreDetailPopup({
                     <p className="text-green-100 text-sm font-medium opacity-90">詳細情報</p>
                   </div>
                 </div>
-                <button
-                  onClick={onClose}
-                  className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-110 hover:rotate-90"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <FavoriteButton
+                    isFavorite={store.isFavorite}
+                    onToggle={() => onFavoriteToggle(store.id)}
+                    className="scale-90"
+                  />
+                  <button
+                    onClick={onClose}
+                    className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-110 hover:rotate-90"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -100,28 +130,31 @@ export function StoreDetailPopup({
           {/* コンテンツ */}
           <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
             <div className="space-y-6">
-              {/* 店舗名とお気に入り */}
+              {/* 店舗名 */}
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{store.name}</h2>
+                <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 border border-green-200">
+                  {store.genreLabel}
+                </span>
               </div>
 
               {/* 店舗写真3枚横並び */}
               <div className="grid grid-cols-3 gap-1">
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden rounded-lg">
                   <img
                     src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg"}
                     alt={`${store.name} 外観`}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden rounded-lg">
                   <img
                     src={getStoreInteriorImage(store.genre)}
                     alt={`${store.name} 店内`}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden rounded-lg">
                   <img
                     src={getStoreFoodImage(store.genre)}
                     alt={`${store.name} 料理`}
@@ -136,6 +169,103 @@ export function StoreDetailPopup({
                 <p className="text-gray-700 leading-relaxed">{store.description}</p>
               </div>
 
+              {/* 予算情報 */}
+              {store.budget && (
+                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Yen className="w-5 h-5 text-green-600" />
+                    <h4 className="text-lg font-bold text-gray-900">予算</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {store.budget.dinner && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700">夜：</span>
+                        <span className="text-gray-900">{formatBudget(store.budget.dinner)}</span>
+                      </div>
+                    )}
+                    {store.budget.lunch && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700">昼：</span>
+                        <span className="text-gray-900">{formatBudget(store.budget.lunch)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 禁煙・喫煙情報 */}
+              {store.smokingPolicy && (
+                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Cigarette className="w-5 h-5 text-green-600" />
+                    <h4 className="text-lg font-bold text-gray-900">禁煙・喫煙</h4>
+                  </div>
+                  <div className="text-gray-900">{getSmokingPolicyText(store.smokingPolicy)}</div>
+                </div>
+              )}
+
+              {/* 支払い方法 */}
+              {store.paymentMethods && (
+                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CreditCard className="w-5 h-5 text-green-600" />
+                    <h4 className="text-lg font-bold text-gray-900">支払い方法</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {/* 現金 */}
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700">現金：</span>
+                      <span className="text-gray-900">{store.paymentMethods.cash ? '可' : '不可'}</span>
+                    </div>
+                    
+                    {/* クレジットカード */}
+                    {store.paymentMethods.creditCards.length > 0 && (
+                      <div>
+                        <div className="text-sm font-medium text-gray-700 mb-2">クレジットカード：</div>
+                        <div className="flex flex-wrap gap-1">
+                          {store.paymentMethods.creditCards.map((card) => (
+                            <span key={card} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full border border-blue-200">
+                              {card}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* コード決済 */}
+                    {store.paymentMethods.digitalPayments.length > 0 && (
+                      <div>
+                        <div className="text-sm font-medium text-gray-700 mb-2">コード決済：</div>
+                        <div className="flex flex-wrap gap-1">
+                          {store.paymentMethods.digitalPayments.map((payment) => (
+                            <span key={payment} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full border border-purple-200">
+                              {payment}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 利用シーン */}
+              {store.usageScenes && store.usageScenes.length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="w-5 h-5 text-green-600" />
+                    <h4 className="text-lg font-bold text-gray-900">利用シーン</h4>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {store.usageScenes.map((scene) => (
+                      <span key={scene} className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full border border-green-200">
+                        {scene}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* 店舗情報 */}
               <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
                 <h4 className="text-lg font-bold text-gray-900 mb-3">店舗情報</h4>
@@ -145,10 +275,10 @@ export function StoreDetailPopup({
                   <MapPin className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
                     <div className="text-sm font-medium text-gray-700 mb-1">住所</div>
-                    <div className="text-gray-900">{store.address}</div>
+                    <div className="text-gray-900 mb-2">{store.address}</div>
                     <button
                       onClick={handleMapClick}
-                      className="text-blue-600 hover:text-blue-700 text-sm mt-1 underline"
+                      className="text-blue-600 hover:text-blue-700 text-sm underline"
                     >
                       Googleマップで表示
                     </button>
