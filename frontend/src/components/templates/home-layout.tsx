@@ -473,6 +473,14 @@ export function HomeLayout({
         onCouponsClick={onCouponsClick}
       />
       
+      <StoreDetailPopup
+        isOpen={isStoreDetailPopupOpen}
+        store={selectedStore}
+        onClose={handleStoreDetailClose}
+        onFavoriteToggle={onFavoriteToggle}
+        onCouponsClick={onCouponsClick}
+      />
+      
       {/* クーポン関連ポップアップ */}
       <CouponListPopup
         isOpen={isCouponListOpen}
