@@ -22,7 +22,7 @@ export function CouponCard({ coupon, onUse, className = "" }: CouponCardProps) {
     >
       {/* クーポン画像 */}
       <div className="relative h-48 overflow-hidden">
-        <img src={coupon.imageUrl || "/placeholder.svg"} alt={coupon.name} className="w-full h-full object-contain bg-gray-100" />
+        <img src={coupon.imageUrl || "/placeholder.svg"} alt={coupon.name} className="w-full h-full object-contain object-center bg-gray-100" />
       </div>
 
       {/* クーポン情報 */}
