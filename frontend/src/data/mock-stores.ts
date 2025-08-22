@@ -14,7 +14,7 @@ export const mockStores: Store[] = [
     thumbnailUrl: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg",
     isFavorite: true,
     visitedAt: new Date("2024-01-15"),
-    businessHours: "17:00〜24:00（L.O. 23:30）",
+    businessHours: "月 〜 金 昼：11:00 〜 14:00 夜：17:00 〜 22:00",
     closedDays: "日曜日",
   },
   {
