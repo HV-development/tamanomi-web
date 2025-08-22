@@ -1,6 +1,6 @@
 "use client"
 
-import { X, MapPin, Phone, Globe, Ticket, Clock, Calendar, Yen, Cigarette, CreditCard, Users } from "lucide-react"
+import { X, MapPin, Phone, Globe, Ticket, Clock, Calendar, JapaneseYen, Cigarette, CreditCard, Users } from "lucide-react"
 import { FavoriteButton } from "../atoms/favorite-button"
 import type { Store } from "../../types/store"
 
@@ -166,7 +166,7 @@ export function StoreDetailPopup({
               {/* 店舗紹介文 */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <h4 className="text-lg font-bold text-gray-900 mb-3">店舗紹介</h4>
-                <p className="text-gray-700 leading-relaxed">{store.description}</p>
+                  <JapaneseYen className="w-5 h-5 text-green-600" />
               </div>
 
               {/* 予算情報 */}
