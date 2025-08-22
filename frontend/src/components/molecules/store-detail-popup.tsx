@@ -101,13 +101,7 @@ export function StoreDetailPopup({
           {/* ヘッダー */}
           <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FavoriteButton
-                  isFavorite={store.isFavorite}
-                  onToggle={() => onFavoriteToggle(store.id)}
-                  className="scale-90"
-                />
-              </div>
+              <div className="w-8"></div>
               <h3 className="text-xl font-bold">店舗詳細</h3>
               <button 
                 onClick={onClose} 
