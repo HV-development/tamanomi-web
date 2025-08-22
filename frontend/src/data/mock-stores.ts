@@ -16,6 +16,17 @@ export const mockStores: Store[] = [
     visitedAt: new Date("2024-01-15"),
     businessHours: "月 〜 金 昼：11:00 〜 14:00 夜：17:00 〜 22:00",
     closedDays: "日曜日",
+    budget: {
+      dinner: { min: 3000, max: 5000 },
+      lunch: { min: 800, max: 1500 }
+    },
+    smokingPolicy: "SEPARATED",
+    paymentMethods: {
+      cash: true,
+      creditCards: ["VISA", "Master", "JCB"],
+      digitalPayments: ["PayPay", "楽天Pay"]
+    },
+    usageScenes: ["おひとり様", "接待", "デート"]
   },
   {
     id: "2",
@@ -32,6 +43,17 @@ export const mockStores: Store[] = [
     visitedAt: new Date("2024-01-10"),
     businessHours: "11:30〜14:30、17:30〜22:00",
     closedDays: "火曜日",
+    budget: {
+      dinner: { min: 5000, max: 8000 },
+      lunch: { min: 1500, max: 2500 }
+    },
+    smokingPolicy: "NON_SMOKING",
+    paymentMethods: {
+      cash: true,
+      creditCards: ["VISA", "Master", "JCB", "Amex"],
+      digitalPayments: ["PayPay"]
+    },
+    usageScenes: ["デート", "家族、子供と", "女子会"]
   },
   {
     id: "3",
@@ -47,6 +69,16 @@ export const mockStores: Store[] = [
     visitedAt: new Date("2024-01-08"),
     businessHours: "17:00〜翌2:00",
     closedDays: "年中無休",
+    budget: {
+      dinner: { min: 4000, max: 6000 }
+    },
+    smokingPolicy: "SEPARATED",
+    paymentMethods: {
+      cash: true,
+      creditCards: ["VISA", "Master", "JCB"],
+      digitalPayments: ["PayPay", "楽天Pay", "d払い"]
+    },
+    usageScenes: ["家族、子供と", "合コン", "女子会"]
   },
   {
     id: "4",
@@ -62,6 +94,17 @@ export const mockStores: Store[] = [
     isFavorite: false,
     businessHours: "11:30〜14:00、17:00〜22:00",
     closedDays: "月曜日",
+    budget: {
+      dinner: { min: 6000, max: 10000 },
+      lunch: { min: 2000, max: 3500 }
+    },
+    smokingPolicy: "NON_SMOKING",
+    paymentMethods: {
+      cash: true,
+      creditCards: ["VISA", "Master", "JCB", "Amex", "Diners"],
+      digitalPayments: ["PayPay"]
+    },
+    usageScenes: ["接待", "デート", "おひとり様"]
   },
   {
     id: "5",
@@ -77,5 +120,15 @@ export const mockStores: Store[] = [
     visitedAt: new Date("2024-01-05"),
     businessHours: "19:00〜翌3:00",
     closedDays: "日曜日",
+    budget: {
+      dinner: { min: 4000, max: 7000 }
+    },
+    smokingPolicy: "SMOKING",
+    paymentMethods: {
+      cash: true,
+      creditCards: ["VISA", "Master"],
+      digitalPayments: ["PayPay"]
+    },
+    usageScenes: ["おひとり様", "デート", "接待"]
   },
 ]

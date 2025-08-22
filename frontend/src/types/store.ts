@@ -12,4 +12,15 @@ export interface Store {
   visitedAt?: Date
   businessHours?: string
   closedDays?: string
+  budget?: {
+    dinner?: { min: number; max: number }
+    lunch?: { min: number; max: number }
+  }
+  smokingPolicy?: 'NON_SMOKING' | 'SMOKING' | 'SEPARATED' | 'HEATED_TOBACCO' | 'UNKNOWN' | 'UNSPECIFIED'
+  paymentMethods?: {
+    cash: boolean
+    creditCards: string[]
+    digitalPayments: string[]
+  }
+  usageScenes?: string[]
 }
