@@ -2,6 +2,7 @@
 
 import { X, MapPin, Phone, Globe, Ticket, Clock, Calendar, JapaneseYen, Cigarette, CreditCard, Users } from "lucide-react"
 import { FavoriteButton } from "../atoms/favorite-button"
+import { getGenreColor } from "../../utils/genre-colors"
 import type { Store } from "../../types/store"
 
 interface StoreDetailPopupProps {
@@ -121,10 +122,93 @@ export function StoreDetailPopup({
 
           {/* コンテンツ */}
           <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-            <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-green-200 p-5 space-y-4 shadow-md">
+              {/* ヘッダー部分 */}
+              <div>
+                {/* 店舗名と距離 */}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex-1">
+                    <h3 className="font-bold text-xl text-gray-900">{store.name}</h3>
+                  </div>
+                  <FavoriteButton
+                    isFavorite={store.isFavorite}
+                    onToggle={() => onFavoriteToggle(store.id)}
+                    className="ml-3 scale-75 flex-shrink-0"
+                  />
+                </div>
+                
+                {/* ジャンルバッジと連絡先アイコン */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
+                      {store.genreLabel}
+                    </span>
+                    <span className="text-green-600 font-medium text-sm">350m</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={handlePhoneClick}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      aria-label="電話をかける"
+                    >
+                      <Phone className="w-4 h-4 text-gray-600 hover:text-green-600" />
+                    </button>
+                    <button
+                      onClick={handleMapClick}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      aria-label="Googleマップで表示"
+                    >
+                      <MapPin className="w-4 h-4 text-gray-600 hover:text-blue-600" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 営業時間・定休日情報 */}
+                {store.businessHours && (
+                  <div className="text-sm font-medium text-gray-700 mt-3">
+                    営業時間：{store.businessHours}
+                  </div>
+                )}
+                {store.closedDays && (
+                  <div className="text-sm font-medium text-gray-700 mt-1">
+                    定休日　：{store.closedDays}
+                  </div>
+                )}
+              </div>
+
+              {/* 店舗写真3枚横並び */}
+              <div className="grid grid-cols-3 gap-1 relative">
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg"}
+                    alt={`${store.name} 外観`}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={getStoreInteriorImage(store.genre)}
+                    alt={`${store.name} 店内`}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={getStoreFoodImage(store.genre)}
+                    alt={`${store.name} 料理`}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              </div>
+
+              {/* 店舗紹介 */}
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="text-sm text-gray-700 leading-relaxed">{store.description}</div>
+              </div>
+
               {/* 予算情報 */}
               {store.budget && (
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex items-center gap-2 mb-3">
                     <JapaneseYen className="w-5 h-5 text-green-600" />
                     <h4 className="text-lg font-bold text-gray-900">予算</h4>
@@ -148,7 +232,7 @@ export function StoreDetailPopup({
 
               {/* 禁煙・喫煙情報 */}
               {store.smokingPolicy && (
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex items-center gap-2 mb-3">
                     <Cigarette className="w-5 h-5 text-green-600" />
                     <h4 className="text-lg font-bold text-gray-900">禁煙・喫煙</h4>
@@ -159,7 +243,7 @@ export function StoreDetailPopup({
 
               {/* 支払い方法 */}
               {store.paymentMethods && (
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex items-center gap-2 mb-3">
                     <CreditCard className="w-5 h-5 text-green-600" />
                     <h4 className="text-lg font-bold text-gray-900">支払い方法</h4>
@@ -204,7 +288,7 @@ export function StoreDetailPopup({
 
               {/* 利用シーン */}
               {store.usageScenes && store.usageScenes.length > 0 && (
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="w-5 h-5 text-green-600" />
                     <h4 className="text-lg font-bold text-gray-900">利用シーン</h4>
@@ -218,6 +302,17 @@ export function StoreDetailPopup({
                   </div>
                 </div>
               )}
+
+              {/* クーポンボタン */}
+              <div className="pt-2">
+                <button
+                  onClick={() => onCouponsClick(store.id)}
+                  className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
+                >
+                  <Ticket className="w-5 h-5" />
+                  <span className="font-medium">クーポンを見る</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
