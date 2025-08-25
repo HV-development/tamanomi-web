@@ -151,32 +151,32 @@ export function StoreDetailPopup({
 
               {/* 営業時間 */}
               {store.businessHours && (
-                <div className="bg-white rounded-lg p-3">
-                  <div className="text-sm font-bold text-gray-900 mb-1">営業時間</div>
-                  <div className="text-sm text-gray-700">{store.businessHours}</div>
+                <div className="bg-white rounded-lg p-4">
+                  <div className="text-base font-bold text-gray-900 mb-2">営業時間</div>
+                  <div className="text-base text-gray-700">{store.businessHours}</div>
                 </div>
               )}
 
               {/* 定休日 */}
               {store.closedDays && (
-                <div className="bg-white rounded-lg p-3">
-                  <div className="text-sm font-bold text-gray-900 mb-1">定休日</div>
-                  <div className="text-sm text-gray-700">{store.closedDays}</div>
+                <div className="bg-white rounded-lg p-4">
+                  <div className="text-base font-bold text-gray-900 mb-2">定休日</div>
+                  <div className="text-base text-gray-700">{store.closedDays}</div>
                 </div>
               )}
 
               {/* 予算 */}
               {store.budget && (
-                <div className="bg-white rounded-lg p-3">
-                  <div className="text-sm font-bold text-gray-900 mb-2">予算</div>
+                <div className="bg-white rounded-lg p-4">
+                  <div className="text-base font-bold text-gray-900 mb-2">予算</div>
                   <div className="space-y-1">
                     {store.budget.dinner && (
-                      <div className="text-sm text-gray-700">
+                      <div className="text-base text-gray-700">
                         夜：{formatBudget(store.budget.dinner)}
                       </div>
                     )}
                     {store.budget.lunch && (
-                      <div className="text-sm text-gray-700">
+                      <div className="text-base text-gray-700">
                         昼：{formatBudget(store.budget.lunch)}
                       </div>
                     )}
@@ -186,32 +186,32 @@ export function StoreDetailPopup({
 
               {/* 禁煙・喫煙 */}
               {store.smokingPolicy && (
-                <div className="bg-white rounded-lg p-3">
-                  <div className="text-sm font-bold text-gray-900 mb-1">禁煙・分煙</div>
-                  <div className="text-sm text-gray-700">{getSmokingPolicyText(store.smokingPolicy)}</div>
+                <div className="bg-white rounded-lg p-4">
+                  <div className="text-base font-bold text-gray-900 mb-2">禁煙・分煙</div>
+                  <div className="text-base text-gray-700">{getSmokingPolicyText(store.smokingPolicy)}</div>
                 </div>
               )}
 
               {/* 支払い方法 */}
               {store.paymentMethods && (
-                <div className="bg-white rounded-lg p-3">
-                  <div className="text-sm font-bold text-gray-900 mb-2">支払い方法</div>
+                <div className="bg-white rounded-lg p-4">
+                  <div className="text-base font-bold text-gray-900 mb-2">支払い方法</div>
                   <div className="space-y-1">
                     {/* 現金 */}
-                    <div className="text-sm text-gray-700">
+                    <div className="text-base text-gray-700">
                       現金：{store.paymentMethods.cash ? '可' : '不可'}
                     </div>
                     
                     {/* クレジットカード */}
                     {store.paymentMethods.creditCards.length > 0 && (
-                      <div className="text-sm text-gray-700">
+                      <div className="text-base text-gray-700">
                         クレジットカード：{store.paymentMethods.creditCards.join('、')}
                       </div>
                     )}
                     
                     {/* コード決済 */}
                     {store.paymentMethods.digitalPayments.length > 0 && (
-                      <div className="text-sm text-gray-700">
+                      <div className="text-base text-gray-700">
                         コード決済：{store.paymentMethods.digitalPayments.join('、')}
                       </div>
                     )}
@@ -221,9 +221,9 @@ export function StoreDetailPopup({
 
               {/* 利用シーン */}
               {store.usageScenes && store.usageScenes.length > 0 && (
-                <div className="bg-white rounded-lg p-3">
-                  <div className="text-sm font-bold text-gray-900 mb-1">利用シーン</div>
-                  <div className="text-sm text-gray-700">{store.usageScenes.join('、')}</div>
+                <div className="bg-white rounded-lg p-4">
+                  <div className="text-base font-bold text-gray-900 mb-2">利用シーン</div>
+                  <div className="text-base text-gray-700">{store.usageScenes.join('、')}</div>
                 </div>
               )}
 
