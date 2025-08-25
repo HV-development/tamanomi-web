@@ -215,13 +215,13 @@ export function StoreDetailPopup({
                   </div>
                   <div className="space-y-2">
                     {store.budget.dinner && (
-                      <div className="flex justify-between items-center">
+                      <div className="flex items-center">
                         <span className="text-sm font-medium text-gray-700">夜：</span>
                         <span className="text-gray-900">{formatBudget(store.budget.dinner)}</span>
                       </div>
                     )}
                     {store.budget.lunch && (
-                      <div className="flex justify-between items-center">
+                      <div className="flex items-center">
                         <span className="text-sm font-medium text-gray-700">昼：</span>
                         <span className="text-gray-900">{formatBudget(store.budget.lunch)}</span>
                       </div>
