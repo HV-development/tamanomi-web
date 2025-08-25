@@ -250,7 +250,7 @@ export function StoreDetailPopup({
                   </div>
                   <div className="space-y-3">
                     {/* 現金 */}
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center">
                       <span className="text-sm font-medium text-gray-700">現金：</span>
                       <span className="text-gray-900">{store.paymentMethods.cash ? '可' : '不可'}</span>
                     </div>
