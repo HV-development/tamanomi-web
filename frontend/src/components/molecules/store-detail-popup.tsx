@@ -115,9 +115,9 @@ export function StoreDetailPopup({
           </div>
 
           {/* 店舗名表示 */}
-          <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
+          <div className="px-6 py-4 bg-white border-b border-green-100 flex-shrink-0">
             <div className="text-center">
-              <h4 className="text-lg font-bold text-green-900">{store.name}</h4>
+              <h4 className="text-lg font-bold text-black">{store.name}</h4>
             </div>
           </div>
 
