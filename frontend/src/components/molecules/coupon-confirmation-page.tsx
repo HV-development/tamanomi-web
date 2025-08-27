@@ -1,7 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
-import { useCouponAudio } from "../../hooks/use-audio"
 import type { Coupon } from "../../types/coupon"
 
 interface CouponConfirmationPageProps {
@@ -15,37 +13,15 @@ interface CouponConfirmationPageProps {
 export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick = () => {}, onLogoClick }: CouponConfirmationPageProps) {
   const { playCouponSound, initializeAudio, isAudioReady } = useCouponAudio()
 
-  // ページマウント時にオーディオを事前初期化
-  useEffect(() => {
-    console.log("🎵 CouponConfirmationPage mounted - pre-initializing audio")
-    initializeAudio()
-  }, [initializeAudio])
-
   if (!coupon) return null
 
-  // ページインタラクション時にオーディオを確実に初期化
-  const handlePageInteraction = () => {
-    initializeAudio()
-  }
-
   const handleConfirm = () => {
-    // 確定ボタンクリック時に再度初期化を試行
-    initializeAudio()
-    
-    // 少し遅延させて音声を再生
-    setTimeout(() => {
-      playCouponSound()
-    }, 50)
-    
-    // 既存の処理を実行
     onConfirm()
   }
 
   return (
     <div 
       className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col justify-center items-center p-4"
-      onClick={handlePageInteraction}
-      onTouchStart={handlePageInteraction}
     >
       <div className="w-full max-w-xs mx-auto">
         {/* 店員への指示 */}
@@ -106,7 +82,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGui
             {/* ボタン */}
             <div className="space-y-3">
               <button
-                onClick={handleConfirm}
+                onClick={onConfirm}
                 className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
               >
                 確定する
