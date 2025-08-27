@@ -1,11 +1,20 @@
 "use client"
 
+import React from 'react'
+
 import { useCouponAudio } from "../../hooks/use-audio"
 
 interface CouponConfirmationPageProps {
   coupon: Coupon | null
   onConfirm: () => void
   onCancel: () => void
+}
+
+export default function CouponConfirmationPage({ 
+  coupon, 
+  onConfirm, 
+  onCancel 
+}: CouponConfirmationPageProps) {
   if (!coupon) return null
 
   return (
