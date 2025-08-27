@@ -17,10 +17,22 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGui
   if (!coupon) return null
 
   const handleConfirm = () => {
+    console.log("🎵 handleConfirm called - starting audio playback")
+    console.log("🎵 playCouponSound function:", typeof playCouponSound)
+    
+    try {
+      console.log("🎵 Attempting to play coupon sound...")
     // 音声を再生
     playCouponSound()
+      console.log("🎵 playCouponSound() called successfully")
+    } catch (error) {
+      console.error("🎵 Error playing coupon sound:", error)
+    }
+    
     // 既存の処理を実行
+    console.log("🎵 Calling onConfirm...")
     onConfirm()
+    console.log("🎵 onConfirm called successfully")
   }
 
   return (
