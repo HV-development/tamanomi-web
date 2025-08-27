@@ -17,11 +17,13 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
   // モーダルが開いた時に音声を再生
   useEffect(() => {
     if (isOpen && coupon) {
-      // 少し遅延させて音声を再生
+      // 音声システムを初期化してから再生
+      initializeAudio()
+      
+      // 少し遅延させて確実に音声を再生
       const timer = setTimeout(() => {
-        initializeAudio()
         playCouponSound()
-      }, 500)
+      }, 800)
       
       return () => clearTimeout(timer)
     }

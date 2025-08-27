@@ -1,24 +1,12 @@
 "use client"
 
-import type { Coupon } from "../../types/coupon"
 import { useCouponAudio } from "../../hooks/use-audio"
 
 interface CouponConfirmationPageProps {
   coupon: Coupon | null
   onConfirm: () => void
   onCancel: () => void
-  onUsageGuideClick: () => void
-  onLogoClick: () => void
-}
-
-export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick = () => {}, onLogoClick }: CouponConfirmationPageProps) {
-  const { playCouponSound, initializeAudio, isAudioReady } = useCouponAudio()
-
   if (!coupon) return null
-
-  const handleConfirm = () => {
-    onConfirm()
-  }
 
   return (
     <div 
