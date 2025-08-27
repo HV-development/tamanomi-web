@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { useCouponAudio } from "../../hooks/use-audio"
 import type { Coupon } from "../../types/coupon"
 
