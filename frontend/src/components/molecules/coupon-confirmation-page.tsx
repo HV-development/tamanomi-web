@@ -1,6 +1,7 @@
 "use client"
 
 import type { Coupon } from "../../types/coupon"
+import { useCouponAudio } from "../../hooks/use-audio"
 
 interface CouponConfirmationPageProps {
   coupon: Coupon | null
