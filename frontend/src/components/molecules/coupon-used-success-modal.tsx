@@ -1,7 +1,8 @@
 "use client"
 
 import { CheckCircle, Sparkles } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useCouponAudio } from "../../hooks/use-audio"
 import type { Coupon } from "../../types/coupon"
 
 interface CouponUsedSuccessModalProps {
@@ -11,6 +12,21 @@ interface CouponUsedSuccessModalProps {
 }
 
 export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSuccessModalProps) {
+  const { playCouponSound, initializeAudio } = useCouponAudio()
+
+  // モーダルが開いた時に音声を再生
+  useEffect(() => {
+    if (isOpen && coupon) {
+      // 少し遅延させて音声を再生
+      const timer = setTimeout(() => {
+        initializeAudio()
+        playCouponSound()
+      }, 500)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen, coupon, initializeAudio, playCouponSound])
+
   // モーダルが閉じられている場合は何も表示しない
   if (!isOpen || !coupon) return null
 
