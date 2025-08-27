@@ -12,14 +12,20 @@ interface CouponConfirmationPageProps {
 }
 
 export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick = () => {}, onLogoClick }: CouponConfirmationPageProps) {
-  const { playCouponSound, isAudioReady } = useCouponAudio()
+  const { playCouponSound, initializeAudio, isAudioReady } = useCouponAudio()
 
   if (!coupon) return null
+
+  // ページ読み込み時にオーディオを初期化
+  const handlePageInteraction = () => {
+    console.log("🎵 Page interaction detected - initializing audio")
+    initializeAudio()
+  }
 
   const handleConfirm = () => {
     console.log("🎵 handleConfirm called - starting audio playback")
     console.log("🎵 playCouponSound function:", typeof playCouponSound)
-   console.log("🎵 isAudioReady:", isAudioReady)
+    console.log("🎵 isAudioReady:", isAudioReady)
     
     try {
       console.log("🎵 Attempting to play coupon sound...")
@@ -36,23 +42,11 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGui
     console.log("🎵 onConfirm called successfully")
   }
 
-  // ユーザーインタラクションでオーディオコンテキストを初期化
-  const handleUserInteraction = () => {
-    console.log("🎵 User interaction detected - preparing audio context")
-    if (couponSound.current && !isAudioReady) {
-      console.log("🎵 Attempting to unlock audio context")
-      // 無音で短時間再生してオーディオコンテキストをアンロック
-      const unlockSound = couponSound.current.play()
-      if (unlockSound) {
-        couponSound.current.stop(unlockSound)
-      }
-    }
-  }
   return (
     <div 
       className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col justify-center items-center p-4"
-      onClick={handleUserInteraction}
-      onTouchStart={handleUserInteraction}
+      onClick={handlePageInteraction}
+      onTouchStart={handlePageInteraction}
     >
       <div className="w-full max-w-xs mx-auto">
         {/* 店員への指示 */}
