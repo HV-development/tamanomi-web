@@ -14,23 +14,36 @@ interface CouponConfirmationPageProps {
 export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick = () => {}, onLogoClick }: CouponConfirmationPageProps) {
   const { playCouponSound, initializeAudio, isAudioReady } = useCouponAudio()
 
+  // ページマウント時にオーディオを事前初期化
+  useEffect(() => {
+    console.log("🎵 CouponConfirmationPage mounted - pre-initializing audio")
+    initializeAudio()
+  }, [initializeAudio])
+
   if (!coupon) return null
 
-  // ページ読み込み時にオーディオを初期化
+  // ページインタラクション時にオーディオを確実に初期化
   const handlePageInteraction = () => {
     console.log("🎵 Page interaction detected - initializing audio")
     initializeAudio()
   }
 
   const handleConfirm = () => {
+    console.log("🎵 === CONFIRM BUTTON CLICKED ===")
     console.log("🎵 handleConfirm called - starting audio playback")
     console.log("🎵 playCouponSound function:", typeof playCouponSound)
     console.log("🎵 isAudioReady:", isAudioReady)
     
+    // 確定ボタンクリック時に再度初期化を試行
+    initializeAudio()
+    
     try {
       console.log("🎵 Attempting to play coupon sound...")
-      // 音声を再生（ユーザーインタラクション内で直接実行）
+      // 少し遅延させて音声を再生
+      setTimeout(() => {
+        console.log("🎵 Playing audio with timeout...")
       playCouponSound()
+      }, 50)
       console.log("🎵 playCouponSound() called successfully")
     } catch (error) {
       console.error("🎵 Error playing coupon sound:", error)
