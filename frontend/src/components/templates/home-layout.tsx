@@ -264,8 +264,6 @@ export function HomeLayout({
   isStoreDetailOpen,
   isStoreDetailPopupOpen,
 }: HomeLayoutProps) {
-  console.log("HomeLayout render - currentView:", currentView, "selectedStore:", selectedStore?.name)
-  
   if (currentView === "coupon-confirmation") {
     return (
       <CouponConfirmationPage

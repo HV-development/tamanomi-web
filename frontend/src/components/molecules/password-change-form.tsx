@@ -88,19 +88,11 @@ export function PasswordChangeForm({ onSubmit, onCancel, isLoading = false }: Pa
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    console.log("🔍 PasswordChangeForm handleSubmit START")
-    console.log("🔍 Form data:", { currentPassword: "***", newPassword: "***", confirmPassword: "***" })
     e.preventDefault()
-    console.log("🔍 preventDefault executed")
     if (validateForm()) {
-      console.log("🔍 Form validation passed")
-      console.log("🔍 Calling onSubmit with passwords")
       onSubmit(currentPassword, newPassword)
-      console.log("🔍 onSubmit called successfully")
     } else {
-      console.log("❌ Form validation failed:", errors)
     }
-    console.log("🔍 PasswordChangeForm handleSubmit END")
   }
 
   const updateField = (field: keyof typeof errors, value: string) => {

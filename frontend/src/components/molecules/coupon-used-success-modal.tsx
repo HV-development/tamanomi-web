@@ -61,14 +61,8 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
             {/* 閉じるボタン */}
             <button
               onClick={() => {
-                console.log("Close button clicked in success modal")
-                console.log("Calling onClose handler...")
                 if (onClose) {
-                  console.log("onClose function exists, calling it...")
                   onClose()
-                  console.log("onClose called successfully")
-                } else {
-                  console.log("onClose function is undefined!")
                 }
               }}
               className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"

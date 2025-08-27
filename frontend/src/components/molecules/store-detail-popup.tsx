@@ -20,11 +20,8 @@ export function StoreDetailPopup({
   onFavoriteToggle, 
   onCouponsClick 
 }: StoreDetailPopupProps) {
-  console.log("StoreDetailPopup render:", { isOpen, storeName: store?.name })
-  
   if (!isOpen || !store) return null
 
-  console.log("StoreDetailPopup rendering:", { isOpen, storeName: store.name })
   
   const getStoreInteriorImage = (genre: string) => {
     const interiorImages: Record<string, string> = {

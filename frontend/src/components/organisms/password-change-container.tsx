@@ -22,13 +22,8 @@ export function PasswordChangeContainer({
   isLoading,
 }: PasswordChangeContainerProps) {
   const handleSubmit = (currentPassword: string, newPassword: string) => {
-    console.log("🔍 PasswordChangeContainer handleSubmit START")
-    console.log("🔍 Received passwords for change")
-    console.log("🔍 Calling onSubmit prop")
     // パスワード変更処理を実行してからログイン画面に遷移
     onSubmit(currentPassword, newPassword)
-    console.log("🔍 onSubmit prop called successfully")
-    console.log("🔍 PasswordChangeContainer handleSubmit END")
   }
 
   return (

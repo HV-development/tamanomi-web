@@ -93,7 +93,6 @@ export default function HomePage() {
   const hasNotification = notifications.some((n) => !n.isRead)
 
   const handleCurrentLocationClick = () => {
-    console.log("全て表示ボタンがクリックされました - フィルターをクリア")
     setSelectedGenres([])
     setSelectedArea("")
     setIsFavoritesFilter(false)
@@ -122,7 +121,6 @@ export default function HomePage() {
     if (otp === "") {
       // メールアドレス送信（ワンタイムパスワード送信）
       setTimeout(() => {
-        console.log("ワンタイムパスワード送信:", email)
         setLoginEmail(email)
         setLoginStep("otp")
         setIsLoading(false)
@@ -130,7 +128,6 @@ export default function HomePage() {
     } else {
       // ワンタイムパスワード認証
       setTimeout(() => {
-        console.log("ワンタイムパスワード認証:", email, otp)
         setIsAuthenticated(true)
         setUser(mockUser)
         setPlan(mockPlan)
@@ -179,7 +176,6 @@ export default function HomePage() {
   const handleResendOtp = () => {
     setIsLoading(true)
     setTimeout(() => {
-      console.log("ワンタイムパスワード再送信:", loginEmail)
       setIsLoading(false)
     }, 1500)
   }
@@ -187,7 +183,6 @@ export default function HomePage() {
   const handleEmailSubmit = (email: string) => {
     setIsLoading(true)
     setTimeout(() => {
-      console.log("認証メール送信:", email)
       setEmailRegistrationEmail(email)
       setEmailRegistrationStep("complete")
       setIsLoading(false)
@@ -207,7 +202,6 @@ export default function HomePage() {
   }
 
   const handleSignupSubmit = (data: any) => {
-    console.log("登録データ:", data)
     setSignupData(data)
     setCurrentView("confirmation")
   }
@@ -220,7 +214,6 @@ export default function HomePage() {
   const handleConfirmRegister = async () => {
     setIsLoading(true)
     setTimeout(() => {
-      console.log("登録完了:", signupData)
       // 確認メール送信完了画面に遷移
       setEmailConfirmationEmail(signupData?.email || "")
       setCurrentView("email-confirmation")
@@ -235,7 +228,6 @@ export default function HomePage() {
       password: "",
       passwordConfirm: "",
     }
-    console.log('Setting signup data for edit:', dataWithoutPassword)
     setSignupData(dataWithoutPassword)
     setCurrentView("signup")
   }
@@ -243,7 +235,6 @@ export default function HomePage() {
   const handleSubscribe = async (planId: string) => {
     setIsLoading(true)
     setTimeout(() => {
-      console.log("サブスクリプション登録:", planId)
       setIsLoading(false)
       setCurrentView("home")
       setActiveTab("home")
@@ -254,7 +245,6 @@ export default function HomePage() {
   const handlePasswordResetSubmit = async (email: string) => {
     setIsLoading(true)
     setTimeout(() => {
-      console.log("パスワード再設定メール送信:", email)
       setPasswordResetEmail(email)
       setPasswordResetStep("complete")
       setIsLoading(false)
@@ -273,23 +263,17 @@ export default function HomePage() {
 
 
   const handleMenuItemClick = (itemId: string) => {
-    console.log("メニュー項目クリック:", itemId)
 
     switch (itemId) {
       case "terms":
-        console.log("利用規約画面を表示")
         break
       case "privacy":
-        console.log("プライバシーポリシー画面を表示")
         break
       case "commercial-law":
-        console.log("特定商取引法画面を表示")
         break
       case "contact":
-        console.log("お問い合わせ画面を表示")
         break
       case "login":
-        console.log("ログイン画面に遷移")
         setCurrentView("login")
         setActiveTab("map")
         break
@@ -299,42 +283,34 @@ export default function HomePage() {
   }
 
   const handleFavoritesClick = () => {
-    console.log("お気に入り一覧を表示")
     setIsFavoritesOpen(true)
   }
 
   const handleHistoryClick = () => {
-    console.log("履歴ボタンがクリックされました")
   }
 
   const handleFavoritesClose = () => {
-    console.log("お気に入りパネルを閉じる")
     setIsFavoritesOpen(false)
   }
 
   const handleHistoryClose = () => {
-    console.log("履歴パネルを閉じる")
   }
 
   const handleNotificationClick = () => {
-    console.log("通知パネルを開く")
     // 通知パネルを開く処理をここに実装
   }
 
   const handleNotificationItemClick = (notificationId: string) => {
-    console.log("通知項目クリック:", notificationId)
     setNotifications((prev) =>
       prev.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n))
     )
   }
 
   const handleMarkAllNotificationsRead = () => {
-    console.log("すべての通知を既読にする")
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })))
   }
 
   const handleFavoriteToggle = (storeId: string) => {
-    console.log("お気に入りトグル:", storeId)
     setStores((prevStores) =>
       prevStores.map((store) => (store.id === storeId ? { ...store, isFavorite: !store.isFavorite } : store)),
     )
@@ -346,14 +322,10 @@ export default function HomePage() {
   }
 
   const handleCouponsClick = (storeId: string) => {
-    console.log("handleCouponsClick called with storeId:", storeId)
     const store = stores.find((s) => s.id === storeId)
-    console.log("Found store:", store?.name)
     if (store) {
       setSelectedStore(store)
-      console.log("Setting isCouponListOpen to true")
       setIsCouponListOpen(true)
-      console.log("Setting isStoreDetailOpen to false")
       setIsStoreDetailOpen(false)
     }
   }
@@ -387,7 +359,6 @@ export default function HomePage() {
   const handlePlanChangeSubmit = async (planId: string) => {
     setIsLoading(true)
     setTimeout(() => {
-      console.log("プラン変更:", planId)
 
       // プラン情報を更新
       const planMap: Record<string, { name: string; price: number; description: string }> = {
@@ -448,17 +419,14 @@ export default function HomePage() {
   }
 
   const handleWithdrawConfirm = () => {
-    console.log("退会処理実行")
     setMyPageView("withdrawal-complete")
   }
 
   const handleWithdrawCancel = () => {
-    console.log("退会キャンセル - プロフィール編集に戻る")
     setMyPageView("profile-edit")
   }
 
   const handleWithdrawComplete = () => {
-    console.log("退会完了 - ログアウトしてトップ画面に戻る")
     // 退会完了時の処理
     setIsAuthenticated(false)
     setUser(undefined)
@@ -480,12 +448,10 @@ export default function HomePage() {
     setCurrentView("home")
     setActiveTab("home")
     setMyPageView("main")
-    console.log("ログアウト")
   }
 
   // 利用履歴関連のハンドラー
   const handleShowStoreOnHome = (storeId: string) => {
-    console.log("ホームで店舗を表示:", storeId)
     // ホーム画面に戻って該当店舗を表示
     setCurrentView("home")
     setActiveTab("home")
@@ -500,13 +466,11 @@ export default function HomePage() {
       return
     }
     
-    console.log("同じクーポンを利用:", couponId)
     // クーポン利用画面に遷移
     // 実際の実装では、該当クーポンの利用画面を表示
   }
 
   const handleLogoClick = () => {
-    console.log("ロゴクリック - ホームに遷移")
     setCurrentView("home")
     setActiveTab("home")
     setMyPageView("main")
@@ -539,7 +503,6 @@ export default function HomePage() {
   }
 
   const handleConfirmCoupon = () => {
-    console.log("クーポン使用確定:", selectedCoupon?.id)
     // 大きい成功モーダルを表示（selectedCouponとselectedStoreをクリアする前に）
     setIsSuccessModalOpen(true)
     // 確認ページを閉じてホームに戻る
@@ -547,7 +510,6 @@ export default function HomePage() {
   }
 
   const handleSuccessModalClose = () => {
-    console.log("成功モーダルを閉じる")
     setIsSuccessModalOpen(false)
     // 成功モーダルを閉じる時に必要な状態のみクリア
     setSelectedCoupon(null)
@@ -565,7 +527,6 @@ export default function HomePage() {
   }
 
   const handleCancelCoupon = () => {
-    console.log("クーポン確認をキャンセル - クーポン一覧に戻る")
     setCurrentView("home")
     setIsCouponListOpen(true)
     setSelectedCoupon(null)
@@ -580,28 +541,18 @@ export default function HomePage() {
   }
 
   const handleStoreClick = (store: Store) => {
-    console.log("店舗詳細ポップアップを表示:", store.name)
-    console.log("現在のisStoreDetailPopupOpen:", isStoreDetailPopupOpen)
     setSelectedStore(store)
-    console.log("setSelectedStore実行完了")
     setIsStoreDetailPopupOpen(true)
-    console.log("setIsStoreDetailPopupOpen(true)実行完了")
-    console.log("更新後のisStoreDetailPopupOpen:", true)
   }
 
   const handleStoreDetailPopupClose = () => {
-    console.log("店舗詳細ポップアップを閉じる")
-    console.log("現在のisStoreDetailPopupOpen:", isStoreDetailPopupOpen)
     setIsStoreDetailPopupOpen(false)
-    console.log("setIsStoreDetailPopupOpen(false)実行完了")
     setSelectedStore(null)
-    console.log("setSelectedStore(null)実行完了")
   }
 
   const handleProfileEditSubmit = async (data: any) => {
     setIsLoading(true)
     setTimeout(() => {
-      console.log("プロフィール更新:", data)
       // ユーザー情報を更新
       setUser((prev) => (prev ? { ...prev, ...data } : prev))
       setIsLoading(false)
@@ -612,7 +563,6 @@ export default function HomePage() {
   const handleEmailChangeSubmit = async (currentPassword: string, newEmail: string) => {
     setIsLoading(true)
     setTimeout(() => {
-      console.log("メールアドレス変更:", { currentPassword, newEmail })
       setNewEmail(newEmail)
       setEmailChangeStep("complete")
       setIsLoading(false)
@@ -626,48 +576,27 @@ export default function HomePage() {
   }
 
   const handlePasswordChangeSubmit = async (currentPassword: string, newPassword: string) => {
-    console.log("🔍 handlePasswordChangeSubmit START")
-    console.log("🔍 Received data:", { currentPassword: "***", newPassword: "***" })
     setIsLoading(true)
-    console.log("🔍 setIsLoading(true) executed")
     
     // パスワード変更処理をシミュレート
     setTimeout(() => {
-      console.log("🔍 setTimeout callback START")
-      console.log("🔍 パスワード変更完了 - ログイン画面に遷移")
-      
       // ログアウト処理
-      console.log("🔍 Starting logout process")
       setIsAuthenticated(false)
-      console.log("🔍 setIsAuthenticated(false) executed")
       setUser(undefined)
-      console.log("🔍 setUser(undefined) executed")
       setPlan(undefined)
-      console.log("🔍 setPlan(undefined) executed")
       setUsageHistory([])
-      console.log("🔍 setUsageHistory([]) executed")
       setPaymentHistory([])
-      console.log("🔍 setPaymentHistory([]) executed")
       
       // ログイン画面に遷移
-      console.log("🔍 Starting navigation to login")
       setCurrentView("login")
-      console.log("🔍 setCurrentView('login') executed")
       setActiveTab("map")
-      console.log("🔍 setActiveTab('map') executed")
       setMyPageView("main")
-      console.log("🔍 setMyPageView('main') executed")
       setPasswordChangeStep("form")
-      console.log("🔍 setPasswordChangeStep('form') executed")
       setIsLoading(false)
-      console.log("🔍 setIsLoading(false) executed")
-      console.log("🔍 setTimeout callback END")
     }, 1500)
-    console.log("🔍 handlePasswordChangeSubmit END")
   }
 
   const handlePasswordChangeComplete = () => {
-    console.log("パスワード変更完了 - ログイン画面に遷移")
     // ログアウト処理
     setIsAuthenticated(false)
     setUser(undefined)
@@ -679,7 +608,6 @@ export default function HomePage() {
     setActiveTab("map")
     setMyPageView("main")
     setPasswordChangeStep("form")
-  }
 
   const handlePasswordChangeBackToLogin = () => {
     // パスワード変更完了後はログアウトしてログイン画面に遷移

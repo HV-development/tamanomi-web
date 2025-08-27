@@ -25,35 +25,20 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGui
 
   // ページインタラクション時にオーディオを確実に初期化
   const handlePageInteraction = () => {
-    console.log("🎵 Page interaction detected - initializing audio")
     initializeAudio()
   }
 
   const handleConfirm = () => {
-    console.log("🎵 === CONFIRM BUTTON CLICKED ===")
-    console.log("🎵 handleConfirm called - starting audio playback")
-    console.log("🎵 playCouponSound function:", typeof playCouponSound)
-    console.log("🎵 isAudioReady:", isAudioReady)
-    
     // 確定ボタンクリック時に再度初期化を試行
     initializeAudio()
     
-    try {
-      console.log("🎵 Attempting to play coupon sound...")
-      // 少し遅延させて音声を再生
-      setTimeout(() => {
-        console.log("🎵 Playing audio with timeout...")
+    // 少し遅延させて音声を再生
+    setTimeout(() => {
       playCouponSound()
-      }, 50)
-      console.log("🎵 playCouponSound() called successfully")
-    } catch (error) {
-      console.error("🎵 Error playing coupon sound:", error)
-    }
+    }, 50)
     
     // 既存の処理を実行
-    console.log("🎵 Calling onConfirm...")
     onConfirm()
-    console.log("🎵 onConfirm called successfully")
   }
 
   return (

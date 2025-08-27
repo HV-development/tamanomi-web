@@ -16,7 +16,6 @@ interface CouponListPopupProps {
 export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, onUseCoupon }: CouponListPopupProps) {
   if (!isOpen) return null
 
-  console.log("CouponListPopup rendering:", { isOpen, storeName, couponsCount: coupons.length })
 
   return (
     <>

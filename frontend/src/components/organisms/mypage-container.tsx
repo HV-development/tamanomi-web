@@ -88,13 +88,9 @@ export function MyPageContainer({
   passwordChangeStep = "form",
   newEmail = "",
 }: MyPageContainerProps) {
-  console.log("🔍 MyPageContainer render - currentView:", currentView)
-  console.log("🔍 MyPageContainer - passwordChangeStep:", passwordChangeStep)
-  console.log("🔍 MyPageContainer - onPasswordChangeSubmit type:", typeof onPasswordChangeSubmit)
 
   // 防御的チェック：userとplanが存在しない場合はnullを返す
   if (!user || !plan) {
-    console.log("❌ MyPageContainer - user or plan is missing")
     return null
   }
 
