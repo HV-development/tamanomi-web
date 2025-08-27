@@ -21,7 +21,7 @@ export function Logo({ size = "md", className = "", onClick }: LogoProps) {
       className={`flex items-center ${onClick ? "cursor-pointer hover:opacity-80 transition-opacity" : ""} ${className}`}
     >
       <img 
-        src="/logo.png" 
+        src="/logo.svg
         alt="TAMAYOI" 
         className={`${sizeClasses[size]} object-contain`}
       />
