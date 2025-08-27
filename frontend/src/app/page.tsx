@@ -608,6 +608,7 @@ export default function HomePage() {
     setActiveTab("map")
     setMyPageView("main")
     setPasswordChangeStep("form")
+  }
 
   const handlePasswordChangeBackToLogin = () => {
     // パスワード変更完了後はログアウトしてログイン画面に遷移
