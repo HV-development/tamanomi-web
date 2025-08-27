@@ -1,5 +1,6 @@
 "use client"
 
+import { useCouponAudio } from "../../hooks/use-audio"
 import type { Coupon } from "../../types/coupon"
 
 interface CouponConfirmationPageProps {
@@ -11,7 +12,16 @@ interface CouponConfirmationPageProps {
 }
 
 export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick = () => {}, onLogoClick }: CouponConfirmationPageProps) {
+  const { playCouponSound } = useCouponAudio()
+
   if (!coupon) return null
+
+  const handleConfirm = () => {
+    // 音声を再生
+    playCouponSound()
+    // 既存の処理を実行
+    onConfirm()
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col justify-center items-center p-4">
@@ -74,7 +84,7 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGui
             {/* ボタン */}
             <div className="space-y-3">
               <button
-                onClick={onConfirm}
+                onClick={handleConfirm}
                 className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
               >
                 確定する
