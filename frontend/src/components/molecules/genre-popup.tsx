@@ -13,6 +13,7 @@ interface GenrePopupProps {
 }
 
 const GENRES = [
+  { value: "event", label: "イベント" },
   { value: "izakaya", label: "居酒屋" },
   { value: "creative", label: "創作料理" },
   { value: "japanese", label: "和食" },
