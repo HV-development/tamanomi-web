@@ -141,8 +141,8 @@ export function FilterControls({
     <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
       {/* ヘッダー */}
       <div className="flex items-center justify-between px-4 py-3">
-        {/* 左側: ハンバーガーメニュー */}
-        <div className="flex items-center gap-3">
+        {/* 左側: ハンバーガーメニューとランク */}
+        <div className="flex items-center gap-3 w-20">
           <HamburgerMenu onMenuItemClick={onMenuItemClick} />
           
           {/* メンバーランク画像（ログイン時のみ） */}
@@ -158,31 +158,12 @@ export function FilterControls({
         </div>
         
         {/* 中央: ロゴ */}
-        <div className="flex-1 flex justify-center">
+        <div className="flex justify-center">
           <Logo size="lg" onClick={onLogoClick} />
         </div>
 
-        {/* 右側: お気に入りとログイン */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onFavoritesClick}
-            className="relative p-2 rounded-full transition-colors hover:bg-gray-100 text-gray-600 hover:text-red-500"
-            aria-label="お気に入り"
-          >
-            <Heart className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => isAuthenticated ? onTabChange("mypage") : onMenuItemClick("login")}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label={isAuthenticated ? "マイページ" : "ログイン"}
-          >
-            {isAuthenticated ? (
-              <User className="w-5 h-5 text-gray-600 hover:text-green-600" />
-            ) : (
-              <LogIn className="w-5 h-5 text-gray-600 hover:text-green-600" />
-            )}
-          </button>
-        </div>
+        {/* 右側: 空のスペース（左右対称にするため） */}
+        <div className="w-20"></div>
       </div>
 
       {/* フィルターコントロール */}
