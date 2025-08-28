@@ -279,6 +279,9 @@ export default function HomePage() {
         setCurrentView("login")
         setActiveTab("map")
         break
+      case "logout":
+        handleLogout()
+        break
       default:
         break
     }
