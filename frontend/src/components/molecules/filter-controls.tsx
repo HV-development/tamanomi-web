@@ -144,8 +144,15 @@ export function FilterControls({
         {/* 左側: ハンバーガーメニューとランク */}
         <div className="flex items-center gap-3 w-20">
           <HamburgerMenu onMenuItemClick={onMenuItemClick} />
-          
-          {/* メンバーランク画像（ログイン時のみ） */}
+        </div>
+        
+        {/* 中央: ロゴ */}
+        <div className="flex justify-center">
+          <Logo size="lg" onClick={onLogoClick} />
+        </div>
+
+        {/* 右側: メンバーランク画像（ログイン時のみ） */}
+        <div className="flex items-center justify-end w-20">
           {isAuthenticated && userRank && (
             <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
               <img
@@ -156,14 +163,6 @@ export function FilterControls({
             </div>
           )}
         </div>
-        
-        {/* 中央: ロゴ */}
-        <div className="flex justify-center">
-          <Logo size="lg" onClick={onLogoClick} />
-        </div>
-
-        {/* 右側: 空のスペース（左右対称にするため） */}
-        <div className="w-20"></div>
       </div>
 
       {/* フィルターコントロール */}
