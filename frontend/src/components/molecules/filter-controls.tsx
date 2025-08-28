@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Logo } from "../atoms/logo"
 import { HamburgerMenu } from "./hamburger-menu"
 import { PopupButton } from "../atoms/popup-button"
 import { Button } from "../atoms/button"
 import { GenrePopup } from "./genre-popup"
 import { AreaPopup } from "./area-popup"
-import { Heart, LogIn } from "lucide-react"
+import { Heart, LogIn, MoreVertical, LogOut } from "lucide-react"
 import { User } from "lucide-react"
 import { RankBadge } from "../atoms/rank-badge"
 import { calculateUserRank } from "../../utils/rank-calculator"
@@ -30,6 +30,7 @@ interface FilterControlsProps {
   onMenuItemClick: (itemId: string) => void
   onLogoClick: () => void
   onTabChange: (tab: string) => void
+  onLogout?: () => void
   favoriteCount?: number
 }
 
@@ -50,12 +51,31 @@ export function FilterControls({
   onMenuItemClick,
   onLogoClick,
   onTabChange,
+  onLogout,
   favoriteCount = 0,
 }: FilterControlsProps) {
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
 
+  // ユーザーメニューの外側クリックで閉じる
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    if (isUserMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isUserMenuOpen])
   const handleGenreToggle = (genre: string) => {
     const newGenres = selectedGenres.includes(genre)
       ? selectedGenres.filter((g) => g !== genre)
@@ -121,6 +141,17 @@ export function FilterControls({
     console.log("すべての通知を既読にする")
   }
 
+  const handleUserMenuToggle = () => {
+    setIsUserMenuOpen(!isUserMenuOpen)
+  }
+
+  const handleLogout = () => {
+    setIsUserMenuOpen(false)
+    if (onLogout) {
+      onLogout()
+    }
+  }
+
   // ユーザーのランクを計算
   const userRank = user ? (() => {
     const contractDate = user.contractStartDate
@@ -146,6 +177,14 @@ export function FilterControls({
           <HamburgerMenu onMenuItemClick={onMenuItemClick} />
         </div>
         
+  const handleUserMenuToggle = () => {
+    setIsUserMenuOpen(!isUserMenuOpen)
+  }
+
+  const handleLogout = () => {
+    setIsUserMenuOpen(false)
+    onLogout()
+  }
         {/* 中央: ロゴ */}
         <div className="flex justify-center">
           <Logo size="lg" onClick={onLogoClick} />
@@ -154,14 +193,66 @@ export function FilterControls({
         {/* 右側: メンバーランク画像（ログイン時のみ） */}
         <div className="flex items-center justify-end w-20">
           {isAuthenticated && userRank && (
-            <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
-              <img
-                src={`/${userRank}.png`}
-                alt={`${userRank}ランク`}
-                className="w-5 h-5 object-contain"
-              />
-            </div>
-          )}
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={handleUserMenuToggle}
+                className="flex items-center gap-2 p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
+        {/* 右側: ユーザーメニュー（ログイン時のみ） */}
+        <div className="flex items-center justify-end w-20 relative" ref={userMenuRef}>
+          {isAuthenticated ? (
+            <>
+              <button
+                onClick={handleUserMenuToggle}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="ユーザーメニュー"
+              >
+                <MoreVertical className="w-5 h-5 text-gray-600" />
+              </button>
+
+              {/* ユーザーメニュードロップダウン */}
+              {isUserMenuOpen && (
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                  {/* ユーザー情報セクション */}
+                  <div className="px-4 py-3 bg-green-50 border-b border-green-100">
+                    <div className="flex items-center gap-3">
+                      {userRank && (
+                        <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
+                          <img
+                            src={`/${userRank}.png`}
+                            alt={`${userRank}ランク`}
+                            className="w-5 h-5 object-contain"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {user?.nickname || "ユーザー"}
+                        </div>
+                        {userRank && (
+                          <div className="text-xs text-green-600 capitalize">
+                            {userRank}ランク
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* メニュー項目 */}
+                  <div className="py-1">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-3 text-left hover:bg-red-50 transition-colors flex items-center gap-3 text-red-600 hover:text-red-700"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="font-medium">ログアウト</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : null}
         </div>
       </div>
 

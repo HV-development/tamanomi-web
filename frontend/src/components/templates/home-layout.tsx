@@ -463,6 +463,7 @@ export function HomeLayout({
         onLogoClick={onLogoClick}
         onTabChange={onTabChange}
         favoriteCount={favoriteStores.length}
+        onLogout={onLogout}
       />
       <div className="flex-1 overflow-hidden">
         <HomeContainer
