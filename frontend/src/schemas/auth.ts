@@ -20,7 +20,6 @@ export const userRegistrationSchema = z.object({
   address: z.string().min(1, '住所を入力してください。'),
   birthDate: z.string().min(1, '生年月日を入力してください。'),
   gender: z.enum(['male', 'female', 'other'], { required_error: '性別を選択してください。' }),
-  saitamaAppId: z.string().optional()
 })
 
 export type EmailRegistrationData = z.infer<typeof emailRegistrationSchema>

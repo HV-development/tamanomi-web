@@ -415,15 +415,6 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
         error={errors.passwordConfirm}
       />
 
-      {/* さいたま市みんなのアプリID */}
-      <Input
-        type="text"
-        label="さいたま市みんなのアプリID（任意）"
-        placeholder="アプリIDを入力"
-        value={formData.saitamaAppId}
-        onChange={(value) => updateFormData("saitamaAppId", value)}
-      />
-
       {/* ボタン */}
       <div className="space-y-3">
         <Button

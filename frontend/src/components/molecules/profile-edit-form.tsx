@@ -313,26 +313,6 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
         error={errors.gender}
       />
 
-      {/* 登録店舗（表示のみ） */}
-      {formData.registeredStore && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">登録店舗</label>
-          <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
-            {formData.registeredStore}
-          </div>
-          <p className="mt-1 text-xs text-gray-500">※店舗QRコードから登録された店舗です</p>
-        </div>
-      )}
-
-      {/* さいたま市みんなのアプリID */}
-      <Input
-        type="text"
-        label="さいたま市みんなのアプリID（任意）"
-        placeholder="アプリIDを入力"
-        value={formData.saitamaAppId}
-        onChange={(value) => updateFormData("saitamaAppId", value)}
-      />
-
       {/* ボタン */}
       <div className="space-y-3">
         <Button
