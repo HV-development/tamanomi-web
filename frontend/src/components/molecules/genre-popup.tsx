@@ -4,6 +4,7 @@ import { useCallback } from "react"
 import { GenreButton } from "../atoms/genre-button"
 import { Button } from "../atoms/button"
 import { getGenreColor } from "../../utils/genre-colors"
+import { cn } from "../../lib/utils"
 
 interface GenrePopupProps {
   isOpen: boolean
@@ -89,7 +90,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                   >
                     {isSelected && (
                       <div className="absolute -top-1 -right-1">
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${genreColors.text.replace('text-', 'bg-')}`}>
+                        <div className={cn("w-4 h-4 rounded-full flex items-center justify-center", genreColors.text.replace('text-', 'bg-'))}>
                           <span className="text-white text-xs">✓</span>
                         </div>
                       </div>
@@ -117,7 +118,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                     >
                       {isSelected && (
                         <div className="absolute -top-1 -right-1">
-                          <div className={\`w-4 h-4 rounded-full flex items-center justify-center ${genreColors.text.replace('text-', 'bg-')}`}>
+                          <div className={cn("w-4 h-4 rounded-full flex items-center justify-center", genreColors.text.replace('text-', 'bg-'))}>
                             <span className="text-white text-xs">✓</span>
                           </div>
                         </div>
