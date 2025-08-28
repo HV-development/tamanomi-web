@@ -190,58 +190,17 @@ export function FilterControls({
         </div>
 
         {/* 右側: ユーザーメニュー（ログイン時のみ） */}
-        <div className="flex items-center justify-end w-20 relative" ref={userMenuRef}>
+        <div className="flex items-center justify-end w-20">
           {isAuthenticated ? (
-            <>
-              <button
-                onClick={handleUserMenuToggle}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="ユーザーメニュー"
-              >
-                <MoreVertical className="w-5 h-5 text-gray-600" />
-              </button>
-
-              {/* ユーザーメニュードロップダウン */}
-              {isUserMenuOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
-                  {/* ユーザー情報セクション */}
-                  <div className="px-4 py-3 bg-green-50 border-b border-green-100">
-                    <div className="flex items-center gap-3">
-                      {userRank && (
-                        <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
-                          <img
-                            src={`/${userRank}.png`}
-                            alt={`${userRank}ランク`}
-                            className="w-5 h-5 object-contain"
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900 truncate">
-                          {user?.nickname || "ユーザー"}
-                        </div>
-                        {userRank && (
-                          <div className="text-xs text-green-600 capitalize">
-                            {userRank}ランク
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* メニュー項目 */}
-                  <div className="py-1">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full px-4 py-3 text-left hover:bg-red-50 transition-colors flex items-center gap-3 text-red-600 hover:text-red-700"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span className="font-medium">ログアウト</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
+            userRank && (
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
+                <img
+                  src={`/${userRank}.png`}
+                  alt={`${userRank}ランク`}
+                  className="w-5 h-5 object-contain"
+                />
+              </div>
+            )
           ) : null}
         </div>
       </div>

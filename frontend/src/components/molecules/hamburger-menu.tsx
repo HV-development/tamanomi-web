@@ -11,10 +11,12 @@ interface MenuItem {
 
 interface HamburgerMenuProps {
   onMenuItemClick: (itemId: string) => void
+  isAuthenticated?: boolean
+  onLogout?: () => void
   className?: string
 }
 
-export function HamburgerMenu({ onMenuItemClick, className = "" }: HamburgerMenuProps) {
+export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, onLogout, className = "" }: HamburgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const menuItems: MenuItem[] = [
@@ -39,6 +41,15 @@ export function HamburgerMenu({ onMenuItemClick, className = "" }: HamburgerMenu
       onClick: () => onMenuItemClick("contact"),
     },
   ]
+
+  // ログイン時はログアウトメニューを追加
+  if (isAuthenticated && onLogout) {
+    menuItems.push({
+      id: "logout",
+      label: "ログアウト",
+      onClick: onLogout,
+    })
+  }
 
   const handleToggle = () => {
     setIsOpen(!isOpen)

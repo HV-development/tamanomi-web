@@ -462,6 +462,7 @@ export function HomeLayout({
         onMenuItemClick={onMenuItemClick}
         onLogoClick={onLogoClick}
         onTabChange={onTabChange}
+        isAuthenticated={isAuthenticated}
         favoriteCount={favoriteStores.length}
         onLogout={onLogout}
       />
