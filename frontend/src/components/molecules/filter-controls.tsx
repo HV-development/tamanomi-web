@@ -122,11 +122,21 @@ export function FilterControls({
   }
 
   // ユーザーのランクを計算
-  const userRank = user && user.contractStartDate 
-    ? calculateUserRank(user.contractStartDate) 
-    : user && user.createdAt 
-    ? calculateUserRank(user.createdAt)
-    : null
+  const userRank = user ? (() => {
+    const contractDate = user.contractStartDate
+    const createdDate = user.createdAt
+    
+    if (contractDate && contractDate instanceof Date) {
+      return calculateUserRank(contractDate)
+    } else if (createdDate && createdDate instanceof Date) {
+      return calculateUserRank(createdDate)
+    } else if (contractDate && typeof contractDate === 'string') {
+      return calculateUserRank(new Date(contractDate))
+    } else if (createdDate && typeof createdDate === 'string') {
+      return calculateUserRank(new Date(createdDate))
+    }
+    return null
+  })() : null
   return (
     <div className="bg-white shadow-sm border-b border-gray-100">
       {/* ヘッダー */}
