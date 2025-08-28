@@ -13,18 +13,18 @@ export function Logo({ size = "md", className = "", onClick }: LogoProps) {
     lg: "h-8",
   }
 
-  const Component = onClick ? "button" : "div"
+  const WrapperComponent = onClick ? "button" : "div"
 
   return (
-    <Component
+    <WrapperComponent
       onClick={onClick}
       className={`flex items-center ${onClick ? "cursor-pointer hover:opacity-80 transition-opacity" : ""} ${className}`}
     >
       <img 
-        src="/logo.svg
+        src="/logo.svg"
         alt="TAMAYOI" 
         className={`${sizeClasses[size]} object-contain`}
       />
-    </Component>
+    </WrapperComponent>
   )
 }
