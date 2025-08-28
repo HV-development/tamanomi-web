@@ -76,6 +76,7 @@ export function FilterControls({
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isUserMenuOpen])
+  
   const handleGenreToggle = (genre: string) => {
     const newGenres = selectedGenres.includes(genre)
       ? selectedGenres.filter((g) => g !== genre)
@@ -168,6 +169,7 @@ export function FilterControls({
     }
     return null
   })() : null
+  
   return (
     <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
       {/* ヘッダー */}
@@ -177,28 +179,11 @@ export function FilterControls({
           <HamburgerMenu onMenuItemClick={onMenuItemClick} />
         </div>
         
-  const handleUserMenuToggle = () => {
-    setIsUserMenuOpen(!isUserMenuOpen)
-  }
-
-  const handleLogout = () => {
-    setIsUserMenuOpen(false)
-    onLogout()
-  }
         {/* 中央: ロゴ */}
         <div className="flex justify-center">
           <Logo size="lg" onClick={onLogoClick} />
         </div>
 
-        {/* 右側: メンバーランク画像（ログイン時のみ） */}
-        <div className="flex items-center justify-end w-20">
-          {isAuthenticated && userRank && (
-            <div className="relative" ref={userMenuRef}>
-              <button
-                onClick={handleUserMenuToggle}
-                className="flex items-center gap-2 p-1 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
         {/* 右側: ユーザーメニュー（ログイン時のみ） */}
         <div className="flex items-center justify-end w-20 relative" ref={userMenuRef}>
           {isAuthenticated ? (
