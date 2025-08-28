@@ -216,7 +216,7 @@ export function FilterControls({
               : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
           }`}
         >
-          <span>イベント</span>
+          <span>ジャンル</span>
           {selectedGenres.length > 0 && (
             <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
               {selectedGenres.length}
