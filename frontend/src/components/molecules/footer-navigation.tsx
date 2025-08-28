@@ -44,7 +44,7 @@ export function FooterNavigation({
   ]
 
   return (
-    <div className={`bg-green-600 px-4 py-3 ${className}`}>
+    <div className={`bg-green-600 px-4 py-3 sticky bottom-0 z-30 ${className}`}>
       <div className="flex justify-around items-center">
         {tabs.map((tab) => {
           const Icon = tab.icon

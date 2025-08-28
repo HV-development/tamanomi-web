@@ -464,7 +464,8 @@ export function HomeLayout({
         onTabChange={onTabChange}
         favoriteCount={favoriteStores.length}
       />
-      <HomeContainer
+      <div className="flex-1 overflow-hidden">
+        <HomeContainer
         selectedGenres={selectedGenres}
         selectedEvents={selectedEvents}
         isFavoritesFilter={isFavoritesFilter}
@@ -472,8 +473,9 @@ export function HomeLayout({
         onStoreClick={onStoreClick}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
-        isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
-      />
+          isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
+        />
+      </div>
 
       {/* お気に入り一覧ポップアップ */}
       <HistoryPopup

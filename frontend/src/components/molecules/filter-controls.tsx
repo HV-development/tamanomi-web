@@ -138,7 +138,7 @@ export function FilterControls({
     return null
   })() : null
   return (
-    <div className="bg-white shadow-sm border-b border-gray-100">
+    <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
       {/* ヘッダー */}
       <div className="flex items-center justify-between px-4 py-3">
         {/* 左側: ハンバーガーメニュー */}
