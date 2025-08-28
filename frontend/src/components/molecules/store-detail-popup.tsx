@@ -121,31 +121,6 @@ export function StoreDetailPopup({
           {/* コンテンツ */}
           <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
             <div className="space-y-4">
-              {/* 店舗写真3枚横並び */}
-              <div className="grid grid-cols-3 gap-1">
-                <div className="aspect-square overflow-hidden rounded-lg">
-                  <img
-                    src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg"}
-                    alt={`${store.name} 外観`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="aspect-square overflow-hidden rounded-lg">
-                  <img
-                    src={getStoreInteriorImage(store.genre)}
-                    alt={`${store.name} 店内`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="aspect-square overflow-hidden rounded-lg">
-                  <img
-                    src={getStoreFoodImage(store.genre)}
-                    alt={`${store.name} 料理`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-
               {/* 営業時間 */}
               {store.businessHours && (
                 <div className="bg-white rounded-lg p-4">
