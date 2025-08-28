@@ -51,7 +51,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
       <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-lg mx-auto max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-gray-900">イベントを選択</h3>
+            <h3 className="text-lg font-bold text-gray-900">ジャンルを選択</h3>
             <button 
               onClick={onClose} 
               className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -66,7 +66,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
           <div className="max-h-96 overflow-y-auto mb-6">
             {/* イベントヘッダー */}
             <div className="mb-4">
-              <h4 className="text-md font-bold text-gray-800 mb-3">イベント</h4>
+              <h4 className="text-md font-bold text-gray-800 mb-3">ジャンル</h4>
             </div>
             
             {/* ジャンル選択 */}
