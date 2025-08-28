@@ -182,6 +182,10 @@ export function FilterControls({
         {/* 左側: ハンバーガーメニューとランク */}
         <div className="flex items-center gap-3 w-20">
           <HamburgerMenu onMenuItemClick={onMenuItemClick} />
+        </div>
+
+        {/* 中央: ロゴ */}
+        <div className="flex-1 flex justify-center">
           <Logo size="lg" onClick={onLogoClick} />
         </div>
 
