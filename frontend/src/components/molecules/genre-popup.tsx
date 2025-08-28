@@ -63,7 +63,13 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
           <div className="text-sm text-gray-600 mb-4">複数選択可能です</div>
 
           <div className="max-h-96 overflow-y-auto mb-6">
-            {/* イベントセクション */}
+            {/* イベントヘッダー */}
+            <div className="mb-4">
+              <h4 className="text-md font-bold text-gray-800 mb-3">イベント</h4>
+            </div>
+            
+            {/* ジャンル選択グリッド */}
+            <div className="grid grid-cols-2 gap-3">
             <div>
               <h4 className="text-md font-bold text-gray-800 mb-3">イベント</h4>
               <div className="grid grid-cols-2 gap-3">
