@@ -16,12 +16,14 @@ import type { User as UserType } from "../../types/user"
 
 interface FilterControlsProps {
   selectedGenres: string[]
+  selectedEvents: string[]
   selectedArea: string
   isFavoritesFilter: boolean
   notifications: Notification[]
   isAuthenticated: boolean
   user?: UserType
   onGenresChange: (genres: string[]) => void
+  onEventsChange: (events: string[]) => void
   onAreaChange: (area: string) => void
   onCurrentLocationClick: () => void
   onFavoritesClick: () => void
@@ -34,12 +36,14 @@ interface FilterControlsProps {
 
 export function FilterControls({
   selectedGenres,
+  selectedEvents,
   selectedArea,
   isFavoritesFilter,
   notifications,
   isAuthenticated,
   user,
   onGenresChange,
+  onEventsChange,
   onAreaChange,
   onCurrentLocationClick,
   onFavoritesClick,
@@ -59,9 +63,16 @@ export function FilterControls({
     onGenresChange(newGenres)
   }
 
+  const handleEventToggle = (event: string) => {
+    const newEvents = selectedEvents.includes(event)
+      ? selectedEvents.filter((e) => e !== event)
+      : [...selectedEvents, event]
+    onEventsChange(newEvents)
+  }
 
   const handleGenresClear = () => {
     onGenresChange([])
+    onEventsChange([])
   }
 
   const handleGenrePopupOpen = () => {
@@ -190,15 +201,15 @@ export function FilterControls({
         <button
           onClick={handleGenrePopupOpen}
           className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-            selectedGenres.length > 0
+            selectedGenres.length > 0 || selectedEvents.length > 0
               ? "border-green-500 bg-green-50 text-green-700"
               : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
           }`}
         >
-          <span>ジャンル</span>
-          {selectedGenres.length > 0 && (
+          <span>条件</span>
+          {(selectedGenres.length > 0 || selectedEvents.length > 0) && (
             <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
-              {selectedGenres.length}
+              {selectedGenres.length + selectedEvents.length}
             </span>
           )}
         </button>
@@ -217,7 +228,9 @@ export function FilterControls({
       <GenrePopup
         isOpen={isGenrePopupOpen}
         selectedGenres={selectedGenres}
+        selectedEvents={selectedEvents}
         onGenreToggle={handleGenreToggle}
+        onEventToggle={handleEventToggle}
         onClose={handleGenrePopupClose}
         onClear={handleGenresClear}
       />

@@ -30,6 +30,7 @@ import type { Coupon } from "../../types/coupon"
 
 interface HomeLayoutProps {
   selectedGenres: string[]
+  selectedEvents: string[]
   selectedArea: string
   isFavoritesFilter: boolean
   stores: Store[]
@@ -81,6 +82,7 @@ interface HomeLayoutProps {
   emailRegistrationEmail?: string
   emailConfirmationEmail?: string
   onGenresChange: (genres: string[]) => void
+  onEventsChange: (events: string[]) => void
   onAreaChange: (area: string) => void
   onCurrentLocationClick: () => void
   onTabChange: (tab: string) => void
@@ -160,6 +162,7 @@ interface HomeLayoutProps {
 
 export function HomeLayout({
   selectedGenres,
+  selectedEvents,
   selectedArea,
   isFavoritesFilter,
   stores,
@@ -189,6 +192,7 @@ export function HomeLayout({
   emailRegistrationEmail,
   emailConfirmationEmail = "",
   onGenresChange,
+  onEventsChange,
   onAreaChange,
   onCurrentLocationClick,
   onTabChange,
@@ -438,16 +442,19 @@ export function HomeLayout({
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100 w-full">
       <FilterControls
         selectedGenres={selectedGenres}
+        selectedEvents={selectedEvents}
         selectedArea={selectedArea}
         isFavoritesFilter={isFavoritesFilter}
         notifications={notifications}
         isAuthenticated={isAuthenticated}
         user={user}
         onGenresChange={onGenresChange}
+        onEventsChange={onEventsChange}
         onAreaChange={onAreaChange}
         onCurrentLocationClick={() => {
           // 全て表示（フィルターをクリア）
           onGenresChange([])
+          onEventsChange([])
           onAreaChange("")
         }}
         onFavoritesClick={onFavoritesClick}
@@ -458,6 +465,7 @@ export function HomeLayout({
       />
       <HomeContainer
         selectedGenres={selectedGenres}
+        selectedEvents={selectedEvents}
         isFavoritesFilter={isFavoritesFilter}
         stores={stores}
         onStoreClick={onStoreClick}

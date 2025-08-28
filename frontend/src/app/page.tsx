@@ -14,6 +14,7 @@ import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 
 export default function HomePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
+  const [selectedEvents, setSelectedEvents] = useState<string[]>([])
   const [selectedArea, setSelectedArea] = useState<string>("")
   const [isFavoritesFilter, setIsFavoritesFilter] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
@@ -94,6 +95,7 @@ export default function HomePage() {
 
   const handleCurrentLocationClick = () => {
     setSelectedGenres([])
+    setSelectedEvents([])
     setSelectedArea("")
     setIsFavoritesFilter(false)
   }
@@ -627,6 +629,7 @@ export default function HomePage() {
   return (
     <HomeLayout
       selectedGenres={selectedGenres}
+      selectedEvents={selectedEvents}
       selectedArea={selectedArea}
       isFavoritesFilter={isFavoritesFilter}
       stores={filteredStores}
@@ -652,6 +655,7 @@ export default function HomePage() {
       emailRegistrationEmail={emailRegistrationEmail}
       emailConfirmationEmail={emailConfirmationEmail}
       onGenresChange={setSelectedGenres}
+      onEventsChange={setSelectedEvents}
       onAreaChange={setSelectedArea}
       onCurrentLocationClick={handleCurrentLocationClick}
       onTabChange={handleTabChange}

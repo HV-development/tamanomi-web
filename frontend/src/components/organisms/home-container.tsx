@@ -6,6 +6,7 @@ import { mockStores } from "../../data/mock-stores";
 
 interface HomeContainerProps {
   selectedGenres: string[]
+  selectedEvents: string[]
   isFavoritesFilter: boolean
   stores: Store[]
   onStoreClick: (store: Store) => void
@@ -14,12 +15,39 @@ interface HomeContainerProps {
   isModalOpen?: boolean
 }
 
-export function HomeContainer({ selectedGenres, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false }: HomeContainerProps) {
+export function HomeContainer({ selectedGenres, selectedEvents, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = stores.filter(store => {
     // ジャンルフィルター
     if (selectedGenres.length > 0 && !selectedGenres.includes(store.genre)) {
       return false
+    }
+    // イベントフィルター
+    if (selectedEvents.length > 0 && store.usageScenes) {
+      const hasMatchingEvent = selectedEvents.some(event => {
+        // イベント値を店舗の利用シーンにマッピング
+        const eventMapping: Record<string, string[]> = {
+          date: ["デート"],
+          business: ["接待"],
+          friends: ["友人と", "女子会", "合コン"],
+          family: ["家族、子供と"],
+          solo: ["おひとり様"],
+          group: ["グループ", "宴会"],
+          party: ["宴会", "合コン"],
+          celebration: ["お祝い"],
+          casual: ["カジュアル"],
+          formal: ["フォーマル", "接待"],
+          lunch: ["ランチ"],
+          dinner: ["ディナー"],
+        }
+        
+        const mappedScenes = eventMapping[event] || []
+        return mappedScenes.some(scene => store.usageScenes?.includes(scene))
+      })
+      
+      if (!hasMatchingEvent) {
+        return false
+      }
     }
     // お気に入りフィルター
     if (isFavoritesFilter && !store.isFavorite) {
