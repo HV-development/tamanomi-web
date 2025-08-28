@@ -1,5 +1,8 @@
 "use client"
 
+// このコンポーネントは FooterNavigation に置き換えられました
+// 後方互換性のため残していますが、使用は推奨されません
+
 import { Map, Heart, RotateCcw, MoreHorizontal, User } from "lucide-react"
 
 interface NavigationBarProps {

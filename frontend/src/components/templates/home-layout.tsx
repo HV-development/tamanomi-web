@@ -23,6 +23,7 @@ import { StoreDetailPopup } from "../molecules/store-detail-popup"
 import { EmailConfirmationLayout } from "./email-confirmation-layout"
 import CouponConfirmationPage from "../molecules/coupon-confirmation-page"
 import { UsageGuidePage } from "../molecules/usage-guide-page"
+import { FooterNavigation } from "../molecules/footer-navigation"
 import type { Store } from "../../types/store"
 import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
 import type { Notification } from "../../types/notification"
@@ -529,6 +530,14 @@ export function HomeLayout({
         isOpen={isLoginRequiredModalOpen}
         onClose={onLoginRequiredModalClose}
         onLogin={onLoginRequiredModalLogin}
+      />
+      
+      {/* フッターナビゲーション */}
+      <FooterNavigation
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        isAuthenticated={isAuthenticated}
+        onFavoritesClick={onFavoritesClick}
       />
       
     </div>
