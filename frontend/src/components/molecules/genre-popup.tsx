@@ -81,10 +81,10 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                     key={genre.value}
                     onClick={() => onGenreToggle(genre.value)}
                     className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${
-                  className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium bg-green-100 ${
+                      isSelected
                         ? `${genreColors.border} ${genreColors.bg} ${genreColors.text} shadow-md`
-                      ? `${genreColors.border} ${genreColors.text} shadow-md`
-                      : `border-green-300 text-green-700 hover:border-green-400 hover:bg-green-200 hover:shadow-sm`
+                        : `border-green-300 text-green-700 hover:border-green-400 hover:bg-green-200 hover:shadow-sm`
+                    }`}
                   >
                     {isSelected && (
                       <div className="absolute -top-1 -right-1">
@@ -116,7 +116,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                     >
                       {isSelected && (
                         <div className="absolute -top-1 -right-1">
-                          <div className={`w-4 h-4 rounded-full flex items-center justify-center ${genreColors.text.replace('text-', 'bg-')}`}>
+                          <div className={\`w-4 h-4 rounded-full flex items-center justify-center ${genreColors.text.replace('text-', 'bg-')}`}>
                             <span className="text-white text-xs">✓</span>
                           </div>
                         </div>
