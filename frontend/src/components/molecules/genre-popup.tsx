@@ -70,36 +70,31 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
             
             {/* ジャンル選択グリッド */}
             <div className="grid grid-cols-2 gap-3">
-            <div>
-              <h4 className="text-md font-bold text-gray-800 mb-3">イベント</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {GENRES.map((genre) => {
-                  const genreColors = getGenreColor(genre.value)
-                  const isSelected = selectedGenres.includes(genre.value)
-                  
-                  return (
-                    <button
-                      key={genre.value}
-                      onClick={() => onGenreToggle(genre.value)}
-                      className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${
-                        isSelected
-                          ? `${genreColors.border} ${genreColors.bg} ${genreColors.text} shadow-md`
-                         : `border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50 hover:shadow-sm`
-                      }`}
-                    >
-                      {isSelected && (
-                        <div className="absolute -top-1 -right-1">
-                          <div className={`w-4 h-4 rounded-full flex items-center justify-center ${genreColors.text.replace('text-', 'bg-')}`}>
-                            <span className="text-white text-xs">✓</span>
-                          </div>
+              {GENRES.map((genre) => {
+                const genreColors = getGenreColor(genre.value)
+                const isSelected = selectedGenres.includes(genre.value)
+                
+                return (
+                  <button
+                    key={genre.value}
+                    onClick={() => onGenreToggle(genre.value)}
+                    className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${
+                      isSelected
+                        ? `${genreColors.border} ${genreColors.bg} ${genreColors.text} shadow-md`
+                       : `border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50 hover:shadow-sm`
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="absolute -top-1 -right-1">
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center ${genreColors.text.replace('text-', 'bg-')}`}>
+                          <span className="text-white text-xs">✓</span>
                         </div>
-                      )}
-                      <span className="block">{genre.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+                      </div>
+                    )}
+                    <span className="block">{genre.label}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
