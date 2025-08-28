@@ -14,6 +14,25 @@ import { calculateUserRank } from "../../utils/rank-calculator"
 import type { Notification } from "../../types/notification"
 import type { User as UserType } from "../../types/user"
 
+// ユーザーランク計算のヘルパー関数
+function getUserRankValue(user?: UserType): string | null {
+  if (!user) return null
+  
+  const contractDate = user.contractStartDate
+  const createdDate = user.createdAt
+  
+  if (contractDate && contractDate instanceof Date) {
+    return calculateUserRank(contractDate)
+  } else if (createdDate && createdDate instanceof Date) {
+    return calculateUserRank(createdDate)
+  } else if (contractDate && typeof contractDate === 'string') {
+    return calculateUserRank(new Date(contractDate))
+  } else if (createdDate && typeof createdDate === 'string') {
+    return calculateUserRank(new Date(createdDate))
+  }
+  return null
+}
+
 interface FilterControlsProps {
   selectedGenres: string[]
   selectedEvents: string[]
@@ -154,21 +173,7 @@ export function FilterControls({
   }
 
   // ユーザーのランクを計算
-  const userRank = user ? (() => {
-    const contractDate = user.contractStartDate
-    const createdDate = user.createdAt
-    
-    if (contractDate && contractDate instanceof Date) {
-      return calculateUserRank(contractDate)
-    } else if (createdDate && createdDate instanceof Date) {
-      return calculateUserRank(createdDate)
-    } else if (contractDate && typeof contractDate === 'string') {
-      return calculateUserRank(new Date(contractDate))
-    } else if (createdDate && typeof createdDate === 'string') {
-      return calculateUserRank(new Date(createdDate))
-    }
-    return null
-  })() : null
+  const userRank = getUserRankValue(user)
   
   return (
     <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
