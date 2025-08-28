@@ -181,7 +181,7 @@ export function FilterControls({
       <div className="flex items-center justify-between px-4 py-3">
         {/* 左側: ハンバーガーメニューとランク */}
         <div className="flex items-center gap-3 w-20">
-          <HamburgerMenu onMenuItemClick={onMenuItemClick} />
+          <HamburgerMenu onMenuItemClick={onMenuItemClick} isAuthenticated={isAuthenticated} />
         </div>
 
         {/* 中央: ロゴ */}
