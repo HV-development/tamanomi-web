@@ -100,6 +100,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                 })}
               </div>
             </div>
+            </div>
           </div>
 
           <div className="flex gap-3">
