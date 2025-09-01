@@ -101,14 +101,14 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="電話をかける"
             >
-              <Phone className="w-4 h-4 text-gray-600 hover:text-green-600" />
+              <Phone className="w-4 h-4 text-green-600 hover:text-green-700" />
             </button>
             <button
               onClick={handleMapClick}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Googleマップで表示"
             >
-              <MapPin className="w-4 h-4 text-gray-600 hover:text-blue-600" />
+              <MapPin className="w-4 h-4 text-green-600 hover:text-green-700" />
             </button>
           </div>
         </div>
