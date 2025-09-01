@@ -465,6 +465,10 @@ export function HomeLayout({
         onTabChange={onTabChange}
         favoriteCount={favoriteStores.length}
       />
+    
+    {/* バナーカルーセル - ヘッダーとモーダルの間 */}
+    <BannerCarousel className="mx-4 mb-4" />
+    
       <div className="flex-1 overflow-hidden">
         <HomeContainer
         selectedGenres={selectedGenres}
@@ -477,9 +481,6 @@ export function HomeLayout({
           isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
         />
       </div>
-
-      {/* バナーカルーセル - ヘッダーとモーダルの間 */}
-      <BannerCarousel className="mx-4 mb-4" />
 
       {/* お気に入り一覧ポップアップ */}
       <HistoryPopup
