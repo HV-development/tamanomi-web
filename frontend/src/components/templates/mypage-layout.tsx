@@ -74,6 +74,7 @@ export function MyPageLayout({
   onEmailChangeResend = () => {},
   emailChangeStep,
   passwordChangeStep,
+  newEmail,
   currentUserRank,
 }: MyPageLayoutProps) {
   return (
