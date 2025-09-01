@@ -82,7 +82,7 @@ export function BannerCarousel({ className = "" }: BannerCarouselProps) {
   const currentBanner = banners[currentIndex]
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`relative overflow-hidden rounded-none ${className}`}>
       {/* バナー表示エリア */}
       <div className="relative h-32 overflow-hidden">
         {/* バナー画像とコンテンツ */}
