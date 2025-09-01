@@ -25,6 +25,12 @@ import CouponConfirmationPage from "../molecules/coupon-confirmation-page"
 import { UsageGuidePage } from "../molecules/usage-guide-page"
 import { FooterNavigation } from "../molecules/footer-navigation"
 import { BannerCarousel } from "../molecules/banner-carousel"
+import { AreaPopup } from "../molecules/area-popup"
+import { GenrePopup } from "../molecules/genre-popup"
+import { HamburgerMenu } from "../molecules/hamburger-menu"
+import { Logo } from "../atoms/logo"
+import { calculateUserRank } from "../../utils/rank-calculator"
+import { useState } from "react"
 import type { Store } from "../../types/store"
 import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
 import type { Notification } from "../../types/notification"
@@ -270,6 +276,9 @@ export function HomeLayout({
   isStoreDetailOpen,
   isStoreDetailPopupOpen,
 }: HomeLayoutProps) {
+  const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
+  const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
+
   if (currentView === "coupon-confirmation") {
     return (
       <CouponConfirmationPage
@@ -442,33 +451,112 @@ export function HomeLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100 w-full">
-      <FilterControls
+      {/* ヘッダー部分のみ */}
+      <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+        <div className="flex items-center justify-between px-4 py-3">
+          {/* 左側: ハンバーガーメニューとランク */}
+          <div className="flex items-center gap-3 w-20">
+            <HamburgerMenu onMenuItemClick={onMenuItemClick} isAuthenticated={isAuthenticated} />
+          </div>
+
+          {/* 中央: ロゴ */}
+          <div className="flex-1 flex justify-center">
+            <Logo size="lg" onClick={onLogoClick} />
+          </div>
+
+          {/* 右側: ユーザーメニュー（ログイン時のみ） */}
+          <div className="flex items-center justify-end w-20">
+            {isAuthenticated ? (
+              user && (
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
+                  <img
+                    src={`/${calculateUserRank(user.contractStartDate || user.createdAt)}.png`}
+                    alt={`${calculateUserRank(user.contractStartDate || user.createdAt)}ランク`}
+                    className="w-5 h-5 object-contain"
+                  />
+                </div>
+              )
+            ) : null}
+          </div>
+        </div>
+      </div>
+    
+      {/* バナーカルーセル */}
+      <BannerCarousel />
+    
+      {/* フィルターボタン */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="grid grid-cols-3 gap-1 px-2 py-4">
+          <button
+            onClick={() => {
+              // 全て表示（フィルターをクリア）
+              onGenresChange([])
+              onEventsChange([])
+              onAreaChange("")
+            }}
+            className="w-full flex items-center justify-center gap-1 px-2 py-2 border border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50 rounded-full text-xs font-medium transition-colors whitespace-nowrap"
+          >
+            近くのお店
+          </button>
+          <button
+            onClick={() => setIsAreaPopupOpen(true)}
+            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+              selectedArea
+                ? "border-green-500 bg-green-50 text-green-700"
+                : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+            }`}
+          >
+            <span>エリア</span>
+            {selectedArea && (
+              <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
+                1
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setIsGenrePopupOpen(true)}
+            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+              selectedGenres.length > 0
+                ? "border-green-500 bg-green-50 text-green-700"
+                : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+            }`}
+          >
+            <span>ジャンル</span>
+            {selectedGenres.length > 0 && (
+              <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
+                {selectedGenres.length}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* エリア選択ポップアップ */}
+      <AreaPopup
+        isOpen={isAreaPopupOpen}
         selectedGenres={selectedGenres}
-        selectedEvents={selectedEvents}
-        selectedArea={selectedArea}
-        isFavoritesFilter={isFavoritesFilter}
-        notifications={notifications}
-        isAuthenticated={isAuthenticated}
-        user={user}
-        onGenresChange={onGenresChange}
-        onEventsChange={onEventsChange}
         onAreaChange={onAreaChange}
-        onCurrentLocationClick={() => {
-          // 全て表示（フィルターをクリア）
+        onClose={() => setIsAreaPopupOpen(false)}
+        onClear={() => onAreaChange("")}
+      />
+
+      {/* ジャンル選択ポップアップ */}
+      <GenrePopup
+        isOpen={isGenrePopupOpen}
+        selectedGenres={selectedGenres}
+        onGenreToggle={(genre) => {
+          const newGenres = selectedGenres.includes(genre)
+            ? selectedGenres.filter((g) => g !== genre)
+            : [...selectedGenres, genre]
+          onGenresChange(newGenres)
+        }}
+        onClose={() => setIsGenrePopupOpen(false)}
+        onClear={() => {
           onGenresChange([])
           onEventsChange([])
-          onAreaChange("")
         }}
-        onFavoritesClick={onFavoritesClick}
-        onMenuItemClick={onMenuItemClick}
-        onLogoClick={onLogoClick}
-        onTabChange={onTabChange}
-        favoriteCount={favoriteStores.length}
       />
-    
-    {/* バナーカルーセル - ヘッダーとモーダルの間 */}
-    <BannerCarousel className="mx-4 mb-4" />
-    
+
       <div className="flex-1 overflow-hidden">
         <HomeContainer
         selectedGenres={selectedGenres}
