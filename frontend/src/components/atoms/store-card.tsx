@@ -90,7 +90,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
         {/* ジャンルバッジと連絡先アイコン */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
+            <span className="inline-block px-3 py-1.5 rounded-full text-sm font-medium border bg-gray-100 text-gray-700 border-gray-300">
               {store.genreLabel}
             </span>
             <span className="text-black text-sm">現在位置から350m</span>
