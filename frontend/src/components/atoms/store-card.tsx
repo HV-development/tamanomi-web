@@ -71,7 +71,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
   return (
     <div
       onClick={handleStoreClick}
-      className={`bg-white rounded-2xl border border-green-200 p-5 space-y-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.01] cursor-pointer ${className}`}
+      className={`bg-white rounded-2xl border border-green-600 p-5 space-y-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.01] cursor-pointer ${className}`}
     >
       {/* ヘッダー部分 */}
       <div>
