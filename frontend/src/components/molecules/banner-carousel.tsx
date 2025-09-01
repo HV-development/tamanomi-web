@@ -21,7 +21,7 @@ const banners: Banner[] = [
     id: "banner-1",
     title: "おいしい酒場。",
     subtitle: "さいたまの夜を彩る特別な一杯",
-    imageUrl: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg",
+    imageUrl: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
     backgroundColor: "bg-gradient-to-r from-orange-600 to-red-600",
     textColor: "text-white"
   },
@@ -29,7 +29,7 @@ const banners: Banner[] = [
     id: "banner-2", 
     title: "新店舗オープン！",
     subtitle: "大宮駅前に新しいイタリアンレストラン",
-    imageUrl: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg",
+    imageUrl: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
     backgroundColor: "bg-gradient-to-r from-green-600 to-blue-600",
     textColor: "text-white"
   },
@@ -37,7 +37,7 @@ const banners: Banner[] = [
     id: "banner-3",
     title: "週末限定キャンペーン",
     subtitle: "金土日はドリンク2杯目半額",
-    imageUrl: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg",
+    imageUrl: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
     backgroundColor: "bg-gradient-to-r from-purple-600 to-pink-600", 
     textColor: "text-white"
   }

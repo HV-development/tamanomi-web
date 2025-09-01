@@ -11,7 +11,7 @@ export const mockStores: Store[] = [
     website: "https://example.com/saitama-sakaba",
     description:
       "地元の新鮮な食材を使った創作料理と豊富な日本酒が自慢の居酒屋です。アットホームな雰囲気で、仕事帰りの一杯から宴会まで幅広くご利用いただけます。",
-    thumbnailUrl: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg",
+    thumbnailUrl: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
     isFavorite: true,
     visitedAt: new Date("2024-01-15"),
     businessHours: "月 〜 金 昼：11:00 〜 14:00 夜：17:00 〜 22:00",
@@ -38,7 +38,7 @@ export const mockStores: Store[] = [
     website: "https://example.com/bella-vista",
     description:
       "本格的なイタリア料理を気軽に楽しめるレストラン。シェフ自慢の手打ちパスタと窯焼きピザが人気です。デートや記念日にもおすすめです。",
-    thumbnailUrl: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg",
+    thumbnailUrl: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
     isFavorite: false,
     visitedAt: new Date("2024-01-10"),
     businessHours: "11:30〜14:30、17:30〜22:00",
@@ -64,7 +64,7 @@ export const mockStores: Store[] = [
     phone: "048-345-6789",
     description:
       "厳選された国産牛を使用した焼肉店。リーズナブルな価格で高品質なお肉をお楽しみいただけます。家族連れにも人気です。",
-    thumbnailUrl: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg",
+    thumbnailUrl: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
     isFavorite: true,
     visitedAt: new Date("2024-01-08"),
     businessHours: "17:00〜翌2:00",
@@ -90,7 +90,7 @@ export const mockStores: Store[] = [
     website: "https://example.com/washoku-sakura",
     description:
       "季節の食材を活かした本格和食をご提供。落ち着いた和の空間で、ゆっくりとお食事をお楽しみいただけます。接待や会食にも最適です。",
-    thumbnailUrl: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg",
+    thumbnailUrl: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
     isFavorite: false,
     businessHours: "11:30〜14:00、17:00〜22:00",
     closedDays: "月曜日",
@@ -115,7 +115,7 @@ export const mockStores: Store[] = [
     phone: "048-567-8901",
     description:
       "大人の隠れ家的なバー。マスターが作る本格カクテルと落ち着いた雰囲気が魅力。一人でも気軽に立ち寄れます。",
-    thumbnailUrl: "https://images.pexels.com/photos/274192/pexels-photo-274192.jpeg",
+    thumbnailUrl: "https://images.pexels.com/photos/274192/pexels-photo-274192.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
     isFavorite: true,
     visitedAt: new Date("2024-01-05"),
     businessHours: "19:00〜翌3:00",

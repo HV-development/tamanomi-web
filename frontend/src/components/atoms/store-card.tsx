@@ -16,12 +16,12 @@ interface StoreCardProps {
 // ジャンルに応じた店内画像を取得
 const getStoreInteriorImage = (genre: string) => {
   const interiorImages: Record<string, string> = {
-    izakaya: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg",
-    italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg",
-    yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg",
-    japanese: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg",
-    bar: "https://images.pexels.com/photos/274192/pexels-photo-274192.jpeg",
-    default: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg"
+    izakaya: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    japanese: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    bar: "https://images.pexels.com/photos/274192/pexels-photo-274192.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    default: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"
   }
   return interiorImages[genre] || interiorImages.default
 }
@@ -29,12 +29,12 @@ const getStoreInteriorImage = (genre: string) => {
 // ジャンルに応じた料理画像を取得
 const getStoreFoodImage = (genre: string) => {
   const foodImages: Record<string, string> = {
-    izakaya: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg",
-    italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg",
-    yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg",
-    japanese: "https://images.pexels.com/photos/1283219/pexels-photo-1283219.jpeg",
-    bar: "https://images.pexels.com/photos/1407846/pexels-photo-1407846.jpeg",
-    default: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg"
+    izakaya: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    japanese: "https://images.pexels.com/photos/1283219/pexels-photo-1283219.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    bar: "https://images.pexels.com/photos/1407846/pexels-photo-1407846.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    default: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"
   }
   return foodImages[genre] || foodImages.default
 }
@@ -119,7 +119,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
         <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
           <div className="flex-shrink-0 w-full aspect-[3/1] snap-start">
             <img
-              src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg"}
+              src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"}
               alt={`${store.name} 外観`}
               className="w-full h-full object-cover"
             />
