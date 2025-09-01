@@ -275,7 +275,6 @@ export function HomeLayout({
   onStoreDetailClose,
   isStoreDetailOpen,
   isStoreDetailPopupOpen,
-  currentUserRank,
 }: HomeLayoutProps) {
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)

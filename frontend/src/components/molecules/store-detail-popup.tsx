@@ -95,35 +95,35 @@ export function StoreDetailPopup({
       </div>
 
       {/* ポップアップ */}
-      <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
+      <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-2xl shadow-xl z-50 max-w-md mx-auto overflow-hidden border border-gray-200">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
-          <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
+          <div className="bg-white p-4 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="w-8"></div>
-              <h3 className="text-xl font-bold">店舗詳細</h3>
+              <h3 className="text-xl font-bold text-gray-900">店舗詳細</h3>
               <button 
                 onClick={onClose} 
-                className="p-2 hover:bg-green-700 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-gray-600" />
               </button>
             </div>
           </div>
 
           {/* 店舗名表示 */}
-          <div className="px-6 py-4 bg-white border-b border-green-100 flex-shrink-0">
+          <div className="px-6 py-4 bg-white border-b border-gray-100 flex-shrink-0">
             <div className="text-left">
-              <h4 className="text-lg font-bold text-black">{store.name}</h4>
+              <h4 className="text-lg font-bold text-gray-900">{store.name}</h4>
             </div>
           </div>
 
           {/* コンテンツ */}
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 bg-white">
             <div className="space-y-4">
               {/* 営業時間 */}
               {store.businessHours && (
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="text-base font-bold text-gray-900 mb-2">営業時間</div>
                   <div className="text-base text-gray-700">{store.businessHours}</div>
                 </div>
@@ -131,7 +131,7 @@ export function StoreDetailPopup({
 
               {/* 定休日 */}
               {store.closedDays && (
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="text-base font-bold text-gray-900 mb-2">定休日</div>
                   <div className="text-base text-gray-700">{store.closedDays}</div>
                 </div>
@@ -139,7 +139,7 @@ export function StoreDetailPopup({
 
               {/* 予算 */}
               {store.budget && (
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="text-base font-bold text-gray-900 mb-2">予算</div>
                   <div className="space-y-1">
                     {store.budget.dinner && (
@@ -158,7 +158,7 @@ export function StoreDetailPopup({
 
               {/* 禁煙・喫煙 */}
               {store.smokingPolicy && (
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="text-base font-bold text-gray-900 mb-2">禁煙・分煙</div>
                   <div className="text-base text-gray-700">{getSmokingPolicyText(store.smokingPolicy)}</div>
                 </div>
@@ -166,7 +166,7 @@ export function StoreDetailPopup({
 
               {/* 支払い方法 */}
               {store.paymentMethods && (
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="text-base font-bold text-gray-900 mb-2">支払い方法</div>
                   <div className="space-y-1">
                     {/* 現金 */}
@@ -193,7 +193,7 @@ export function StoreDetailPopup({
 
               {/* 利用シーン */}
               {store.usageScenes && store.usageScenes.length > 0 && (
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                   <div className="text-base font-bold text-gray-900 mb-2">利用シーン</div>
                   <div className="text-base text-gray-700">{store.usageScenes.join('、')}</div>
                 </div>
