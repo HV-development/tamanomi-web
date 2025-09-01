@@ -307,6 +307,14 @@ export function MyPageContainer({
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* メニューボタン群 */}
+        <div className="space-y-3">
+          {/* プランの変更 */}
+          <button
+            onClick={onViewPlan}
             className="w-full bg-white rounded-2xl border border-green-200 p-4 flex items-center justify-between hover:bg-green-50 transition-colors"
           >
             <div className="flex items-center gap-3">

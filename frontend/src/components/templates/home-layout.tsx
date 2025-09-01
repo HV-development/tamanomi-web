@@ -166,7 +166,6 @@ interface HomeLayoutProps {
   isStoreDetailOpen?: boolean
   isStoreDetailPopupOpen?: boolean
   currentUserRank?: string | null
-  currentUserRank?: string | null
 }
 
 export function HomeLayout({
@@ -276,7 +275,6 @@ export function HomeLayout({
   onStoreDetailClose,
   isStoreDetailOpen,
   isStoreDetailPopupOpen,
-  currentUserRank,
   currentUserRank,
 }: HomeLayoutProps) {
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
