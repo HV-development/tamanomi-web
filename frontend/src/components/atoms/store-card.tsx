@@ -159,10 +159,9 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       <div className="pt-2">
         <button
           onClick={() => onCouponsClick(store.id)}
-          className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
+          className="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
         >
-          <Ticket className="w-5 h-5" />
-          <span className="font-medium">クーポンを見る</span>
+          <span className="font-medium">クーポン一覧</span>
         </button>
       </div>
     </div>
