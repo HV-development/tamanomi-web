@@ -108,9 +108,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
               className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
               aria-label="Googleマップで表示"
             >
-              <div className="w-4 h-4 text-green-600 hover:text-green-700 transition-colors">
-                📍
-              </div>
+              <MapPin className="w-4 h-4 text-green-600 hover:text-green-700 fill-current transition-colors" />
             </button>
           </div>
         </div>
