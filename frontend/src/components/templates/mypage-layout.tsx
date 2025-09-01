@@ -42,7 +42,6 @@ interface MyPageLayoutProps {
   passwordChangeStep?: "form" | "complete"
   newEmail?: string
   currentUserRank?: string | null
-  currentUserRank?: string | null
 }
 
 export function MyPageLayout({
@@ -76,7 +75,6 @@ export function MyPageLayout({
   emailChangeStep,
   passwordChangeStep,
   newEmail,
-  currentUserRank,
   currentUserRank,
 }: MyPageLayoutProps) {
   return (
