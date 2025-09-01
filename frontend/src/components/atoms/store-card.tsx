@@ -78,7 +78,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
         {/* 店舗名と距離 */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex-1">
-            <h3 className="font-bold text-xl text-gray-900">{store.name}</h3>
+            <h3 className="text-xl text-gray-900">{store.name}</h3>
           </div>
           <FavoriteButton
             isFavorite={store.isFavorite}
