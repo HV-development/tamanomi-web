@@ -630,7 +630,7 @@ export default function HomePage() {
   }
 
   return (
-    <HomeLayout
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-lime-50 to-lime-100 w-full">
       selectedGenres={selectedGenres}
       selectedEvents={selectedEvents}
       selectedArea={selectedArea}

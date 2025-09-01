@@ -59,7 +59,7 @@ export function HomeContainer({ selectedGenres, selectedEvents, isFavoritesFilte
 
 
   return (
-    <div className="h-full relative bg-gradient-to-br from-green-50 to-green-100">
+    <div className="h-full relative bg-gradient-to-br from-lime-50 to-lime-100">
       {/* 店舗リスト */}
       <div className="h-full overflow-y-auto p-4">
         <StoreList
