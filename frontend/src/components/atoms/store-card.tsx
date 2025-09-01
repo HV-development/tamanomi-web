@@ -168,7 +168,6 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             className="flex items-center justify-center gap-1 bg-white hover:bg-gray-50 text-gray-700 py-3 px-3 rounded-2xl transition-all duration-300 border border-gray-300 hover:border-gray-400 font-medium whitespace-nowrap"
           >
             <span className="text-sm">店舗詳細</span>
-            <span className="text-gray-400 text-sm">→</span>
           </button>
         </div>
       </div>
