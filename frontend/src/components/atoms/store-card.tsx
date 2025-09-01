@@ -143,9 +143,9 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
         {/* インジケーター */}
         <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
           <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 bg-white/70 rounded-full"></div>
-            <div className="w-1.5 h-1.5 bg-white/40 rounded-full"></div>
-            <div className="w-1.5 h-1.5 bg-white/40 rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-green-300 rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-green-300 rounded-full"></div>
           </div>
         </div>
       </div>
