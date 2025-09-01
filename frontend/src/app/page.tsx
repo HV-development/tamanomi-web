@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { HomeLayout } from "@/components/templates/home-layout"
+import { Home
+}Layout } from "@/components/templates/home-layout"
 import { mockStores } from "@/data/mock-stores"
 import { mockNotifications } from "@/data/mock-notifications"
 import type { Store } from "@/types/store"
