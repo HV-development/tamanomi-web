@@ -80,11 +80,6 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           <div className="flex-1">
             <h3 className="text-xl font-medium text-gray-900">{store.name}</h3>
           </div>
-          <FavoriteButton
-            isFavorite={store.isFavorite}
-            onToggle={() => onFavoriteToggle(store.id)}
-          className="ml-3 scale-75 flex-shrink-0"
-          />
         </div>
         
         {/* ジャンルバッジと連絡先アイコン */}
@@ -96,6 +91,11 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             <span className="text-black text-sm">現在位置から350m</span>
           </div>
           <div className="flex items-center gap-1">
+            <FavoriteButton
+              isFavorite={store.isFavorite}
+              onToggle={() => onFavoriteToggle(store.id)}
+              className="flex-shrink-0"
+            />
             <button
               onClick={handlePhoneClick}
               className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
