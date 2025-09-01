@@ -95,7 +95,7 @@ export function StoreDetailPopup({
       </div>
 
       {/* ポップアップ */}
-      <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-2xl shadow-xl z-50 max-w-md mx-auto overflow-hidden border border-gray-200">
+      <div className="fixed inset-x-4 top-4 bottom-4 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-xl z-50 max-w-md mx-auto overflow-hidden border border-gray-200">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
           <div className="bg-green-600 p-4 text-white flex-shrink-0">
@@ -119,7 +119,7 @@ export function StoreDetailPopup({
           </div>
 
           {/* コンテンツ */}
-          <div className="flex-1 overflow-y-auto p-4 bg-white">
+          <div className="flex-1 overflow-y-auto p-4 bg-transparent">
             <div className="space-y-4">
               {/* 営業時間 */}
               {store.businessHours && (

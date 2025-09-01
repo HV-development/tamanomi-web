@@ -23,7 +23,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50" onClick={onClose}></div>
 
       {/* ポップアップ */}
-      <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
+      <div className="fixed inset-x-4 top-4 bottom-4 bg-gradient-to-br from-green-50 to-green-100 rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
           <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
@@ -47,7 +47,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
           </div>
 
           {/* クーポンリスト */}
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 bg-transparent">
             {coupons.length === 0 ? (
               <div className="text-center py-12">
                 <Ticket className="w-16 h-16 text-gray-300 mx-auto mb-4" />
