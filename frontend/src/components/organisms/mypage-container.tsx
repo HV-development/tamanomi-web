@@ -4,7 +4,7 @@ import { ArrowLeft, Settings, Crown, RefreshCw, Mail, Lock, History, CreditCard,
 import { User } from "lucide-react"
 import { Logo } from "../atoms/logo"
 import { RankBadge } from "../atoms/rank-badge"
-import { calculateUserRank, getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "../../utils/rank-calculator"
+import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "../../utils/rank-calculator"
 import { UsageHistoryList } from "../molecules/usage-history-list"
 import { PaymentHistoryList } from "../molecules/payment-history-list"
 import { WithdrawalLayout } from "../templates/withdrawal-layout"
@@ -54,6 +54,7 @@ interface MyPageContainerProps {
   emailChangeStep?: "form" | "complete"
   passwordChangeStep?: "form" | "complete"
   newEmail?: string
+  currentUserRank?: string | null
 }
 
 export function MyPageContainer({
@@ -87,6 +88,7 @@ export function MyPageContainer({
   emailChangeStep = "form",
   passwordChangeStep = "form",
   newEmail = "",
+  currentUserRank,
 }: MyPageContainerProps) {
 
   // 防御的チェック：userとplanが存在しない場合はnullを返す
@@ -118,6 +120,7 @@ export function MyPageContainer({
         onResend={onEmailChangeResend}
         onLogoClick={onLogoClick}
         isLoading={false}
+        currentUserRank={currentUserRank}
       />
     )
   }
@@ -134,6 +137,7 @@ export function MyPageContainer({
         onBackToLogin={onPasswordChangeBackToLogin}
         onLogoClick={onLogoClick}
         isLoading={false}
+        currentUserRank={currentUserRank}
       />
     )
   }
@@ -166,6 +170,7 @@ export function MyPageContainer({
         onWithdrawCancel={onWithdrawCancel}
         onLogoClick={onLogoClick}
         isLoading={false}
+        currentUserRank={currentUserRank}
       />
     )
   }
@@ -189,10 +194,29 @@ export function MyPageContainer({
 
   // ランク計算
   const contractStartDate = user.contractStartDate || user.createdAt
-  const currentRank = calculateUserRank(contractStartDate)
-  const nextRank = getNextRankInfo(currentRank)
-  const monthsToNext = getMonthsToNextRank(contractStartDate, currentRank)
-  const currentRankInfo = RANK_INFO[currentRank]
+  const nextRank = currentUserRank ? getNextRankInfo(currentUserRank) : null
+  const monthsToNext = currentUserRank ? getMonthsToNextRank(contractStartDate, currentUserRank) : null
+  const currentRankInfo = currentUserRank ? RANK_INFO[currentUserRank] : null
+
+  // ランクが計算されていない場合は何も表示しない
+  if (!currentUserRank || !currentRankInfo) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+        <div className="bg-white border-b border-gray-200 px-4 py-4">
+          <div className="flex items-center justify-between">
+            <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
+              ← 戻る
+            </button>
+            <Logo size="lg" onClick={onLogoClick} />
+            <div className="w-12"></div>
+          </div>
+        </div>
+        <div className="p-4 flex items-center justify-center">
+          <div className="text-gray-500">読み込み中...</div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
@@ -254,7 +278,7 @@ export function MyPageContainer({
                 <div className={`text-base font-bold ${currentRankInfo.color}`}>{currentRankInfo.label}</div>
               </div>
               <div>
-                <RankBadge rank={currentRank} size="lg" showLabel={false} />
+                <RankBadge rank={currentUserRank} size="lg" showLabel={false} />
               </div>
             </div>
 
@@ -283,14 +307,6 @@ export function MyPageContainer({
                 </div>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* メニューリスト */}
-        <div className="space-y-3">
-          {/* プランの変更 */}
-          <button
-            onClick={onViewPlan}
             className="w-full bg-white rounded-2xl border border-green-200 p-4 flex items-center justify-between hover:bg-green-50 transition-colors"
           >
             <div className="flex items-center gap-3">

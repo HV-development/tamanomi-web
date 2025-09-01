@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { HomeLayout } from "@/components/templates/home-layout"
 import { mockStores } from "@/data/mock-stores"
 import { mockNotifications } from "@/data/mock-notifications"
@@ -11,6 +11,7 @@ import type { Coupon } from "@/types/coupon"
 
 import { mockUser, mockPlan, mockUsageHistory, mockPaymentHistory } from "@/data/mock-user"
 import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
+import { calculateUserRank } from "@/utils/rank-calculator"
 
 export default function HomePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
@@ -74,6 +75,7 @@ export default function HomePage() {
   // 店舗詳細画面の状態を追加
   const [isStoreDetailOpen, setIsStoreDetailOpen] = useState(false)
   const [isStoreDetailPopupOpen, setIsStoreDetailPopupOpen] = useState(false)
+  const [currentUserRank, setCurrentUserRank] = useState<string | null>(null)
 
   const [historyStores, setHistoryStores] = useState<Store[]>([])
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
@@ -82,6 +84,17 @@ export default function HomePage() {
   // 店舗詳細関連の状態
   const favoriteStores = stores.filter((store) => store.isFavorite)
   
+  // クライアントサイドでのみランク計算を実行
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const contractStartDate = user.contractStartDate || user.createdAt
+      const rank = calculateUserRank(contractStartDate)
+      setCurrentUserRank(rank)
+    } else {
+      setCurrentUserRank(null)
+    }
+  }, [isAuthenticated, user])
+
   // フィルタリングされた店舗データ
   const filteredStores = stores.filter((store) => {
     // お気に入りフィルター
@@ -739,6 +752,7 @@ export default function HomePage() {
       onLoginRequiredModalLogin={handleLoginRequiredModalLogin}
       passwordChangeStep={passwordChangeStep}
       newEmail={newEmail}
+      currentUserRank={currentUserRank}
       />
     </div>
   )

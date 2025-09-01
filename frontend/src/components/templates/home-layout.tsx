@@ -29,7 +29,6 @@ import { AreaPopup } from "../molecules/area-popup"
 import { GenrePopup } from "../molecules/genre-popup"
 import { HamburgerMenu } from "../molecules/hamburger-menu"
 import { Logo } from "../atoms/logo"
-import { calculateUserRank } from "../../utils/rank-calculator"
 import { useState } from "react"
 import type { Store } from "../../types/store"
 import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
@@ -166,6 +165,7 @@ interface HomeLayoutProps {
   onStoreDetailClose?: () => void
   isStoreDetailOpen?: boolean
   isStoreDetailPopupOpen?: boolean
+  currentUserRank?: string | null
 }
 
 export function HomeLayout({
@@ -275,6 +275,7 @@ export function HomeLayout({
   onStoreDetailClose,
   isStoreDetailOpen,
   isStoreDetailPopupOpen,
+  currentUserRank,
 }: HomeLayoutProps) {
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
@@ -467,11 +468,11 @@ export function HomeLayout({
           {/* 右側: ユーザーメニュー（ログイン時のみ） */}
           <div className="flex items-center justify-end w-20">
             {isAuthenticated ? (
-              user && (
+              user && currentUserRank && (
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
                   <img
-                    src={`/${calculateUserRank(user.contractStartDate || user.createdAt)}.png`}
-                    alt={`${calculateUserRank(user.contractStartDate || user.createdAt)}ランク`}
+                    src={`/${currentUserRank}.png`}
+                    alt={`${currentUserRank}ランク`}
                     className="w-5 h-5 object-contain"
                   />
                 </div>
