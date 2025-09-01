@@ -630,7 +630,8 @@ export default function HomePage() {
   }
 
   return (
-    <HomeLayout
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100 w-full">
+      <HomeLayout
       selectedGenres={selectedGenres}
       selectedEvents={selectedEvents}
       selectedArea={selectedArea}
@@ -738,6 +739,7 @@ export default function HomePage() {
       onLoginRequiredModalLogin={handleLoginRequiredModalLogin}
       passwordChangeStep={passwordChangeStep}
       newEmail={newEmail}
-    />
+      />
+    </div>
   )
 }
