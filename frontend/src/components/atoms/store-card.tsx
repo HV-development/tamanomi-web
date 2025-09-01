@@ -93,7 +93,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
-            <span className="text-green-600 font-medium text-sm">350m</span>
+            <span className="text-black font-medium text-sm">現在位置から350m</span>
           </div>
           <div className="flex items-center gap-1">
             <button
