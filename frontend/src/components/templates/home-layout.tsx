@@ -166,6 +166,7 @@ interface HomeLayoutProps {
   isStoreDetailOpen?: boolean
   isStoreDetailPopupOpen?: boolean
   currentUserRank?: string | null
+  currentUserRank?: string | null
 }
 
 export function HomeLayout({
@@ -276,6 +277,7 @@ export function HomeLayout({
   isStoreDetailOpen,
   isStoreDetailPopupOpen,
   currentUserRank,
+  currentUserRank,
 }: HomeLayoutProps) {
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
@@ -385,6 +387,7 @@ export function HomeLayout({
         emailChangeStep={emailChangeStep}
         passwordChangeStep={passwordChangeStep}
         newEmail={newEmail}
+        currentUserRank={currentUserRank}
       />
     )
   }
