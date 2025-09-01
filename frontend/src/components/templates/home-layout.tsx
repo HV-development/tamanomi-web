@@ -452,7 +452,7 @@ export function HomeLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100 w-full">
+    <div className="min-h-screen flex flex-col bg-gray-50 w-full">
       {/* ヘッダー部分のみ */}
       <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
         <div className="flex items-center justify-between px-4 py-3">
