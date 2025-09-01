@@ -98,17 +98,19 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           <div className="flex items-center gap-1">
             <button
               onClick={handlePhoneClick}
-              className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
+              className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
               aria-label="電話をかける"
             >
               <Phone className="w-4 h-4 text-green-600 hover:text-green-700 fill-current" />
             </button>
             <button
               onClick={handleMapClick}
-              className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
+              className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
               aria-label="Googleマップで表示"
             >
-              <MapPin className="w-4 h-4 text-green-600 hover:text-green-700 fill-current" />
+              <div className="w-4 h-4 text-green-600 hover:text-green-700 transition-colors">
+                📍
+              </div>
             </button>
           </div>
         </div>
