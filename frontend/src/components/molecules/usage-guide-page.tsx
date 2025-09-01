@@ -1,3 +1,5 @@
+"use client"
+
 import { ArrowLeft, Ticket, CheckCircle, AlertTriangle, Info } from 'lucide-react'
 import { HeaderLogo } from '../atoms/header-logo'
 
