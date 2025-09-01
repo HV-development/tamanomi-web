@@ -17,8 +17,8 @@ export function FavoriteButton({ isFavorite, onToggle, className = "" }: Favorit
       <Heart 
         className={`w-6 h-6 transition-colors ${
           isFavorite 
-            ? "text-red-500 fill-red-500 w-7 h-7" 
-            : "text-gray-400 hover:text-red-500 w-7 h-7"
+            ? "text-red-500 fill-red-500" 
+            : "text-gray-400 hover:text-red-500"
         }`}
       />
     </button>
