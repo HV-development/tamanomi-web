@@ -1,6 +1,6 @@
 "use client"
 
-import { MapPin, Phone, Globe, Ticket, Info } from "lucide-react"
+import { Map, Phone, Globe, Ticket, Info } from "lucide-react"
 import { FavoriteButton } from "./favorite-button"
 import type { Store } from "../../types/store"
 import { getGenreColor } from "../../utils/genre-colors"
@@ -108,7 +108,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
               className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
               aria-label="Googleマップで表示"
             >
-              <MapPin className="w-4 h-4 text-green-600 hover:text-green-700 fill-current transition-colors" />
+              <Map className="w-4 h-4 text-green-600 hover:text-green-700 fill-current transition-colors" />
             </button>
           </div>
         </div>
