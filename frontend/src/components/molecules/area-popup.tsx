@@ -33,7 +33,7 @@ export function AreaPopup({ isOpen, selectedArea, onAreaSelect, onClose, onClear
       <div className="fixed inset-0 bg-black bg-opacity-20 z-40" onClick={onClose}></div>
 
       {/* ポップアップ */}
-      <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-lg mx-auto max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-sm mx-auto overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900">エリアを選択</h3>
@@ -52,14 +52,14 @@ export function AreaPopup({ isOpen, selectedArea, onAreaSelect, onClose, onClear
           </div>
 
           {/* エリア選択グリッド - スマホ最適化 */}
-          <div className="grid grid-cols-2 gap-3 mb-6 max-h-64 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-3 mb-6">
             {SAITAMA_AREAS.map((area) => (
               <AreaButton
                 key={area.value}
                 label={area.label}
                 isSelected={selectedArea === area.value}
                 onClick={() => onAreaSelect(area.value)}
-                className="text-sm py-4 px-3 min-h-[48px] flex items-center justify-center w-full font-medium"
+                className="text-sm py-3 px-2 min-h-[44px] flex items-center justify-center w-full font-medium"
               />
             ))}
           </div>
