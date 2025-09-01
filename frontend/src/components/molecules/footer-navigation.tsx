@@ -56,7 +56,7 @@ export function FooterNavigation({
               className="flex flex-col items-center gap-0.5 py-1 min-w-0 flex-1"
             >
               <Icon className="w-5 h-5 text-white" />
-              <span className={`text-xs font-medium ${isActive ? "text-white" : "text-green-200"}`}>
+              <span className="text-xs font-medium text-white">
                 {tab.label}
               </span>
             </button>
