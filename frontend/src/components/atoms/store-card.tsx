@@ -90,26 +90,28 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             </span>
             <span className="text-black text-sm">現在位置から350m</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex flex-col items-center gap-1">
             <FavoriteButton
               isFavorite={store.isFavorite}
               onToggle={() => onFavoriteToggle(store.id)}
               className="flex-shrink-0"
             />
-            <button
-              onClick={handlePhoneClick}
-              className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
-              aria-label="電話をかける"
-            >
-              <Phone className="w-4 h-4 text-green-600 hover:text-green-700 fill-current" />
-            </button>
-            <button
-              onClick={handleMapClick}
-              className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
-              aria-label="Googleマップで表示"
-            >
-              <Navigation className="w-4 h-4 text-green-600 hover:text-green-700 fill-current transition-colors" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handlePhoneClick}
+                className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
+                aria-label="電話をかける"
+              >
+                <Phone className="w-4 h-4 text-green-600 hover:text-green-700 fill-current" />
+              </button>
+              <button
+                onClick={handleMapClick}
+                className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
+                aria-label="Googleマップで表示"
+              >
+                <Navigation className="w-4 h-4 text-green-600 hover:text-green-700 fill-current transition-colors" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
