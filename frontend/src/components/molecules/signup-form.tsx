@@ -395,6 +395,22 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
         error={errors.gender}
       />
 
+     {/* 登録店舗 */}
+     <div>
+       <label className="block text-sm font-medium text-gray-700 mb-2">
+         登録店舗
+       </label>
+       <input
+         type="text"
+         placeholder="店舗QRコードから登録された店舗です"
+         value={formData.registeredStore}
+         onChange={(e) => handleInputChange("registeredStore", e.target.value)}
+         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors bg-gray-50"
+         readOnly
+       />
+       <p className="mt-1 text-xs text-gray-500">※店舗QRコードから登録された店舗です</p>
+     </div>
+
       {/* パスワード */}
       <Input
         type="password"

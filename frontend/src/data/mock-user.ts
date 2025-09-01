@@ -10,6 +10,7 @@ export const mockUser: User = {
   gender: "male",
   createdAt: new Date("2024-01-01"),
   contractStartDate: new Date("2023-06-01"),
+  registeredStore: "さいたま酒場 大宮店",
 }
 
 export const mockPlan: Plan = {

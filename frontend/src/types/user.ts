@@ -10,6 +10,7 @@ export interface User {
   gender: string
   createdAt: Date
   contractStartDate?: Date
+  registeredStore?: string
 }
 
 export interface Plan {
