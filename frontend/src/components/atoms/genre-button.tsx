@@ -19,7 +19,7 @@ export function GenreButton({ label, genre, isSelected, onClick, className = "" 
       onClick={onClick}
       className={`relative rounded-lg border-2 transition-all duration-200 text-center w-full ${
         isSelected
-          ? `${genreColors.border.replace('border-', 'border-')} ${genreColors.bg} ${genreColors.text} shadow-md`
+          ? `border-green-600 ${genreColors.bg} ${genreColors.text} shadow-md`
           : `border-gray-300 bg-white text-gray-700 ${genreColors.hover} hover:border-gray-400`
       } block ${className}`}
     >
