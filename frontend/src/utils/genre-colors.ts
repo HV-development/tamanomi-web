@@ -8,94 +8,94 @@ export interface GenreColor {
 
 export const GENRE_COLORS: Record<string, GenreColor> = {
   izakaya: {
-    bg: "bg-orange-100",
-    text: "text-orange-700",
-    border: "border-orange-200",
-    hover: "hover:bg-orange-200"
+    bg: "bg-orange-200",
+    text: "text-orange-800",
+    border: "border-orange-300",
+    hover: "hover:bg-orange-300"
   },
   creative: {
-    bg: "bg-purple-100",
-    text: "text-purple-700",
-    border: "border-purple-200",
-    hover: "hover:bg-purple-200"
+    bg: "bg-pink-200",
+    text: "text-pink-800",
+    border: "border-pink-300",
+    hover: "hover:bg-pink-300"
   },
   japanese: {
-    bg: "bg-emerald-100",
-    text: "text-emerald-700",
-    border: "border-emerald-200",
-    hover: "hover:bg-emerald-200"
+    bg: "bg-green-200",
+    text: "text-green-800",
+    border: "border-green-300",
+    hover: "hover:bg-green-300"
   },
   western: {
-    bg: "bg-sky-100",
-    text: "text-sky-700",
-    border: "border-sky-200",
-    hover: "hover:bg-sky-200"
+    bg: "bg-cyan-200",
+    text: "text-cyan-800",
+    border: "border-cyan-300",
+    hover: "hover:bg-cyan-300"
   },
   italian: {
-    bg: "bg-lime-100",
-    text: "text-lime-700",
-    border: "border-lime-200",
-    hover: "hover:bg-lime-200"
+    bg: "bg-lime-200",
+    text: "text-lime-800",
+    border: "border-lime-300",
+    hover: "hover:bg-lime-300"
   },
   french: {
-    bg: "bg-pink-100",
-    text: "text-pink-700",
-    border: "border-pink-200",
-    hover: "hover:bg-pink-200"
+    bg: "bg-rose-200",
+    text: "text-rose-800",
+    border: "border-rose-300",
+    hover: "hover:bg-rose-300"
   },
   chinese: {
-    bg: "bg-yellow-100",
-    text: "text-yellow-700",
-    border: "border-yellow-200",
-    hover: "hover:bg-yellow-200"
+    bg: "bg-yellow-200",
+    text: "text-yellow-800",
+    border: "border-yellow-300",
+    hover: "hover:bg-yellow-300"
   },
   yakiniku: {
-    bg: "bg-red-100",
-    text: "text-red-700",
-    border: "border-red-200",
-    hover: "hover:bg-red-200"
+    bg: "bg-red-200",
+    text: "text-red-800",
+    border: "border-red-300",
+    hover: "hover:bg-red-300"
   },
   korean: {
-    bg: "bg-fuchsia-100",
-    text: "text-fuchsia-700",
-    border: "border-fuchsia-200",
-    hover: "hover:bg-fuchsia-200"
+    bg: "bg-purple-200",
+    text: "text-purple-800",
+    border: "border-purple-300",
+    hover: "hover:bg-purple-300"
   },
   asian: {
-    bg: "bg-amber-100",
-    text: "text-amber-700",
-    border: "border-amber-200",
-    hover: "hover:bg-amber-200"
+    bg: "bg-amber-200",
+    text: "text-amber-800",
+    border: "border-amber-300",
+    hover: "hover:bg-amber-300"
   },
   bar: {
-    bg: "bg-violet-100",
-    text: "text-violet-700",
-    border: "border-violet-200",
-    hover: "hover:bg-violet-200"
+    bg: "bg-indigo-200",
+    text: "text-indigo-800",
+    border: "border-indigo-300",
+    hover: "hover:bg-indigo-300"
   },
   ramen: {
-    bg: "bg-teal-100",
-    text: "text-teal-700",
-    border: "border-teal-200",
-    hover: "hover:bg-teal-200"
+    bg: "bg-orange-300",
+    text: "text-orange-900",
+    border: "border-orange-400",
+    hover: "hover:bg-orange-400"
   },
   soba: {
-    bg: "bg-stone-100",
-    text: "text-stone-700",
-    border: "border-stone-200",
-    hover: "hover:bg-stone-200"
+    bg: "bg-gray-200",
+    text: "text-gray-800",
+    border: "border-gray-300",
+    hover: "hover:bg-gray-300"
   },
   udon: {
-    bg: "bg-cyan-100",
-    text: "text-cyan-700",
-    border: "border-cyan-200",
-    hover: "hover:bg-cyan-200"
+    bg: "bg-teal-200",
+    text: "text-teal-800",
+    border: "border-teal-300",
+    hover: "hover:bg-teal-300"
   },
   default: {
-    bg: "bg-neutral-100",
-    text: "text-neutral-700",
-    border: "border-neutral-200",
-    hover: "hover:bg-neutral-200"
+    bg: "bg-gray-100",
+    text: "text-gray-700",
+    border: "border-gray-200",
+    hover: "hover:bg-gray-200"
   }
 }
 
