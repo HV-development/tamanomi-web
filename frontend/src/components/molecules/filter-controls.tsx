@@ -238,8 +238,8 @@ export function FilterControls({
           onClick={handleGenrePopupOpen}
           className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
             selectedGenres.length > 0
-              ? "border-green-500 bg-green-50 text-green-700"
-              : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+              ? "border-green-700 bg-green-100 text-green-800"
+              : "border-gray-300 bg-white text-gray-700 hover:border-green-400 hover:bg-green-100"
           }`}
         >
           <span>ジャンル</span>
