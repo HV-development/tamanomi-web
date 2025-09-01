@@ -98,15 +98,15 @@ export function StoreDetailPopup({
       <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-2xl shadow-xl z-50 max-w-md mx-auto overflow-hidden border border-gray-200">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
-          <div className="bg-white p-4 border-b border-gray-200 flex-shrink-0">
+          <div className="bg-green-600 p-4 text-white flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="w-8"></div>
-              <h3 className="text-xl font-bold text-gray-900">店舗詳細</h3>
+              <h3 className="text-xl font-bold text-white">店舗詳細</h3>
               <button 
                 onClick={onClose} 
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-green-700 rounded-full transition-colors"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-white" />
               </button>
             </div>
           </div>
