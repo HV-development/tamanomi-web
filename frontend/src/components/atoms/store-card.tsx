@@ -114,28 +114,39 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
         </div>
       </div>
 
-      {/* 店舗写真3枚横並び */}
-      <div className="grid grid-cols-3 gap-1 relative">
-        <div className="aspect-square overflow-hidden">
-          <img
-            src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg"}
-            alt={`${store.name} 外観`}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          />
+      {/* 店舗写真カルーセル */}
+      <div className="relative overflow-hidden">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+          <div className="flex-shrink-0 w-full aspect-[16/9] snap-start">
+            <img
+              src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg"}
+              alt={`${store.name} 外観`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex-shrink-0 w-full aspect-[16/9] snap-start">
+            <img
+              src={getStoreInteriorImage(store.genre)}
+              alt={`${store.name} 店内`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex-shrink-0 w-full aspect-[16/9] snap-start">
+            <img
+              src={getStoreFoodImage(store.genre)}
+              alt={`${store.name} 料理`}
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
-        <div className="aspect-square overflow-hidden">
-          <img
-            src={getStoreInteriorImage(store.genre)}
-            alt={`${store.name} 店内`}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          />
-        </div>
-        <div className="aspect-square overflow-hidden">
-          <img
-            src={getStoreFoodImage(store.genre)}
-            alt={`${store.name} 料理`}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          />
+        
+        {/* インジケーター */}
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+          <div className="flex gap-1">
+            <div className="w-1.5 h-1.5 bg-white/70 rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-white/40 rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-white/40 rounded-full"></div>
+          </div>
         </div>
       </div>
 
