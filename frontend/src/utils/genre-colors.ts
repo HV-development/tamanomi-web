@@ -26,10 +26,10 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     hover: "hover:bg-emerald-200"
   },
   western: {
-    bg: "bg-blue-100",
-    text: "text-blue-700",
-    border: "border-blue-200",
-    hover: "hover:bg-blue-200"
+    bg: "bg-sky-100",
+    text: "text-sky-700",
+    border: "border-sky-200",
+    hover: "hover:bg-sky-200"
   },
   italian: {
     bg: "bg-lime-100",
@@ -56,10 +56,10 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     hover: "hover:bg-red-200"
   },
   korean: {
-    bg: "bg-rose-100",
-    text: "text-rose-700",
-    border: "border-rose-200",
-    hover: "hover:bg-rose-200"
+    bg: "bg-fuchsia-100",
+    text: "text-fuchsia-700",
+    border: "border-fuchsia-200",
+    hover: "hover:bg-fuchsia-200"
   },
   asian: {
     bg: "bg-amber-100",
@@ -68,10 +68,10 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     hover: "hover:bg-amber-200"
   },
   bar: {
-    bg: "bg-indigo-100",
-    text: "text-indigo-700",
-    border: "border-indigo-200",
-    hover: "hover:bg-indigo-200"
+    bg: "bg-violet-100",
+    text: "text-violet-700",
+    border: "border-violet-200",
+    hover: "hover:bg-violet-200"
   },
   ramen: {
     bg: "bg-teal-100",
@@ -80,10 +80,10 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     hover: "hover:bg-teal-200"
   },
   soba: {
-    bg: "bg-slate-100",
-    text: "text-slate-700",
-    border: "border-slate-200",
-    hover: "hover:bg-slate-200"
+    bg: "bg-stone-100",
+    text: "text-stone-700",
+    border: "border-stone-200",
+    hover: "hover:bg-stone-200"
   },
   udon: {
     bg: "bg-cyan-100",
@@ -92,10 +92,10 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     hover: "hover:bg-cyan-200"
   },
   default: {
-    bg: "bg-gray-100",
-    text: "text-gray-700",
-    border: "border-gray-200",
-    hover: "hover:bg-gray-200"
+    bg: "bg-neutral-100",
+    text: "text-neutral-700",
+    border: "border-neutral-200",
+    hover: "hover:bg-neutral-200"
   }
 }
 
