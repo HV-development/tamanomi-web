@@ -4,6 +4,7 @@ import { Navigation, Phone, Globe, Ticket, Info } from "lucide-react"
 import { FavoriteButton } from "./favorite-button"
 import type { Store } from "../../types/store"
 import { getGenreColor } from "../../utils/genre-colors"
+import { useState } from "react"
 
 interface StoreCardProps {
   store: Store
@@ -40,6 +41,21 @@ const getStoreFoodImage = (genre: string) => {
 }
 
 export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClick, className = "" }: StoreCardProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+  // 画像配列を作成
+  const images = [
+    store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    getStoreInteriorImage(store.genre),
+    getStoreFoodImage(store.genre)
+  ]
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setCurrentImageIndex((prev) => (prev + 1) % images.length)
+  }
+
   const handlePhoneClick = () => {
     window.open(`tel:${store.phone}`, "_self")
   }
@@ -116,36 +132,25 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
 
       {/* 店舗写真カルーセル */}
       <div className="relative overflow-hidden">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-          <div className="flex-shrink-0 w-full aspect-[3/1] snap-start">
-            <img
-              src={store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"}
-              alt={`${store.name} 外観`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-shrink-0 w-full aspect-[3/1] snap-start">
-            <img
-              src={getStoreInteriorImage(store.genre)}
-              alt={`${store.name} 店内`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-shrink-0 w-full aspect-[3/1] snap-start">
-            <img
-              src={getStoreFoodImage(store.genre)}
-              alt={`${store.name} 料理`}
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <div className="w-full aspect-[3/1] cursor-pointer" onClick={handleImageClick}>
+          <img
+            src={images[currentImageIndex]}
+            alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
+            className="w-full h-full object-cover rounded-lg transition-opacity duration-300"
+          />
         </div>
         
         {/* インジケーター */}
         <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
           <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-            <div className="w-1.5 h-1.5 bg-white/60 rounded-full"></div>
-            <div className="w-1.5 h-1.5 bg-white/60 rounded-full"></div>
+            {images.map((_, index) => (
+              <div
+                key={index}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                  index === currentImageIndex ? "bg-white" : "bg-white/60"
+                }`}
+              ></div>
+            ))}
           </div>
         </div>
       </div>
