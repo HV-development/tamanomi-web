@@ -1,5 +1,7 @@
 "use client"
 
+import { Heart } from "lucide-react"
+
 interface FavoriteButtonProps {
   isFavorite: boolean
   onToggle: () => void
@@ -16,9 +18,13 @@ export function FavoriteButton({ isFavorite, onToggle, className = "" }: Favorit
           : "text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200"
       } ${className}`}
     >
-      <span className={`text-lg ${isFavorite ? "text-red-500" : "text-gray-400"}`}>
-        {isFavorite ? "♥" : "♡"}
-      </span>
+      <Heart 
+        className={`w-5 h-5 transition-colors ${
+          isFavorite 
+            ? "text-red-500 fill-red-500" 
+            : "text-gray-400"
+        }`}
+      />
     </button>
   )
 }
