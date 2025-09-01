@@ -1,3 +1,5 @@
+"use client"
+
 import { SubscriptionContainer } from "../organisms/subscription-container"
 
 interface SubscriptionLayoutProps {

@@ -1,3 +1,5 @@
+"use client"
+
 import { LoginContainer } from "../organisms/login-container"
 
 interface LoginLayoutProps {

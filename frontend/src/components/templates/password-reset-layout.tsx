@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import { PasswordResetContainer } from "../organisms/password-reset-container"
 
 interface PasswordResetLayoutProps {

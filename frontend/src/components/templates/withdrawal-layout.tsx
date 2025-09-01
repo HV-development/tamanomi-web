@@ -1,3 +1,5 @@
+"use client"
+
 import { WithdrawalContainer } from "../organisms/withdrawal-container"
 
 interface WithdrawalLayoutProps {

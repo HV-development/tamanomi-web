@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import { EmailConfirmationContainer } from "../organisms/email-confirmation-container"
 
 interface EmailConfirmationLayoutProps {

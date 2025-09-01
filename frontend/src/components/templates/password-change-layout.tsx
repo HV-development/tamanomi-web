@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import { PasswordChangeContainer } from "../organisms/password-change-container"
 
 interface PasswordChangeLayoutProps {

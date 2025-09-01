@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import { ProfileEditContainer } from "../organisms/profile-edit-container"
 import type { User } from "../../types/user"
 

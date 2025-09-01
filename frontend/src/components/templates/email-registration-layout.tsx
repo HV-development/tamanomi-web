@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import { EmailRegistrationContainer } from "../organisms/email-registration-container"
 
 interface EmailRegistrationLayoutProps {

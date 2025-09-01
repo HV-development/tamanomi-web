@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import { SignupContainer } from "../organisms/signup-container"
 
 interface SignupFormData {

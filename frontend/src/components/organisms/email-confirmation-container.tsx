@@ -1,5 +1,7 @@
 "use client"
 
+"use client"
+
 import { Logo } from "../atoms/logo"
 import { EmailConfirmationComplete } from "../molecules/email-confirmation-complete"
 
