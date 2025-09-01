@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Home
-}Layout } from "@/components/templates/home-layout"
+import { HomeLayout } from "@/components/templates/home-layout"
 import { mockStores } from "@/data/mock-stores"
 import { mockNotifications } from "@/data/mock-notifications"
 import type { Store } from "@/types/store"
@@ -631,7 +630,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-lime-50 to-lime-100 w-full">
+    <HomeLayout
       selectedGenres={selectedGenres}
       selectedEvents={selectedEvents}
       selectedArea={selectedArea}
