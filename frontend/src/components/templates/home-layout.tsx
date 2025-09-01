@@ -466,6 +466,9 @@ export function HomeLayout({
         favoriteCount={favoriteStores.length}
       />
       <div className="flex-1 overflow-hidden">
+        {/* バナーカルーセル */}
+        <BannerCarousel className="mx-4 mt-4 rounded-2xl" />
+        
         <HomeContainer
         selectedGenres={selectedGenres}
         selectedEvents={selectedEvents}
