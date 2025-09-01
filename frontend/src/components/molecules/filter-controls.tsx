@@ -77,7 +77,13 @@ export function FilterControls({
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isClient, setIsClient] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
+
+  // クライアントサイドでのみレンダリングするためのフラグ
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // ユーザーメニューの外側クリックで閉じる
   useEffect(() => {
@@ -191,7 +197,7 @@ export function FilterControls({
 
         {/* 右側: ユーザーメニュー（ログイン時のみ） */}
         <div className="flex items-center justify-end w-20">
-          {isAuthenticated ? (
+          {isClient && isAuthenticated ? (
             userRank && (
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
                 <img
