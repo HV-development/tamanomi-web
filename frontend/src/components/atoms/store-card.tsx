@@ -155,20 +155,22 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
 
       {/* クーポンボタン */}
       <div className="pt-2">
-        <button
-          onClick={() => onCouponsClick(store.id)}
-          className="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
-        >
-          <span className="font-medium">クーポン一覧</span>
-        </button>
-        
-        <button
-          onClick={() => onStoreClick(store)}
-          className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 py-3 px-4 rounded-xl transition-all duration-300 border border-gray-300 hover:border-gray-400 mt-2"
-        >
-          <span className="font-medium">店舗詳細</span>
-          <span className="text-gray-400">→</span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => onCouponsClick(store.id)}
+            className="flex-1 flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
+          >
+            <span className="font-medium">クーポン一覧</span>
+          </button>
+          
+          <button
+            onClick={() => onStoreClick(store)}
+            className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 py-3 px-4 rounded-xl transition-all duration-300 border border-gray-300 hover:border-gray-400"
+          >
+            <span className="font-medium">店舗詳細</span>
+            <span className="text-gray-400">→</span>
+          </button>
+        </div>
       </div>
     </div>
   )
