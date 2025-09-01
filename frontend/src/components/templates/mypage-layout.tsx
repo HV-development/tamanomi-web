@@ -109,7 +109,6 @@ export function MyPageLayout({
       passwordChangeStep={passwordChangeStep}
       newEmail={newEmail}
       currentUserRank={currentUserRank}
-      currentUserRank={currentUserRank}
     />
   )
 }
