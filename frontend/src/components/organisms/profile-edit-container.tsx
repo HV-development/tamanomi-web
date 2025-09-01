@@ -43,6 +43,7 @@ export function ProfileEditContainer({ user, onSubmit, onCancel, onWithdraw, onL
   return (
     <>
       <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
         {/* ヘッダー */}
         <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
 
