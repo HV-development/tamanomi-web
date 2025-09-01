@@ -19,8 +19,8 @@ export function GenreButton({ label, genre, isSelected, onClick, className = "" 
       onClick={onClick}
       className={`relative rounded-lg border-2 transition-all duration-200 text-center w-full ${
         isSelected
-          ? `border-green-600 ${genreColors.bg} ${genreColors.text} shadow-md`
-          : `border-gray-300 bg-white text-gray-700 ${genreColors.hover} hover:border-gray-400`
+          ? "border-green-700 bg-green-100 text-green-800 shadow-md"
+          : "border-gray-300 bg-white text-gray-700 hover:bg-green-100 hover:border-green-400"
       } block ${className}`}
     >
       {isSelected && (
