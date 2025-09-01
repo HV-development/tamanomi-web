@@ -25,7 +25,7 @@ interface SignupContainerProps {
 
 export function SignupContainer({ initialData, email, onSubmit, onCancel, onLogoClick, isLoading }: SignupContainerProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-lime-50 to-lime-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
       {/* ヘッダー */}
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
 
