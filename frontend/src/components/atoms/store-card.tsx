@@ -151,9 +151,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       </div>
 
       {/* 店舗紹介 */}
-      <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-        <div className="text-sm text-gray-700 leading-relaxed">{store.description}</div>
-      </div>
+      <div className="text-sm text-gray-700 leading-relaxed">{store.description}</div>
 
       {/* クーポンボタン */}
       <div className="pt-2">
