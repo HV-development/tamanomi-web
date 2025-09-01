@@ -50,7 +50,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
       ></div>
 
       {/* ポップアップ */}
-      <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-lg mx-auto max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-sm mx-auto max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-gray-900">ジャンルを選択</h3>
