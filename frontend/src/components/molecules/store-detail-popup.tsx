@@ -123,24 +123,24 @@ export function StoreDetailPopup({
             <div className="space-y-4">
               {/* 営業時間 */}
               {store.businessHours && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="text-base font-bold text-gray-900 mb-2">営業時間</div>
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">営業時間</div>
                   <div className="text-base text-gray-700">{store.businessHours}</div>
                 </div>
               )}
 
               {/* 定休日 */}
               {store.closedDays && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="text-base font-bold text-gray-900 mb-2">定休日</div>
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">定休日</div>
                   <div className="text-base text-gray-700">{store.closedDays}</div>
                 </div>
               )}
 
               {/* 予算 */}
               {store.budget && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="text-base font-bold text-gray-900 mb-2">予算</div>
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">予算</div>
                   <div className="space-y-1">
                     {store.budget.dinner && (
                       <div className="text-base text-gray-700">
@@ -158,16 +158,16 @@ export function StoreDetailPopup({
 
               {/* 禁煙・喫煙 */}
               {store.smokingPolicy && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="text-base font-bold text-gray-900 mb-2">禁煙・分煙</div>
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">禁煙・分煙</div>
                   <div className="text-base text-gray-700">{getSmokingPolicyText(store.smokingPolicy)}</div>
                 </div>
               )}
 
               {/* 支払い方法 */}
               {store.paymentMethods && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="text-base font-bold text-gray-900 mb-2">支払い方法</div>
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">支払い方法</div>
                   <div className="space-y-1">
                     {/* 現金 */}
                     <div className="text-base text-gray-700">
@@ -193,8 +193,8 @@ export function StoreDetailPopup({
 
               {/* 利用シーン */}
               {store.usageScenes && store.usageScenes.length > 0 && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="text-base font-bold text-gray-900 mb-2">利用シーン</div>
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">利用シーン</div>
                   <div className="text-base text-gray-700">{store.usageScenes.join('、')}</div>
                 </div>
               )}
