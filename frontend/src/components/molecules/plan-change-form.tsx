@@ -127,76 +127,60 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
         </div>
 
         {/* 変更内容 */}
-        <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl border-2 border-blue-200 p-6">
-          <div className="space-y-4">
-            {/* 現在のプラン */}
-            <div className="flex items-center justify-between p-4 bg-white/70 rounded-xl">
-              <div>
-                <div className="text-sm text-gray-600">現在のプラン</div>
-                <div className="font-bold text-gray-900">{currentPlan.name}</div>
-                <div className="text-sm text-gray-700">¥{currentPlan.price.toLocaleString()}/月</div>
-              </div>
-            </div>
-
-            {/* 矢印 */}
+        <div className="space-y-4">
+          {/* 現在のプラン */}
+          <div className="p-4 bg-white rounded-xl border border-gray-300">
             <div className="text-center">
-              <div className="text-2xl text-blue-600">↓</div>
-              <div className="text-sm text-blue-700 font-medium">変更</div>
+              <div className="text-sm text-gray-600 mb-1">現在のプラン</div>
+              <div className="font-bold text-gray-900">{currentPlan.name}</div>
+              <div className="text-sm text-gray-700">¥{currentPlan.price.toLocaleString()}/月</div>
             </div>
+          </div>
 
-            {/* 新しいプラン */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-xl border-2 border-green-300">
-              <div>
-                <div className="text-sm text-green-700">新しいプラン</div>
-                <div className="font-bold text-green-900 text-lg">{selectedPlanData.name}</div>
-                <div className="text-sm text-green-800">¥{selectedPlanData.price.toLocaleString()}/月</div>
-              </div>
-              {selectedPlanData.badge && (
-                <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  {selectedPlanData.badge}
-                </span>
-              )}
+          {/* 矢印 */}
+          <div className="text-center">
+            <div className="text-2xl text-green-600">↓</div>
+          </div>
+
+          {/* 新しいプラン */}
+          <div className="p-4 bg-green-100 rounded-xl border border-green-300">
+            <div className="text-center">
+              <div className="text-sm text-green-700 mb-1">新しいプラン</div>
+              <div className="font-bold text-green-900">{selectedPlanData.name}</div>
+              <div className="text-sm text-green-800">¥{selectedPlanData.price.toLocaleString()}/月</div>
             </div>
           </div>
         </div>
 
-        {/* 料金変更の説明 */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-yellow-800">
-              <div className="font-bold mb-2">料金変更について</div>
-              {isUpgrade && (
-                <div className="space-y-1">
-                  <div>• プランアップグレードにより、次回請求額が変更されます</div>
-                  <div>• 変更は即座に適用され、追加機能をすぐにご利用いただけます</div>
-                  <div>• 次回請求日: {formatNextBillingDate()}</div>
-                </div>
-              )}
-              {isDowngrade && (
-                <div className="space-y-1">
-                  <div>• プランダウングレードにより、次回請求額が変更されます</div>
-                  <div>• 変更は次回請求日から適用されます</div>
-                  <div>• 現在の請求期間中は現在のプランが継続されます</div>
-                </div>
-              )}
-            </div>
-          </div>
+        {/* 料金変更について */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+          <div className="text-sm text-yellow-900 font-bold mb-3">料金変更について</div>
+          <ul className="text-sm text-yellow-800 space-y-1">
+            {isUpgrade && (
+              <>
+                <li>• プランアップグレードにより、次回請求額が変更されます</li>
+                <li>• 変更は即座に適用され、追加機能をすぐにご利用いただけます</li>
+                <li>• 次回請求日: {formatNextBillingDate()}</li>
+              </>
+            )}
+            {isDowngrade && (
+              <>
+                <li>• プランダウングレードにより、次回請求額が変更されます</li>
+                <li>• 変更は次回請求日から適用されます</li>
+                <li>• 現在の請求期間中は現在のプランが継続されます</li>
+              </>
+            )}
+          </ul>
         </div>
 
         {/* 請求情報 */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <CreditCard className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-blue-800">
-              <div className="font-bold mb-2">請求情報</div>
-              <div className="space-y-1">
-                <div>• 次回請求日: {formatNextBillingDate()}</div>
-                <div>• 請求金額: ¥{selectedPlanData.price.toLocaleString()}</div>
-                <div>• 決済方法: 登録済みのクレジットカード</div>
-              </div>
-            </div>
-          </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+          <div className="text-sm text-blue-900 font-bold mb-3">請求情報</div>
+          <ul className="text-sm text-blue-800 space-y-1">
+            <li>• 次回請求日: {formatNextBillingDate()}</li>
+            <li>• 請求金額: ¥{selectedPlanData.price.toLocaleString()}</li>
+            <li>• 決済方法: 登録済みのクレジットカード</li>
+          </ul>
         </div>
 
         {/* ボタン */}
@@ -204,9 +188,9 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
           <Button
             onClick={handleFinalConfirm}
             disabled={isLoading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-medium"
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base font-medium"
           >
-            {isLoading ? "変更中..." : "プラン変更を確定する"}
+            {isLoading ? "変更中..." : "変更する"}
           </Button>
 
           <Button
