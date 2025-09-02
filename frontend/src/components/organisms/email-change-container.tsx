@@ -35,7 +35,7 @@ export function EmailChangeContainer({
       <HeaderLogo
         onLogoClick={onLogoClick}
         showBackButton={true}
-        onBackClick={currentStep === "form" ? onCancel : onBackToMyPage}
+        onBackClick={currentStep === "form" ? onCancel : undefined}
       />
 
       {/* メインコンテンツ */}
