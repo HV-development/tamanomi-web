@@ -38,15 +38,11 @@ export function UsageHistoryList({
             >
               ← 戻る
             </button>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 text-green-600">
-                🍷
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-green-700 text-lg leading-tight">TAMAYOI</span>
-                <span className="text-xs text-green-600 font-medium -mt-1">たまよい</span>
-              </div>
-            </div>
+            <img 
+              src="/logo.svg"
+              alt="TAMAYOI" 
+              className="h-8 object-contain"
+            />
             <div className="w-12"></div>
           </div>
         </div>
@@ -79,15 +75,11 @@ export function UsageHistoryList({
           >
             ← 戻る
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 text-green-600">
-              🍷
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-green-700 text-lg leading-tight">TAMAYOI</span>
-              <span className="text-xs text-green-600 font-medium -mt-1">たまよい</span>
-            </div>
-          </div>
+          <img 
+            src="/logo.svg"
+            alt="TAMAYOI" 
+            className="h-8 object-contain"
+          />
           <div className="w-12"></div>
         </div>
       </div>
