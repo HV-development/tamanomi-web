@@ -106,6 +106,10 @@ export function PaymentHistoryList({
             alt="TAMAYOI" 
             className="h-8 object-contain"
           />
+          <div className="w-12"></div>
+        </div>
+      </div>
+
       {/* メインコンテンツ */}
       <div className="p-6">
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-8">決済履歴</h1>
