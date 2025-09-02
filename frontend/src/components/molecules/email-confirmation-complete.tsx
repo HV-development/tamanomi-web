@@ -1,7 +1,6 @@
 "use client"
 
 import { Mail, CheckCircle } from "lucide-react"
-import { Button } from "../atoms/button"
 
 interface EmailConfirmationCompleteProps {
   email: string
@@ -28,6 +27,15 @@ export function EmailConfirmationComplete({
         </div>
       </div>
 
+      {/* ログイン画面に戻るボタン */}
+      <div className="flex justify-center">
+        <button
+          onClick={() => window.location.href = '/'}
+          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-medium text-base transition-colors"
+        >
+          ログイン画面に戻る
+        </button>
+      </div>
     </div>
   )
 }
