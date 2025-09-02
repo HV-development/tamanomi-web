@@ -305,7 +305,6 @@ export function HomeLayout({
     return (
       <EmailConfirmationLayout
         email={emailConfirmationEmail}
-        onBackToLogin={onBackToLogin}
         onLogoClick={onLogoClick}
       />
     )

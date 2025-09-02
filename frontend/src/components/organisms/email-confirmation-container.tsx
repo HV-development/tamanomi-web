@@ -7,13 +7,11 @@ import { EmailConfirmationComplete } from "../molecules/email-confirmation-compl
 
 interface EmailConfirmationContainerProps {
   email: string
-  onBackToLogin: () => void
   onLogoClick: () => void
 }
 
 export function EmailConfirmationContainer({
   email,
-  onBackToLogin,
   onLogoClick,
 }: EmailConfirmationContainerProps) {
   return (
@@ -30,7 +28,6 @@ export function EmailConfirmationContainer({
         <div className="w-full max-w-md">
           <EmailConfirmationComplete
             email={email}
-            onBackToLogin={onBackToLogin}
           />
         </div>
       </div>
