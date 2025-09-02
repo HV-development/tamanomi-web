@@ -285,7 +285,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
           disabled={!selectedPlan}
           className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-medium disabled:bg-gray-300"
         >
-          選択したプランで変更する
+          変更する
         </Button>
 
         <Button onClick={onCancel} variant="secondary" className="w-full py-3 text-base font-medium">
