@@ -274,7 +274,8 @@ export function MyPageContainer({
             {/* 現在のメンバーランク */}
             <div className="flex items-center justify-center gap-12">
               <div className="text-center">
-             <div className="text-gray-400">›</div>
+                <RankBadge rank={currentUserRank} size="lg" showLabel={true} />
+              </div>
             </div>
 
             {/* 次のランク情報 */}
@@ -407,7 +408,5 @@ export function MyPageContainer({
         </div>
       </div>
     </div>
-  )
-}
   )
 }
