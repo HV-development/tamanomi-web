@@ -509,7 +509,7 @@ export function HomeLayout({
           >
             <span>エリア</span>
             {selectedAreas.length > 0 && (
-              <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
+              <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
                 {selectedAreas.length}
               </span>
             )}
@@ -524,7 +524,7 @@ export function HomeLayout({
           >
             <span>ジャンル</span>
             {selectedGenres.length > 0 && (
-              <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
+              <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
                 {selectedGenres.length}
               </span>
             )}
