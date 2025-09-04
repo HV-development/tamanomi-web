@@ -57,8 +57,8 @@ export function AreaPopup({ isOpen, selectedAreas, onAreaToggle, onClose, onClea
               <AreaButton
                 key={area.value}
                 label={area.label}
-                isSelected={selectedArea === area.value}
-                onClick={() => onAreaSelect(area.value)}
+                isSelected={selectedAreas.includes(area.value)}
+                onClick={() => onAreaToggle(area.value)}
                 className="text-sm py-3 px-2 min-h-[44px] flex items-center justify-center w-full font-medium"
               />
             ))}
