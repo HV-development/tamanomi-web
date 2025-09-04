@@ -16,7 +16,7 @@ import { calculateUserRank } from "@/utils/rank-calculator"
 export default function HomePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [selectedEvents, setSelectedEvents] = useState<string[]>([])
-  const [selectedArea, setSelectedArea] = useState<string>("")
+  const [selectedAreas, setSelectedAreas] = useState<string[]>([])
   const [isFavoritesFilter, setIsFavoritesFilter] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
   const [currentView, setCurrentView] = useState<
@@ -109,7 +109,7 @@ export default function HomePage() {
   const handleCurrentLocationClick = () => {
     setSelectedGenres([])
     setSelectedEvents([])
-    setSelectedArea("")
+    setSelectedAreas([])
     setIsFavoritesFilter(false)
   }
 
@@ -647,7 +647,7 @@ export default function HomePage() {
       <HomeLayout
       selectedGenres={selectedGenres}
       selectedEvents={selectedEvents}
-      selectedArea={selectedArea}
+      selectedAreas={selectedAreas}
       isFavoritesFilter={isFavoritesFilter}
       stores={filteredStores}
       activeTab={activeTab}
@@ -673,7 +673,7 @@ export default function HomePage() {
       emailConfirmationEmail={emailConfirmationEmail}
       onGenresChange={setSelectedGenres}
       onEventsChange={setSelectedEvents}
-      onAreaChange={setSelectedArea}
+      onAreasChange={setSelectedAreas}
       onCurrentLocationClick={handleCurrentLocationClick}
       onTabChange={handleTabChange}
       onFavoritesClick={handleFavoritesClick}

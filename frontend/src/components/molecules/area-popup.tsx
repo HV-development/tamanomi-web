@@ -5,8 +5,8 @@ import { Button } from "../atoms/button"
 
 interface AreaPopupProps {
   isOpen: boolean
-  selectedArea: string
-  onAreaSelect: (area: string) => void
+  selectedAreas: string[]
+  onAreaToggle: (area: string) => void
   onClose: () => void
   onClear: () => void
 }
@@ -24,7 +24,7 @@ const SAITAMA_AREAS = [
   { value: "iwatsuki", label: "岩槻区" },
 ]
 
-export function AreaPopup({ isOpen, selectedArea, onAreaSelect, onClose, onClear }: AreaPopupProps) {
+export function AreaPopup({ isOpen, selectedAreas, onAreaToggle, onClose, onClear }: AreaPopupProps) {
   if (!isOpen) return null
 
   return (

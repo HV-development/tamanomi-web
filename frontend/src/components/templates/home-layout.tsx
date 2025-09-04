@@ -38,7 +38,7 @@ import type { Coupon } from "../../types/coupon"
 interface HomeLayoutProps {
   selectedGenres: string[]
   selectedEvents: string[]
-  selectedArea: string
+  selectedAreas: string[]
   isFavoritesFilter: boolean
   stores: Store[]
   activeTab: string
@@ -90,7 +90,7 @@ interface HomeLayoutProps {
   emailConfirmationEmail?: string
   onGenresChange: (genres: string[]) => void
   onEventsChange: (events: string[]) => void
-  onAreaChange: (area: string) => void
+  onAreasChange: (areas: string[]) => void
   onCurrentLocationClick: () => void
   onTabChange: (tab: string) => void
   onFavoritesClick: () => void
@@ -171,7 +171,7 @@ interface HomeLayoutProps {
 export function HomeLayout({
   selectedGenres,
   selectedEvents,
-  selectedArea,
+  selectedAreas,
   isFavoritesFilter,
   stores,
   activeTab,
@@ -201,7 +201,7 @@ export function HomeLayout({
   emailConfirmationEmail = "",
   onGenresChange,
   onEventsChange,
-  onAreaChange,
+  onAreasChange,
   onCurrentLocationClick,
   onTabChange,
   onFavoritesClick,
@@ -493,7 +493,7 @@ export function HomeLayout({
               // 全て表示（フィルターをクリア）
               onGenresChange([])
               onEventsChange([])
-              onAreaChange("")
+              onAreasChange([])
             }}
             className="w-full flex items-center justify-center gap-1 px-2 py-2 border border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50 rounded-full text-xs font-medium transition-colors whitespace-nowrap"
           >
@@ -502,15 +502,15 @@ export function HomeLayout({
           <button
             onClick={() => setIsAreaPopupOpen(true)}
             className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-              selectedArea
+              selectedAreas.length > 0
                 ? "border-green-500 bg-green-50 text-green-700"
                 : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
             }`}
           >
             <span>エリア</span>
-            {selectedArea && (
+            {selectedAreas.length > 0 && (
               <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
-                1
+                {selectedAreas.length}
               </span>
             )}
           </button>
@@ -535,10 +535,15 @@ export function HomeLayout({
       {/* エリア選択ポップアップ */}
       <AreaPopup
         isOpen={isAreaPopupOpen}
-        selectedGenres={selectedGenres}
-        onAreaChange={onAreaChange}
+        selectedAreas={selectedAreas}
+        onAreaToggle={(area) => {
+          const newAreas = selectedAreas.includes(area)
+            ? selectedAreas.filter((a) => a !== area)
+            : [...selectedAreas, area]
+          onAreasChange(newAreas)
+        }}
         onClose={() => setIsAreaPopupOpen(false)}
-        onClear={() => onAreaChange("")}
+        onClear={() => onAreasChange([])}
       />
 
       {/* ジャンル選択ポップアップ */}
