@@ -274,12 +274,7 @@ export function MyPageContainer({
             {/* 現在のメンバーランク */}
             <div className="flex items-center justify-center gap-12">
               <div className="text-center">
-                <div className="text-base text-left text-gray-600 font-medium">現在のメンバーランク</div>
-                <div className={`text-base font-bold ${currentRankInfo.color}`}>{currentRankInfo.label}</div>
-              </div>
-              <div>
-                <RankBadge rank={currentUserRank} size="lg" showLabel={false} />
-              </div>
+             <div className="text-gray-400">›</div>
             </div>
 
             {/* 次のランク情報 */}
@@ -312,6 +307,20 @@ export function MyPageContainer({
 
         {/* メニューボタン群 */}
         <div className="space-y-3">
+          {/* プロフィール編集 */}
+          <button
+            onClick={onEditProfile}
+            className="w-full bg-white rounded-2xl border border-green-200 p-4 flex items-center justify-between hover:bg-green-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <Edit className="w-5 h-5 text-green-600" />
+              </div>
+              <span className="text-lg font-medium text-gray-500">プロフィール編集</span>
+            </div>
+            <div className="text-gray-400">›</div>
+          </button>
+
           {/* プランの変更 */}
           <button
             onClick={onViewPlan}
