@@ -142,24 +142,10 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
                   <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
                   <h3 className="text-lg font-bold text-blue-900">困ったときは</h3>
                 </div>
-                <p className="text-sm text-blue-800 leading-relaxed">
-                  クーポンの使用でご不明な点やトラブルがございましたら、
-                  メニューの「お問い合わせ」からお気軽にご連絡ください。
-                  サポートチームが迅速に対応いたします。
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* フッター */}
-          <div className="p-6 bg-white border-t border-gray-200 flex-shrink-0">
-            <button
-              onClick={onClose}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-all duration-200 hover:scale-[1.02] shadow-md hover:shadow-lg"
-            >
-              閉じる
-            </button>
-          </div>
+      <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
+        <div className="text-center">
+          <h3 className="text-xl font-bold">クーポン使用方法</h3>
+          <p className="text-green-100 text-sm mt-1">正しい使用手順をご確認ください</p>
         </div>
       </div>
     </>
