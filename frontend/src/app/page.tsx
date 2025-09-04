@@ -35,7 +35,7 @@ export default function HomePage() {
   // ゴールド会員として初期化
   const [user, setUser] = useState<User | undefined>({
     ...mockUser,
-    contractStartDate: new Date("2022-06-01") // 1年半前の契約開始日でシルバーランク
+    contractStartDate: new Date("2023-01-01") // 1年前の契約開始日でシルバーランク
   })
   const [plan, setPlan] = useState<Plan | undefined>(mockPlan)
   const [usageHistory, setUsageHistory] = useState<UsageHistory[]>(mockUsageHistory)
