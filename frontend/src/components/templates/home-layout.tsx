@@ -287,12 +287,12 @@ export function HomeLayout({
   // ランクに基づく背景色を取得
   const getBackgroundColorByRank = (rank: string | null, isAuth: boolean) => {
     if (!isAuth || !rank) {
-      return "bg-gradient-to-br from-yellow-50 to-yellow-100" // 非会員・ブロンズ
+      return "bg-gradient-to-br from-green-50 to-green-100" // 非会員・ブロンズ
     }
     
     switch (rank) {
       case "bronze":
-        return "bg-gradient-to-br from-yellow-50 to-yellow-100"
+        return "bg-gradient-to-br from-green-50 to-green-100"
       case "silver":
         return "bg-gradient-to-br from-rose-50 to-rose-100"
       case "gold":
@@ -300,7 +300,7 @@ export function HomeLayout({
       case "diamond":
         return "bg-gradient-to-br from-sky-50 to-sky-100"
       default:
-        return "bg-gradient-to-br from-yellow-50 to-yellow-100"
+        return "bg-gradient-to-br from-green-50 to-green-100"
     }
   }
 
