@@ -69,7 +69,7 @@ export function AreaPopup({ isOpen, selectedAreas, onAreaToggle, onClose, onClea
               クリア
             </Button>
             <Button onClick={onClose} className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white">
-              完了{selectedArea ? `（${SAITAMA_AREAS.find(a => a.value === selectedArea)?.label}）` : ""}
+              完了（{selectedAreas.length}件選択）
             </Button>
           </div>
         </div>
