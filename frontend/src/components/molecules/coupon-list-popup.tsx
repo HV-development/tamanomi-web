@@ -87,6 +87,13 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
                         {coupon.description}
                       </p>
                       
+                      {/* 利用条件 */}
+                      <div className="mb-4 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-600 text-center">
+                          利用条件：焼き鳥2本以上のご注文
+                        </p>
+                      </div>
+                      
                       {/* 利用ボタン */}
                       <button
                         onClick={() => onUseCoupon(coupon.id)}
