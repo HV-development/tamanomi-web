@@ -409,5 +409,3 @@ export function MyPageContainer({
     </div>
   )
 }
-  )
-}
