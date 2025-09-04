@@ -15,6 +15,7 @@ interface LoginContainerProps {
   loginStep?: "email" | "otp"
   email?: string
   onResendOtp?: () => void
+  backgroundColorClass?: string
 }
 
 export function LoginContainer({
@@ -27,6 +28,7 @@ export function LoginContainer({
   loginStep = "email",
   email = "",
   onResendOtp = () => {},
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: LoginContainerProps) {
   const handleBackToEmail = () => {
     // メールアドレス入力画面に戻る処理は親コンポーネントで処理
@@ -34,7 +36,7 @@ export function LoginContainer({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
       <HeaderLogo 
         onLogoClick={onLogoClick} 

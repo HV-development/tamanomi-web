@@ -25,7 +25,7 @@ interface ProfileEditContainerProps {
   isLoading?: boolean
 }
 
-export function ProfileEditContainer({ user, onSubmit, onCancel, onWithdraw, onLogoClick, isLoading }: ProfileEditContainerProps) {
+export function ProfileEditContainer({ user, onSubmit, onCancel, onWithdraw, onLogoClick, isLoading, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: ProfileEditContainerProps) {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [updatedFields, setUpdatedFields] = useState<string[]>([])
 

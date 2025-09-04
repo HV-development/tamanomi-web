@@ -2,9 +2,40 @@
 
 import { ArrowLeft, Ticket, CheckCircle, AlertTriangle, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
-export default function UsageGuidePage() {
+export default function UsageGuidePage({ currentUserRank }: { currentUserRank?: string | null }) {
   const router = useRouter()
+  const [clientUserRank, setClientUserRank] = useState<string | null>(null)
+
+  // クライアントサイドでランク情報を取得
+  useEffect(() => {
+    // 実際の実装では、ここでユーザー情報を取得してランクを計算
+    // 今回はシルバーランクとして設定
+    setClientUserRank("silver")
+  }, [])
+
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null) => {
+    if (!rank) {
+      return "bg-gradient-to-br from-green-50 to-green-100" // 非会員・ブロンズ
+    }
+    
+    switch (rank) {
+      case "bronze":
+        return "bg-gradient-to-br from-green-50 to-green-100"
+      case "silver":
+        return "bg-gradient-to-br from-rose-50 to-rose-100"
+      case "gold":
+        return "bg-gradient-to-br from-amber-50 to-amber-100"
+      case "diamond":
+        return "bg-gradient-to-br from-sky-50 to-sky-100"
+      default:
+        return "bg-gradient-to-br from-green-50 to-green-100"
+    }
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(clientUserRank)
 
   const handleBack = () => {
     router.back()
@@ -52,7 +83,7 @@ export default function UsageGuidePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+    <div className={`min-h-screen ${backgroundColorClass}`}>
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-between">

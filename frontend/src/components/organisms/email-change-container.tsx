@@ -15,6 +15,7 @@ interface EmailChangeContainerProps {
   onResend: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  backgroundColorClass?: string
 }
 
 export function EmailChangeContainer({
@@ -28,9 +29,10 @@ export function EmailChangeContainer({
   onResend = () => {},
   onLogoClick,
   isLoading,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: EmailChangeContainerProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
       <HeaderLogo
         onLogoClick={onLogoClick}
