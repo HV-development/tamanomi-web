@@ -498,6 +498,9 @@ export function HomeLayout({
                 : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
             }`}
           >
+            {isNearbyFilter && (
+              <span className="text-green-600 text-xs">✓</span>
+            )}
             近くのお店
           </button>
           <button
