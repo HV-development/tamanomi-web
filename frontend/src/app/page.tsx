@@ -25,17 +25,21 @@ export default function HomePage() {
   >("home")
   const [loginStep, setLoginStep] = useState<"email" | "otp">("email")
   const [loginEmail, setLoginEmail] = useState("")
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(true) // ゴールド会員としてログイン状態
   const [isLoading, setIsLoading] = useState(false)
   const [signupData, setSignupData] = useState<any>(null)
 
   const [stores, setStores] = useState<Store[]>(mockStores)
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications)
 
-  const [user, setUser] = useState<User | undefined>(undefined)
-  const [plan, setPlan] = useState<Plan | undefined>(undefined)
-  const [usageHistory, setUsageHistory] = useState<UsageHistory[]>([])
-  const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([])
+  // ゴールド会員として初期化
+  const [user, setUser] = useState<User | undefined>({
+    ...mockUser,
+    contractStartDate: new Date("2021-01-01") // 3年以上前の契約開始日でゴールドランク
+  })
+  const [plan, setPlan] = useState<Plan | undefined>(mockPlan)
+  const [usageHistory, setUsageHistory] = useState<UsageHistory[]>(mockUsageHistory)
+  const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>(mockPaymentHistory)
   const [myPageView, setMyPageView] = useState<
     | "main"
     | "profile-edit"
