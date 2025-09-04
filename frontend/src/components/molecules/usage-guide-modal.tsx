@@ -142,10 +142,16 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
                   <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
                   <h3 className="text-lg font-bold text-blue-900">困ったときは</h3>
                 </div>
-      <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
-        <div className="text-center">
-          <h3 className="text-xl font-bold">クーポン使用方法</h3>
-          <p className="text-green-100 text-sm mt-1">正しい使用手順をご確認ください</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
+            <div className="text-center">
+              <h3 className="text-xl font-bold">クーポン使用方法</h3>
+              <p className="text-green-100 text-sm mt-1">正しい使用手順をご確認ください</p>
+            </div>
+          </div>
         </div>
       </div>
     </>
