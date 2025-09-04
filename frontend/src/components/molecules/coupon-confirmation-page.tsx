@@ -26,8 +26,8 @@ export default function CouponConfirmationPage({
       <div className="w-full max-w-xs mx-auto">
         {/* 店員への指示 */}
         <div className="text-center mb-6">
-          <h2 className="text-lg font-bold text-gray-900">店員の方に画面をお見せください</h2>
-          <p className="text-red-600 font-medium text-sm mt-2">
+          <h2 className="text-base font-bold text-gray-900">店員の方に画面をお見せください</h2>
+          <p className="text-red-600 font-medium text-base mt-2">
             自分では押さないでください
           </p>
         </div>
@@ -68,6 +68,13 @@ export default function CouponConfirmationPage({
                   <p className="text-sm text-gray-700 leading-relaxed">
                     {coupon.description}
                   </p>
+                  
+                  {/* 利用条件 */}
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-xs text-gray-600">
+                      利用条件：焼き鳥2本以上のご注文
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
