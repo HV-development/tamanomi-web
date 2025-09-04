@@ -138,6 +138,11 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
                   <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
                   <h3 className="text-lg font-bold text-blue-900">困ったときは</h3>
                 </div>
+                <p className="text-sm text-blue-800 leading-relaxed">
+                  クーポンの使用でご不明な点やトラブルがございましたら、
+                  メニューの「お問い合わせ」からお気軽にご連絡ください。
+                  サポートチームが迅速に対応いたします。
+                </p>
               </div>
             </div>
           </div>
