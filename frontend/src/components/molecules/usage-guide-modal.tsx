@@ -67,16 +67,12 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
       <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-[10001] max-w-lg mx-auto overflow-hidden border-2 border-green-200 animate-in slide-in-from-bottom-4 duration-300">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
-          <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white flex-shrink-0">
+          <div className="bg-green-600 p-6 text-white flex-shrink-0 rounded-t-3xl">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-full">
-                  <Ticket className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">クーポン使用方法</h3>
-                  <p className="text-green-100 text-sm">正しい使用手順をご確認ください</p>
-                </div>
+              <div className="w-8"></div>
+              <div className="text-center">
+                <h3 className="text-xl font-bold">クーポン使用方法</h3>
+                <p className="text-green-100 text-sm">正しい使用手順をご確認ください</p>
               </div>
               <button 
                 onClick={onClose} 
@@ -143,16 +139,6 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
                   <h3 className="text-lg font-bold text-blue-900">困ったときは</h3>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
-            <div className="flex items-center justify-between">
-              <div className="w-8"></div>
-              <div className="text-center">
-                <h3 className="text-xl font-bold">クーポン使用方法</h3>
-              </div>
-              <div className="w-8"></div>
             </div>
           </div>
         </div>
