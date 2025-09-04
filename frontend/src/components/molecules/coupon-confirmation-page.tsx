@@ -69,14 +69,11 @@ export default function CouponConfirmationPage({
               </div>
             </div>
 
-            {/* リンクセクション */}
-            <div className="space-y-2 mb-6">
-              <button 
-                onClick={onUsageGuideClick}
-                className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
-              >
-                使用方法、注意事項についてはこちら
-              </button>
+            {/* 注意事項 */}
+            <div className="text-center mb-6">
+              <p className="text-red-600 font-medium text-sm">
+                自分では押さないでください
+              </p>
             </div>
 
             {/* ボタン */}
@@ -85,7 +82,7 @@ export default function CouponConfirmationPage({
                 onClick={onConfirm}
                 className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
               >
-                確定する
+                承認する
               </button>
               <button
                 onClick={onCancel}
