@@ -14,9 +14,10 @@ interface HomeContainerProps {
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick?: (storeId: string) => void
   isModalOpen?: boolean
+  backgroundColorClass?: string
 }
 
-export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false }: HomeContainerProps) {
+export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = stores.filter(store => {
     // ジャンルフィルター
@@ -60,7 +61,7 @@ export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, 
 
 
   return (
-    <div className="h-full relative bg-gradient-to-br from-green-50 to-green-100">
+    <div className={`h-full relative ${backgroundColorClass}`}>
       {/* 店舗リスト */}
       <div className="h-full overflow-y-auto p-4">
         <StoreList

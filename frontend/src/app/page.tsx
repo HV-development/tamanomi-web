@@ -96,6 +96,27 @@ export default function HomePage() {
     }
   }, [isAuthenticated, user])
 
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null, isAuth: boolean) => {
+    if (!isAuth || !rank) {
+      return "bg-gradient-to-br from-yellow-50 to-yellow-100" // 非会員・ブロンズ
+    }
+    
+    switch (rank) {
+      case "bronze":
+        return "bg-gradient-to-br from-yellow-50 to-yellow-100"
+      case "silver":
+        return "bg-gradient-to-br from-rose-50 to-rose-100"
+      case "gold":
+        return "bg-gradient-to-br from-yellow-50 to-yellow-100"
+      case "diamond":
+        return "bg-gradient-to-br from-sky-50 to-sky-100"
+      default:
+        return "bg-gradient-to-br from-yellow-50 to-yellow-100"
+    }
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank, isAuthenticated)
   // フィルタリングされた店舗データ
   const filteredStores = stores.filter((store) => {
     // お気に入りフィルター
@@ -641,7 +662,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100 w-full">
+    <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
       <HomeLayout
       selectedGenres={selectedGenres}
       selectedEvents={selectedEvents}
