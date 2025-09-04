@@ -123,3 +123,5 @@ export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }:
     </>
   )
 }
+  )
+}
