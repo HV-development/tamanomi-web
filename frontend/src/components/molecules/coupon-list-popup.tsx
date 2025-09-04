@@ -43,6 +43,13 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
               <h4 className="text-lg font-bold text-green-900">{storeName}</h4>
+              {/* 使用方法リンク */}
+              <button 
+                onClick={() => window.open('/usage-guide', '_blank')}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors mt-2"
+              >
+                使用方法、注意事項についてはこちら
+              </button>
             </div>
           </div>
 

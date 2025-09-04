@@ -81,16 +81,6 @@ export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }:
 
               {/* 注意事項 */}
               <div className="mb-6 p-4 bg-red-50 rounded-xl border border-red-200">
-                <h5 className="font-bold text-red-900 mb-3">注意事項</h5>
-                <ul className="text-sm text-red-800 space-y-1">
-                  <li>1. 使用した場合はキャンセルできません</li>
-                  <li>2. 使用後の返金・交換はできません</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* ボタン部分 - 固定 */}
           <div className="p-6 bg-white border-t border-gray-100 flex-shrink-0">
             <div className="space-y-3">
               <button
