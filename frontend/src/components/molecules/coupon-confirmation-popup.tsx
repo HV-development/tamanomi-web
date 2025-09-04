@@ -70,3 +70,5 @@ export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }:
               </div>
 
               {/* 使用方法について */}
+  )
+}
