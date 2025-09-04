@@ -27,6 +27,9 @@ export default function CouponConfirmationPage({
         {/* 店員への指示 */}
         <div className="text-center mb-6">
           <h2 className="text-lg font-bold text-gray-900">店員の方に画面をお見せください</h2>
+          <p className="text-red-600 font-medium text-sm mt-2">
+            自分では押さないでください
+          </p>
         </div>
 
         {/* メインカード */}
@@ -70,12 +73,6 @@ export default function CouponConfirmationPage({
             </div>
 
             {/* 注意事項 */}
-            <div className="text-center mb-6">
-              <p className="text-red-600 font-medium text-sm">
-                自分では押さないでください
-              </p>
-            </div>
-
             {/* ボタン */}
             <div className="space-y-3">
               <button
