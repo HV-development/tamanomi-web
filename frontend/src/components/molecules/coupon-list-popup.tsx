@@ -14,7 +14,7 @@ interface CouponListPopupProps {
  onUsageGuideClick: () => void
 }
 
-export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, onUseCoupon }: CouponListPopupProps) {
+export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, onUseCoupon, onUsageGuideClick }: CouponListPopupProps) {
   if (!isOpen) return null
 
 
