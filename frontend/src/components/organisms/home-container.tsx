@@ -68,6 +68,7 @@ export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, 
           onFavoriteToggle={onFavoriteToggle}
           onCouponsClick={onCouponsClick || (() => {})}
           onStoreClick={onStoreClick}
+          showDistance={isNearbyFilter}
           emptyMessage="条件に合う店舗が見つかりませんでした"
           emptyEmoji="🔍"
         />
