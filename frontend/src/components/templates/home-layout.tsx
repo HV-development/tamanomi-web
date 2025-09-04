@@ -296,7 +296,7 @@ export function HomeLayout({
       case "silver":
         return "bg-gradient-to-br from-rose-50 to-rose-100"
       case "gold":
-        return "bg-gradient-to-br from-yellow-50 to-yellow-100"
+        return "bg-gradient-to-br from-amber-50 to-amber-100"
       case "diamond":
         return "bg-gradient-to-br from-sky-50 to-sky-100"
       default:
