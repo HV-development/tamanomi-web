@@ -151,6 +151,10 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
               <div className="w-8"></div>
               <div className="text-center">
                 <h3 className="text-xl font-bold">クーポン使用方法</h3>
+              </div>
+              <div className="w-8"></div>
+            </div>
+          </div>
         </div>
       </div>
     </>
