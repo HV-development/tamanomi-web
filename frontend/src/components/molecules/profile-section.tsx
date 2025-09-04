@@ -1,6 +1,6 @@
 "use client"
 
-import { User, Settings } from "lucide-react"
+import { User, Edit } from "lucide-react"
 import { RankBadge } from "../atoms/rank-badge"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "../../utils/rank-calculator"
 import type { User as UserType } from "../../types/user"
@@ -38,7 +38,7 @@ export function ProfileSection({ user, onEdit, className = "", currentUserRank }
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="プロフィールを編集"
           >
-            <Settings className="w-5 h-5 text-gray-600 hover:text-green-600" />
+            <Edit className="w-5 h-5 text-gray-600 hover:text-green-600" />
           </button>
         </div>
 

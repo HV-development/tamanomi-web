@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Settings, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
+import { ArrowLeft, Edit, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/logo"
 import { RankBadge } from "../atoms/rank-badge"
@@ -245,7 +245,7 @@ export function MyPageContainer({
               onClick={onEditProfile}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <Settings className="w-5 h-5 text-gray-600" />
+              <Edit className="w-5 h-5 text-gray-600" />
             </button>
           </div>
 
