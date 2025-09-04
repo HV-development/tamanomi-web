@@ -7,6 +7,7 @@ import { mockStores } from "../../data/mock-stores";
 interface HomeContainerProps {
   selectedGenres: string[]
   selectedEvents: string[]
+   isNearbyFilter: boolean
   isFavoritesFilter: boolean
   stores: Store[]
   onStoreClick: (store: Store) => void
@@ -15,7 +16,7 @@ interface HomeContainerProps {
   isModalOpen?: boolean
 }
 
-export function HomeContainer({ selectedGenres, selectedEvents, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false }: HomeContainerProps) {
+export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = stores.filter(store => {
     // ジャンルフィルター

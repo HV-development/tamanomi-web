@@ -17,6 +17,7 @@ export default function HomePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [selectedEvents, setSelectedEvents] = useState<string[]>([])
   const [selectedAreas, setSelectedAreas] = useState<string[]>([])
+  const [isNearbyFilter, setIsNearbyFilter] = useState(false)
   const [isFavoritesFilter, setIsFavoritesFilter] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
   const [currentView, setCurrentView] = useState<
@@ -107,10 +108,7 @@ export default function HomePage() {
   const hasNotification = notifications.some((n) => !n.isRead)
 
   const handleCurrentLocationClick = () => {
-    setSelectedGenres([])
-    setSelectedEvents([])
-    setSelectedAreas([])
-    setIsFavoritesFilter(false)
+    setIsNearbyFilter(!isNearbyFilter)
   }
 
   const handleTabChange = (tab: string) => {
@@ -648,6 +646,7 @@ export default function HomePage() {
       selectedGenres={selectedGenres}
       selectedEvents={selectedEvents}
       selectedAreas={selectedAreas}
+       isNearbyFilter={isNearbyFilter}
       isFavoritesFilter={isFavoritesFilter}
       stores={filteredStores}
       activeTab={activeTab}

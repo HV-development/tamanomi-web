@@ -11,6 +11,7 @@ interface StoreCardProps {
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
   onStoreClick: (store: Store) => void
+   showDistance?: boolean
   className?: string
 }
 
@@ -40,7 +41,7 @@ const getStoreFoodImage = (genre: string) => {
   return foodImages[genre] || foodImages.default
 }
 
-export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClick, className = "" }: StoreCardProps) {
+export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClick, showDistance = false, className = "" }: StoreCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
@@ -150,7 +151,9 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
-            <span className="text-black text-sm">現在位置から350m</span>
+            {showDistance && (
+              <span className="text-black text-sm">現在位置から350m</span>
+            )}
           </div>
           <div className="flex items-center gap-1">
               <button

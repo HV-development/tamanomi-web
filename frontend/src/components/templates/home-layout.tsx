@@ -39,6 +39,7 @@ interface HomeLayoutProps {
   selectedGenres: string[]
   selectedEvents: string[]
   selectedAreas: string[]
+   isNearbyFilter: boolean
   isFavoritesFilter: boolean
   stores: Store[]
   activeTab: string
@@ -172,6 +173,7 @@ export function HomeLayout({
   selectedGenres,
   selectedEvents,
   selectedAreas,
+   isNearbyFilter,
   isFavoritesFilter,
   stores,
   activeTab,
@@ -489,13 +491,12 @@ export function HomeLayout({
       <div className="bg-white border-b border-gray-100">
         <div className="grid grid-cols-3 gap-1 px-2 py-4">
           <button
-            onClick={() => {
-              // 全て表示（フィルターをクリア）
-              onGenresChange([])
-              onEventsChange([])
-              onAreasChange([])
-            }}
-            className="w-full flex items-center justify-center gap-1 px-2 py-2 border border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50 rounded-full text-xs font-medium transition-colors whitespace-nowrap"
+            onClick={onCurrentLocationClick}
+            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+              isNearbyFilter
+                ? "border-green-500 bg-green-50 text-green-700"
+                : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+            }`}
           >
             近くのお店
           </button>
@@ -567,6 +568,7 @@ export function HomeLayout({
         <HomeContainer
         selectedGenres={selectedGenres}
         selectedEvents={selectedEvents}
+         isNearbyFilter={isNearbyFilter}
         isFavoritesFilter={isFavoritesFilter}
         stores={stores}
         onStoreClick={onStoreClick}
