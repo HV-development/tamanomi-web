@@ -29,7 +29,6 @@ import { AreaPopup } from "../molecules/area-popup"
 import { GenrePopup } from "../molecules/genre-popup"
 import { HamburgerMenu } from "../molecules/hamburger-menu"
 import { Logo } from "../atoms/logo"
-import { UsageGuideModal } from "../molecules/usage-guide-modal"
 import { useState } from "react"
 import type { Store } from "../../types/store"
 import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
@@ -282,7 +281,6 @@ export function HomeLayout({
 }: HomeLayoutProps) {
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
-  const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
 
   if (currentView === "coupon-confirmation") {
     return (
@@ -624,13 +622,6 @@ export function HomeLayout({
         onClose={onCouponListClose}
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
-        onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
-      />
-      
-      {/* 使用方法ガイドモーダル */}
-      <UsageGuideModal
-        isOpen={isUsageGuideModalOpen}
-        onClose={() => setIsUsageGuideModalOpen(false)}
       />
       
       {/* クーポン使用成功モーダル */}
