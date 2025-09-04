@@ -235,11 +235,11 @@ export function MyPageContainer({
         {/* プロフィールカード */}
         <div className="bg-white rounded-2xl border border-green-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                 <User className="w-5 h-5 text-green-600" />
               </div>
-              <span className="text-lg font-bold text-gray-500 flex-1">プロフィール</span>
+              <span className="text-lg font-bold text-gray-500">プロフィール</span>
             </div>
             <button
               onClick={onEditProfile}
