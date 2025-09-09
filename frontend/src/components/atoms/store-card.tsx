@@ -116,23 +116,20 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
   }
 
   const handleStoreClick = (e: React.MouseEvent) => {
-    // ボタンクリックの場合は詳細表示しない
+    // ボタンクリックの場合は何もしない
     const target = e.target as HTMLElement
     if (target.closest('button')) {
       return
     }
-    // 店舗画像部分のクリックの場合はクーポン一覧を表示
-    const imageElement = target.closest('.store-image-area')
-    if (imageElement) {
-      e.preventDefault()
-      e.stopPropagation()
-      onCouponsClick(store.id)
-      return
-    }
-    // その他の部分のクリックは店舗詳細を表示
+    
+    // デフォルトで店舗詳細を表示
+    onStoreClick(store)
+  }
+
+  const handleImageAreaClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    onStoreClick(store)
+    onCouponsClick(store.id)
   }
 
   return (
@@ -186,8 +183,8 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       {/* 店舗写真カルーセル */}
       <div className="relative overflow-hidden">
         <div 
-          className="w-full aspect-[3/1] cursor-pointer select-none store-image-area" 
-          onClick={handleImageClick}
+          className="w-full aspect-[3/1] cursor-pointer select-none" 
+          onClick={handleImageAreaClick}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
