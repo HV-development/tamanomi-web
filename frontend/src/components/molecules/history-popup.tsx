@@ -40,7 +40,7 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
           {/* 店舗数表示 */}
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
-              <h4 className="text-lg font-bold text-green-900">{stores.length} 件のお気に入り</h4>
+              <h4 className="text-lg font-bold text-green-900">気になるお店{stores.length}選</h4>
             </div>
           </div>
 

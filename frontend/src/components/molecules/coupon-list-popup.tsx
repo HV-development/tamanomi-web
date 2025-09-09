@@ -99,7 +99,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
                         onClick={() => onUseCoupon(coupon.id)}
                         className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                       >
-                        利用する
+                        このクーポンで乾杯！
                       </button>
                     </div>
                   </div>

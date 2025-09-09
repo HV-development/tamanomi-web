@@ -106,7 +106,7 @@ export function StoreDetailPopup({
                 onClick={onClose} 
                 className="p-2 hover:bg-green-700 rounded-full transition-colors"
               >
-                <X className="w-5 h-5 text-white" />
+                <span className="font-medium">今すぐクーポンGET</span>
               </button>
             </div>
           </div>
