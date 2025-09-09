@@ -121,6 +121,15 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
     if (target.closest('button')) {
       return
     }
+    // 店舗画像部分のクリックの場合はクーポン一覧を表示
+    const imageElement = target.closest('.store-image-area')
+    if (imageElement) {
+      e.preventDefault()
+      e.stopPropagation()
+      onCouponsClick(store.id)
+      return
+    }
+    // その他の部分のクリックは店舗詳細を表示
     e.preventDefault()
     e.stopPropagation()
     onStoreClick(store)
@@ -177,7 +186,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       {/* 店舗写真カルーセル */}
       <div className="relative overflow-hidden">
         <div 
-          className="w-full aspect-[3/1] cursor-pointer select-none" 
+          className="w-full aspect-[3/1] cursor-pointer select-none store-image-area" 
           onClick={handleImageClick}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
