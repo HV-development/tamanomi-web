@@ -106,7 +106,7 @@ export function StoreDetailPopup({
                 onClick={onClose} 
                 className="p-2 hover:bg-green-700 rounded-full transition-colors"
               >
-                <span className="font-medium">今すぐクーポンGET</span>
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -211,7 +211,7 @@ export function StoreDetailPopup({
                   onClick={() => onCouponsClick(store.id)}
                   className="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
                 >
-                  <span className="font-medium">クーポン一覧</span>
+                  <span className="font-medium">今すぐクーポンGET</span>
                 </button>
               </div>
             </div>
