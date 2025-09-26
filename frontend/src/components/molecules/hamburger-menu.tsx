@@ -31,7 +31,11 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
     {
       id: "privacy",
       label: "プライバシーポリシー",
-      onClick: () => onMenuItemClick("privacy"),
+      onClick: () => {
+        // PDFファイルを新しいタブで開く
+        window.open("/プライバシーポリシー.pdf", "_blank")
+        onMenuItemClick("privacy")
+      },
     },
     {
       id: "commercial-law",
