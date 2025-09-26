@@ -22,7 +22,11 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
     {
       id: "terms",
       label: "利用規約",
-      onClick: () => onMenuItemClick("terms"),
+      onClick: () => {
+        // PDFファイルを新しいタブで開く
+        window.open("/たまのみサービス利用規約.pdf", "_blank")
+        onMenuItemClick("terms")
+      },
     },
     {
       id: "privacy",

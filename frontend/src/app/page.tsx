@@ -294,6 +294,7 @@ export default function HomePage() {
 
     switch (itemId) {
       case "terms":
+        // PDFは既にハンバーガーメニューで開かれているので、ここでは何もしない
         break
       case "privacy":
         break
