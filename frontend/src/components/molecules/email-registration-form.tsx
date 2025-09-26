@@ -118,21 +118,6 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
           />
           {campaignCodeError && <p className="text-sm text-red-500">{campaignCodeError}</p>}
-          
-          {/* キャンペーンコードの説明 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <div className="flex items-start gap-2">
-              <Gift className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-800">
-                <div className="font-medium mb-1">キャンペーンコードについて</div>
-                <ul className="text-xs space-y-1">
-                  <li>• 特別なキャンペーンや紹介コードをお持ちの方はご入力ください</li>
-                  <li>• 入力は任意です。お持ちでない場合は空欄のままで構いません</li>
-                  <li>• 有効なコードの場合、登録後に特典が適用されます</li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       <div className="space-y-3">
