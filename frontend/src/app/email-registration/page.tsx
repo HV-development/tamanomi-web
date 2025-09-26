@@ -30,8 +30,8 @@ export default function EmailRegistrationPage() {
 
       const data = await response.json()
       if (data.success) {
-        // 認証メール送信後、直接新規登録画面に遷移
-        router.push(`/register?email=${encodeURIComponent(email)}`)
+        // 認証メール送信後に新規登録画面に遷移
+        router.push(`/register?email=${encodeURIComponent(email)}&token=dummy`)
       } else {
         alert(data.message || 'エラーが発生しました')
       }
@@ -59,8 +59,11 @@ export default function EmailRegistrationPage() {
 
   return (
     <EmailRegistrationLayout
+      currentStep="form"
       onSubmit={handleEmailSubmit}
       onBack={handleBack}
+      onBackToLogin={handleBack}
+      onResend={() => {}}
       onLogoClick={handleLogoClick}
       isLoading={isLoading}
     />
