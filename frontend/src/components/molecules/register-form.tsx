@@ -16,7 +16,6 @@ interface RegisterFormData {
   gender: string
   password: string
   passwordConfirm: string
-  saitamaAppId: string
 }
 
 interface RegisterFormProps {
@@ -35,7 +34,6 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
     gender: "",
     password: "",
     passwordConfirm: "",
-    saitamaAppId: "",
   })
 
   const [errors, setErrors] = useState<Partial<RegisterFormData>>({})
@@ -349,16 +347,6 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
         value={formData.passwordConfirm}
         onChange={(value) => updateFormData("passwordConfirm", value)}
         error={errors.passwordConfirm}
-      />
-
-      {/* さいたま市みんなのアプリID */}
-      <Input
-        type="text"
-        label="さいたま市みんなのアプリID"
-        placeholder="アプリIDを入力（任意）"
-        value={formData.saitamaAppId}
-        onChange={(value) => updateFormData("saitamaAppId", value)}
-        error={errors.saitamaAppId}
       />
 
       {/* ボタン */}

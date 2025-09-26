@@ -11,7 +11,6 @@ interface RegisterFormData {
   gender: string
   password: string
   passwordConfirm: string
-  saitamaAppId: string
 }
 
 interface RegisterContainerProps {
