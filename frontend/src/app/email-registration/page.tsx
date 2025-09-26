@@ -17,28 +17,14 @@ export default function EmailRegistrationPage() {
   const handleEmailSubmit = async (email: string, campaignCode?: string) => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/auth/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email,
-          ...(campaignCode && { campaignCode })
-        }),
-      })
-
-      const data = await response.json()
-      if (data.success) {
-        // 認証メール送信後に新規登録画面に遷移
+      // APIを呼び出さずに直接新規登録画面に遷移
+      setTimeout(() => {
         router.push(`/register?email=${encodeURIComponent(email)}&token=dummy`)
-      } else {
-        alert(data.message || 'エラーが発生しました')
-      }
+      }, 1500)
     } catch (error) {
       alert('ネットワークエラーが発生しました')
     } finally {
-      setIsLoading(false)
+      // 遷移後にローディングを解除するため、setIsLoadingは削除
     }
   }
 
