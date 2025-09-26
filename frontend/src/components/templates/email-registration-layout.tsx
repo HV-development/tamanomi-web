@@ -7,7 +7,7 @@ import { EmailRegistrationContainer } from "../organisms/email-registration-cont
 interface EmailRegistrationLayoutProps {
   currentStep: "form" | "complete"
   email?: string
-  onSubmit: (email: string) => void
+  onSubmit: (email: string, campaignCode?: string) => void
   onBack: () => void
   onBackToLogin: () => void
   onResend: () => void

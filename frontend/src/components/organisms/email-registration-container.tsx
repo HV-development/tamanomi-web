@@ -7,7 +7,7 @@ import { EmailRegistrationComplete } from "../molecules/email-registration-compl
 interface EmailRegistrationContainerProps {
   currentStep: "form" | "complete"
   email?: string
-  onSubmit: (email: string) => void
+  onSubmit: (email: string, campaignCode?: string) => void
   onBack: () => void
   onBackToLogin: () => void
   onResend: () => void

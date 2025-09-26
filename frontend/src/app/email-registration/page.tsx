@@ -14,7 +14,7 @@ export default function EmailRegistrationPage() {
     setIsClient(true)
   }, [])
 
-  const handleEmailSubmit = async (email: string) => {
+  const handleEmailSubmit = async (email: string, campaignCode?: string) => {
     setIsLoading(true)
     try {
       const response = await fetch('/api/auth/verify', {
@@ -22,7 +22,10 @@ export default function EmailRegistrationPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          email,
+          ...(campaignCode && { campaignCode })
+        }),
       })
 
       const data = await response.json()

@@ -121,7 +121,7 @@ interface HomeLayoutProps {
   onForgotPassword: () => void
   onBackToHome: () => void
   onBackToLogin: () => void
-  onEmailSubmit: (email: string) => void
+  onEmailSubmit: (email: string, campaignCode?: string) => void
   onEmailRegistrationBackToLogin: () => void
   onEmailRegistrationResend: () => void
   onSignupSubmit: (data: any) => void

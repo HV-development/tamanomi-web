@@ -204,10 +204,14 @@ export default function HomePage() {
     }, 1500)
   }
 
-  const handleEmailSubmit = (email: string) => {
+  const handleEmailSubmit = (email: string, campaignCode?: string) => {
     setIsLoading(true)
     setTimeout(() => {
       setEmailRegistrationEmail(email)
+      // キャンペーンコードがある場合はログに記録（実際の実装では保存処理）
+      if (campaignCode) {
+        console.log("キャンペーンコード:", campaignCode)
+      }
       setEmailRegistrationStep("complete")
       setIsLoading(false)
     }, 1500)

@@ -5,17 +5,21 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
+import { Gift } from "lucide-react"
 
 interface EmailRegistrationFormProps {
   initialEmail?: string
-  onSubmit: (email: string) => void
+  onSubmit: (email: string, campaignCode?: string) => void
   onBack: () => void
   isLoading?: boolean
 }
 
 export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isLoading = false }: EmailRegistrationFormProps) {
   const [email, setEmail] = useState(initialEmail)
+  const [campaignCode, setCampaignCode] = useState("")
   const [error, setError] = useState("")
+  const [campaignCodeError, setCampaignCodeError] = useState("")
+  const [showCampaignCode, setShowCampaignCode] = useState(false)
 
   // initialEmailが変更された時にemailを更新
   useEffect(() => {
@@ -51,9 +55,31 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
       return
     }
     setError("")
-    onSubmit(email)
+    onSubmit(email, campaignCode)
   }
 
+  const validateCampaignCode = (code: string) => {
+    if (!code) return "" // 任意項目なのでエラーなし
+    
+    // 英数字のみ許可
+    if (!/^[A-Za-z0-9]+$/.test(code)) {
+      return "キャンペーンコードは英数字のみ入力可能です"
+    }
+    
+    // 長さチェック（4-20文字）
+    if (code.length < 4 || code.length > 20) {
+      return "キャンペーンコードは4文字以上20文字以下で入力してください"
+    }
+    
+    return ""
+  }
+
+  const handleCampaignCodeChange = (value: string) => {
+    setCampaignCode(value)
+    // リアルタイムバリデーション
+    const error = validateCampaignCode(value)
+    setCampaignCodeError(error)
+  }
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center mb-6">
@@ -78,6 +104,49 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
         {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
       </div>
 
+      {/* キャンペーンコード入力（オプション） */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            キャンペーンコード（任意）
+          </label>
+          <button
+            type="button"
+            onClick={() => setShowCampaignCode(!showCampaignCode)}
+            className="text-sm text-green-600 hover:text-green-700 underline"
+          >
+            {showCampaignCode ? "非表示" : "コードをお持ちの方"}
+          </button>
+        </div>
+        
+        {showCampaignCode && (
+          <div className="space-y-3">
+            <input
+              type="text"
+              placeholder="例: WELCOME2024"
+              value={campaignCode}
+              onChange={(e) => handleCampaignCodeChange(e.target.value.toUpperCase())}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+            />
+            {campaignCodeError && <p className="text-sm text-red-500">{campaignCodeError}</p>}
+            
+            {/* キャンペーンコードの説明 */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <Gift className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-blue-800">
+                  <div className="font-medium mb-1">キャンペーンコードについて</div>
+                  <ul className="text-xs space-y-1">
+                    <li>• 特別なキャンペーンや紹介コードをお持ちの方はご入力ください</li>
+                    <li>• 入力は任意です。お持ちでない場合は空欄のままで構いません</li>
+                    <li>• 有効なコードの場合、登録後に特典が適用されます</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
       <div className="space-y-3">
         <Button
           type="submit"
