@@ -2,37 +2,46 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { EmailRegistrationLayout } from '@/components/templates/email-registration-layout'
+import { RegisterLayout } from '@/components/templates/register-layout'
 
-export default function EmailRegistrationPage() {
+export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const [searchParams, setSearchParams] = useState<{ email?: string; token?: string }>({})
   const [isClient, setIsClient] = useState(false)
   const router = useRouter()
 
-  // クライアントサイドの初期化
+  // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
     setIsClient(true)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      setSearchParams({
+        email: urlParams.get('email') || undefined,
+        token: urlParams.get('token') || undefined,
+      })
+    }
   }, [])
 
-  const handleEmailSubmit = async (email: string, campaignCode?: string) => {
+  const handleRegisterSubmit = async (data: any) => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/auth/verify', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          email,
-          ...(campaignCode && { campaignCode })
+        body: JSON.stringify({
+          ...data,
+          token: searchParams.token || '',
         }),
       })
 
-      const data = await response.json()
-      if (data.success) {
-        router.push(`/register?email=${encodeURIComponent(email)}&token=${data.token || ''}`)
+      const result = await response.json()
+      if (result.success) {
+        // 登録完了後はホーム画面に遷移
+        router.push('/')
       } else {
-        alert(data.message || 'エラーが発生しました')
+        alert(result.message || 'エラーが発生しました')
       }
     } catch (error) {
       alert('ネットワークエラーが発生しました')
@@ -41,7 +50,7 @@ export default function EmailRegistrationPage() {
     }
   }
 
-  const handleBack = () => router.push('/')
+  const handleCancel = () => router.push('/')
   const handleLogoClick = () => router.push('/')
 
   // クライアントサイドでの初期化が完了するまでローディング表示
@@ -57,9 +66,10 @@ export default function EmailRegistrationPage() {
   }
 
   return (
-    <EmailRegistrationLayout
-      onSubmit={handleEmailSubmit}
-      onBack={handleBack}
+    <RegisterLayout
+      email={searchParams.email}
+      onSubmit={handleRegisterSubmit}
+      onCancel={handleCancel}
       onLogoClick={handleLogoClick}
       isLoading={isLoading}
     />
