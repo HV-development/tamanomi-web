@@ -17,14 +17,16 @@ export default function EmailRegistrationPage() {
   const handleEmailSubmit = async (email: string, campaignCode?: string) => {
     setIsLoading(true)
     try {
-      // APIを呼び出さずに直接新規登録画面に遷移
       setTimeout(() => {
-        router.push(`/register?email=${encodeURIComponent(email)}&token=dummy`)
+        // 直接新規登録画面に遷移
+        router.push(`/register?email=${encodeURIComponent(email)}&token=dummy-token`)
+        setIsLoading(false)
       }, 1500)
     } catch (error) {
       alert('ネットワークエラーが発生しました')
+      setIsLoading(false)
     } finally {
-      // 遷移後にローディングを解除するため、setIsLoadingは削除
+      // 遷移処理のため、ここでのsetIsLoadingは不要
     }
   }
 
