@@ -7,6 +7,7 @@ import { EmailRegistrationLayout } from '@/components/templates/email-registrati
 export default function EmailRegistrationPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isClient, setIsClient] = useState(false)
+  const [currentStep, setCurrentStep] = useState<'form' | 'complete'>('form')
   const router = useRouter()
 
   // クライアントサイドの初期化
@@ -17,16 +18,11 @@ export default function EmailRegistrationPage() {
   const handleEmailSubmit = async (email: string, campaignCode?: string) => {
     setIsLoading(true)
     try {
-      setTimeout(() => {
-        // 直接新規登録画面に遷移
-        router.push(`/register?email=${encodeURIComponent(email)}&token=dummy-token`)
-        setIsLoading(false)
-      }, 1500)
+      // 直接新規登録画面に遷移（遅延なし）
+      router.push(`/register?email=${encodeURIComponent(email)}&token=dummy-token`)
     } catch (error) {
       alert('ネットワークエラーが発生しました')
       setIsLoading(false)
-    } finally {
-      // 遷移処理のため、ここでのsetIsLoadingは不要
     }
   }
 
@@ -47,11 +43,11 @@ export default function EmailRegistrationPage() {
 
   return (
     <EmailRegistrationLayout
-      currentStep="form"
+      currentStep={currentStep}
       onSubmit={handleEmailSubmit}
       onBack={handleBack}
       onBackToLogin={handleBack}
-      onResend={() => {}}
+      onResend={() => setCurrentStep('form')}
       onLogoClick={handleLogoClick}
       isLoading={isLoading}
     />
