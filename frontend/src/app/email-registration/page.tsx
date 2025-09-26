@@ -30,7 +30,8 @@ export default function EmailRegistrationPage() {
 
       const data = await response.json()
       if (data.success) {
-        router.push(`/register?email=${encodeURIComponent(email)}&token=${data.token || ''}`)
+        // 認証メール送信後、直接新規登録画面に遷移
+        router.push(`/register?email=${encodeURIComponent(email)}`)
       } else {
         alert(data.message || 'エラーが発生しました')
       }
