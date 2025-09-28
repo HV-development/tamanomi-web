@@ -22,7 +22,19 @@ export default function SignupPage() {
     }
   }, [])
 
-  const handleSignupSubmit = async (data: any) => {
+  const handleSignupSubmit = async (data: {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    name: string;
+    nameKana: string;
+    phone: string;
+    postalCode: string;
+    prefecture: string;
+    city: string;
+    address1: string;
+    address2: string;
+  }) => {
     setIsLoading(true)
     try {
       const response = await fetch('/api/auth/register', {

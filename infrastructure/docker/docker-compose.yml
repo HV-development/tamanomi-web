@@ -14,6 +14,7 @@ services:
       - ../../frontend/tsconfig.json:/app/tsconfig.json
       - ../../frontend/postcss.config.mjs:/app/postcss.config.mjs
       - ../../frontend/components.json:/app/components.json
+      - ../../../tamanomi-schemas:/app/tamanomi-schemas
     environment:
       - NODE_ENV=development
     command: pnpm dev 

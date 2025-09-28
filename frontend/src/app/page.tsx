@@ -24,7 +24,19 @@ export default function HomePage() {
   const [loginEmail, setLoginEmail] = useState("")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [signupData, setSignupData] = useState<any>(null)
+  const [signupData, setSignupData] = useState<{
+    email: string;
+    password: string;
+    confirmPassword: string;
+    name: string;
+    nameKana: string;
+    phone: string;
+    postalCode: string;
+    prefecture: string;
+    city: string;
+    address1: string;
+    address2: string;
+  } | null>(null)
 
   const [stores, setStores] = useState<Store[]>(mockStores)
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications)
@@ -50,7 +62,6 @@ export default function HomePage() {
   const [newEmail, setNewEmail] = useState("")
 
   const [isCouponListOpen, setIsCouponListOpen] = useState(false)
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false)
   const [selectedStore, setSelectedStore] = useState<Store | null>(null)
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null)
 
@@ -71,11 +82,8 @@ export default function HomePage() {
   // 確認メール送信完了関連の状態
   const [emailConfirmationEmail, setEmailConfirmationEmail] = useState("")
   // 店舗詳細画面の状態を追加
-  const [isStoreDetailOpen, setIsStoreDetailOpen] = useState(false)
   const [isStoreDetailPopupOpen, setIsStoreDetailPopupOpen] = useState(false)
 
-  const [historyStores, setHistoryStores] = useState<Store[]>([])
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false)
 
   // 店舗詳細関連の状態
@@ -206,7 +214,19 @@ export default function HomePage() {
     // emailRegistrationEmailは保持される
   }
 
-  const handleSignupSubmit = (data: any) => {
+  const handleSignupSubmit = (data: {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    name: string;
+    nameKana: string;
+    phone: string;
+    postalCode: string;
+    prefecture: string;
+    city: string;
+    address1: string;
+    address2: string;
+  }) => {
     console.log("登録データ:", data)
     setSignupData(data)
     setCurrentView("confirmation")
@@ -359,7 +379,7 @@ export default function HomePage() {
   }
 
   const handleMyPageViewChange = (view: string) => {
-    setMyPageView(view as any)
+    setMyPageView(view as "main" | "profile" | "usage-history" | "favorites" | "settings" | "email-change" | "password-change")
   }
 
   const handleEditProfile = () => {
@@ -484,8 +504,8 @@ export default function HomePage() {
   }
 
   // 利用履歴関連のハンドラー
-  const handleShowStoreOnHome = (storeId: string) => {
-    console.log("ホームで店舗を表示:", storeId)
+  const _handleShowStoreOnHome = (_storeId: string) => {
+    console.log("ホームで店舗を表示:", _storeId)
     // ホーム画面に戻って該当店舗を表示
     setCurrentView("home")
     setActiveTab("home")
@@ -598,7 +618,16 @@ export default function HomePage() {
     console.log("setSelectedStore(null)実行完了")
   }
 
-  const handleProfileEditSubmit = async (data: any) => {
+  const handleProfileEditSubmit = async (data: {
+    name: string;
+    nameKana: string;
+    phone: string;
+    postalCode: string;
+    prefecture: string;
+    city: string;
+    address1: string;
+    address2: string;
+  }) => {
     setIsLoading(true)
     setTimeout(() => {
       console.log("プロフィール更新:", data)
@@ -625,7 +654,7 @@ export default function HomePage() {
     // newEmailは保持される（initialNewEmailとして渡される）
   }
 
-  const handlePasswordChangeSubmit = async (currentPassword: string, newPassword: string) => {
+  const handlePasswordChangeSubmit = async (_currentPassword: string, _newPassword: string) => {
     console.log("🔍 handlePasswordChangeSubmit START")
     console.log("🔍 Received data:", { currentPassword: "***", newPassword: "***" })
     setIsLoading(true)
@@ -666,7 +695,7 @@ export default function HomePage() {
     console.log("🔍 handlePasswordChangeSubmit END")
   }
 
-  const handlePasswordChangeComplete = () => {
+  const _handlePasswordChangeComplete = () => {
     console.log("パスワード変更完了 - ログイン画面に遷移")
     // ログアウト処理
     setIsAuthenticated(false)
@@ -681,7 +710,7 @@ export default function HomePage() {
     setPasswordChangeStep("form")
   }
 
-  const handlePasswordChangeBackToLogin = () => {
+  const _handlePasswordChangeBackToLogin = () => {
     // パスワード変更完了後はログアウトしてログイン画面に遷移
     setIsAuthenticated(false)
     setUser(undefined)
@@ -708,8 +737,8 @@ export default function HomePage() {
       signupData={signupData}
       hasNotification={hasNotification}
       favoriteStores={favoriteStores}
-      historyStores={historyStores}
-      isHistoryOpen={isHistoryOpen}
+      historyStores={[]}
+      isHistoryOpen={false}
       isFavoritesOpen={isFavoritesOpen}
       notifications={notifications}
       user={user}
