@@ -271,54 +271,50 @@ export function MyPageContainer({
 
         {/* メンバーランクカード */}
         <div className="bg-white rounded-2xl border border-green-200 p-4">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
               <Crown className="w-5 h-5 text-green-600" />
             </div>
-            <span className="text-xl font-bold text-gray-900">メンバーランク</span>
+            <span className="text-lg font-bold text-gray-900">メンバーランク</span>
           </div>
 
-          <div className="space-y-6">
-            {/* 現在のメンバーランク */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-lg font-medium text-gray-700">現在のメンバーランク</div>
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-2 border-gray-300 shadow-sm">
-                  <img
-                    src={`/${currentUserRank}.png`}
-                    alt={`${currentUserRank}ランク`}
-                    className="w-12 h-12 object-contain"
-                  />
-                </div>
+          <div className="space-y-4">
+            {/* 現在のメンバーランク - 横並び */}
+            <div className="flex items-center justify-between">
+              <span className="text-base font-medium text-gray-700">現在のメンバーランク</span>
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-gray-300 shadow-sm">
+                <img
+                  src={`/${currentUserRank}.png`}
+                  alt={`${currentUserRank}ランク`}
+                  className="w-8 h-8 object-contain"
+                />
               </div>
             </div>
 
-            {/* 次のランクアップまで */}
+            {/* 次のランクアップまで - 緑のバー */}
             {nextRank && monthsToNext !== null ? (
-              <div>
-                <div className="bg-green-500 text-white rounded-2xl p-4 text-center mb-4">
-                  <div className="text-lg font-bold">次のランクアップまで</div>
+              <div className="space-y-3">
+                <div className="bg-green-500 text-white rounded-full py-2 px-4 text-center">
+                  <span className="text-sm font-bold">次のランクアップまで</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="text-left">
-                    <div className="text-lg font-medium text-gray-700 mb-1">あと{monthsToNext}ヶ月で</div>
-                    <div className="text-lg font-bold text-gray-900">{nextRank.label}にランクアップ！</div>
+                  <div className="flex-1">
+                    <div className="text-base text-gray-700">あと{monthsToNext}ヶ月で</div>
+                    <div className="text-base font-bold text-gray-900">{nextRank.label}にランクアップ！</div>
                   </div>
-                  <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300 shadow-sm">
-                        <img
-                          src={`/${nextRank.rank}.png`}
-                          alt={`${nextRank.label}ランク`}
-                          className="w-12 h-12 object-contain"
-                        />
-                    </div>
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300 shadow-sm">
+                    <img
+                      src={`/${nextRank.rank}.png`}
+                      alt={`${nextRank.label}ランク`}
+                      className="w-8 h-8 object-contain"
+                    />
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
                 <div className="text-center">
-                  <div className="font-bold text-blue-900 mb-1">🎉 最高ランク達成！</div>
+                  <div className="font-bold text-blue-900 text-sm mb-1">🎉 最高ランク達成！</div>
                   <div className="text-sm text-blue-700">レジェンドメンバーです</div>
                 </div>
               </div>
