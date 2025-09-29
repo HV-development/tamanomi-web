@@ -209,10 +209,6 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
 
   // フォームデータの変化を監視
   useEffect(() => {
-    console.log(`📝 updateFormData完了 - ${field}を${value}に更新`)
-    // リアルタイムバリデーションは無効化
-    // バリデーションは登録ボタン押下時のみ実行
-    
     console.log("🔍 formData state changed:", formData)
   }, [formData])
 
