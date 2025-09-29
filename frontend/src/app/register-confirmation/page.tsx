@@ -45,35 +45,14 @@ export default function RegisterConfirmationPage() {
     if (!formData || !token) return
     
     setIsLoading(true)
-    try {
-      const requestBody = {
-        ...formData,
-        token: token,
-      }
-      
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      })
-
-      const result = await response.json()
-      
-      if (result.success) {
-        // 登録成功後はセッションストレージをクリアして完了画面に遷移
-        sessionStorage.removeItem('registerFormData')
-        router.push('/register-complete')
-      } else {
-        alert(result.message || 'エラーが発生しました')
-      }
-    } catch (error) {
-      console.error('Registration error:', error)
-      alert('ネットワークエラーが発生しました')
-    } finally {
+    
+    // 仮登録処理（バックエンド連携なし）
+    setTimeout(() => {
+      // 登録成功後はセッションストレージをクリアしてトップページに遷移
+      sessionStorage.removeItem('registerFormData')
+      router.push('/')
       setIsLoading(false)
-    }
+    }, 1500)
   }
 
   const handleEdit = () => {
