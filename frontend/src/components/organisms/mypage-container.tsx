@@ -294,8 +294,8 @@ export function MyPageContainer({
             {/* 次のランクアップまで - 緑のバー */}
             {nextRank && monthsToNext !== null ? (
               <div className="space-y-3">
-                <div className="bg-green-500 text-white rounded-full py-2 px-4 text-center">
-                  <span className="text-sm font-bold">次のランクアップまで</span>
+                <div className="bg-green-500 text-white rounded-full py-3 px-6 text-center">
+                  <span className="text-base font-bold">次のランクアップまで</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
