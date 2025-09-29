@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 import { RadioButton } from "../atoms/radio-button"
