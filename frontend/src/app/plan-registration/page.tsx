@@ -52,9 +52,6 @@ export default function PlanRegistrationPage() {
       onPaymentMethodRegister={handlePaymentMethodRegister}
       onLogoClick={handleLogoClick}
       isLoading={isLoading}
-      isLoading={isLoading}
     />
   )
-}
-}
 }
