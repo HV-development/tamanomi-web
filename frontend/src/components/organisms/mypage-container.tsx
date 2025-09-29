@@ -307,7 +307,7 @@ export function MyPageContainer({
                     <div className="flex items-center justify-center gap-3">
                       <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300">
                         <img
-                          src={`/${nextRank.rank}.png`}
+                          src={(`/${nextRank.rank}.png`)}
                           alt={`${nextRank.label}ランク`}
                           className="w-6 h-6 object-contain"
                         />
