@@ -112,14 +112,25 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
   }
 
   const handleAddressSearch = async () => {
+    console.log("🔍 handleAddressSearch関数が呼び出されました")
+    console.log("🔍 現在のformData:", formData)
+    console.log("🔍 現在のerrors:", errors)
+    
     const cleanedPostalCode = formData.postalCode.replace(/-/g, "")
+    
+    console.log("🔍 住所検索ボタンクリック - デバッグ開始")
+    console.log("📋 現在のフォームデータ:", formData)
+    console.log("📋 現在のエラー状態:", errors)
+    console.log("📋 郵便番号:", formData.postalCode, "クリーンアップ後:", cleanedPostalCode)
     
     // 住所検索時は郵便番号の基本チェックのみ（エラー表示なし）
     if (!formData.postalCode || !/^\d{7}$/.test(cleanedPostalCode)) {
       // 無効な郵便番号の場合は何もしない（エラー表示もしない）
+      console.log("❌ 郵便番号が無効なため住所検索をスキップ")
       return
     }
 
+    console.log("✅ 郵便番号が有効 - 住所検索を実行")
     setIsSearchingAddress(true)
     
     const apiUrl = `/api/address/search?zipcode=${cleanedPostalCode}`
@@ -129,10 +140,22 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
       const data = await response.json()
       
       if (data.success && data.address) {
+        // 住所が見つかった場合
+        console.log("📍 住所検索結果:", data.data)
+        console.log("📍 完全住所:", data.address)
+        
+        console.log("📝 住所をフォームに設定する前のformData:", formData)
         setFormData(prev => ({ 
           ...prev, 
           address: data.address 
         }))
+        console.log("📝 住所設定後 - setFormDataを呼び出し完了")
+        
+        // エラーをクリアする前の状態をログ
+        console.log("🧹 エラークリア前のerrors:", errors)
+        setErrors(prev => ({ ...prev, address: undefined }))
+        console.log("🧹 エラークリア後 - setErrorsを呼び出し完了")
+        console.log("✅ 住所検索成功:", data.address)
       } else {
         // 住所が見つからない場合も住所検索時はエラー表示しない
         // 住所フィールドは空のままにして、ユーザーが手入力できるようにする
@@ -158,10 +181,22 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
   }
 
   const updateFormData = (field: keyof RegisterFormData, value: string) => {
+    console.log(`🔍 updateFormData called: field=${field}, value=${value}`)
+    console.log("🔍 updateFormData - 変更前のformData:", formData)
+    console.log("🔍 updateFormData - 変更前のerrors:", errors)
+    
+    console.log(`📝 updateFormData呼び出し - field: ${field}, value: ${value}`)
+    console.log("📝 updateFormData前のformData:", formData)
+    console.log("📝 updateFormData前のerrors:", errors)
+    
     setFormData({ ...formData, [field]: value })
     
+    console.log(`📝 updateFormData完了 - ${field}を${value}に更新`)
     // リアルタイムバリデーションは無効化
     // バリデーションは登録ボタン押下時のみ実行
+    
+    console.log("🔍 updateFormData - setFormData実行後")
+    console.log("📝 リアルタイムバリデーションはスキップ")
   }
 
   return (
@@ -197,6 +232,7 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
         <div className="flex gap-3">
           <div className="flex-1">
             <input
+              id="postalCode"
               type="text"
               placeholder="123-4567 または 1234567"
               value={formData.postalCode}
@@ -206,6 +242,7 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
           </div>
           <Button
             type="button"
+            id="addressSearchButton"
             onClick={handleAddressSearch}
             disabled={isSearchingAddress}
             variant="secondary"

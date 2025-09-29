@@ -12,6 +12,16 @@ interface ButtonProps {
 }
 
 export function Button({ children, onClick, variant = "primary", className = "" }: ButtonProps) {
+  const handleClick = () => {
+    console.log("🔍 Button clicked:", children)
+    if (onClick) {
+      console.log("🔍 Button onClick handler exists, calling it")
+      onClick()
+    } else {
+      console.log("🔍 Button onClick handler is undefined")
+    }
+  }
+
   const baseClasses =
     "px-3 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 whitespace-nowrap"
 
@@ -23,7 +33,7 @@ export function Button({ children, onClick, variant = "primary", className = "" 
   }
 
   return (
-    <button onClick={onClick} className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
+    <button onClick={handleClick} className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
       {children}
     </button>
   )
