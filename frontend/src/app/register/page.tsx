@@ -15,12 +15,22 @@ export default function RegisterPage() {
     setIsClient(true)
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
+      const email = urlParams.get('email') || undefined
+      const token = urlParams.get('token') || undefined
+      
+      // トークンが存在しない場合はメール登録画面にリダイレクト
+      if (!token || token.trim() === '') {
+        console.log('❌ Token is missing or empty, redirecting to email registration')
+        router.push('/email-registration')
+        return
+      }
+      
       setSearchParams({
-        email: urlParams.get('email') || undefined,
-        token: urlParams.get('token') || undefined,
+        email,
+        token,
       })
     }
-  }, [])
+  }, [router])
 
   const handleRegisterSubmit = async (data: any) => {
     setIsLoading(true)
