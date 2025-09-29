@@ -40,24 +40,16 @@ export default function AdvancedDrinkAnimation({
       const switchTimer = setTimeout(() => {
         setCurrentImage('drink2');
         setAnimationPhase('drinking');
-      }, 500);
-      
-      // 2秒後にアニメーション完了
-      const completeTimer = setTimeout(() => {
-        setAnimationPhase('resetting');
-        setIsAnimating(false);
-        onAnimationComplete?.();
         
-        // 1秒後にdrink1に戻す
+        // drink2で停止（ループしない）
         setTimeout(() => {
-          setCurrentImage('drink1');
-          setAnimationPhase('idle');
+          setIsAnimating(false);
+          onAnimationComplete?.();
         }, 1000);
-      }, 2000);
+      }, 500);
 
       return () => {
         clearTimeout(switchTimer);
-        clearTimeout(completeTimer);
       };
     }
   }, [isAnimating]);
@@ -89,11 +81,10 @@ export default function AdvancedDrinkAnimation({
             alt={currentImage === 'drink1' ? '飲む前' : '飲んでいる'}
             width={width}
             height={height}
-            className={`transition-all duration-700 ease-in-out ${
-              animationPhase === 'switching' ? 'scale-95 opacity-70 rotate-1' :
-              animationPhase === 'drinking' ? 'scale-110 rotate-3 animate-pulse' :
-              animationPhase === 'resetting' ? 'scale-105 rotate-1' :
-              'scale-100 rotate-0'
+            className={`transition-opacity duration-500 ease-in-out ${
+              animationPhase === 'switching' ? 'opacity-70' :
+              animationPhase === 'drinking' ? 'opacity-100' :
+              'opacity-100'
             }`}
             priority
           />

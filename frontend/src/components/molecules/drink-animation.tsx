@@ -35,20 +35,12 @@ export default function DrinkAnimation({
         setAnimationPhase('drinking');
       }, 500);
       
-      // 2秒後にアニメーション完了
+      // drink2で停止（ループしない）
       const completeTimer = setTimeout(() => {
         console.log('Animation complete');
-        setAnimationPhase('resetting');
         setIsAnimating(false);
         onAnimationComplete?.();
-        
-        // 1秒後にdrink1に戻す
-        setTimeout(() => {
-          console.log('Resetting to drink1');
-          setCurrentImage('drink1');
-          setAnimationPhase('idle');
-        }, 1000);
-      }, 2000);
+      }, 1000);
 
       return () => {
         console.log('Cleaning up timers');
@@ -76,18 +68,6 @@ export default function DrinkAnimation({
 
   return (
     <div className={`drink-animation-container ${className}`}>
-      <style jsx>{`
-        @keyframes drinkMotion {
-          0% { transform: scale(1) rotate(0deg); }
-          25% { transform: scale(0.95) rotate(1deg); }
-          50% { transform: scale(1.1) rotate(3deg); }
-          75% { transform: scale(1.05) rotate(2deg); }
-          100% { transform: scale(1) rotate(0deg); }
-        }
-        .drink-motion {
-          animation: drinkMotion 2s ease-in-out;
-        }
-      `}</style>
       <div 
         className="relative cursor-pointer transition-transform hover:scale-105"
         onClick={startAnimation}
@@ -98,11 +78,10 @@ export default function DrinkAnimation({
           alt={currentImage === 'drink1' ? '飲む前' : '飲んでいる'}
           width={width}
           height={height}
-          className={`transition-all duration-700 ease-in-out ${
-            animationPhase === 'switching' ? 'scale-95 opacity-70 rotate-1' :
-            animationPhase === 'drinking' ? 'drink-motion' :
-            animationPhase === 'resetting' ? 'scale-105 rotate-1' :
-            'scale-100 rotate-0'
+          className={`transition-opacity duration-500 ease-in-out ${
+            animationPhase === 'switching' ? 'opacity-70' :
+            animationPhase === 'drinking' ? 'opacity-100' :
+            'opacity-100'
           }`}
           priority
           onLoad={() => console.log(`Image loaded: ${currentImage}.svg`)}
