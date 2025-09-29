@@ -48,9 +48,10 @@ export default function PlanRegistrationPage() {
   }
 
   return (
-    <PlanRegistrationLayout
       onPaymentMethodRegister={handlePaymentMethodRegister}
       onLogoClick={handleLogoClick}
+      isLoading={isLoading}
+    />
       isLoading={isLoading}
     />
   )
