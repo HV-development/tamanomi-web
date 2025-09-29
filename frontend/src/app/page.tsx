@@ -83,6 +83,31 @@ export default function HomePage() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false)
 
+  // 自動ログイン処理
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const autoLogin = urlParams.get('auto-login')
+      const loginEmail = urlParams.get('email')
+      
+      if (autoLogin === 'true' && loginEmail) {
+        // 自動ログイン処理
+        setIsAuthenticated(true)
+        setUser({
+          ...mockUser,
+          email: loginEmail,
+          contractStartDate: new Date() // 新規登録なのでブロンズランク
+        })
+        setPlan(mockPlan)
+        setUsageHistory(mockUsageHistory)
+        setPaymentHistory(mockPaymentHistory)
+        
+        // URLパラメータをクリア
+        window.history.replaceState({}, '', '/')
+      }
+    }
+  }, [])
+
   // 店舗詳細関連の状態
   const favoriteStores = stores.filter((store) => store.isFavorite)
   
