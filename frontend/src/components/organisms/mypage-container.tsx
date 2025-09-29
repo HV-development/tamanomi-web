@@ -299,7 +299,7 @@ export function MyPageContainer({
                 </div>
                 
                 {/* ランクアップ情報 */}
-                <div className="flex items-center justify-between">
+               <div className="flex items-center justify-center gap-4">
                   <div className="flex-1">
                     <div className="text-base text-gray-700">あと{monthsToNext}ヶ月で</div>
                     <div className="text-base font-bold text-gray-900">{nextRank.label}にランクアップ！</div>
