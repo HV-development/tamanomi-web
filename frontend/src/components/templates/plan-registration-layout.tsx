@@ -3,7 +3,7 @@
 import { PlanRegistrationContainer } from "../organisms/plan-registration-container"
 
 interface PlanRegistrationLayoutProps {
-  onPaymentMethodRegister: () => void
+  onPaymentMethodRegister: (planId: string) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean

@@ -4,7 +4,7 @@ import { HeaderLogo } from "../atoms/header-logo"
 import { PlanRegistrationForm } from "../molecules/plan-registration-form"
 
 interface PlanRegistrationContainerProps {
-  onPaymentMethodRegister: () => void
+  onPaymentMethodRegister: (planId: string) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean

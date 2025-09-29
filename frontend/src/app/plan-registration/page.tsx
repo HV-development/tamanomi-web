@@ -20,10 +20,11 @@ export default function PlanRegistrationPage() {
     }
   }, [])
 
-  const handlePaymentMethodRegister = async () => {
+  const handlePaymentMethodRegister = async (planId: string) => {
     setIsLoading(true)
     
     // 仮の支払い方法登録処理（イオンレジGUI表示予定）
+    console.log('選択されたプラン:', planId)
     setTimeout(() => {
       // 支払い方法登録完了後、自動ログインでトップページに遷移
       router.push('/?auto-login=true&email=' + encodeURIComponent(email))
@@ -49,7 +50,7 @@ export default function PlanRegistrationPage() {
   return (
     <PlanRegistrationLayout
       onPaymentMethodRegister={handlePaymentMethodRegister}
-      onCancel={handleCancel}
+  onPaymentMethodRegister: (planId: string) => void
       onLogoClick={handleLogoClick}
       isLoading={isLoading}
     />
