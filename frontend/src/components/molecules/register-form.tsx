@@ -114,19 +114,11 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
   const handleAddressSearch = async () => {
     const cleanedPostalCode = formData.postalCode.replace(/-/g, "")
     
-    // 郵便番号の基本バリデーション
-    if (!formData.postalCode) {
-      setErrors({ ...errors, postalCode: "郵便番号を入力してください" })
+    // 住所検索時は郵便番号の基本チェックのみ（エラー表示なし）
+    if (!formData.postalCode || !/^\d{7}$/.test(cleanedPostalCode)) {
+      // 無効な郵便番号の場合は何もしない（エラー表示もしない）
       return
     }
-    
-    if (!/^\d{7}$/.test(cleanedPostalCode)) {
-      setErrors({ ...errors, postalCode: "郵便番号は7桁の数字で入力してください" })
-      return
-    }
-
-    // 郵便番号が正しい場合はエラーをクリア
-    setErrors(prev => ({ ...prev, postalCode: undefined }))
 
     setIsSearchingAddress(true)
     
@@ -141,12 +133,9 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
           ...prev, 
           address: data.address 
         }))
-        setErrors(prev => ({ ...prev, address: undefined }))
       } else {
-        setErrors(prev => ({
-          ...prev,
-          address: data.message || "該当する住所が見つかりませんでした。手入力で住所を入力してください。"
-        }))
+        // 住所が見つからない場合も住所検索時はエラー表示しない
+        // 住所フィールドは空のままにして、ユーザーが手入力できるようにする
         
         // 住所フィールドにフォーカスを移す
         setTimeout(() => {
@@ -157,11 +146,6 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
       }
       
     } catch (error) {
-      setErrors(prev => ({
-        ...prev,
-        address: "住所検索サービスに接続できませんでした。ネットワーク接続を確認するか、手入力で住所を入力してください。"
-      }))
-      
       // エラー時も住所フィールドにフォーカス
       setTimeout(() => {
         if (addressInputRef.current) {
@@ -176,70 +160,8 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
   const updateFormData = (field: keyof RegisterFormData, value: string) => {
     setFormData({ ...formData, [field]: value })
     
-    // リアルタイムバリデーション
-    const newErrors = { ...errors }
-    
-    switch (field) {
-      case 'nickname':
-        if (value.trim()) {
-          delete newErrors.nickname
-        }
-        break
-      case 'postalCode':
-        const cleanedValue = value.replace(/-/g, "")
-        if (value && /^\d{7}$/.test(cleanedValue)) {
-          delete newErrors.postalCode
-        }
-        break
-      case 'address':
-        if (value.trim()) {
-          delete newErrors.address
-        }
-        break
-      case 'birthDate':
-        if (value) {
-          const birthDate = new Date(value)
-          const today = new Date()
-          if (!isNaN(birthDate.getTime()) && birthDate < today && today.getFullYear() - birthDate.getFullYear() <= 120) {
-            delete newErrors.birthDate
-          }
-        }
-        break
-      case 'gender':
-        if (value) {
-          delete newErrors.gender
-        }
-        break
-      case 'password':
-        // パスワードリアルタイムバリデーション
-        const passwordValidation = validatePasswordRealtime(value)
-        if (passwordValidation.isValid) {
-          delete newErrors.password
-        } else if (passwordValidation.errors.length > 0) {
-          newErrors.password = passwordValidation.errors[0]
-        }
-        // パスワードが変更されたらパスワード確認もチェック
-        if (formData.passwordConfirm) {
-          const confirmValidation = validatePasswordConfirmRealtime(value, formData.passwordConfirm)
-          if (confirmValidation.isValid) {
-            delete newErrors.passwordConfirm
-          } else if (confirmValidation.error) {
-            newErrors.passwordConfirm = confirmValidation.error
-          }
-        }
-        break
-      case 'passwordConfirm':
-        // パスワード確認リアルタイムバリデーション
-        const confirmValidation = validatePasswordConfirmRealtime(formData.password, value)
-        if (confirmValidation.isValid) {
-          delete newErrors.passwordConfirm
-        } else if (confirmValidation.error) {
-          newErrors.passwordConfirm = confirmValidation.error
-        }
-        break
-    }
-    
-    setErrors(newErrors)
+    // リアルタイムバリデーションは無効化
+    // バリデーションは登録ボタン押下時のみ実行
   }
 
   return (
