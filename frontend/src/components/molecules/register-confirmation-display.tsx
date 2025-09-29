@@ -57,16 +57,6 @@ export function RegisterConfirmationDisplay({
         <p className="text-gray-600">以下の内容で登録します。よろしければ「登録する」ボタンを押してください。</p>
       </div>
 
-      {/* メールアドレス表示 */}
-      {email && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-green-700">メールアドレス</span>
-            <span className="text-sm text-green-900 font-medium">{email}</span>
-          </div>
-        </div>
-      )}
-
       <div className="bg-gray-50 rounded-lg p-6 space-y-4">
         {confirmationItems.map((item, index) => (
           <div key={index} className="flex justify-between items-start">
