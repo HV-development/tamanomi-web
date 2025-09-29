@@ -38,8 +38,8 @@ export default function RegisterPage() {
 
       const result = await response.json()
       if (result.success) {
-        // 登録完了後はホーム画面に遷移
-        router.push('/')
+        // 登録完了後は登録確認画面に遷移
+        router.push('/register-confirmation')
       } else {
         alert(result.message || 'エラーが発生しました')
       }
