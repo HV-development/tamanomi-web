@@ -7,11 +7,12 @@ import { MapPin } from "lucide-react"
 interface ButtonProps {
   children: React.ReactNode
   onClick?: () => void
+  type?: "button" | "submit" | "reset"
   variant?: "primary" | "secondary" | "location"
   className?: string
 }
 
-export function Button({ children, onClick, variant = "primary", className = "" }: ButtonProps) {
+export function Button({ children, onClick, type = "button", variant = "primary", className = "" }: ButtonProps) {
   const handleClick = () => {
     console.log("🔍 Button clicked:", children)
     if (onClick) {
@@ -33,7 +34,7 @@ export function Button({ children, onClick, variant = "primary", className = "" 
   }
 
   return (
-    <button onClick={handleClick} className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
+    <button type={type} onClick={handleClick} className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
       {children}
     </button>
   )
