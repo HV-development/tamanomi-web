@@ -313,8 +313,7 @@ export function MyPageContainer({
                   </div>
                 </div>
               </div>
-            ) : null}
-            )}
+          )}
           </div>
         </div>
 
