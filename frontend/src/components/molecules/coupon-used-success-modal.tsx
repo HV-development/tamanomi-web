@@ -1,8 +1,9 @@
 "use client"
 
-import { CheckCircle, Sparkles } from "lucide-react"
-import { useState } from "react"
+import { useEffect } from "react"
+import { useCouponAudio } from "../../hooks/use-audio"
 import type { Coupon } from "../../types/coupon"
+import AdvancedDrinkAnimation from "./advanced-drink-animation"
 
 interface CouponUsedSuccessModalProps {
   isOpen: boolean
@@ -11,6 +12,23 @@ interface CouponUsedSuccessModalProps {
 }
 
 export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSuccessModalProps) {
+  const { playCouponSound, initializeAudio } = useCouponAudio()
+
+  // モーダルが開いた時に音声を再生
+  useEffect(() => {
+    if (isOpen && coupon) {
+      // 音声システムを初期化してから再生
+      initializeAudio()
+      
+      // 少し遅延させて確実に音声を再生
+      const timer = setTimeout(() => {
+        playCouponSound()
+      }, 800)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen, coupon, initializeAudio, playCouponSound])
+
   // モーダルが閉じられている場合は何も表示しない
   if (!isOpen || !coupon) return null
 
@@ -36,14 +54,16 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
           <div className="p-6 text-center">
             {/* ドリンクアニメーション */}
             <div className="mb-8 flex justify-center">
-              <div className="relative">
-                {/* GIFファイルを使用したビールジョッキ */}
-                <img 
-                  src="/Beer_mug.gif" 
-                  alt="ビールジョッキ" 
-                  className="w-32 h-32 object-contain transform scale-[2]"
-                />
-              </div>
+              <AdvancedDrinkAnimation
+                width={128}
+                height={128}
+                duration={2000}
+                autoStart={true}
+                showButton={false}
+                onAnimationComplete={() => {
+                  console.log('クーポン使用アニメーション完了！');
+                }}
+              />
             </div>
 
             {/* メッセージ */}
@@ -61,14 +81,8 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
             {/* 閉じるボタン */}
             <button
               onClick={() => {
-                console.log("Close button clicked in success modal")
-                console.log("Calling onClose handler...")
                 if (onClose) {
-                  console.log("onClose function exists, calling it...")
                   onClose()
-                  console.log("onClose called successfully")
-                } else {
-                  console.log("onClose function is undefined!")
                 }
               }}
               className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"

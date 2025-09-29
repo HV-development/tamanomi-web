@@ -11,33 +11,51 @@ interface MenuItem {
 
 interface HamburgerMenuProps {
   onMenuItemClick: (itemId: string) => void
+  isAuthenticated?: boolean
   className?: string
 }
 
-export function HamburgerMenu({ onMenuItemClick, className = "" }: HamburgerMenuProps) {
+export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, className = "" }: HamburgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const menuItems: MenuItem[] = [
     {
       id: "terms",
       label: "利用規約",
-      onClick: () => onMenuItemClick("terms"),
+      onClick: () => {
+        // PDFファイルを新しいタブで開く
+        window.open("/たまのみサービス利用規約.pdf", "_blank")
+        onMenuItemClick("terms")
+      },
     },
     {
       id: "privacy",
       label: "プライバシーポリシー",
-      onClick: () => onMenuItemClick("privacy"),
+      onClick: () => {
+        // PDFファイルを新しいタブで開く
+        window.open("/プライバシーポリシー.pdf", "_blank")
+        onMenuItemClick("privacy")
+      },
     },
     {
       id: "commercial-law",
       label: "特定商取引法について",
-      onClick: () => onMenuItemClick("commercial-law"),
+      onClick: () => {
+        // PDFファイルを新しいタブで開く
+        window.open("/特定商取引法.pdf", "_blank")
+        onMenuItemClick("commercial-law")
+      },
     },
     {
       id: "contact",
       label: "お問い合わせ",
       onClick: () => onMenuItemClick("contact"),
     },
+    ...(isAuthenticated ? [{
+      id: "logout",
+      label: "ログアウト",
+      onClick: () => onMenuItemClick("logout"),
+    }] : []),
   ]
 
   const handleToggle = () => {
@@ -62,9 +80,9 @@ export function HamburgerMenu({ onMenuItemClick, className = "" }: HamburgerMenu
         aria-label="メニューを開く"
       >
         {isOpen ? (
-          <X className="w-5 h-5 text-gray-600" />
+          <X className="w-5 h-5 text-green-600" />
         ) : (
-          <Menu className="w-5 h-5 text-gray-600" />
+          <Menu className="w-5 h-5 text-green-600" />
         )}
       </button>
 

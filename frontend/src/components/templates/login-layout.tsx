@@ -10,19 +10,29 @@ interface LoginLayoutProps {
   loginStep?: "email" | "otp"
   email?: string
   onResendOtp?: () => void
+  currentUserRank?: string | null
 }
 
-export function LoginLayout({ 
-  onLogin, 
-  onSignup, 
-  onForgotPassword, 
-  onBack, 
-  onLogoClick, 
+export function LoginLayout({
+  onLogin,
+  onSignup,
+  onForgotPassword,
+  onBack,
+  onLogoClick,
   isLoading,
-  loginStep,
-  email,
-  onResendOtp
+  loginStep = "email",
+  email = "",
+  onResendOtp = () => {},
+  currentUserRank,
 }: LoginLayoutProps) {
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null) => {
+    // 全ての背景色をブロンズ・非会員色に統一
+    return "bg-gradient-to-br from-green-50 to-green-100"
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+
   return (
     <LoginContainer
       onLogin={onLogin}
@@ -34,6 +44,7 @@ export function LoginLayout({
       loginStep={loginStep}
       email={email}
       onResendOtp={onResendOtp}
+      backgroundColorClass={backgroundColorClass}
     />
   )
 }

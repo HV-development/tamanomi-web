@@ -1,24 +1,45 @@
 "use client"
 
-import type { Coupon } from "../../types/coupon"
+import React from 'react'
+
+import { useCouponAudio } from "../../hooks/use-audio"
 
 interface CouponConfirmationPageProps {
   coupon: Coupon | null
   onConfirm: () => void
   onCancel: () => void
   onUsageGuideClick: () => void
-  onLogoClick: () => void
+  currentUserRank?: string | null
 }
 
-export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGuideClick = () => {}, onLogoClick }: CouponConfirmationPageProps) {
+export default function CouponConfirmationPage({ 
+  coupon, 
+  onConfirm, 
+  onCancel,
+  onUsageGuideClick,
+  currentUserRank
+}: CouponConfirmationPageProps) {
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null) => {
+    // 全ての背景色をブロンズ・非会員色に統一
+    return "bg-gradient-to-br from-green-50 to-green-100"
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+
   if (!coupon) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col justify-center items-center p-4">
+    <div 
+      className={`min-h-screen ${backgroundColorClass} flex flex-col justify-center items-center p-4`}
+    >
       <div className="w-full max-w-xs mx-auto">
         {/* 店員への指示 */}
         <div className="text-center mb-6">
-          <h2 className="text-lg font-bold text-gray-900">店員の方に画面をお見せください</h2>
+          <h2 className="text-base font-bold text-gray-900">店員の方に画面をお見せください</h2>
+          <p className="text-red-600 font-medium text-base mt-2">
+            自分では押さないでください
+          </p>
         </div>
 
         {/* メインカード */}
@@ -57,27 +78,25 @@ export function CouponConfirmationPage({ coupon, onConfirm, onCancel, onUsageGui
                   <p className="text-sm text-gray-700 leading-relaxed">
                     {coupon.description}
                   </p>
+                  
+                  {/* 利用条件 */}
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-xs text-gray-600">
+                      利用条件：焼き鳥2本以上のご注文
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* リンクセクション */}
-            <div className="space-y-2 mb-6">
-              <button 
-                onClick={onUsageGuideClick}
-                className="w-full text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
-              >
-                使用方法、注意事項についてはこちら
-              </button>
-            </div>
-
+            {/* 注意事項 */}
             {/* ボタン */}
             <div className="space-y-3">
               <button
                 onClick={onConfirm}
                 className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
               >
-                確定する
+                承認する
               </button>
               <button
                 onClick={onCancel}

@@ -7,9 +7,18 @@ interface PlanChangeLayoutProps {
   onBack: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  currentUserRank?: string | null
 }
 
-export function PlanChangeLayout({ currentPlan, onPlanChange, onBack, onLogoClick, isLoading }: PlanChangeLayoutProps) {
+export function PlanChangeLayout({ currentPlan, onPlanChange, onBack, onLogoClick, isLoading, currentUserRank }: PlanChangeLayoutProps) {
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null) => {
+    // 全ての背景色をブロンズ・非会員色に統一
+    return "bg-gradient-to-br from-green-50 to-green-100"
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+
   return (
     <PlanChangeContainer
       currentPlan={currentPlan}
@@ -17,6 +26,7 @@ export function PlanChangeLayout({ currentPlan, onPlanChange, onBack, onLogoClic
       onBack={onBack}
       onLogoClick={onLogoClick}
       isLoading={isLoading}
+      backgroundColorClass={backgroundColorClass}
     />
   )
 }

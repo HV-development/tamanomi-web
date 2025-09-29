@@ -8,10 +8,9 @@ export interface User {
   address: string
   birthDate: string
   gender: string
-  saitamaAppId?: string
-  registeredStore?: string
   createdAt: Date
   contractStartDate?: Date
+  registeredStore?: string
 }
 
 export interface Plan {

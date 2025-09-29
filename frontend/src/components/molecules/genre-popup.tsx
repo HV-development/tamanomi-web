@@ -1,8 +1,10 @@
 "use client"
 
+import { useCallback } from "react"
 import { GenreButton } from "../atoms/genre-button"
 import { Button } from "../atoms/button"
 import { getGenreColor } from "../../utils/genre-colors"
+import { cn } from "../../lib/utils"
 
 interface GenrePopupProps {
   isOpen: boolean
@@ -13,6 +15,7 @@ interface GenrePopupProps {
 }
 
 const GENRES = [
+  { value: "event", label: "イベント" },
   { value: "izakaya", label: "居酒屋" },
   { value: "creative", label: "創作料理" },
   { value: "japanese", label: "和食" },
@@ -32,11 +35,11 @@ const GENRES = [
 export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onClear }: GenrePopupProps) {
   if (!isOpen) return null
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
+  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose()
     }
-  }
+  }, [onClose])
 
   return (
     <>
@@ -47,7 +50,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
       ></div>
 
       {/* ポップアップ */}
-      <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-lg mx-auto max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-sm mx-auto max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-gray-900">ジャンルを選択</h3>
@@ -62,32 +65,70 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
 
           <div className="text-sm text-gray-600 mb-4">複数選択可能です</div>
 
-          <div className="grid grid-cols-2 gap-3 mb-6 max-h-80 overflow-y-auto">
-            {GENRES.map((genre) => {
-              const genreColors = getGenreColor(genre.value)
-              const isSelected = selectedGenres.includes(genre.value)
-              
-              return (
-                <button
-                  key={genre.value}
-                  onClick={() => onGenreToggle(genre.value)}
-                  className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-4 px-3 min-h-[48px] flex items-center justify-center font-medium ${
-                    isSelected
-                      ? `${genreColors.border} ${genreColors.bg} ${genreColors.text} shadow-md`
-                     : `border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50 hover:shadow-sm`
-                  }`}
-                >
-                  {isSelected && (
-                    <div className="absolute -top-1 -right-1">
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center ${genreColors.text.replace('text-', 'bg-')}`}>
-                        <span className="text-white text-xs">✓</span>
+          <div className="max-h-96 overflow-y-auto mb-6">
+            {/* イベントヘッダー */}
+            <div className="mb-4">
+              <h4 className="text-md font-bold text-gray-800 mb-3">ジャンル</h4>
+            </div>
+            
+            {/* ジャンル選択 */}
+            <div className="space-y-3">
+              {/* イベントボタン（2カラム分） */}
+              {GENRES.filter(genre => genre.value === "event").map((genre) => {
+                const genreColors = getGenreColor(genre.value)
+                const isSelected = selectedGenres.includes(genre.value)
+                
+                return (
+                  <button
+                    key={genre.value}
+                    onClick={() => onGenreToggle(genre.value)}
+                    className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${
+                      isSelected
+                        ? `border-orange-500 bg-orange-100 text-orange-800 shadow-md`
+                        : `border-orange-300 bg-orange-50 text-orange-700 hover:border-orange-400 hover:bg-orange-100 hover:shadow-sm`
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="absolute -top-1 -right-1">
+                        <div className="w-4 h-4 rounded-full flex items-center justify-center bg-orange-600">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  <span className="block">{genre.label}</span>
-                </button>
-              )
-            })}
+                    )}
+                    <span className="block">{genre.label}</span>
+                  </button>
+                )
+              })}
+              
+              {/* その他のジャンルは2カラムグリッド */}
+              <div className="grid grid-cols-2 gap-3">
+                {GENRES.filter(genre => genre.value !== "event").map((genre) => {
+                  const genreColors = getGenreColor(genre.value)
+                  const isSelected = selectedGenres.includes(genre.value)
+                  
+                  return (
+                    <button
+                      key={genre.value}
+                      onClick={() => onGenreToggle(genre.value)}
+                      className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${
+                        isSelected
+                          ? "border-green-700 bg-green-100 text-green-800 shadow-md"
+                          : "border-gray-300 bg-white text-gray-700 hover:border-green-400 hover:bg-green-100 hover:shadow-sm"
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute -top-1 -right-1">
+                          <div className={cn("w-4 h-4 rounded-full flex items-center justify-center", genreColors.text.replace('text-', 'bg-'))}>
+                            <span className="text-white text-xs">✓</span>
+                          </div>
+                        </div>
+                      )}
+                      <span className="block">{genre.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-3">

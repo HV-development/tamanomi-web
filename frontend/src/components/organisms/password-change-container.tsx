@@ -11,6 +11,7 @@ interface PasswordChangeContainerProps {
   onLogoClick: () => void
   onBackToLogin: () => void
   isLoading?: boolean
+  backgroundColorClass?: string
 }
 
 export function PasswordChangeContainer({
@@ -20,19 +21,15 @@ export function PasswordChangeContainer({
   onLogoClick,
   onBackToLogin,
   isLoading,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: PasswordChangeContainerProps) {
   const handleSubmit = (currentPassword: string, newPassword: string) => {
-    console.log("🔍 PasswordChangeContainer handleSubmit START")
-    console.log("🔍 Received passwords for change")
-    console.log("🔍 Calling onSubmit prop")
     // パスワード変更処理を実行してからログイン画面に遷移
     onSubmit(currentPassword, newPassword)
-    console.log("🔍 onSubmit prop called successfully")
-    console.log("🔍 PasswordChangeContainer handleSubmit END")
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
       <HeaderLogo
         onLogoClick={onLogoClick}

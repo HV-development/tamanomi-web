@@ -4,7 +4,7 @@ import { UserX, ChevronRight } from "lucide-react"
 import { HeaderLogo } from "../atoms/header-logo"
 import { ProfileEditForm } from "../molecules/profile-edit-form"
 import { ProfileUpdateSuccessModal } from "../molecules/profile-update-success-modal"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import type { User } from "../../types/user"
 
 interface ProfileEditFormData {
@@ -17,7 +17,7 @@ interface ProfileEditFormData {
 }
 
 interface ProfileEditContainerProps {
-  user?: User // オプショナルに変更
+  user: User
   onSubmit: (data: ProfileEditFormData) => void
   onCancel: () => void
   onWithdraw: () => void
@@ -25,46 +25,9 @@ interface ProfileEditContainerProps {
   isLoading?: boolean
 }
 
-export function ProfileEditContainer({ user: propUser, onSubmit, onCancel, onWithdraw, onLogoClick, isLoading }: ProfileEditContainerProps) {
+export function ProfileEditContainer({ user, onSubmit, onCancel, onWithdraw, onLogoClick, isLoading, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: ProfileEditContainerProps) {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [updatedFields, setUpdatedFields] = useState<string[]>([])
-  const [user, setUser] = useState<User | null>(propUser || null)
-  const [isLoadingUser, setIsLoadingUser] = useState(!propUser)
-
-  // APIからユーザー情報を取得
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (propUser) {
-        setUser(propUser)
-        setIsLoadingUser(false)
-        return
-      }
-
-      try {
-        const response = await fetch('/api/v1/users/me', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // 認証トークンが必要な場合は追加
-            // 'Authorization': `Bearer ${token}`
-          },
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          console.error('ユーザーデータの取得に失敗しました:', response.status);
-        }
-      } catch (error) {
-        console.error('ユーザーデータの取得エラー:', error);
-      } finally {
-        setIsLoadingUser(false);
-      }
-    };
-
-    fetchUserData();
-  }, [propUser]);
 
   const handleSubmit = (data: ProfileEditFormData, updatedFieldsList: string[]) => {
     setUpdatedFields(updatedFieldsList)
@@ -77,27 +40,9 @@ export function ProfileEditContainer({ user: propUser, onSubmit, onCancel, onWit
     onCancel() // マイページに戻る
   }
 
-  // ローディング状態の表示
-  if (isLoadingUser || !user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
-        <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-md space-y-4">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <div className="text-center">
-                <p className="text-gray-500">データを読み込んでいます...</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+      <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
         {/* ヘッダー */}
         <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
 
