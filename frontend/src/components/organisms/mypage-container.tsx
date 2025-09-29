@@ -324,23 +324,6 @@ export function MyPageContainer({
             )}
           </div>
         </div>
-                    <img
-                      src={`/${nextRank.rank}.png`}
-                      alt={`${nextRank.label}ランク`}
-                      className="w-12 h-12 object-contain"
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-green-600 text-white text-center py-3 px-4 rounded-full text-sm font-medium">
-                <div className="font-bold">
-                  🎉 最高ランク達成！
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* メニューボタン群 */}
         <div className="space-y-3">
