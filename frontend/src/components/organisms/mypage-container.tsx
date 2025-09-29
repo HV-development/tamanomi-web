@@ -414,15 +414,6 @@ export function MyPageContainer({
             className="w-full bg-white rounded-2xl border border-red-200 p-4 flex items-center justify-between hover:bg-red-50 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                <LogOut className="w-5 h-5 text-red-600" />
-              </div>
-              <span className="text-lg font-medium text-gray-500">ログアウト</span>
-            </div>
-            <div className="text-gray-400">›</div>
-          </button>
-        </div>
-      </div>
     </div>
   )
 }
