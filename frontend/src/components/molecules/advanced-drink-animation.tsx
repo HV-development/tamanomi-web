@@ -24,13 +24,14 @@ export default function AdvancedDrinkAnimation({
 }: AdvancedDrinkAnimationProps) {
   const [currentImage, setCurrentImage] = useState<'drink1' | 'drink2'>('drink1');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'switching' | 'drinking' | 'resetting'>('idle');
 
   useEffect(() => {
-    if (autoStart && !isAnimating) {
+    if (autoStart && !isAnimating && !hasAnimated) {
       startAnimation();
     }
-  }, [autoStart, isAnimating]);
+  }, [autoStart, isAnimating, hasAnimated]);
 
   useEffect(() => {
     if (isAnimating) {
@@ -44,6 +45,7 @@ export default function AdvancedDrinkAnimation({
         // drink2で停止（ループしない）
         setTimeout(() => {
           setIsAnimating(false);
+          setHasAnimated(true);
           onAnimationComplete?.();
         }, 1000);
       }, 500);
@@ -55,7 +57,7 @@ export default function AdvancedDrinkAnimation({
   }, [isAnimating]);
 
   const startAnimation = () => {
-    if (!isAnimating) {
+    if (!isAnimating && !hasAnimated) {
       setCurrentImage('drink1');
       setAnimationPhase('idle');
       setIsAnimating(true);
@@ -66,6 +68,7 @@ export default function AdvancedDrinkAnimation({
     setCurrentImage('drink1');
     setAnimationPhase('idle');
     setIsAnimating(false);
+    setHasAnimated(false);
   };
 
   return (

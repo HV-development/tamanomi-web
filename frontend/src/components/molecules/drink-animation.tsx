@@ -20,6 +20,7 @@ export default function DrinkAnimation({
 }: DrinkAnimationProps) {
   const [currentImage, setCurrentImage] = useState<'drink1' | 'drink2'>('drink1');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'switching' | 'drinking' | 'resetting'>('idle');
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function DrinkAnimation({
       const completeTimer = setTimeout(() => {
         console.log('Animation complete');
         setIsAnimating(false);
+        setHasAnimated(true);
         onAnimationComplete?.();
       }, 1000);
 
@@ -54,16 +56,18 @@ export default function DrinkAnimation({
     console.log('startAnimation called, isAnimating:', isAnimating);
     console.log('Current image before start:', currentImage);
     
-    // 強制的にリセットしてから開始
-    setCurrentImage('drink1');
-    setIsAnimating(false);
-    setAnimationPhase('idle');
-    
-    // 少し遅延してからアニメーション開始
-    setTimeout(() => {
-      console.log('Starting animation after reset...');
-      setIsAnimating(true);
-    }, 100);
+    if (!isAnimating && !hasAnimated) {
+      // 強制的にリセットしてから開始
+      setCurrentImage('drink1');
+      setIsAnimating(false);
+      setAnimationPhase('idle');
+      
+      // 少し遅延してからアニメーション開始
+      setTimeout(() => {
+        console.log('Starting animation after reset...');
+        setIsAnimating(true);
+      }, 100);
+    }
   };
 
   return (
@@ -108,6 +112,7 @@ export default function DrinkAnimation({
             setCurrentImage('drink1');
             setIsAnimating(false);
             setAnimationPhase('idle');
+            setHasAnimated(false);
           }}
           className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
         >
