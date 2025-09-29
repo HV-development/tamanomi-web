@@ -61,7 +61,7 @@ export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, 
 
 
   return (
-    <div className={`h-full relative ${backgroundColorClass}`}>
+    <div className={`flex-1 relative ${backgroundColorClass}`}>
       {/* 店舗リスト */}
       <div className="h-full overflow-y-auto p-4">
         <StoreList
