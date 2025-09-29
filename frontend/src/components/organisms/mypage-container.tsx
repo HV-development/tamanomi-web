@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Edit, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
+import { ArrowLeft, CreditCard as Edit, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/logo"
 import { RankBadge } from "../atoms/rank-badge"
