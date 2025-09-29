@@ -34,44 +34,13 @@ export default function RegisterPage() {
 
   const handleRegisterSubmit = async (data: any) => {
     setIsLoading(true)
-    console.log('🔍 Register submit started with data:', data)
-    console.log('🔍 Search params:', searchParams)
     
-    try {
-      const requestBody = {
-        ...data,
-        token: searchParams.token || '',
-      }
-      console.log('🔍 Request body:', requestBody)
-      
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      })
-
-      console.log('🔍 Response status:', response.status)
-      console.log('🔍 Response ok:', response.ok)
-      
-      const result = await response.json()
-      console.log('🔍 Response result:', result)
-      
-      if (result.success) {
-        // 登録完了後は登録確認画面に遷移
-        console.log('✅ Registration successful, redirecting to confirmation')
-        router.push('/register-confirmation')
-      } else {
-        console.error('❌ Registration failed:', result.message)
-        alert(result.message || 'エラーが発生しました')
-      }
-    } catch (error) {
-      console.error('❌ Network error during registration:', error)
-      alert('ネットワークエラーが発生しました')
-    } finally {
-      setIsLoading(false)
-    }
+    // フォームデータをセッションストレージに保存
+    sessionStorage.setItem('registerFormData', JSON.stringify(data))
+    
+    // 確認画面に遷移
+    router.push(`/register-confirmation?email=${encodeURIComponent(searchParams.email || '')}&token=${encodeURIComponent(searchParams.token || '')}`)
+    setIsLoading(false)
   }
 
   const handleCancel = () => router.push('/')
