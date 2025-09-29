@@ -6,6 +6,8 @@ services:
       dockerfile: ../infrastructure/docker/Dockerfile
     ports:
       - "3000:3000"
+    env_file:
+      - ../../frontend/.env
     volumes:
       - ../../frontend/src:/app/src
       - ../../frontend/public:/app/public
@@ -16,5 +18,4 @@ services:
       - ../../frontend/components.json:/app/components.json
     environment:
       - NODE_ENV=development
-      - TAMAYOI_API_URL=http://localhost:3000
     command: pnpm dev 
