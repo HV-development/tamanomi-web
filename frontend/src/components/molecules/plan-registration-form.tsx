@@ -100,37 +100,6 @@ export function PlanRegistrationForm({
         ))}
       </div>
 
-      {/* 選択されたプランの詳細表示 */}
-      {selectedPlanData && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-          <div className="flex items-center gap-3 mb-4">
-            <Crown className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-bold text-blue-900">選択中のプラン</h3>
-          </div>
-          <div className="text-center mb-4">
-            <h4 className="text-xl font-bold text-blue-900">{selectedPlanData.name}</h4>
-            <div className="text-2xl font-bold text-blue-600">¥{selectedPlanData.price.toLocaleString()}</div>
-            <div className="text-sm text-blue-700 mt-1">
-              {selectedPlanData.id === "3days" ? "3日間" : "月額料金"}（税込）
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 注意事項 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Calendar className="w-5 h-5 text-blue-600" />
-          <h4 className="text-blue-900 font-bold">ご利用について</h4>
-        </div>
-        <ul className="text-sm text-blue-800 space-y-1">
-          <li>• 初回請求は登録完了後に行われます</li>
-          <li>• プランはいつでも変更・キャンセル可能です</li>
-          <li>• 決済は安全なシステムで処理されます</li>
-          <li>• ご不明な点はお問い合わせください</li>
-        </ul>
-      </div>
-
       {/* 支払い方法登録ボタン */}
       <div className="space-y-3">
         <Button
