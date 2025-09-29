@@ -61,6 +61,7 @@ export default function RegisterPage() {
   return (
     <RegisterLayout
       email={searchParams.email}
+      initialFormData={initialFormData}
       onSubmit={handleRegisterSubmit}
       onCancel={handleCancel}
       onLogoClick={handleLogoClick}

@@ -46,6 +46,7 @@ export function RegisterContainer({
 
             <RegisterForm
               email={email}
+              initialFormData={initialFormData}
               onSubmit={onSubmit}
               onCancel={onCancel}
               isLoading={isLoading}

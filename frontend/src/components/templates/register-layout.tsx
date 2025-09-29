@@ -41,6 +41,7 @@ export function RegisterLayout({
   return (
     <RegisterContainer
       email={email}
+      initialFormData={initialFormData}
       onSubmit={onSubmit}
       onCancel={onCancel}
       onLogoClick={onLogoClick}
