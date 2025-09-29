@@ -271,8 +271,8 @@ export function MyPageContainer({
 
         {/* メンバーランクカード */}
         <div className="bg-white rounded-2xl border border-green-200 p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+          <div className="text-center mb-6">
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
               <Crown className="w-5 h-5 text-green-600" />
             </div>
             <span className="text-lg font-bold text-gray-500">メンバーランク</span>
@@ -281,8 +281,8 @@ export function MyPageContainer({
           <div className="space-y-4">
             {/* 現在のメンバーランク */}
             <div>
-              <div className="text-sm text-gray-600 mb-3">現在のメンバーランク</div>
-              <div className="flex items-center justify-end">
+              <div className="text-sm text-gray-600 mb-3 text-center">現在のメンバーランク</div>
+              <div className="flex items-center justify-center">
                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-2 border-gray-300">
                   <img
                     src={`/${currentUserRank}.png`}
@@ -296,15 +296,34 @@ export function MyPageContainer({
             {/* 次のランクアップまで */}
             {nextRank && monthsToNext !== null ? (
               <div>
-                <div className="bg-green-600 text-white text-center py-2 px-4 rounded-full text-sm font-medium mb-3">
+                <div className="bg-green-600 text-white text-center py-3 px-4 rounded-full text-sm font-medium mb-4">
                   次のランクアップまで
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-left">
-                    <div className="text-base text-gray-700">あと{monthsToNext}ヶ月で</div>
-                    <div className="text-base font-bold text-gray-900">{nextRank.label}にランクアップ！</div>
+                <div className="text-center space-y-3">
+                  <div>
+                    <div className="text-lg text-gray-700 mb-1">あと{monthsToNext}ヶ月で</div>
+                    <div className="text-xl font-bold text-gray-900">{nextRank.label}にランクアップ！</div>
                   </div>
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300">
+                  <div className="flex justify-center">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300">
+                      <img
+                        src={`/${nextRank.rank}.png`}
+                        alt={`${nextRank.label}ランク`}
+                        className="w-12 h-12 object-contain"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-green-600 text-white text-center py-3 px-4 rounded-full text-sm font-medium">
+                <div className="font-bold">
+                  🎉 最高ランク達成！
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
                     <img
                       src={`/${nextRank.rank}.png`}
                       alt={`${nextRank.label}ランク`}
