@@ -29,9 +29,11 @@ export default function AdvancedDrinkAnimation({
 
   useEffect(() => {
     if (autoStart && !isAnimating && !hasAnimated) {
-      startAnimation();
+      setCurrentImage('drink1');
+      setAnimationPhase('idle');
+      setIsAnimating(true);
     }
-  }, [autoStart, isAnimating, hasAnimated, startAnimation]);
+  }, [autoStart, isAnimating, hasAnimated]);
 
   useEffect(() => {
     if (isAnimating) {
