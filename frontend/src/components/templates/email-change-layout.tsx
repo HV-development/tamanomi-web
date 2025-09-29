@@ -13,6 +13,7 @@ interface EmailChangeLayoutProps {
   onResend: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  currentUserRank?: string | null
 }
 
 export function EmailChangeLayout({
@@ -26,7 +27,16 @@ export function EmailChangeLayout({
   onResend = () => {},
   onLogoClick,
   isLoading,
+  currentUserRank,
 }: EmailChangeLayoutProps) {
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null) => {
+    // 全ての背景色をブロンズ・非会員色に統一
+    return "bg-gradient-to-br from-green-50 to-green-100"
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+
   return (
     <EmailChangeContainer
       currentStep={currentStep}
@@ -39,6 +49,7 @@ export function EmailChangeLayout({
       onResend={onResend}
       onLogoClick={onLogoClick}
       isLoading={isLoading}
+      backgroundColorClass={backgroundColorClass}
     />
   )
 }

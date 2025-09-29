@@ -21,11 +21,12 @@ interface SignupContainerProps {
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  backgroundColorClass?: string
 }
 
-export function SignupContainer({ initialData, email, onSubmit, onCancel, onLogoClick, isLoading }: SignupContainerProps) {
+export function SignupContainer({ initialData, email, onSubmit, onCancel, onLogoClick, isLoading, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: SignupContainerProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
 

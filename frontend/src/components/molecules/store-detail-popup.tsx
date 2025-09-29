@@ -106,7 +106,7 @@ export function StoreDetailPopup({
                 onClick={onClose} 
                 className="p-2 hover:bg-green-700 rounded-full transition-colors"
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -169,24 +169,30 @@ export function StoreDetailPopup({
                 <div className="space-y-2">
                   <div className="text-base font-bold text-gray-900">支払い方法</div>
                   <div className="space-y-1">
+                    {/* さいコイン */}
+                    <div className="text-base text-gray-700">
+                      さいコイン：不可
+                    </div>
+                    
+                    {/* たまポン */}
+                    <div className="text-base text-gray-700">
+                      たまポン：可
+                    </div>
+                    
                     {/* 現金 */}
                     <div className="text-base text-gray-700">
-                      現金：{store.paymentMethods.cash ? '可' : '不可'}
+                      現金：可
                     </div>
                     
                     {/* クレジットカード */}
-                    {store.paymentMethods.creditCards.length > 0 && (
-                      <div className="text-base text-gray-700">
-                        クレジットカード：{store.paymentMethods.creditCards.join('、')}
-                      </div>
-                    )}
+                    <div className="text-base text-gray-700">
+                      クレジットカード：可　{store.paymentMethods.creditCards.join('、')}
+                    </div>
                     
                     {/* コード決済 */}
-                    {store.paymentMethods.digitalPayments.length > 0 && (
-                      <div className="text-base text-gray-700">
-                        コード決済：{store.paymentMethods.digitalPayments.join('、')}
-                      </div>
-                    )}
+                    <div className="text-base text-gray-700">
+                      コード決済：可　{store.paymentMethods.digitalPayments.join('、')}
+                    </div>
                   </div>
                 </div>
               )}
@@ -205,7 +211,7 @@ export function StoreDetailPopup({
                   onClick={() => onCouponsClick(store.id)}
                   className="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
                 >
-                  <span className="font-medium">クーポン一覧</span>
+                  <span className="font-medium">今すぐクーポンGET</span>
                 </button>
               </div>
             </div>

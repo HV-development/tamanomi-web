@@ -7,12 +7,13 @@ import { EmailRegistrationComplete } from "../molecules/email-registration-compl
 interface EmailRegistrationContainerProps {
   currentStep: "form" | "complete"
   email?: string
-  onSubmit: (email: string) => void
+  onSubmit: (email: string, campaignCode?: string) => void
   onBack: () => void
   onBackToLogin: () => void
   onResend: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  backgroundColorClass?: string
 }
 
 export function EmailRegistrationContainer({
@@ -24,9 +25,10 @@ export function EmailRegistrationContainer({
   onResend,
   onLogoClick,
   isLoading,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: EmailRegistrationContainerProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
       <HeaderLogo 
         onLogoClick={onLogoClick} 

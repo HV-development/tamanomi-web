@@ -13,6 +13,7 @@ interface PasswordResetContainerProps {
   onResend: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  backgroundColorClass?: string
 }
 
 export function PasswordResetContainer({
@@ -24,9 +25,10 @@ export function PasswordResetContainer({
   onResend,
   onLogoClick,
   isLoading,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: PasswordResetContainerProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
       <HeaderLogo
         onLogoClick={onLogoClick}

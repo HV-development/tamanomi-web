@@ -11,6 +11,7 @@ interface PlanChangeContainerProps {
   onBack: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  backgroundColorClass?: string
 }
 
 export function PlanChangeContainer({
@@ -19,13 +20,14 @@ export function PlanChangeContainer({
   onBack,
   onLogoClick,
   isLoading,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: PlanChangeContainerProps) {
   const handlePlanChange = (planId: string) => {
     onPlanChange(planId)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onBack} />
 

@@ -29,6 +29,7 @@ import { AreaPopup } from "../molecules/area-popup"
 import { GenrePopup } from "../molecules/genre-popup"
 import { HamburgerMenu } from "../molecules/hamburger-menu"
 import { Logo } from "../atoms/logo"
+import { UsageGuideModal } from "../molecules/usage-guide-modal"
 import { useState } from "react"
 import type { Store } from "../../types/store"
 import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
@@ -38,7 +39,8 @@ import type { Coupon } from "../../types/coupon"
 interface HomeLayoutProps {
   selectedGenres: string[]
   selectedEvents: string[]
-  selectedArea: string
+  selectedAreas: string[]
+   isNearbyFilter: boolean
   isFavoritesFilter: boolean
   stores: Store[]
   activeTab: string
@@ -90,7 +92,7 @@ interface HomeLayoutProps {
   emailConfirmationEmail?: string
   onGenresChange: (genres: string[]) => void
   onEventsChange: (events: string[]) => void
-  onAreaChange: (area: string) => void
+  onAreasChange: (areas: string[]) => void
   onCurrentLocationClick: () => void
   onTabChange: (tab: string) => void
   onFavoritesClick: () => void
@@ -119,7 +121,7 @@ interface HomeLayoutProps {
   onForgotPassword: () => void
   onBackToHome: () => void
   onBackToLogin: () => void
-  onEmailSubmit: (email: string) => void
+  onEmailSubmit: (email: string, campaignCode?: string) => void
   onEmailRegistrationBackToLogin: () => void
   onEmailRegistrationResend: () => void
   onSignupSubmit: (data: any) => void
@@ -171,7 +173,8 @@ interface HomeLayoutProps {
 export function HomeLayout({
   selectedGenres,
   selectedEvents,
-  selectedArea,
+  selectedAreas,
+   isNearbyFilter,
   isFavoritesFilter,
   stores,
   activeTab,
@@ -201,7 +204,7 @@ export function HomeLayout({
   emailConfirmationEmail = "",
   onGenresChange,
   onEventsChange,
-  onAreaChange,
+  onAreasChange,
   onCurrentLocationClick,
   onTabChange,
   onFavoritesClick,
@@ -279,7 +282,29 @@ export function HomeLayout({
 }: HomeLayoutProps) {
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
+ const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
 
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null, isAuth: boolean) => {
+    if (!isAuth || !rank) {
+      return "bg-gradient-to-br from-green-50 to-green-100" // 非会員・ブロンズ
+    }
+    
+    switch (rank) {
+      case "bronze":
+        return "bg-gradient-to-br from-green-50 to-green-100"
+      case "silver":
+        return "bg-gradient-to-br from-rose-50 to-rose-100"
+      case "gold":
+        return "bg-gradient-to-br from-amber-50 to-amber-100"
+      case "diamond":
+        return "bg-gradient-to-br from-sky-50 to-sky-100"
+      default:
+        return "bg-gradient-to-br from-green-50 to-green-100"
+    }
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank, isAuthenticated)
   if (currentView === "coupon-confirmation") {
     return (
       <CouponConfirmationPage
@@ -451,7 +476,7 @@ export function HomeLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100 w-full">
+    <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
       {/* ヘッダー部分のみ */}
       <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
         <div className="flex items-center justify-between px-4 py-3">
@@ -489,28 +514,30 @@ export function HomeLayout({
       <div className="bg-white border-b border-gray-100">
         <div className="grid grid-cols-3 gap-1 px-2 py-4">
           <button
-            onClick={() => {
-              // 全て表示（フィルターをクリア）
-              onGenresChange([])
-              onEventsChange([])
-              onAreaChange("")
-            }}
-            className="w-full flex items-center justify-center gap-1 px-2 py-2 border border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50 rounded-full text-xs font-medium transition-colors whitespace-nowrap"
+            onClick={onCurrentLocationClick}
+            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+              isNearbyFilter
+                ? "border-green-500 bg-green-50 text-green-700"
+                : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+            }`}
           >
+            {isNearbyFilter && (
+              <span className="text-green-600 text-xs">✓</span>
+            )}
             近くのお店
           </button>
           <button
             onClick={() => setIsAreaPopupOpen(true)}
             className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-              selectedArea
+              selectedAreas.length > 0
                 ? "border-green-500 bg-green-50 text-green-700"
                 : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
             }`}
           >
             <span>エリア</span>
-            {selectedArea && (
-              <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
-                1
+            {selectedAreas.length > 0 && (
+              <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
+                {selectedAreas.length}
               </span>
             )}
           </button>
@@ -524,7 +551,7 @@ export function HomeLayout({
           >
             <span>ジャンル</span>
             {selectedGenres.length > 0 && (
-              <span className="bg-green-600 text-white text-xs px-1 py-0.5 rounded-full min-w-[16px] text-center flex-shrink-0">
+              <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
                 {selectedGenres.length}
               </span>
             )}
@@ -535,10 +562,15 @@ export function HomeLayout({
       {/* エリア選択ポップアップ */}
       <AreaPopup
         isOpen={isAreaPopupOpen}
-        selectedGenres={selectedGenres}
-        onAreaChange={onAreaChange}
+        selectedAreas={selectedAreas}
+        onAreaToggle={(area) => {
+          const newAreas = selectedAreas.includes(area)
+            ? selectedAreas.filter((a) => a !== area)
+            : [...selectedAreas, area]
+          onAreasChange(newAreas)
+        }}
         onClose={() => setIsAreaPopupOpen(false)}
-        onClear={() => onAreaChange("")}
+        onClear={() => onAreasChange([])}
       />
 
       {/* ジャンル選択ポップアップ */}
@@ -562,12 +594,14 @@ export function HomeLayout({
         <HomeContainer
         selectedGenres={selectedGenres}
         selectedEvents={selectedEvents}
+         isNearbyFilter={isNearbyFilter}
         isFavoritesFilter={isFavoritesFilter}
         stores={stores}
         onStoreClick={onStoreClick}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
           isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
+        backgroundColorClass={backgroundColorClass}
         />
       </div>
 
@@ -612,8 +646,15 @@ export function HomeLayout({
         onClose={onCouponListClose}
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
+       onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
       />
       
+     {/* 使用方法ガイドモーダル */}
+     <UsageGuideModal
+       isOpen={isUsageGuideModalOpen}
+       onClose={() => setIsUsageGuideModalOpen(false)}
+     />
+     
       {/* クーポン使用成功モーダル */}
       <CouponUsedSuccessModal
         isOpen={isSuccessModalOpen}

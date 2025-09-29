@@ -22,17 +22,29 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
     {
       id: "terms",
       label: "利用規約",
-      onClick: () => onMenuItemClick("terms"),
+      onClick: () => {
+        // PDFファイルを新しいタブで開く
+        window.open("/たまのみサービス利用規約.pdf", "_blank")
+        onMenuItemClick("terms")
+      },
     },
     {
       id: "privacy",
       label: "プライバシーポリシー",
-      onClick: () => onMenuItemClick("privacy"),
+      onClick: () => {
+        // PDFファイルを新しいタブで開く
+        window.open("/プライバシーポリシー.pdf", "_blank")
+        onMenuItemClick("privacy")
+      },
     },
     {
       id: "commercial-law",
       label: "特定商取引法について",
-      onClick: () => onMenuItemClick("commercial-law"),
+      onClick: () => {
+        // PDFファイルを新しいタブで開く
+        window.open("/特定商取引法.pdf", "_blank")
+        onMenuItemClick("commercial-law")
+      },
     },
     {
       id: "contact",

@@ -11,9 +11,10 @@ interface CouponListPopupProps {
   onClose: () => void
   onBack: () => void
   onUseCoupon: (couponId: string) => void
+ onUsageGuideClick: () => void
 }
 
-export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, onUseCoupon }: CouponListPopupProps) {
+export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, onUseCoupon, onUsageGuideClick }: CouponListPopupProps) {
   if (!isOpen) return null
 
 
@@ -43,9 +44,16 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
               <h4 className="text-lg font-bold text-green-900">{storeName}</h4>
+             <button 
+               onClick={onUsageGuideClick}
+               className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
+             >
+               使用方法、注意事項についてはこちら
+             </button>
             </div>
           </div>
 
+          {/* 使用方法リンク */}
           {/* クーポンリスト */}
           <div className="flex-1 overflow-y-auto p-4 bg-transparent">
             {coupons.length === 0 ? (
@@ -79,12 +87,19 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
                         {coupon.description}
                       </p>
                       
+                      {/* 利用条件 */}
+                      <div className="mb-4 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-600 text-center">
+                          利用条件：焼き鳥2本以上のご注文
+                        </p>
+                      </div>
+                      
                       {/* 利用ボタン */}
                       <button
                         onClick={() => onUseCoupon(coupon.id)}
                         className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                       >
-                        利用する
+                        このクーポンで乾杯！
                       </button>
                     </div>
                   </div>

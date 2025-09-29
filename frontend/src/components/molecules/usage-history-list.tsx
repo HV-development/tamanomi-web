@@ -10,14 +10,24 @@ interface UsageHistoryListProps {
   onBackToMyPage: () => void
   onBackToTop: () => void
   className?: string
+  currentUserRank?: string | null
 }
 
 export function UsageHistoryList({ 
   history, 
   onBackToMyPage, 
   onBackToTop, 
-  className = "" 
+  className = "",
+  currentUserRank
 }: UsageHistoryListProps) {
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null) => {
+    // 全ての背景色をブロンズ・非会員色に統一
+    return "bg-gradient-to-br from-green-50 to-green-100"
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+
   const formatDate = (date: Date) => {
     return format(date, "yyyy年M月d日 HH:mm", { locale: ja })
   }
@@ -28,7 +38,7 @@ export function UsageHistoryList({
 
   if (history.length === 0) {
     return (
-      <div className={`min-h-screen bg-gradient-to-br from-green-50 to-green-100 ${className}`}>
+      <div className={`min-h-screen ${backgroundColorClass} ${className}`}>
         {/* ヘッダー */}
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="flex items-center justify-between">
@@ -65,7 +75,7 @@ export function UsageHistoryList({
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-green-50 to-green-100 ${className}`}>
+    <div className={`min-h-screen ${backgroundColorClass} ${className}`}>
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-between">

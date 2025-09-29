@@ -7,15 +7,17 @@ import { mockStores } from "../../data/mock-stores";
 interface HomeContainerProps {
   selectedGenres: string[]
   selectedEvents: string[]
+   isNearbyFilter: boolean
   isFavoritesFilter: boolean
   stores: Store[]
   onStoreClick: (store: Store) => void
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick?: (storeId: string) => void
   isModalOpen?: boolean
+  backgroundColorClass?: string
 }
 
-export function HomeContainer({ selectedGenres, selectedEvents, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false }: HomeContainerProps) {
+export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = stores.filter(store => {
     // ジャンルフィルター
@@ -59,7 +61,7 @@ export function HomeContainer({ selectedGenres, selectedEvents, isFavoritesFilte
 
 
   return (
-    <div className="h-full relative bg-gradient-to-br from-green-50 to-green-100">
+    <div className={`h-full relative ${backgroundColorClass}`}>
       {/* 店舗リスト */}
       <div className="h-full overflow-y-auto p-4">
         <StoreList
@@ -67,6 +69,7 @@ export function HomeContainer({ selectedGenres, selectedEvents, isFavoritesFilte
           onFavoriteToggle={onFavoriteToggle}
           onCouponsClick={onCouponsClick || (() => {})}
           onStoreClick={onStoreClick}
+          showDistance={isNearbyFilter}
           emptyMessage="条件に合う店舗が見つかりませんでした"
           emptyEmoji="🔍"
         />

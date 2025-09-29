@@ -11,6 +11,7 @@ interface StoreCardProps {
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
   onStoreClick: (store: Store) => void
+   showDistance?: boolean
   className?: string
 }
 
@@ -40,7 +41,7 @@ const getStoreFoodImage = (genre: string) => {
   return foodImages[genre] || foodImages.default
 }
 
-export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClick, className = "" }: StoreCardProps) {
+export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClick, showDistance = false, className = "" }: StoreCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
@@ -115,14 +116,20 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
   }
 
   const handleStoreClick = (e: React.MouseEvent) => {
-    // ボタンクリックの場合は詳細表示しない
+    // ボタンクリックの場合は何もしない
     const target = e.target as HTMLElement
     if (target.closest('button')) {
       return
     }
+    
+    // デフォルトで店舗詳細を表示
+    onStoreClick(store)
+  }
+
+  const handleImageAreaClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    onStoreClick(store)
+    onCouponsClick(store.id)
   }
 
   return (
@@ -150,7 +157,9 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
-            <span className="text-black text-sm">現在位置から350m</span>
+            {showDistance && (
+              <span className="text-black text-sm">現在位置から350m</span>
+            )}
           </div>
           <div className="flex items-center gap-1">
               <button
@@ -175,7 +184,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       <div className="relative overflow-hidden">
         <div 
           className="w-full aspect-[3/1] cursor-pointer select-none" 
-          onClick={handleImageClick}
+          onClick={handleImageAreaClick}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -212,14 +221,14 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             onClick={() => onCouponsClick(store.id)}
             className="flex-1 flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg font-medium"
           >
-            <span>クーポン一覧</span>
+            <span>今すぐクーポンGET</span>
           </button>
           
           <button
             onClick={() => onStoreClick(store)}
             className="flex items-center justify-center gap-1 bg-white hover:bg-gray-50 text-gray-700 py-3 px-3 rounded-2xl transition-all duration-300 border border-gray-300 hover:border-gray-400 font-medium whitespace-nowrap"
           >
-            <span className="text-sm">店舗詳細</span>
+            <span className="text-sm">お店をチェック</span>
           </button>
         </div>
       </div>

@@ -21,7 +21,7 @@ export function PopupButton({ label, selectedCount = 0, onClick, className = "" 
     >
       <span className="truncate">{label}</span>
       {selectedCount > 0 && (
-        <span className="bg-green-600 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[18px] text-center flex-shrink-0">
+        <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
           {selectedCount}
         </span>
       )}

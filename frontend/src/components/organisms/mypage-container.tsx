@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Settings, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
+import { ArrowLeft, SquarePen, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/logo"
 import { RankBadge } from "../atoms/rank-badge"
@@ -90,6 +90,14 @@ export function MyPageContainer({
   newEmail = "",
   currentUserRank,
 }: MyPageContainerProps) {
+
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null) => {
+    // 全ての背景色をブロンズ・非会員色に統一
+    return "bg-gradient-to-br from-green-50 to-green-100"
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
 
   // 防御的チェック：userとplanが存在しない場合はnullを返す
   if (!user || !plan) {
@@ -219,7 +227,7 @@ export function MyPageContainer({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+    <div className={`min-h-screen ${backgroundColorClass}`}>
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-between">
@@ -245,7 +253,7 @@ export function MyPageContainer({
               onClick={onEditProfile}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <Settings className="w-5 h-5 text-gray-600" />
+              <SquarePen className="w-5 h-5 text-gray-600" />
             </button>
           </div>
 
@@ -267,43 +275,59 @@ export function MyPageContainer({
             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
               <Crown className="w-5 h-5 text-green-600" />
             </div>
-            <span className="text-lg font-bold text-gray-500">メンバーランク</span>
+            <span className="text-lg font-bold text-gray-900">メンバーランク</span>
           </div>
 
-          <div className="space-y-2">
-            {/* 現在のメンバーランク */}
-            <div className="flex items-center justify-center gap-12">
-              <div className="text-center">
-                <div className="text-base text-left text-gray-600 font-medium">現在のメンバーランク</div>
-                <div className={`text-base font-bold ${currentRankInfo.color}`}>{currentRankInfo.label}</div>
-              </div>
-              <div>
-                <RankBadge rank={currentUserRank} size="lg" showLabel={false} />
+          <div className="space-y-4">
+            {/* 現在のメンバーランク - 横並び */}
+            <div className="flex items-center justify-center gap-4">
+              <span className="text-base font-medium text-gray-700">現在のメンバーランク</span>
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-gray-300 shadow-sm">
+                <img
+                  src={`/${currentUserRank}.png`}
+                  alt={`${currentUserRank}ランク`}
+                  className="w-8 h-8 object-contain"
+                />
               </div>
             </div>
 
-            {/* 次のランク情報 */}
+            {/* 次のランクアップまで - 緑のバー */}
             {nextRank && monthsToNext !== null ? (
-              <div className="space-y-2">
-                <div className="bg-green-600 text-white text-center py-1 px-4 rounded-full text-xs font-medium">
-                  次のランクアップまで
+              <div className="space-y-3">
+                <div className="bg-green-600 text-white rounded-full py-2 px-6 text-center mx-auto">
+                  <span className="text-base font-bold">次のランクアップまで</span>
                 </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <div>
-                      <div className="text-base">あと{monthsToNext}ヶ月で</div>
-                      <div className={`text-base font-bold ${nextRank.color}`}>{nextRank.label}にランクアップ！</div>
-                    </div>
-                    <div>
-                      <RankBadge rank={nextRank.rank} size="lg" showLabel={false} />
-                    </div>
+                
+                {/* ランクアップ情報 */}
+               <div className="flex items-center justify-center gap-4">
+                  <div className="flex-1">
+                    <div className="text-base text-gray-700">あと{monthsToNext}ヶ月で</div>
+                    <div className="text-base font-bold text-gray-900">{nextRank.label}にランクアップ！</div>
+                  </div>
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300 shadow-sm">
+                    <img
+                      src={`/${nextRank.rank}.png`}
+                      alt={`${nextRank.label}ランク`}
+                      className="w-8 h-8 object-contain"
+                    />
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-green-600 text-white text-center py-1.5 px-4 rounded-full text-sm font-medium">
-                <div className="font-bold">
-                  🎉 最高ランク達成！
+              <div className="space-y-3">
+                <div className="bg-green-600 text-white rounded-full py-2 px-6 text-center mx-auto">
+                  <span className="text-base font-bold">次のランクアップまで</span>
+                </div>
+                
+                <div className="flex items-center justify-center gap-4">
+                  <span className="text-base font-medium text-gray-700">あと10ヶ月でゴールドにランクアップ！</span>
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300 shadow-sm">
+                    <img
+                      src="/gold.png"
+                      alt="ゴールドランク"
+                      className="w-8 h-8 object-contain"
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -312,6 +336,20 @@ export function MyPageContainer({
 
         {/* メニューボタン群 */}
         <div className="space-y-3">
+          {/* プロフィール編集 */}
+          <button
+            onClick={onEditProfile}
+            className="w-full bg-white rounded-2xl border border-green-200 p-4 flex items-center justify-between hover:bg-green-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <SquarePen className="w-5 h-5 text-green-600" />
+              </div>
+              <span className="text-lg font-medium text-gray-500">プロフィール編集</span>
+            </div>
+            <div className="text-gray-400">›</div>
+          </button>
+
           {/* プランの変更 */}
           <button
             onClick={onViewPlan}
