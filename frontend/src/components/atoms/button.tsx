@@ -6,18 +6,18 @@ import { MapPin } from "lucide-react"
 
 interface ButtonProps {
   children: React.ReactNode
-  onClick?: () => void
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
   type?: "button" | "submit" | "reset"
   variant?: "primary" | "secondary" | "location"
   className?: string
 }
 
 export function Button({ children, onClick, type = "button", variant = "primary", className = "" }: ButtonProps) {
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     console.log("🔍 Button clicked:", children)
     if (onClick) {
       console.log("🔍 Button onClick handler exists, calling it")
-      onClick()
+      onClick(e)
     } else {
       console.log("🔍 Button onClick handler is undefined")
     }
