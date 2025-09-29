@@ -49,16 +49,20 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const emailError = validateEmail(email)
-    if (emailError) {
+    const campaignError = validateCampaignCode(campaignCode)
+    
+    if (emailError || campaignError) {
       setError(emailError)
+      setCampaignCodeError(campaignError)
       return
     }
     setError("")
+    setCampaignCodeError("")
     onSubmit(email, campaignCode)
   }
 
   const validateCampaignCode = (code: string) => {
-    if (!code) return "" // 任意項目なのでエラーなし
+    if (!code) return "キャンペーンコードを入力してください"
     
     // 英数字のみ許可
     if (!/^[A-Za-z0-9]+$/.test(code)) {
@@ -106,7 +110,7 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
       {/* キャンペーンコード入力 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          キャンペーンコード（任意）
+          キャンペーンコード
         </label>
         
         <div className="space-y-3">
@@ -118,6 +122,17 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
           />
           {campaignCodeError && <p className="text-sm text-red-500">{campaignCodeError}</p>}
+          
+          {/* キャンペーンコード案内リンク */}
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => window.open("/モニターキャンペーン.pdf", "_blank")}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
+            >
+              キャンペーンコードはこちら
+            </button>
+          </div>
         </div>
       </div>
       <div className="space-y-3">

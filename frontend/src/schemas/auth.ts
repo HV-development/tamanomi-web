@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const emailRegistrationSchema = z.object({
   email: z.string().email('正しいメールアドレスを入力してください。'),
-  campaignCode: z.string().optional()
+  campaignCode: z.string().min(1, 'キャンペーンコードを入力してください。')
 })
 
 // パスワードのZodスキーマ
