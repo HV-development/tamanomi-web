@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, Home, User } from 'lucide-react'
+import { CircleCheck as CheckCircle, Hop as Home, User } from 'lucide-react'
 import { Logo } from '@/components/atoms/logo'
 
 export default function RegisterConfirmationPage() {
