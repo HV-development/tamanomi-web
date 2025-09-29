@@ -84,11 +84,7 @@ export default function AdvancedDrinkAnimation({
             alt={currentImage === 'drink1' ? '飲む前' : '飲んでいる'}
             width={width}
             height={height}
-            className={`transition-opacity duration-500 ease-in-out ${
-              animationPhase === 'switching' ? 'opacity-70' :
-              animationPhase === 'drinking' ? 'opacity-100' :
-              'opacity-100'
-            }`}
+            className="opacity-100"
             priority
           />
         </div>
