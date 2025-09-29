@@ -313,7 +313,7 @@ export function MyPageContainer({
                   </div>
                 </div>
               </div>
-          )}
+            ) : null}
           </div>
         </div>
 
@@ -420,3 +420,4 @@ export function MyPageContainer({
       </div>
     </div>
   )
+}
