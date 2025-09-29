@@ -10,11 +10,11 @@ interface RegisterFormData {
   gender: string
   password: string
   passwordConfirm: string
-  saitamaAppId: string
 }
 
 interface RegisterLayoutProps {
   email?: string
+  initialFormData?: RegisterFormData | null
   onSubmit: (data: RegisterFormData) => void
   onCancel: () => void
   onLogoClick: () => void
@@ -24,6 +24,7 @@ interface RegisterLayoutProps {
 
 export function RegisterLayout({ 
   email, 
+  initialFormData,
   onSubmit, 
   onCancel, 
   onLogoClick, 

@@ -15,6 +15,7 @@ interface RegisterFormData {
 
 interface RegisterContainerProps {
   email?: string
+  initialFormData?: RegisterFormData | null
   onSubmit: (data: RegisterFormData) => void
   onCancel: () => void
   onLogoClick: () => void
@@ -24,6 +25,7 @@ interface RegisterContainerProps {
 
 export function RegisterContainer({ 
   email, 
+  initialFormData,
   onSubmit, 
   onCancel, 
   onLogoClick, 

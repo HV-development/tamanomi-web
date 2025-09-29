@@ -20,7 +20,7 @@ interface RegisterFormData {
 
 interface RegisterFormProps {
   email?: string
-  initialFormData?: any
+  initialFormData?: RegisterFormData | null
   onSubmit: (data: RegisterFormData) => void
   onCancel: () => void
   isLoading?: boolean
@@ -48,6 +48,18 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   
   // 住所フィールドへの参照を追加
   const addressInputRef = useRef<HTMLInputElement>(null)
+
+  // initialFormDataが変更された時にフォームデータを設定
+  useEffect(() => {
+    if (initialFormData) {
+      setFormData({
+        ...initialFormData,
+        // セキュリティのためパスワードフィールドはクリア
+        password: "",
+        passwordConfirm: "",
+      })
+    }
+  }, [initialFormData])
 
   const genderOptions = [
     { value: "male", label: "男性" },

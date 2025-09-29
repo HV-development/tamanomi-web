@@ -17,6 +17,7 @@ interface SignupFormData {
 
 interface SignupLayoutProps {
   initialData?: Partial<SignupFormData>
+  email?: string
   onSubmit: (data: SignupFormData) => void
   onCancel: () => void
   onLogoClick: () => void
