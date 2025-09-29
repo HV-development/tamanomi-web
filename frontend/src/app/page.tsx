@@ -408,7 +408,6 @@ export default function HomePage() {
     if (store) {
       setSelectedStore(store)
       setIsCouponListOpen(true)
-      setIsStoreDetailOpen(false)
     }
   }
 

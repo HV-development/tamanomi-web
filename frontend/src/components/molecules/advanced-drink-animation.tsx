@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 
 interface AdvancedDrinkAnimationProps {
@@ -31,7 +31,7 @@ export default function AdvancedDrinkAnimation({
     if (autoStart && !isAnimating && !hasAnimated) {
       startAnimation();
     }
-  }, [autoStart, isAnimating, hasAnimated]);
+  }, [autoStart, isAnimating, hasAnimated, startAnimation]);
 
   useEffect(() => {
     if (isAnimating) {
@@ -46,7 +46,9 @@ export default function AdvancedDrinkAnimation({
         setTimeout(() => {
           setIsAnimating(false);
           setHasAnimated(true);
-          onAnimationComplete?.();
+          if (!hasAnimated) {
+            onAnimationComplete?.();
+          }
         }, 1000);
       }, 500);
 
@@ -56,13 +58,13 @@ export default function AdvancedDrinkAnimation({
     }
   }, [isAnimating]);
 
-  const startAnimation = () => {
+  const startAnimation = useCallback(() => {
     if (!isAnimating && !hasAnimated) {
       setCurrentImage('drink1');
       setAnimationPhase('idle');
       setIsAnimating(true);
     }
-  };
+  }, [isAnimating, hasAnimated]);
 
   const resetAnimation = () => {
     setCurrentImage('drink1');
