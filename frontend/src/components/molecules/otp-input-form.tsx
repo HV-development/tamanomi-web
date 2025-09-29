@@ -63,16 +63,16 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
         inputRefs.current[index + 1]?.focus()
       }
 
-      // 6桁すべて入力された場合の自動送信
-      if (index === 5 && numericValue) {
-        const completeOtp = [...newOtp]
-        completeOtp[5] = numericValue
-        if (completeOtp.every(digit => digit !== "")) {
-          setTimeout(() => {
-            handleSubmit(completeOtp)
-          }, 100)
-        }
-      }
+      // 自動送信を無効化 - ユーザーが明示的に送信ボタンを押すまで待機
+      // if (index === 5 && numericValue) {
+      //   const completeOtp = [...newOtp]
+      //   completeOtp[5] = numericValue
+      //   if (completeOtp.every(digit => digit !== "")) {
+      //     setTimeout(() => {
+      //       handleSubmit(completeOtp)
+      //     }, 100)
+      //   }
+      // }
     }
   }
 
