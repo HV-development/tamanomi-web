@@ -293,8 +293,6 @@ export function MyPageContainer({
 
             {/* 次のランクアップまで - 緑のバー */}
             {nextRank && monthsToNext !== null ? (
-                )
-                }
               <div className="space-y-3">
                 <div className="bg-green-500 text-white rounded-full py-3 px-6 text-center">
                   <span className="text-base font-bold">次のランクアップまで</span>
@@ -314,12 +312,8 @@ export function MyPageContainer({
                     />
                   </div>
                 </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-                <div className="text-center">
-                  <div className="font-bold text-blue-900 text-sm mb-1">🎉 最高ランク達成！</div>
-                  <div className="text-sm text-blue-700">レジェンドメンバーです</div>
-                </div>
               </div>
+            ) : null}
             )}
           </div>
         </div>
@@ -416,8 +410,14 @@ export function MyPageContainer({
             className="w-full bg-white rounded-2xl border border-red-200 p-4 flex items-center justify-between hover:bg-red-50 transition-colors"
           >
             <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                <LogOut className="w-5 h-5 text-red-600" />
+              </div>
+              <span className="text-lg font-medium text-gray-500">ログアウト</span>
+            </div>
+            <div className="text-gray-400">›</div>
+          </button>
+        </div>
+      </div>
     </div>
   )
-}
-  )
-}
