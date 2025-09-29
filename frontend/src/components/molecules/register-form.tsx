@@ -185,6 +185,10 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
     console.log("🔍 updateFormData - 変更前のformData:", formData)
     console.log("🔍 updateFormData - 変更前のerrors:", errors)
     
+    console.log(`🔍 updateFormData called: field=${field}, value=${value}`)
+    console.log("🔍 updateFormData - 変更前のformData:", formData)
+    console.log("🔍 updateFormData - 変更前のerrors:", errors)
+    
     console.log(`📝 updateFormData呼び出し - field: ${field}, value: ${value}`)
     console.log("📝 updateFormData前のformData:", formData)
     console.log("📝 updateFormData前のerrors:", errors)
@@ -192,12 +196,25 @@ export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: R
     setFormData({ ...formData, [field]: value })
     
     console.log(`📝 updateFormData完了 - ${field}を${value}に更新`)
-    // リアルタイムバリデーションは無効化
-    // バリデーションは登録ボタン押下時のみ実行
-    
     console.log("🔍 updateFormData - setFormData実行後")
     console.log("📝 リアルタイムバリデーションはスキップ")
   }
+
+  // エラー状態の変化を監視
+  useEffect(() => {
+    console.log("🔍 errors state changed:", errors)
+    console.log("🔍 errors keys:", Object.keys(errors))
+    console.log("🔍 errors values:", Object.values(errors))
+  }, [errors])
+
+  // フォームデータの変化を監視
+  useEffect(() => {
+    console.log(`📝 updateFormData完了 - ${field}を${value}に更新`)
+    // リアルタイムバリデーションは無効化
+    // バリデーションは登録ボタン押下時のみ実行
+    
+    console.log("🔍 formData state changed:", formData)
+  }, [formData])
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
