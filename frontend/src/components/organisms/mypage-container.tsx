@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, CreditCard as Edit, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
+import { ArrowLeft, PenTool, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/logo"
 import { RankBadge } from "../atoms/rank-badge"
@@ -253,7 +253,7 @@ export function MyPageContainer({
               onClick={onEditProfile}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <Edit className="w-5 h-5 text-gray-600" />
+              <PenTool className="w-5 h-5 text-gray-600" />
             </button>
           </div>
 
@@ -343,7 +343,7 @@ export function MyPageContainer({
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                <Edit className="w-5 h-5 text-green-600" />
+                <PenTool className="w-5 h-5 text-green-600" />
               </div>
               <span className="text-lg font-medium text-gray-500">プロフィール編集</span>
             </div>
