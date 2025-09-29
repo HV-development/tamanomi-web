@@ -48,10 +48,10 @@ export default function PlanRegistrationPage() {
   }
 
   return (
+    <PlanRegistrationLayout
       onPaymentMethodRegister={handlePaymentMethodRegister}
       onLogoClick={handleLogoClick}
-      isLoading={isLoading}
-    />
+      onCancel={handleCancel}
       isLoading={isLoading}
     />
   )
