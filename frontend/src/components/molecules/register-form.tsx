@@ -20,12 +20,19 @@ interface RegisterFormData {
 
 interface RegisterFormProps {
   email?: string
+  initialFormData?: any
   onSubmit: (data: RegisterFormData) => void
   onCancel: () => void
   isLoading?: boolean
 }
 
-export function RegisterForm({ email, onSubmit, onCancel, isLoading = false }: RegisterFormProps) {
+export const RegisterForm: React.FC<RegisterFormProps> = ({
+  email,
+  initialFormData,
+  onSubmit,
+  onCancel,
+  isLoading = false,
+}) => {
   const [formData, setFormData] = useState<RegisterFormData>({
     nickname: "",
     postalCode: "",
