@@ -20,6 +20,7 @@ interface ConfirmationContainerProps {
   onEdit: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  backgroundColorClass?: string
 }
 
 export function ConfirmationContainer({
@@ -28,9 +29,10 @@ export function ConfirmationContainer({
   onEdit,
   onLogoClick,
   isLoading,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: ConfirmationContainerProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onEdit} />
 

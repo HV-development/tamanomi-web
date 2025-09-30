@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 export const emailRegistrationSchema = z.object({
-  email: z.string().email('正しいメールアドレスを入力してください。')
+  email: z.string().email('正しいメールアドレスを入力してください。'),
+  campaignCode: z.string().min(1, 'キャンペーンコードを入力してください。')
 })
 
 // パスワードのZodスキーマ
@@ -20,7 +21,6 @@ export const userRegistrationSchema = z.object({
   address: z.string().min(1, '住所を入力してください。'),
   birthDate: z.string().min(1, '生年月日を入力してください。'),
   gender: z.enum(['male', 'female', 'other'], { required_error: '性別を選択してください。' }),
-  saitamaAppId: z.string().optional()
 })
 
 export type EmailRegistrationData = z.infer<typeof emailRegistrationSchema>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { HomeLayout } from "@/components/templates/home-layout"
 import { mockStores } from "@/data/mock-stores"
 import { mockNotifications } from "@/data/mock-notifications"
@@ -11,10 +11,13 @@ import type { Coupon } from "@/types/coupon"
 
 import { mockUser, mockPlan, mockUsageHistory, mockPaymentHistory } from "@/data/mock-user"
 import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
+import { calculateUserRank } from "@/utils/rank-calculator"
 
 export default function HomePage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
-  const [selectedArea, setSelectedArea] = useState<string>("")
+  const [selectedEvents, setSelectedEvents] = useState<string[]>([])
+  const [selectedAreas, setSelectedAreas] = useState<string[]>([])
+  const [isNearbyFilter, setIsNearbyFilter] = useState(false)
   const [isFavoritesFilter, setIsFavoritesFilter] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
   const [currentView, setCurrentView] = useState<
@@ -22,13 +25,14 @@ export default function HomePage() {
   >("home")
   const [loginStep, setLoginStep] = useState<"email" | "otp">("email")
   const [loginEmail, setLoginEmail] = useState("")
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false) // 未ログイン状態
   const [isLoading, setIsLoading] = useState(false)
   const [signupData, setSignupData] = useState<any>(null)
 
   const [stores, setStores] = useState<Store[]>(mockStores)
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications)
 
+  // 未ログイン状態として初期化
   const [user, setUser] = useState<User | undefined>(undefined)
   const [plan, setPlan] = useState<Plan | undefined>(undefined)
   const [usageHistory, setUsageHistory] = useState<UsageHistory[]>([])
@@ -73,14 +77,58 @@ export default function HomePage() {
   // 店舗詳細画面の状態を追加
   const [isStoreDetailOpen, setIsStoreDetailOpen] = useState(false)
   const [isStoreDetailPopupOpen, setIsStoreDetailPopupOpen] = useState(false)
+  const [currentUserRank, setCurrentUserRank] = useState<string | null>(null)
 
   const [historyStores, setHistoryStores] = useState<Store[]>([])
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false)
 
+  // 自動ログイン処理
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const autoLogin = urlParams.get('auto-login')
+      const loginEmail = urlParams.get('email')
+      
+      if (autoLogin === 'true' && loginEmail) {
+        // 自動ログイン処理
+        setIsAuthenticated(true)
+        setUser({
+          ...mockUser,
+          email: loginEmail,
+          contractStartDate: new Date() // 新規登録なのでブロンズランク
+        })
+        setPlan(mockPlan)
+        setUsageHistory(mockUsageHistory)
+        setPaymentHistory(mockPaymentHistory)
+        
+        // URLパラメータをクリア
+        window.history.replaceState({}, '', '/')
+      }
+    }
+  }, [])
+
   // 店舗詳細関連の状態
   const favoriteStores = stores.filter((store) => store.isFavorite)
   
+  // クライアントサイドでのみランク計算を実行
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const contractStartDate = user.contractStartDate || user.createdAt
+      const rank = calculateUserRank(contractStartDate)
+      setCurrentUserRank(rank)
+    } else {
+      setCurrentUserRank(null)
+    }
+  }, [isAuthenticated, user])
+
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null, isAuth: boolean) => {
+    // 全ての背景色をブロンズ・非会員色に統一
+    return "bg-gradient-to-br from-green-50 to-green-100"
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank, isAuthenticated)
   // フィルタリングされた店舗データ
   const filteredStores = stores.filter((store) => {
     // お気に入りフィルター
@@ -93,9 +141,7 @@ export default function HomePage() {
   const hasNotification = notifications.some((n) => !n.isRead)
 
   const handleCurrentLocationClick = () => {
-    setSelectedGenres([])
-    setSelectedArea("")
-    setIsFavoritesFilter(false)
+    setIsNearbyFilter(!isNearbyFilter)
   }
 
   const handleTabChange = (tab: string) => {
@@ -129,7 +175,10 @@ export default function HomePage() {
       // ワンタイムパスワード認証
       setTimeout(() => {
         setIsAuthenticated(true)
-        setUser(mockUser)
+        setUser({
+          ...mockUser,
+          contractStartDate: new Date("2019-01-01") // ダイヤモンドランク用の契約開始日
+        })
         setPlan(mockPlan)
         setUsageHistory(mockUsageHistory)
         setPaymentHistory(mockPaymentHistory)
@@ -180,10 +229,14 @@ export default function HomePage() {
     }, 1500)
   }
 
-  const handleEmailSubmit = (email: string) => {
+  const handleEmailSubmit = (email: string, campaignCode?: string) => {
     setIsLoading(true)
     setTimeout(() => {
       setEmailRegistrationEmail(email)
+      // キャンペーンコードがある場合はログに記録（実際の実装では保存処理）
+      if (campaignCode) {
+        console.log("キャンペーンコード:", campaignCode)
+      }
       setEmailRegistrationStep("complete")
       setIsLoading(false)
     }, 1500)
@@ -266,6 +319,7 @@ export default function HomePage() {
 
     switch (itemId) {
       case "terms":
+        // PDFは既にハンバーガーメニューで開かれているので、ここでは何もしない
         break
       case "privacy":
         break
@@ -276,6 +330,9 @@ export default function HomePage() {
       case "login":
         setCurrentView("login")
         setActiveTab("map")
+        break
+      case "logout":
+        handleLogout()
         break
       default:
         break
@@ -625,9 +682,12 @@ export default function HomePage() {
   }
 
   return (
-    <HomeLayout
+    <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
+      <HomeLayout
       selectedGenres={selectedGenres}
-      selectedArea={selectedArea}
+      selectedEvents={selectedEvents}
+      selectedAreas={selectedAreas}
+       isNearbyFilter={isNearbyFilter}
       isFavoritesFilter={isFavoritesFilter}
       stores={filteredStores}
       activeTab={activeTab}
@@ -652,7 +712,8 @@ export default function HomePage() {
       emailRegistrationEmail={emailRegistrationEmail}
       emailConfirmationEmail={emailConfirmationEmail}
       onGenresChange={setSelectedGenres}
-      onAreaChange={setSelectedArea}
+      onEventsChange={setSelectedEvents}
+      onAreasChange={setSelectedAreas}
       onCurrentLocationClick={handleCurrentLocationClick}
       onTabChange={handleTabChange}
       onFavoritesClick={handleFavoritesClick}
@@ -731,6 +792,8 @@ export default function HomePage() {
       onLoginRequiredModalLogin={handleLoginRequiredModalLogin}
       passwordChangeStep={passwordChangeStep}
       newEmail={newEmail}
-    />
+      currentUserRank={currentUserRank}
+      />
+    </div>
   )
 }

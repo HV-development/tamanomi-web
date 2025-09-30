@@ -8,10 +8,9 @@ export const mockUser: User = {
   address: "埼玉県さいたま市大宮区桜木町1-7-5",
   birthDate: "1990-05-15",
   gender: "male",
-  saitamaAppId: "SAITAMA123456",
-  registeredStore: "さいたま酒場 大宮店",
   createdAt: new Date("2024-01-01"),
   contractStartDate: new Date("2023-06-01"),
+  registeredStore: "さいたま酒場 大宮店",
 }
 
 export const mockPlan: Plan = {

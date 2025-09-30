@@ -1,9 +1,9 @@
 "use client"
 
-import { CheckCircle, Sparkles } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { useCouponAudio } from "../../hooks/use-audio"
 import type { Coupon } from "../../types/coupon"
+import AdvancedDrinkAnimation from "./advanced-drink-animation"
 
 interface CouponUsedSuccessModalProps {
   isOpen: boolean
@@ -54,14 +54,16 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
           <div className="p-6 text-center">
             {/* ドリンクアニメーション */}
             <div className="mb-8 flex justify-center">
-              <div className="relative">
-                {/* GIFファイルを使用したビールジョッキ */}
-                <img 
-                  src="/Beer_mug.gif" 
-                  alt="ビールジョッキ" 
-                  className="w-32 h-32 object-contain transform scale-[2]"
-                />
-              </div>
+              <AdvancedDrinkAnimation
+                width={128}
+                height={128}
+                duration={2000}
+                autoStart={true}
+                showButton={false}
+                onAnimationComplete={() => {
+                  console.log('クーポン使用アニメーション完了！');
+                }}
+              />
             </div>
 
             {/* メッセージ */}

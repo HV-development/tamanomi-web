@@ -5,13 +5,11 @@ import { EmailConfirmationComplete } from "../molecules/email-confirmation-compl
 
 interface EmailConfirmationContainerProps {
   email: string
-  onBackToLogin: () => void
   onLogoClick: () => void
 }
 
 export function EmailConfirmationContainer({
   email,
-  onBackToLogin,
   onLogoClick,
 }: EmailConfirmationContainerProps) {
   return (
@@ -21,11 +19,12 @@ export function EmailConfirmationContainer({
         <div className="flex items-center justify-center">
           <Logo size="lg" onClick={onLogoClick} />
         </div>
+      </div>
+
+      {/* メインコンテンツ */}
+      <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <EmailConfirmationComplete
-            email={email}
-            onBackToLogin={onBackToLogin}
-          />
+          <EmailConfirmationComplete email={email} />
         </div>
       </div>
     </div>

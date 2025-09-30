@@ -1,6 +1,4 @@
-"use client"
-
-import { X, MapPin, Heart, Ticket, User, Search, Filter } from "lucide-react"
+import { X, Ticket, CheckCircle, AlertTriangle, Info } from 'lucide-react'
 
 interface UsageGuideModalProps {
   isOpen: boolean
@@ -10,51 +8,48 @@ interface UsageGuideModalProps {
 export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
   if (!isOpen) return null
 
-  const guideSteps = [
+  const usageSteps = [
     {
-      icon: Search,
-      title: "お店を探す",
-      description: "エリアやジャンルを選択して、お好みのお店を見つけましょう。",
+      step: 1,
+      title: "店員さんに画面を見せる",
+      description: "クーポン確認画面を店員さんにお見せください。",
       details: [
-        "現在地ボタンで近くのお店を表示",
-        "エリア選択でさいたま市内の区を指定",
-        "ジャンル選択で料理の種類を絞り込み"
+        "画面を店員さんに向けてください",
+        "クーポンの内容を確認してもらいます",
+        "店員さんが内容を確認するまでお待ちください"
       ]
     },
     {
-      icon: Ticket,
-      title: "クーポンを使う",
-      description: "気になるお店のクーポン一覧から、使いたいクーポンを選択します。",
+      step: 2,
+      title: "店員さんに確定ボタンを押してもらう",
+      description: "店員さんに「確定する」ボタンを押してもらってください。",
       details: [
-        "店舗カードの「クーポン一覧」ボタンをタップ",
-        "利用したいクーポンを選択",
-        "店員さんに画面を見せて確定ボタンを押してもらう"
+        "お客様ご自身では押さないでください",
+        "店員さんが確認後に押していただきます",
+        "ボタンを押すとクーポンが使用済みになります"
       ]
     },
     {
-      icon: Heart,
-      title: "お気に入り登録",
-      description: "気に入ったお店をお気に入りに登録して、後で簡単にアクセスできます。",
+      step: 3,
+      title: "クーポン適用完了",
+      description: "クーポンが正常に適用され、割引が反映されます。",
       details: [
-        "店舗カードのハートマークをタップ",
-        "お気に入りタブから登録したお店を確認",
-        "いつでもお気に入りの解除が可能"
-      ]
-    },
-    {
-      icon: User,
-      title: "マイページ",
-      description: "利用履歴の確認やプロフィール編集ができます。",
-      details: [
-        "クーポンの利用履歴を確認",
-        "決済履歴とプラン管理",
-        "プロフィール情報の編集"
+        "使用完了画面が表示されます",
+        "レシートで割引内容をご確認ください",
+        "利用履歴に記録されます"
       ]
     }
   ]
 
+  const importantNotes = [
+    "クーポンは1日1回まで利用可能です",
+    "一度使用したクーポンはキャンセルできません",
+    "他のクーポンとの併用はできません",
+    "有効期限内にご利用ください",
+    "店舗の営業時間内でのみ利用可能です"
+  ]
+
   const handleOverlayClick = (e: React.MouseEvent) => {
-    // オーバーレイをクリックした時のみ閉じる
     if (e.target === e.currentTarget) {
       onClose()
     }
@@ -64,24 +59,20 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
     <>
       {/* オーバーレイ */}
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-in fade-in-0 duration-300"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[10001] animate-in fade-in-0 duration-300"
         onClick={handleOverlayClick}
       ></div>
 
       {/* モーダル */}
-      <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-50 max-w-lg mx-auto overflow-hidden border-2 border-green-200 animate-in slide-in-from-bottom-4 duration-300">
+      <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-[10001] max-w-lg mx-auto overflow-hidden border-2 border-green-200 animate-in slide-in-from-bottom-4 duration-300">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
-          <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white flex-shrink-0">
+          <div className="bg-green-600 p-6 text-white flex-shrink-0 rounded-t-3xl">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-full">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">TAMAYOIの使い方</h3>
-                  <p className="text-green-100 text-sm">アプリの基本的な使用方法</p>
-                </div>
+              <div className="w-8"></div>
+              <div className="text-center">
+                <h3 className="text-xl font-bold">クーポン使用方法</h3>
+                <p className="text-green-100 text-sm">正しい使用手順をご確認ください</p>
               </div>
               <button 
                 onClick={onClose} 
@@ -96,96 +87,64 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
           {/* コンテンツ */}
           <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
             <div className="space-y-6">
-              {/* アプリ概要 */}
-              <div className="bg-white rounded-2xl border border-green-200 p-5">
-                <h4 className="text-lg font-bold text-gray-900 mb-3">TAMAYOIとは？</h4>
-                <p className="text-gray-700 leading-relaxed">
-                  さいたま市内の飲食店で使えるお得なクーポンアプリです。
-                  毎日1杯のお酒が無料になるクーポンを利用して、
-                  さいたまの夜をもっと楽しくお過ごしください。
-                </p>
-              </div>
-
-              {/* 使い方ステップ */}
-              {guideSteps.map((step, index) => {
-                const Icon = step.icon
-                return (
-                  <div 
-                    key={index} 
-                    className="bg-white rounded-2xl border border-gray-200 p-5 animate-in slide-in-from-left-4 duration-300"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                          <Icon className="w-6 h-6 text-green-600" />
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="bg-green-600 text-white text-sm px-2 py-1 rounded-full font-bold">
-                            {index + 1}
-                          </span>
-                          <h5 className="text-lg font-bold text-gray-900">{step.title}</h5>
-                        </div>
-                        <p className="text-gray-700 mb-3 leading-relaxed">{step.description}</p>
-                        <ul className="space-y-1">
-                          {step.details.map((detail, detailIndex) => (
-                            <li key={detailIndex} className="flex items-start gap-2 text-sm text-gray-600">
-                              <span className="text-green-600 font-bold flex-shrink-0 mt-0.5">•</span>
-                              <span>{detail}</span>
-                            </li>
-                          ))}
-                        </ul>
+              {/* 使用手順 */}
+              {usageSteps.map((step, index) => (
+                <div 
+                  key={step.step}
+                  className="bg-white rounded-2xl border border-gray-200 p-6 animate-in slide-in-from-left-4 duration-300"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <span className="text-green-600 font-bold text-lg">{step.step}</span>
                       </div>
                     </div>
+                    <div className="flex-1">
+                      <h5 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h5>
+                      <p className="text-gray-700 mb-3 leading-relaxed">{step.description}</p>
+                      <ul className="space-y-1">
+                        {step.details.map((detail, detailIndex) => (
+                          <li key={detailIndex} className="flex items-start gap-2 text-sm text-gray-600">
+                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                )
-              })}
+                </div>
+              ))}
 
-              {/* 注意事項 */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
-                <h4 className="text-lg font-bold text-yellow-900 mb-3">ご利用時の注意</h4>
-                <ul className="space-y-2 text-sm text-yellow-800">
-                  <li className="flex items-start gap-2">
-                    <span className="text-yellow-600 font-bold flex-shrink-0 mt-0.5">•</span>
-                    <span>クーポンは1日1回まで利用可能です</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-yellow-600 font-bold flex-shrink-0 mt-0.5">•</span>
-                    <span>利用時は必ず店員さんに画面をお見せください</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-yellow-600 font-bold flex-shrink-0 mt-0.5">•</span>
-                    <span>一度使用したクーポンはキャンセルできません</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-yellow-600 font-bold flex-shrink-0 mt-0.5">•</span>
-                    <span>プランに応じて利用できる店舗が異なります</span>
-                  </li>
+              {/* 重要な注意事項 */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
+                <div className="flex items-start gap-3 mb-4">
+                  <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <h3 className="text-lg font-bold text-yellow-900">重要な注意事項</h3>
+                </div>
+                <ul className="space-y-2">
+                  {importantNotes.map((note, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-yellow-800">
+                      <span className="text-yellow-600 font-bold flex-shrink-0 mt-0.5">•</span>
+                      <span>{note}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
               {/* サポート情報 */}
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
-                <h4 className="text-lg font-bold text-blue-900 mb-3">困ったときは</h4>
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                <div className="flex items-start gap-3 mb-4">
+                  <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <h3 className="text-lg font-bold text-blue-900">困ったときは</h3>
+                </div>
                 <p className="text-sm text-blue-800 leading-relaxed">
-                  ご不明な点やトラブルがございましたら、
+                  クーポンの使用でご不明な点やトラブルがございましたら、
                   メニューの「お問い合わせ」からお気軽にご連絡ください。
                   サポートチームが迅速に対応いたします。
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* フッター */}
-          <div className="p-6 bg-white border-t border-gray-200 flex-shrink-0">
-            <button
-              onClick={onClose}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-all duration-200 hover:scale-[1.02] shadow-md hover:shadow-lg"
-            >
-              閉じる
-            </button>
           </div>
         </div>
       </div>

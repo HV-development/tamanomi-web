@@ -11,9 +11,10 @@ interface CouponListPopupProps {
   onClose: () => void
   onBack: () => void
   onUseCoupon: (couponId: string) => void
+ onUsageGuideClick: () => void
 }
 
-export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, onUseCoupon }: CouponListPopupProps) {
+export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, onUseCoupon, onUsageGuideClick }: CouponListPopupProps) {
   if (!isOpen) return null
 
 
@@ -23,7 +24,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50" onClick={onClose}></div>
 
       {/* ポップアップ */}
-      <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
+      <div className="fixed inset-x-4 top-4 bottom-4 bg-gradient-to-br from-green-50 to-green-100 rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
           <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
@@ -43,11 +44,18 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
               <h4 className="text-lg font-bold text-green-900">{storeName}</h4>
+             <button 
+               onClick={onUsageGuideClick}
+               className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
+             >
+               使用方法、注意事項についてはこちら
+             </button>
             </div>
           </div>
 
+          {/* 使用方法リンク */}
           {/* クーポンリスト */}
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 bg-transparent">
             {coupons.length === 0 ? (
               <div className="text-center py-12">
                 <Ticket className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -79,12 +87,19 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
                         {coupon.description}
                       </p>
                       
+                      {/* 利用条件 */}
+                      <div className="mb-4 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-600 text-center">
+                          利用条件：焼き鳥2本以上のご注文
+                        </p>
+                      </div>
+                      
                       {/* 利用ボタン */}
                       <button
                         onClick={() => onUseCoupon(coupon.id)}
                         className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                       >
-                        利用する
+                        このクーポンで乾杯！
                       </button>
                     </div>
                   </div>

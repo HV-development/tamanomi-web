@@ -6,6 +6,8 @@ services:
       dockerfile: ../infrastructure/docker/Dockerfile
     ports:
       - "3000:3000"
+    env_file:
+      - ../../frontend/.env
     volumes:
       - ../../frontend/src:/app/src
       - ../../frontend/public:/app/public

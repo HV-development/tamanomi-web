@@ -10,6 +10,7 @@ interface PlanManagementContainerProps {
   onCancelSubscription: () => void
   onBack: () => void
   onLogoClick: () => void
+  backgroundColorClass?: string
 }
 
 export function PlanManagementContainer({
@@ -18,9 +19,10 @@ export function PlanManagementContainer({
   onCancelSubscription,
   onBack,
   onLogoClick,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: PlanManagementContainerProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${backgroundColorClass}`}>
       {/* ヘッダー */}
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onBack} />
 

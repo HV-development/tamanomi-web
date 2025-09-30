@@ -1,12 +1,23 @@
+"use client"
+
 import { ArrowLeft, Ticket, CheckCircle, AlertTriangle, Info } from 'lucide-react'
 import { HeaderLogo } from '../atoms/header-logo'
 
 interface UsageGuidePageProps {
   onBack: () => void
   onLogoClick: () => void
+  currentUserRank?: string | null
 }
 
-export function UsageGuidePage({ onBack, onLogoClick }: UsageGuidePageProps) {
+export function UsageGuidePage({ onBack, onLogoClick, currentUserRank }: UsageGuidePageProps) {
+  // ランクに基づく背景色を取得
+  const getBackgroundColorByRank = (rank: string | null) => {
+    // 全ての背景色をブロンズ・非会員色に統一
+    return "bg-gradient-to-br from-green-50 to-green-100"
+  }
+
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+
   const usageSteps = [
     {
       step: 1,
@@ -47,7 +58,7 @@ export function UsageGuidePage({ onBack, onLogoClick }: UsageGuidePageProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+    <div className={`min-h-screen ${backgroundColorClass}`}>
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onBack} />
 
       {/* メインコンテンツ */}

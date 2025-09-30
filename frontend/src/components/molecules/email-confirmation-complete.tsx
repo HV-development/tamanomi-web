@@ -1,17 +1,14 @@
 "use client"
 
 import { Mail, CheckCircle } from "lucide-react"
-import { Button } from "../atoms/button"
 
 interface EmailConfirmationCompleteProps {
   email: string
-  onBackToLogin: () => void
   className?: string
 }
 
 export function EmailConfirmationComplete({ 
   email, 
-  onBackToLogin, 
   className = "" 
 }: EmailConfirmationCompleteProps) {
   return (
@@ -32,12 +29,12 @@ export function EmailConfirmationComplete({
 
       {/* ログイン画面に戻るボタン */}
       <div className="flex justify-center">
-        <Button
-          onClick={onBackToLogin}
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-medium text-base"
+        <button
+          onClick={() => window.location.href = '/'}
+          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-medium text-base transition-colors"
         >
           ログイン画面に戻る
-        </Button>
+        </button>
       </div>
     </div>
   )

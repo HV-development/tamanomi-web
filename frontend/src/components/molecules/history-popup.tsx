@@ -21,7 +21,7 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={onClose}></div>
 
       {/* ポップアップ */}
-      <div className="fixed inset-x-4 top-4 bottom-4 bg-white rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
+      <div className="fixed inset-x-4 top-4 bottom-4 bg-gradient-to-br from-green-50 to-green-100 rounded-3xl shadow-2xl z-50 max-w-md mx-auto overflow-hidden border-2 border-green-200">
         <div className="flex flex-col h-full">
           {/* ヘッダー */}
           <div className="bg-green-600 p-4 text-white flex-shrink-0 rounded-t-3xl">
@@ -40,12 +40,12 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
           {/* 店舗数表示 */}
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
-              <h4 className="text-lg font-bold text-green-900">{stores.length} 件のお気に入り</h4>
+              <h4 className="text-lg font-bold text-green-900">気になるお店{String(stores.length).replace(/[0-9]/g, (match) => String.fromCharCode(match.charCodeAt(0) + 0xFEE0))}選</h4>
             </div>
           </div>
 
           {/* コンテンツ */}
-          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-6 bg-transparent">
             <StoreList
               stores={stores}
               onFavoriteToggle={onFavoriteToggle}
