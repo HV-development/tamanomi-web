@@ -2,8 +2,8 @@ services:
   # ローカル開発環境
   app:
     build:
-      context: ../../frontend
-      dockerfile: ../infrastructure/docker/Dockerfile
+      context: ../../../
+      dockerfile: tamanomi-web/infrastructure/docker/Dockerfile
     ports:
       - "3000:3000"
     env_file:
