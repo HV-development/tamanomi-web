@@ -1,0 +1,3 @@
+[submodule "frontend/tamanomi-schemas"]
+	path = frontend/tamanomi-schemas
+	url = https://github.com/HV-development/tamayoi-schemas.git
