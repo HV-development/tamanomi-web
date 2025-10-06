@@ -12,8 +12,8 @@ importers:
         specifier: ^3.9.1
         version: 3.10.0(react-hook-form@7.63.0(react@18.3.1))
       '@hv-development/schemas':
-        specifier: file:../../tamanomi-schemas
-        version: file:../../tamanomi-schemas
+        specifier: file:./tamanomi-schemas
+        version: file:tamanomi-schemas
       '@radix-ui/react-accordion':
         specifier: 1.2.2
         version: 1.2.2(@types/react-dom@18.3.7(@types/react@18.3.25))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -266,8 +266,8 @@ packages:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
 
-  '@hv-development/schemas@file:../../tamanomi-schemas':
-    resolution: {directory: ../../tamanomi-schemas, type: directory}
+  '@hv-development/schemas@file:tamanomi-schemas':
+    resolution: {directory: tamanomi-schemas, type: directory}
     engines: {node: '>=18.0.0'}
 
   '@isaacs/cliui@8.0.2':
@@ -2997,7 +2997,7 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
-  '@hv-development/schemas@file:../../tamanomi-schemas':
+  '@hv-development/schemas@file:tamanomi-schemas':
     dependencies:
       zod: 3.25.76
 
