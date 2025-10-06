@@ -1,5 +1,5 @@
 # Next.jsアプリケーション用Dockerfile（ローカル開発用）
-FROM node:18-alpine
+FROM node:20-alpine
 
 # 依存関係のインストール
 RUN apk add --no-cache libc6-compat
