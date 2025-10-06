@@ -1,6 +1,3 @@
 {
-  "engines": {
-    "node": "18.20.x"
-  },
-  "packageManager": "pnpm@8.15.8"
+  "version": 2
 }
