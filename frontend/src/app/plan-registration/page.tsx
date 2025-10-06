@@ -10,7 +10,7 @@ import {
   CreateUserPlanSchema 
 } from '@hv-development/schemas'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002/api/v1'
 
 export default function PlanRegistrationPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -40,13 +40,25 @@ export default function PlanRegistrationPage() {
   const fetchPlans = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch(`${API_BASE_URL}/api/v1/plans?status=active&limit=50`)
+      console.log('🔍 Fetching plans from:', `${API_BASE_URL}/plans?status=active&limit=50`)
+      
+      const response = await fetch(`${API_BASE_URL}/plans?status=active&limit=50`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+      
+      console.log('🔍 Response status:', response.status)
+      console.log('🔍 Response headers:', Object.fromEntries(response.headers.entries()))
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       
       const data = await response.json()
+      console.log('🔍 Response data:', data)
       
       // バリデーション（一時的に無効化）
       // const validatedData = PlanListResponseSchema.parse(data)
@@ -54,7 +66,11 @@ export default function PlanRegistrationPage() {
       setPlans(data.plans)
     } catch (err) {
       console.error('プラン取得エラー:', err)
-      setError('プランの取得に失敗しました')
+      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+        setError('CORSエラーまたはネットワークエラーが発生しました。APIサーバーが起動しているか確認してください。')
+      } else {
+        setError('プランの取得に失敗しました')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -74,7 +90,7 @@ export default function PlanRegistrationPage() {
       const validatedData = CreateUserPlanSchema.parse(userPlanData)
       
       // ユーザープラン作成API呼び出し
-      const response = await fetch(`${API_BASE_URL}/api/v1/user-plans`, {
+      const response = await fetch(`${API_BASE_URL}/user-plans`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
