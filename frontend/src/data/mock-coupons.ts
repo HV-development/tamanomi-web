@@ -9,6 +9,7 @@ export const mockCoupons: Record<string, Coupon[]> = {
       imageUrl: "https://images.pexels.com/photos/1089930/pexels-photo-1089930.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
       storeId: "1",
       storeName: "さいたま酒場 大宮店",
+      uuid: "uuid-1-1",
     },
     {
       id: "coupon-1-2",
@@ -17,6 +18,7 @@ export const mockCoupons: Record<string, Coupon[]> = {
       imageUrl: "https://images.pexels.com/photos/1283219/pexels-photo-1283219.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
       storeId: "1",
       storeName: "さいたま酒場 大宮店",
+      uuid: "uuid-1-2",
     },
   ],
   "2": [
@@ -27,6 +29,7 @@ export const mockCoupons: Record<string, Coupon[]> = {
       imageUrl: "https://images.pexels.com/photos/1407846/pexels-photo-1407846.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
       storeId: "2",
       storeName: "イタリアン・ベラヴィスタ",
+      uuid: "uuid-2-1",
     },
     {
       id: "coupon-2-2",
@@ -35,6 +38,7 @@ export const mockCoupons: Record<string, Coupon[]> = {
       imageUrl: "https://images.pexels.com/photos/1337825/pexels-photo-1337825.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
       storeId: "2",
       storeName: "イタリアン・ベラヴィスタ",
+      uuid: "uuid-2-2",
     },
   ],
   "3": [
@@ -45,6 +49,7 @@ export const mockCoupons: Record<string, Coupon[]> = {
       imageUrl: "https://images.pexels.com/photos/1089930/pexels-photo-1089930.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
       storeId: "3",
       storeName: "焼肉 牛角 大宮東口店",
+      uuid: "uuid-3-1",
     },
   ],
   "4": [
@@ -55,6 +60,7 @@ export const mockCoupons: Record<string, Coupon[]> = {
       imageUrl: "https://images.pexels.com/photos/1283219/pexels-photo-1283219.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
       storeId: "4",
       storeName: "和食処 さくら",
+      uuid: "uuid-4-1",
     },
   ],
   "5": [
@@ -65,6 +71,7 @@ export const mockCoupons: Record<string, Coupon[]> = {
       imageUrl: "https://images.pexels.com/photos/1407846/pexels-photo-1407846.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
       storeId: "5",
       storeName: "バー・ムーンライト",
+      uuid: "uuid-5-1",
     },
   ],
 }

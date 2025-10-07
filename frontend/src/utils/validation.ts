@@ -1,4 +1,5 @@
-// パスワードバリデーション関連のユーティリティ関数
+import { UseRregistrationCompleteSchema } from '@/schemas/auth'
+import { z } from 'zod'
 
 export interface PasswordValidationResult {
   isValid: boolean
@@ -11,113 +12,66 @@ export interface PasswordConfirmValidationResult {
 }
 
 /**
- * パスワードのバリデーション
+ * パスワードのバリデーション（tamanomi-schemasを使用）
  */
 export function validatePassword(password: string): PasswordValidationResult {
-  const errors: string[] = []
-
-  // 必須チェック
-  if (!password) {
-    errors.push("パスワードを入力してください")
-    return { isValid: false, errors }
-  }
-
-  // 最小桁チェック
-  if (password.length < 8) {
-    errors.push("8文字以上で入力してください")
-  }
-
-  // 最大桁チェック
-  if (password.length > 255) {
-    errors.push("255文字以下で入力してください")
-  }
-
-  // フォーマットチェック（英数字混在）
-  const hasLetter = /[A-Za-z]/.test(password)
-  const hasNumber = /\d/.test(password)
-  if (!hasLetter || !hasNumber) {
-    errors.push("英数字混在で入力してください")
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors
-  }
+  return validateField('password', password)
 }
 
 /**
- * パスワード確認のバリデーション
+ * パスワード確認のバリデーション（tamanomi-schemasを使用）
  */
 export function validatePasswordConfirm(password: string, passwordConfirm: string): PasswordConfirmValidationResult {
-  // 必須チェック
-  if (!passwordConfirm) {
-    return {
-      isValid: false,
-      error: "パスワードを入力してください"
+  try {
+    UseRregistrationCompleteSchema.pick({ password: true, passwordConfirm: true }).parse({
+      password,
+      passwordConfirm
+    })
+    return { isValid: true }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const confirmError = error.errors.find(err =>
+        err.path.includes('passwordConfirm') || err.message.includes('一致')
+      )
+      if (confirmError) {
+        return { isValid: false, error: confirmError.message }
+      }
+      return { isValid: false, error: error.errors[0]?.message || "パスワード確認でエラーが発生しました" }
     }
+    return { isValid: false, error: "パスワード確認でエラーが発生しました" }
   }
-
-  // パスワードが一致しているかチェック
-  if (password !== passwordConfirm) {
-    return {
-      isValid: false,
-      error: "パスワードが一致していません"
-    }
-  }
-
-  return { isValid: true }
 }
 
 /**
  * リアルタイムパスワードバリデーション（入力中は必須エラーを表示しない）
  */
 export function validatePasswordRealtime(password: string): PasswordValidationResult {
-  const errors: string[] = []
-
-  // 入力中は必須チェックをスキップ
   if (!password) {
     return { isValid: true, errors: [] }
   }
-
-  // 最小桁チェック
-  if (password.length < 8) {
-    errors.push("8文字以上で入力してください")
-  }
-
-  // 最大桁チェック
-  if (password.length > 255) {
-    errors.push("255文字以下で入力してください")
-  }
-
-  // フォーマットチェック（英数字混在）
-  const hasLetter = /[A-Za-z]/.test(password)
-  const hasNumber = /\d/.test(password)
-  if (!hasLetter || !hasNumber) {
-    errors.push("英数字混在で入力してください")
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors
-  }
+  return validatePassword(password)
 }
 
 /**
  * リアルタイムパスワード確認バリデーション
  */
 export function validatePasswordConfirmRealtime(password: string, passwordConfirm: string): PasswordConfirmValidationResult {
-  // 入力中は必須チェックをスキップ
   if (!passwordConfirm) {
     return { isValid: true }
   }
+  return validatePasswordConfirm(password, passwordConfirm)
+}
 
-  // パスワードが一致しているかチェック
-  if (password !== passwordConfirm) {
-    return {
-      isValid: false,
-      error: "パスワードが一致していません"
+// ヘルパー関数
+function validateField(field: string, value: any): PasswordValidationResult {
+  try {
+    const fieldSchema = UseRregistrationCompleteSchema.pick({ [field]: true } as any)
+    fieldSchema.parse({ [field]: value })
+    return { isValid: true, errors: [] }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { isValid: false, errors: [error.errors[0]?.message || 'バリデーションエラー'] }
     }
+    return { isValid: false, errors: ['バリデーションエラーが発生しました'] }
   }
-
-  return { isValid: true }
 }

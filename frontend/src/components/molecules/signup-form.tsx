@@ -2,54 +2,42 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 import { RadioButton } from "../atoms/radio-button"
 import { DateInput } from "../atoms/date-input"
-import { validatePassword, validatePasswordRealtime, validatePasswordConfirm, validatePasswordConfirmRealtime } from "../../utils/validation"
-
-interface SignupFormData {
-  nickname: string
-  password: string
-  passwordConfirm: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  saitamaAppId: string
-}
+import { UseRregistrationCompleteSchema, type UserRegistrationComplete } from "@tamanomi/schemas"
+import { z } from "zod"
 
 interface SignupFormProps {
-  initialData?: Partial<SignupFormData>
+  initialData?: Partial<UserRegistrationComplete>
   email?: string
-  onSubmit: (data: SignupFormData) => void
+  onSubmit: (data: UserRegistrationComplete) => void
   onCancel: () => void
   isLoading?: boolean
 }
 
 export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading = false }: SignupFormProps) {
-  const [formData, setFormData] = useState<SignupFormData>({
+  const [formData, setFormData] = useState<UserRegistrationComplete>({
     nickname: "",
     password: "",
     passwordConfirm: "",
     postalCode: "",
     address: "",
     birthDate: "",
-    gender: "",
-    saitamaAppId: "",
+    gender: "male",
   })
 
-  const [errors, setErrors] = useState<Partial<SignupFormData>>({})
+  const [errors, setErrors] = useState<Partial<Record<keyof UserRegistrationComplete, string>>>({})
   const [isSearchingAddress, setIsSearchingAddress] = useState(false)
-  
+
   // 住所フィールドへの参照を追加
   const addressInputRef = useRef<HTMLInputElement>(null)
 
   // initialDataが変更された際にフォームデータを更新
   useEffect(() => {
     if (initialData) {
-      console.log('initialData received:', initialData)
       setFormData({
         nickname: initialData.nickname || "",
         password: initialData.password || "",
@@ -57,11 +45,8 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
         postalCode: initialData.postalCode || "",
         address: initialData.address || "",
         birthDate: initialData.birthDate || "",
-        gender: initialData.gender || "",
-        saitamaAppId: initialData.saitamaAppId || "",
+        gender: initialData.gender || "male",
       })
-    } else {
-      console.log('No initialData provided')
     }
   }, [initialData])
 
@@ -72,150 +57,72 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
   ]
 
   const validateForm = () => {
-    const newErrors: Partial<SignupFormData> = {}
+    try {
+      // スキーマを使用してバリデーション
+      const result = UseRregistrationCompleteSchema.parse(formData)
+      setErrors({})
+      return true
+    } catch (error) {
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error && Array.isArray((error as any).errors)) {
+        const zodError = error as any
+        const newErrors: Partial<Record<keyof UserRegistrationComplete, string>> = {}
 
-    // ニックネーム - 必須チェック
-    if (!formData.nickname.trim()) {
-      newErrors.nickname = "ニックネームを入力してください。"
-    }
+        zodError.errors.forEach((err: any) => {
+          const field = err.path?.[0] as keyof UserRegistrationComplete
+          if (field) {
+            newErrors[field] = err.message
+          }
+        })
 
-    // 郵便番号 - 必須チェック、桁数チェック
-    if (!formData.postalCode) {
-      newErrors.postalCode = "郵便番号を入力してください。"
-    } else if (!/^\d{7}$/.test(formData.postalCode.replace(/-/g, ""))) {
-      newErrors.postalCode = "郵便番号は7桁の数字で入力してください。"
-    }
-
-    // 住所 - 必須チェック
-    if (!formData.address.trim()) {
-      newErrors.address = "住所を入力してください。"
-    }
-
-    // 生年月日 - 必須チェック、日付形式チェック
-    if (!formData.birthDate) {
-      newErrors.birthDate = "生年月日を入力してください。"
-    } else {
-      const birthDate = new Date(formData.birthDate)
-      const today = new Date()
-      if (isNaN(birthDate.getTime())) {
-        newErrors.birthDate = "正しい日付形式で入力してください。"
-      } else if (birthDate >= today) {
-        newErrors.birthDate = "生年月日は今日より前の日付を入力してください。"
-      } else if (today.getFullYear() - birthDate.getFullYear() > 120) {
-        newErrors.birthDate = "正しい生年月日を入力してください。"
+        setErrors(() => newErrors)
       }
+      return false
     }
-
-    // 性別 - 選択チェック
-    if (!formData.gender) {
-      newErrors.gender = "性別を選択してください。"
-    }
-
-    // パスワードバリデーション
-    const passwordValidation = validatePassword(formData.password)
-    if (!passwordValidation.isValid) {
-      newErrors.password = passwordValidation.errors[0]
-    }
-
-    // パスワード確認バリデーション
-    const passwordConfirmValidation = validatePasswordConfirm(formData.password, formData.passwordConfirm)
-    if (!passwordConfirmValidation.isValid) {
-      newErrors.passwordConfirm = passwordConfirmValidation.error
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (validateForm()) {
+    const isValid = validateForm()
+    if (isValid) {
       onSubmit(formData)
     }
   }
 
   const handleAddressSearch = async () => {
     const cleanedPostalCode = formData.postalCode.replace(/-/g, "")
-    
-    console.log("🔍 住所検索開始:", cleanedPostalCode)
-    
-    // 郵便番号の基本バリデーション
-    if (!formData.postalCode) {
-      setErrors({ ...errors, postalCode: "郵便番号を入力してください" })
-      console.log("❌ 郵便番号が空です")
-      return
-    }
-    
-    if (!/^\d{7}$/.test(cleanedPostalCode)) {
-      setErrors({ ...errors, postalCode: "郵便番号は7桁の数字で入力してください" })
-      console.log("❌ 郵便番号の形式が正しくありません:", cleanedPostalCode)
-      return
-    }
-
-    // 郵便番号が正しい場合はエラーをクリア
-    setErrors(prev => ({ ...prev, postalCode: undefined }))
-
     setIsSearchingAddress(true)
-    
+
     const apiUrl = `/api/address/search?zipcode=${cleanedPostalCode}`
-    console.log("📡 API URL:", apiUrl)
-    
+
     try {
-      // Next.js API ルート経由で住所検索
-      console.log("📡 APIリクエスト送信中...")
       const response = await fetch(apiUrl)
-      console.log("📡 APIレスポンス受信:", {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok
-      })
-      
       const data = await response.json()
-      console.log("📡 APIレスポンスデータ:", data)
-      
+
       if (data.success && data.address) {
-        // 住所が見つかった場合
-        console.log("📍 住所検索結果:", data.data)
-        console.log("📍 完全住所:", data.address)
-        
-        setFormData(prev => ({ 
-          ...prev, 
-          address: data.address 
+        setFormData(prev => ({
+          ...prev,
+          address: data.address
         }))
-        setErrors(prev => ({ ...prev, address: undefined }))
-        console.log("✅ 住所検索成功:", data.address)
       } else {
-        // 住所が見つからない場合
-        console.log("❌ 住所が見つかりません:", {
-          postalCode: cleanedPostalCode,
-          message: data.message
-        })
         setErrors(prev => ({
           ...prev,
           address: data.message || "該当する住所が見つかりませんでした。手入力で住所を入力してください。"
         }))
-        
-        // 住所フィールドにフォーカスを移す
+
         setTimeout(() => {
           if (addressInputRef.current) {
             addressInputRef.current.focus()
           }
         }, 100)
       }
-      
+
     } catch (error) {
-      console.error("❌ 住所検索エラー:", {
-        error: error,
-        message: error instanceof Error ? error.message : 'Unknown error',
-        postalCode: cleanedPostalCode,
-        apiUrl: apiUrl
-      })
       setErrors(prev => ({
         ...prev,
         address: "住所検索サービスに接続できませんでした。ネットワーク接続を確認するか、手入力で住所を入力してください。"
       }))
-      
-      // エラー時も住所フィールドにフォーカス
+
       setTimeout(() => {
         if (addressInputRef.current) {
           addressInputRef.current.focus()
@@ -223,90 +130,22 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
       }, 100)
     } finally {
       setIsSearchingAddress(false)
-      console.log("🔍 住所検索処理完了")
     }
   }
 
-  const updateFormData = (field: keyof SignupFormData, value: string) => {
-    setFormData({ ...formData, [field]: value })
-    
-    // リアルタイムバリデーション
-    const newErrors = { ...errors }
-    
-    switch (field) {
-      case 'nickname':
-        if (value.trim()) {
-          delete newErrors.nickname
-        }
-        break
-      case 'postalCode':
-        const cleanedValue = value.replace(/-/g, "")
-        if (value && /^\d{7}$/.test(cleanedValue)) {
-          delete newErrors.postalCode
-        }
-        break
-      case 'address':
-        if (value.trim()) {
-          delete newErrors.address
-        }
-        break
-      case 'birthDate':
-        if (value) {
-          const birthDate = new Date(value)
-          const today = new Date()
-          if (!isNaN(birthDate.getTime()) && birthDate < today && today.getFullYear() - birthDate.getFullYear() <= 120) {
-            delete newErrors.birthDate
-          }
-        }
-        break
-      case 'gender':
-        if (value) {
-          delete newErrors.gender
-        }
-        break
-      case 'password':
-        // パスワードリアルタイムバリデーション
-        const passwordValidation = validatePasswordRealtime(value)
-        if (passwordValidation.isValid) {
-          delete newErrors.password
-        } else if (passwordValidation.errors.length > 0) {
-          newErrors.password = passwordValidation.errors[0]
-        }
-        // パスワードが変更されたらパスワード確認もチェック
-        if (formData.passwordConfirm) {
-          const confirmValidation = validatePasswordConfirmRealtime(value, formData.passwordConfirm)
-          if (confirmValidation.isValid) {
-            delete newErrors.passwordConfirm
-          } else if (confirmValidation.error) {
-            newErrors.passwordConfirm = confirmValidation.error
-          }
-        }
-        break
-      case 'passwordConfirm':
-        // パスワード確認リアルタイムバリデーション
-        const confirmValidation = validatePasswordConfirmRealtime(formData.password, value)
-        if (confirmValidation.isValid) {
-          delete newErrors.passwordConfirm
-        } else if (confirmValidation.error) {
-          newErrors.passwordConfirm = confirmValidation.error
-        }
-        break
-    }
-    
-    setErrors(newErrors)
+  const updateFormData = (field: keyof UserRegistrationComplete, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  // 入力時のリアルタイムバリデーション用ヘルパー
-  const handleInputChange = (field: keyof SignupFormData, value: string) => {
+  // 入力時のヘルパー
+  const handleInputChange = (field: keyof UserRegistrationComplete, value: string) => {
     updateFormData(field, value)
   }
 
-  // 住所が自動入力された場合の処理
+  // エラー状態の変更を監視
   useEffect(() => {
-    if (formData.address.trim() && errors.address) {
-      setErrors(prev => ({ ...prev, address: undefined }))
-    }
-  }, [formData.address, errors.address])
+    // エラー状態の変更を監視（必要に応じて）
+  }, [errors])
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -395,21 +234,6 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
         error={errors.gender}
       />
 
-     {/* 登録店舗 */}
-     <div>
-       <label className="block text-sm font-medium text-gray-700 mb-2">
-         登録店舗
-       </label>
-       <input
-         type="text"
-         placeholder="店舗QRコードから登録された店舗です"
-         value={formData.registeredStore}
-         onChange={(e) => handleInputChange("registeredStore", e.target.value)}
-         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors bg-gray-50"
-         readOnly
-       />
-       <p className="mt-1 text-xs text-gray-500">※店舗QRコードから登録された店舗です</p>
-     </div>
 
       {/* パスワード */}
       <Input
@@ -430,6 +254,8 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
         onChange={(value) => handleInputChange("passwordConfirm", value)}
         error={errors.passwordConfirm}
       />
+
+
 
       {/* ボタン */}
       <div className="space-y-3">

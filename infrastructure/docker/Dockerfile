@@ -16,7 +16,7 @@ COPY tamanomi-schemas ./tamanomi-schemas
 
 # package.jsonのパスを修正（Dockerコンテキスト用）
 RUN if [ -f "tamanomi-schemas/package.json" ]; then \
-      sed -i 's|file:../../tamanomi-schemas|file:./tamanomi-schemas|g' package.json; \
+      sed -i 's|"@tamanomi/schemas": "workspace:\*"|"@tamanomi/schemas": "file:./tamanomi-schemas"|g' package.json; \
     fi
 
 RUN pnpm install --no-frozen-lockfile

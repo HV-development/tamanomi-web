@@ -17,10 +17,10 @@ import type { User as UserType } from "../../types/user"
 // ユーザーランク計算のヘルパー関数
 function getUserRankValue(user?: UserType): string | null {
   if (!user) return null
-  
+
   const contractDate = user.contractStartDate
   const createdDate = user.createdAt
-  
+
   if (contractDate && contractDate instanceof Date) {
     return calculateUserRank(contractDate)
   } else if (createdDate && createdDate instanceof Date) {
@@ -101,7 +101,7 @@ export function FilterControls({
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isUserMenuOpen])
-  
+
   const handleGenreToggle = (genre: string) => {
     const newGenres = selectedGenres.includes(genre)
       ? selectedGenres.filter((g) => g !== genre)
@@ -159,12 +159,10 @@ export function FilterControls({
 
   const handleNotificationItemClick = (notificationId: string) => {
     // 通知項目クリック処理は親コンポーネントに委譲
-    console.log("通知項目クリック:", notificationId)
   }
 
   const handleMarkAllNotificationsRead = () => {
     // 全て既読処理は親コンポーネントに委譲
-    console.log("すべての通知を既読にする")
   }
 
   const handleUserMenuToggle = () => {
@@ -180,7 +178,7 @@ export function FilterControls({
 
   // ユーザーのランクを計算
   const userRank = getUserRankValue(user)
-  
+
   return (
     <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
       {/* ヘッダー */}
@@ -221,11 +219,10 @@ export function FilterControls({
         </button>
         <button
           onClick={handleAreaPopupOpen}
-          className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-            selectedArea
-              ? "border-green-500 bg-green-50 text-green-700"
-              : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
-          }`}
+          className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${selectedArea
+            ? "border-green-500 bg-green-50 text-green-700"
+            : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+            }`}
         >
           <span>エリア</span>
           {selectedArea && (
@@ -236,11 +233,10 @@ export function FilterControls({
         </button>
         <button
           onClick={handleGenrePopupOpen}
-          className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-            selectedGenres.length > 0
-              ? "border-green-700 bg-green-100 text-green-800"
-              : "border-gray-300 bg-white text-gray-700 hover:border-green-400 hover:bg-green-100"
-          }`}
+          className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${selectedGenres.length > 0
+            ? "border-green-700 bg-green-100 text-green-800"
+            : "border-gray-300 bg-white text-gray-700 hover:border-green-400 hover:bg-green-100"
+            }`}
         >
           <span>ジャンル</span>
           {selectedGenres.length > 0 && (
@@ -254,8 +250,14 @@ export function FilterControls({
       {/* エリア選択ポップアップ */}
       <AreaPopup
         isOpen={isAreaPopupOpen}
-        selectedArea={selectedArea}
-        onAreaSelect={handleAreaSelect}
+        selectedAreas={[selectedArea]}
+        onAreaToggle={(area) => {
+          if (area === selectedArea) {
+            handleAreaClear()
+          } else {
+            handleAreaSelect(area)
+          }
+        }}
         onClose={handleAreaPopupClose}
         onClear={handleAreaClear}
       />
@@ -264,9 +266,7 @@ export function FilterControls({
       <GenrePopup
         isOpen={isGenrePopupOpen}
         selectedGenres={selectedGenres}
-        selectedEvents={selectedEvents}
         onGenreToggle={handleGenreToggle}
-        onEventToggle={handleEventToggle}
         onClose={handleGenrePopupClose}
         onClear={handleGenresClear}
       />

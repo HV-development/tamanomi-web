@@ -4,6 +4,8 @@ import { useState } from "react"
 import { HeaderLogo } from "../atoms/header-logo"
 import { LoginForm } from "../molecules/login-form"
 import { OtpInputForm } from "../molecules/otp-input-form"
+import { otpRequestSchema } from "@tamanomi/schemas"
+
 
 interface LoginContainerProps {
   onLogin: (email: string, otp: string) => void
@@ -27,7 +29,7 @@ export function LoginContainer({
   isLoading,
   loginStep = "email",
   email = "",
-  onResendOtp = () => {},
+  onResendOtp = () => { },
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: LoginContainerProps) {
   const handleBackToEmail = () => {
@@ -38,10 +40,10 @@ export function LoginContainer({
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
-      <HeaderLogo 
-        onLogoClick={onLogoClick} 
-        showBackButton={true} 
-        onBackClick={loginStep === "email" ? onBack : handleBackToEmail} 
+      <HeaderLogo
+        onLogoClick={onLogoClick}
+        showBackButton={true}
+        onBackClick={loginStep === "email" ? onBack : handleBackToEmail}
       />
 
       {/* メインコンテンツ */}

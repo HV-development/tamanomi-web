@@ -5,6 +5,8 @@ import type React from "react"
 import { useState } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
+import { otpRequestSchema } from '@/schemas/auth'
+import { z } from "zod"
 
 interface LoginFormProps {
   onLogin: (email: string, otp: string) => void
@@ -17,38 +19,59 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
   const [email, setEmail] = useState("")
   const [errors, setErrors] = useState<{ email?: string }>({})
 
-  const validateForm = () => {
-    const newErrors: { email?: string } = {}
+  // Zodスキーマを使った統一バリデーション関数
+  const validateField = (fieldName: string, value: string) => {
+    try {
+      otpRequestSchema.pick({ [fieldName]: true } as any).parse({ [fieldName]: value })
 
-    // メールアドレス - 必須チェック
-    if (!email) {
-      newErrors.email = "メールアドレスを入力してください。"
-    // メールアドレス - メールフォーマットチェック
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "正しいメールアドレスを入力してください。"
+      // エラーをクリア
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName as keyof typeof newErrors]
+        return newErrors
+      })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors[0]?.message || "入力エラーです"
+        setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
+      }
     }
+  }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+  const validateForm = () => {
+    try {
+      otpRequestSchema.parse({ email })
+      setErrors({})
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: { email?: string } = {}
+        error.errors.forEach(err => {
+          const fieldName = err.path[0] as string
+          if (fieldName === 'email') {
+            newErrors.email = err.message
+          }
+        })
+        setErrors(newErrors)
+      }
+      return false
+    }
   }
 
   // リアルタイムバリデーション（input時）
-  const validateField = (field: 'email', value: string) => {
-    const newErrors = { ...errors }
-    
-    if (field === 'email') {
-      // メールアドレス - 必須チェック
-      if (!value) {
-        newErrors.email = "メールアドレスを入力してください。"
-      // メールアドレス - メールフォーマットチェック
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        newErrors.email = "正しいメールアドレスを入力してください。"
-      } else {
+  const handleEmailChange = (value: string) => {
+    setEmail(value)
+    // 空文字の場合はバリデーションをスキップ（必須チェックは送信時のみ）
+    if (value.trim()) {
+      validateField('email', value)
+    } else {
+      // エラーをクリア
+      setErrors(prev => {
+        const newErrors = { ...prev }
         delete newErrors.email
-      }
+        return newErrors
+      })
     }
-    
-    setErrors(newErrors)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -71,10 +94,7 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
         label="メールアドレス"
         placeholder="example@email.com"
         value={email}
-        onChange={(value) => {
-          setEmail(value)
-          validateField('email', value)
-        }}
+        onChange={handleEmailChange}
         error={errors.email}
       />
 

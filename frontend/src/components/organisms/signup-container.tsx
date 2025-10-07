@@ -2,22 +2,12 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { SignupForm } from "../molecules/signup-form"
-
-interface SignupFormData {
-  nickname: string
-  password: string
-  passwordConfirm: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  saitamaAppId: string
-}
+import { type UserRegistrationComplete } from "@tamanomi/schemas"
 
 interface SignupContainerProps {
-  initialData?: Partial<SignupFormData>
+  initialData?: Partial<UserRegistrationComplete>
   email?: string
-  onSubmit: (data: SignupFormData) => void
+  onSubmit: (data: UserRegistrationComplete) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean

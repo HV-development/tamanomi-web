@@ -14,6 +14,14 @@ interface EmailRegistrationContainerProps {
   onLogoClick: () => void
   isLoading?: boolean
   backgroundColorClass?: string
+  errorMessage?: string
+  //テスト用
+  debugInfo?: {
+    registrationId?: string
+    verificationUrl?: string
+    otp?: string
+    requestId?: string
+  }
 }
 
 export function EmailRegistrationContainer({
@@ -26,14 +34,17 @@ export function EmailRegistrationContainer({
   onLogoClick,
   isLoading,
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
+  errorMessage,
+  //テスト用
+  debugInfo
 }: EmailRegistrationContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
-      <HeaderLogo 
-        onLogoClick={onLogoClick} 
-        showBackButton={true} 
-        onBackClick={currentStep === "form" ? onBack : onBackToLogin} 
+      <HeaderLogo
+        onLogoClick={onLogoClick}
+        showBackButton={true}
+        onBackClick={currentStep === "form" ? onBack : onBackToLogin}
       />
 
       {/* メインコンテンツ */}
@@ -41,17 +52,20 @@ export function EmailRegistrationContainer({
         <div className="w-full max-w-md">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             {currentStep === "form" ? (
-              <EmailRegistrationForm 
+              <EmailRegistrationForm
                 initialEmail={email}
-                onSubmit={onSubmit} 
-                onBack={onBack} 
-                isLoading={isLoading} 
+                onSubmit={onSubmit}
+                onBack={onBack}
+                isLoading={isLoading}
+                errorMessage={errorMessage}
               />
             ) : (
-              <EmailRegistrationComplete 
+              <EmailRegistrationComplete
                 email={email}
                 onBackToLogin={onBackToLogin}
                 onResend={onResend}
+                //テスト用
+                debugInfo={debugInfo}
               />
             )}
           </div>

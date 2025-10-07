@@ -1,24 +1,12 @@
 "use client"
 
-"use client"
-
 import { SignupContainer } from "../organisms/signup-container"
-
-interface SignupFormData {
-  nickname: string
-  password: string
-  passwordConfirm: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  saitamaAppId: string
-}
+import { type UserRegistrationComplete } from "@tamanomi/schemas"
 
 interface SignupLayoutProps {
-  initialData?: Partial<SignupFormData>
+  initialData?: Partial<UserRegistrationComplete>
   email?: string
-  onSubmit: (data: SignupFormData) => void
+  onSubmit: (data: UserRegistrationComplete) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean
@@ -32,7 +20,7 @@ export function SignupLayout({ initialData, email, onSubmit, onCancel, onLogoCli
     return "bg-gradient-to-br from-green-50 to-green-100"
   }
 
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
 
   return (
     <SignupContainer

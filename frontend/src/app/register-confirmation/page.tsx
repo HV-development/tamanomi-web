@@ -19,16 +19,16 @@ export default function RegisterConfirmationPage() {
       const urlParams = new URLSearchParams(window.location.search)
       const emailParam = urlParams.get('email') || ''
       const tokenParam = urlParams.get('token') || ''
-      
+
       // フォームデータを取得（通常はlocalStorageやsessionStorageから）
       const storedData = sessionStorage.getItem('registerFormData')
-      
+
       if (!storedData || !tokenParam) {
         // データがない場合は登録画面にリダイレクト
         router.push('/email-registration')
         return
       }
-      
+
       try {
         const parsedData = JSON.parse(storedData)
         setFormData(parsedData)
@@ -43,18 +43,46 @@ export default function RegisterConfirmationPage() {
 
   const handleRegister = async () => {
     if (!formData || !token) return
-    
+
     setIsLoading(true)
-    
-    // 仮登録処理（バックエンド連携なし）
-    setTimeout(() => {
-      // 登録成功後はセッションストレージをクリアし、プラン登録画面に遷移
-      sessionStorage.removeItem('registerFormData')
-      
-      // プラン登録画面に遷移
-      router.push('/plan-registration?email=' + encodeURIComponent(email))
+
+    try {
+
+      // バックエンドAPIに登録リクエストを送信
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: formData.password,
+          displayName: formData.displayName,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          token: token,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        // 登録成功後はセッションストレージをクリア
+        sessionStorage.removeItem('registerFormData')
+
+        // プラン登録画面に遷移
+        router.push('/plan-registration?email=' + encodeURIComponent(email))
+      } else {
+        // エラーハンドリング
+        const errorMessage = result.message || '登録に失敗しました'
+        alert(errorMessage)
+      }
+    } catch (error) {
+      alert('ネットワークエラーが発生しました。再度お試しください。')
+    } finally {
       setIsLoading(false)
-    }, 1500)
+    }
   }
 
   const handleEdit = () => {

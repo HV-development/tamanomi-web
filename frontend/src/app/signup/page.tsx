@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { SignupLayout } from '@/components/templates/signup-layout'
+import { type UserRegistrationComplete } from '@tamanomi/schemas'
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -17,14 +18,13 @@ export default function SignupPage() {
       const urlParams = new URLSearchParams(window.location.search)
       const email = urlParams.get('email') || undefined
       const token = urlParams.get('token') || undefined
-      
+
       // トークンが存在しない場合はメール登録画面にリダイレクト
       if (!token || token.trim() === '') {
-        console.log('❌ Token is missing or empty, redirecting to email registration')
         router.push('/email-registration')
         return
       }
-      
+
       setSearchParams({
         email,
         token,
@@ -32,21 +32,10 @@ export default function SignupPage() {
     }
   }, [router])
 
-  const handleSignupSubmit = async (data: {
-    email: string;
-    password: string;
-    confirmPassword: string;
-    name: string;
-    nameKana: string;
-    phone: string;
-    postalCode: string;
-    prefecture: string;
-    city: string;
-    address1: string;
-    address2: string;
-  }) => {
+  const handleSignupSubmit = async (data: UserRegistrationComplete) => {
     setIsLoading(true)
     try {
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
@@ -54,11 +43,13 @@ export default function SignupPage() {
         },
         body: JSON.stringify({
           ...data,
+          email: searchParams.email,
           token: searchParams.token || '',
         }),
       })
 
       const result = await response.json()
+
       if (result.success) {
         // 登録完了後は確認画面に遷移
         router.push('/?view=confirmation')
@@ -89,7 +80,7 @@ export default function SignupPage() {
 
   return (
     <SignupLayout
-      initialData={{ email: searchParams.email }}
+      initialData={{}}
       email={searchParams.email}
       onSubmit={handleSignupSubmit}
       onCancel={handleCancel}

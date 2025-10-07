@@ -16,7 +16,7 @@ export function UsageGuidePage({ onBack, onLogoClick, currentUserRank }: UsageGu
     return "bg-gradient-to-br from-green-50 to-green-100"
   }
 
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
 
   const usageSteps = [
     {
@@ -73,7 +73,7 @@ export function UsageGuidePage({ onBack, onLogoClick, currentUserRank }: UsageGu
             {/* 使用手順 */}
             <div className="space-y-6 mb-8">
               {usageSteps.map((step, index) => (
-                <div 
+                <div
                   key={step.step}
                   className="bg-gray-50 rounded-2xl border border-gray-200 p-6 animate-in slide-in-from-left-4 duration-300"
                   style={{ animationDelay: `${index * 100}ms` }}

@@ -1,15 +1,41 @@
 "use client"
 
-import { Mail, CheckCircle, AlertTriangle, RefreshCw, ArrowLeft } from "lucide-react"
+import { Mail, CheckCircle, AlertTriangle, RefreshCw, ArrowLeft, Copy, ExternalLink } from "lucide-react"
 import { Button } from "../atoms/button"
+import { useState } from "react"
 
 interface EmailRegistrationCompleteProps {
   email: string
   onBackToLogin: () => void
   onResend: () => void
+  //テスト用
+  debugInfo?: {
+    registrationId?: string
+    verificationUrl?: string
+    otp?: string
+    requestId?: string
+  }
 }
 
-export function EmailRegistrationComplete({ email, onBackToLogin, onResend }: EmailRegistrationCompleteProps) {
+export function EmailRegistrationComplete({ email, onBackToLogin, onResend, debugInfo }: EmailRegistrationCompleteProps) {
+  const [copiedItem, setCopiedItem] = useState<string | null>(null)
+  const isDevelopment = process.env.NODE_ENV === 'development'
+
+  const copyToClipboard = async (text: string, item: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedItem(item)
+      setTimeout(() => setCopiedItem(null), 2000)
+    } catch (err) {
+    }
+  }
+
+  const openVerificationUrl = () => {
+    if (debugInfo?.verificationUrl) {
+      window.location.href = debugInfo.verificationUrl
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* 送信完了メッセージ */}
@@ -27,6 +53,117 @@ export function EmailRegistrationComplete({ email, onBackToLogin, onResend }: Em
           <p className="text-green-900 font-bold">{email}</p>
         </div>
       </div>
+      {/* テスト用 */}
+      {/* 開発環境用デバッグ情報 */}
+      {isDevelopment && debugInfo && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-6">
+          <h3 className="text-yellow-900 font-bold mb-3 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" />
+            開発環境 - テスト用情報
+          </h3>
+
+          {/* 確認URL */}
+          {debugInfo.verificationUrl && (
+            <div className="mb-4">
+              <p className="text-sm text-yellow-800 font-medium mb-2">🔗 新規登録画面へのリンク</p>
+              <div className="bg-white border border-yellow-300 rounded-lg p-3 flex items-center gap-2">
+                <button
+                  onClick={openVerificationUrl}
+                  className="flex-1 text-left text-sm text-blue-600 hover:text-blue-800 underline truncate"
+                >
+                  {debugInfo.verificationUrl}
+                </button>
+                <button
+                  onClick={() => copyToClipboard(debugInfo.verificationUrl!, 'url')}
+                  className="p-1 hover:bg-yellow-100 rounded"
+                  title="URLをコピー"
+                >
+                  <Copy className="w-4 h-4 text-yellow-600" />
+                </button>
+                <button
+                  onClick={openVerificationUrl}
+                  className="p-1 hover:bg-yellow-100 rounded"
+                  title="新規登録画面に遷移"
+                >
+                  <ExternalLink className="w-4 h-4 text-yellow-600" />
+                </button>
+              </div>
+              {copiedItem === 'url' && (
+                <p className="text-xs text-green-600 mt-1">✅ URLをコピーしました</p>
+              )}
+            </div>
+          )}
+
+          {/* 登録ID */}
+          {debugInfo.registrationId && (
+            <div className="mb-4">
+              <p className="text-sm text-yellow-800 font-medium mb-2">🔑 登録ID</p>
+              <div className="bg-white border border-yellow-300 rounded-lg p-3 flex items-center gap-2">
+                <code className="flex-1 text-sm text-gray-800 font-mono">{debugInfo.registrationId}</code>
+                <button
+                  onClick={() => copyToClipboard(debugInfo.registrationId!, 'registrationId')}
+                  className="p-1 hover:bg-yellow-100 rounded"
+                  title="登録IDをコピー"
+                >
+                  <Copy className="w-4 h-4 text-yellow-600" />
+                </button>
+              </div>
+              {copiedItem === 'registrationId' && (
+                <p className="text-xs text-green-600 mt-1">✅ 登録IDをコピーしました</p>
+              )}
+            </div>
+          )}
+
+          {/* OTP */}
+          {debugInfo.otp && (
+            <div className="mb-4">
+              <p className="text-sm text-yellow-800 font-medium mb-2">🔢 テスト用OTP</p>
+              <div className="bg-white border border-yellow-300 rounded-lg p-3 flex items-center gap-2">
+                <code className="flex-1 text-lg text-gray-800 font-mono font-bold">{debugInfo.otp}</code>
+                <button
+                  onClick={() => copyToClipboard(debugInfo.otp!, 'otp')}
+                  className="p-1 hover:bg-yellow-100 rounded"
+                  title="OTPをコピー"
+                >
+                  <Copy className="w-4 h-4 text-yellow-600" />
+                </button>
+              </div>
+              {copiedItem === 'otp' && (
+                <p className="text-xs text-green-600 mt-1">✅ OTPをコピーしました</p>
+              )}
+            </div>
+          )}
+
+          {/* リクエストID */}
+          {debugInfo.requestId && (
+            <div className="mb-4">
+              <p className="text-sm text-yellow-800 font-medium mb-2">🆔 リクエストID</p>
+              <div className="bg-white border border-yellow-300 rounded-lg p-3 flex items-center gap-2">
+                <code className="flex-1 text-sm text-gray-800 font-mono">{debugInfo.requestId}</code>
+                <button
+                  onClick={() => copyToClipboard(debugInfo.requestId!, 'requestId')}
+                  className="p-1 hover:bg-yellow-100 rounded"
+                  title="リクエストIDをコピー"
+                >
+                  <Copy className="w-4 h-4 text-yellow-600" />
+                </button>
+              </div>
+              {copiedItem === 'requestId' && (
+                <p className="text-xs text-green-600 mt-1">✅ リクエストIDをコピーしました</p>
+              )}
+            </div>
+          )}
+
+          <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3">
+            <p className="text-xs text-yellow-800">
+              💡 <strong>テスト手順:</strong><br />
+              1. 上記の「新規登録画面へのリンク」をクリックして新規登録画面に遷移<br />
+              2. OTP認証が必要な場合は上記のOTPを使用<br />
+              3. 登録IDは上記の値をコピーして使用
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 手順説明 */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
@@ -55,8 +192,6 @@ export function EmailRegistrationComplete({ email, onBackToLogin, onResend }: Em
           </li>
         </ol>
       </div>
-
-
 
       {/* ボタン */}
       <div className="space-y-3">

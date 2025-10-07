@@ -31,265 +31,138 @@ import { HamburgerMenu } from "../molecules/hamburger-menu"
 import { Logo } from "../atoms/logo"
 import { UsageGuideModal } from "../molecules/usage-guide-modal"
 import { useState } from "react"
+import { useAppContext } from "../../contexts/AppContext"
 import type { Store } from "../../types/store"
 import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
 import type { Notification } from "../../types/notification"
 import type { Coupon } from "../../types/coupon"
 
-interface HomeLayoutProps {
-  selectedGenres: string[]
-  selectedEvents: string[]
-  selectedAreas: string[]
-   isNearbyFilter: boolean
-  isFavoritesFilter: boolean
-  stores: Store[]
-  activeTab: string
-  currentView:
-    | "home"
-    | "email-confirmation"
-    | "login"
-    | "email-registration"
-    | "signup"
-    | "confirmation"
-    | "subscription"
-    | "mypage"
-    | "password-reset"
-    | "store-detail"
-    | "coupon-confirmation"
-    | "usage-guide"
-  isAuthenticated: boolean
-  isLoading?: boolean
-  signupData?: any
-  hasNotification?: boolean
-  favoriteStores: Store[]
-  historyStores: Store[]
-  isHistoryOpen: boolean
-  isFavoritesOpen: boolean
-  notifications: Notification[]
-  user?: User
-  plan?: Plan
-  usageHistory?: UsageHistory[]
-  paymentHistory?: PaymentHistory[]
-  myPageView?:
-    | "main"
-    | "profile-edit"
-    | "email-change"
-    | "password-change"
-    | "usage-history"
-    | "payment-history"
-    | "plan-management"
-    | "plan-change"
-    | "withdrawal"
-    | "withdrawal-complete"
-  isCouponListOpen: boolean
-  selectedStore: Store | null
-  selectedCoupon: Coupon | null
-  storeCoupons: Coupon[]
-  passwordResetStep: "form" | "complete"
-  passwordResetEmail: string
-  emailRegistrationStep?: "form" | "complete"
-  emailRegistrationEmail?: string
-  emailConfirmationEmail?: string
-  onGenresChange: (genres: string[]) => void
-  onEventsChange: (events: string[]) => void
-  onAreasChange: (areas: string[]) => void
-  onCurrentLocationClick: () => void
-  onTabChange: (tab: string) => void
-  onFavoritesClick: () => void
-  onFavoritesClose: () => void
-  onHistoryClick?: () => void
-  onHistoryClose?: () => void
-  onFavoriteToggle: (storeId: string) => void
-  onCouponsClick: (storeId: string) => void
-  onMyPageViewChange?: (view: string) => void
-  onEditProfile?: () => void
-  onChangeEmail?: () => void
-  onChangePassword?: () => void
-  onViewPlan?: () => void
-  onChangePlan?: () => void
-  onPlanChangeSubmit?: (planId: string) => void
-  onViewUsageHistory?: () => void
-  onViewPaymentHistory?: () => void
-  onCancelSubscription?: () => void
-  onWithdraw?: () => void
-  onWithdrawConfirm?: () => void
-  onWithdrawCancel?: () => void
-  onWithdrawComplete?: () => void
-  onLogout?: () => void
-  onLogin: (email: string, otp: string) => void
-  onSignup: () => void
-  onForgotPassword: () => void
-  onBackToHome: () => void
-  onBackToLogin: () => void
-  onEmailSubmit: (email: string, campaignCode?: string) => void
-  onEmailRegistrationBackToLogin: () => void
-  onEmailRegistrationResend: () => void
-  onSignupSubmit: (data: any) => void
-  onSignupCancel: () => void
-  onConfirmRegister: () => void
-  onConfirmEdit: () => void
-  onSubscribe: (planId: string) => void
-  onPasswordResetSubmit: (email: string) => void
-  onPasswordResetCancel: () => void
-  onPasswordResetResend: () => void
-  onNotificationClick: () => void
-  onNotificationItemClick: (notificationId: string) => void
-  onMarkAllNotificationsRead: () => void
-  onMenuItemClick: (itemId: string) => void
-  onPlanChangeBack?: () => void
-  onLogoClick: () => void
-  loginStep?: "email" | "otp"
-  loginEmail?: string
-  onResendOtp?: () => void
-  onBackToEmailLogin?: () => void
-  onCouponListClose: () => void
-  onCouponListBack: () => void
-  onUseCoupon: (couponId: string) => void
-  onUseSameCoupon?: (couponId: string) => void
-  onConfirmCoupon: () => void
-  onCancelCoupon: () => void
-  onUsageGuideClick: () => void
-  onUsageGuideBack: () => void
-  isSuccessModalOpen: boolean
-  onSuccessModalClose?: () => void
-  isLoginRequiredModalOpen?: boolean
-  onLoginRequiredModalClose?: () => void
-  onLoginRequiredModalLogin?: () => void
-  onStoreClick: (store: Store) => void
-  onProfileEditSubmit?: (data: any) => void
-  onEmailChangeSubmit?: (currentPassword: string, newEmail: string) => void
-  onPasswordChangeSubmit?: (currentPassword: string, newPassword: string) => void
-  onBackToLogin?: () => void
-  onEmailChangeResend?: () => void
-  emailChangeStep?: "form" | "complete"
-  passwordChangeStep?: "form" | "complete"
-  newEmail?: string
-  onStoreDetailClose?: () => void
-  isStoreDetailOpen?: boolean
-  isStoreDetailPopupOpen?: boolean
-  currentUserRank?: string | null
-}
 
-export function HomeLayout({
-  selectedGenres,
-  selectedEvents,
-  selectedAreas,
-   isNearbyFilter,
-  isFavoritesFilter,
-  stores,
-  activeTab,
-  currentView,
-  isAuthenticated,
-  isLoading,
-  signupData,
-  hasNotification = false,
-  favoriteStores,
-  historyStores,
-  isHistoryOpen,
-  isFavoritesOpen,
-  notifications,
-  user,
-  plan,
-  usageHistory = [],
-  paymentHistory = [],
-  myPageView = "main",
-  isCouponListOpen,
-  selectedStore,
-  selectedCoupon,
-  storeCoupons,
-  passwordResetStep,
-  passwordResetEmail,
-  emailRegistrationStep,
-  emailRegistrationEmail,
-  emailConfirmationEmail = "",
-  onGenresChange,
-  onEventsChange,
-  onAreasChange,
-  onCurrentLocationClick,
-  onTabChange,
-  onFavoritesClick,
-  onFavoritesClose,
-  onHistoryClick,
-  onHistoryClose,
-  onFavoriteToggle,
-  onCouponsClick,
-  onMyPageViewChange = () => {},
-  onEditProfile = () => {},
-  onChangeEmail = () => {},
-  onChangePassword = () => {},
-  onViewPlan = () => {},
-  onChangePlan = () => {},
-  onPlanChangeSubmit = () => {},
-  onViewUsageHistory = () => {},
-  onViewPaymentHistory = () => {},
-  onCancelSubscription = () => {},
-  onWithdraw = () => {},
-  onWithdrawConfirm = () => {},
-  onWithdrawCancel = () => {},
-  onWithdrawComplete = () => {},
-  onLogout = () => {},
-  onLogin,
-  onSignup,
-  onForgotPassword,
-  onBackToHome,
-  onBackToLogin,
-  onEmailSubmit,
-  onEmailRegistrationBackToLogin,
-  onEmailRegistrationResend,
-  onSignupSubmit,
-  onSignupCancel,
-  onConfirmRegister,
-  onConfirmEdit,
-  onSubscribe,
-  onPasswordResetSubmit,
-  onPasswordResetCancel,
-  onPasswordResetResend,
-  onNotificationClick,
-  onNotificationItemClick,
-  onMarkAllNotificationsRead,
-  onMenuItemClick,
-  onPlanChangeBack = () => {},
-  onLogoClick,
-  onStoreClick,
-  loginStep = "email",
-  loginEmail = "",
-  onResendOtp = () => {},
-  onBackToEmailLogin = () => {},
-  onCouponListClose,
-  onCouponListBack,
-  onUseCoupon,
-  onUseSameCoupon = () => {},
-  onConfirmCoupon,
-  onCancelCoupon = () => {},
-  onUsageGuideClick,
-  onUsageGuideBack,
-  isSuccessModalOpen,
-  onSuccessModalClose,
-  isLoginRequiredModalOpen = false,
-  onLoginRequiredModalClose = () => {},
-  onLoginRequiredModalLogin = () => {},
-  onProfileEditSubmit = () => {},
-  onEmailChangeSubmit = () => {},
-  onPasswordChangeSubmit = () => {},
-  onEmailChangeResend = () => {},
-  emailChangeStep = "form",
-  passwordChangeStep = "form",
-  newEmail = "",
-  onStoreDetailClose,
-  isStoreDetailOpen,
-  isStoreDetailPopupOpen,
-  currentUserRank,
-}: HomeLayoutProps) {
+export function HomeLayout() {
+  // Context から必要な値を取得
+  const { state, handlers, auth, navigation, filters, computedValues } = useAppContext()
+
+  // 必要な値をローカル変数として定義
+  const selectedGenres = filters.selectedGenres
+  const selectedEvents = filters.selectedEvents
+  const selectedAreas = filters.selectedAreas
+  const isNearbyFilter = filters.isNearbyFilter
+  const isFavoritesFilter = filters.isFavoritesFilter
+  const stores = state.stores
+  const activeTab = navigation.activeTab
+  const currentView = navigation.currentView
+  const isAuthenticated = auth.isAuthenticated
+  const isLoading = auth.isLoading
+  const signupData = state.signupData
+  const hasNotification = computedValues.hasNotification
+  const favoriteStores = computedValues.favoriteStores
+  const historyStores: Store[] = [] // TODO: 履歴データの実装
+  const isHistoryOpen = state.isHistoryOpen
+  const isFavoritesOpen = state.isFavoritesOpen
+  const notifications = state.notifications
+  const user = auth.user
+  const plan = auth.plan
+  const usageHistory = auth.usageHistory || []
+  const paymentHistory = auth.paymentHistory || []
+  const myPageView = navigation.myPageView
+  const isCouponListOpen = state.isCouponListOpen
+  const selectedStore = state.selectedStore
+  const selectedCoupon = state.selectedCoupon
+  const storeCoupons = state.storeCoupons || []
+  const passwordResetStep = state.passwordResetStep
+  const passwordResetEmail = state.passwordResetEmail
+  const emailRegistrationStep = state.emailRegistrationStep
+  const emailRegistrationEmail = state.emailRegistrationEmail
+  const emailConfirmationEmail = state.emailConfirmationEmail || ""
+
+  // イベントハンドラーを Context から取得
+  const onGenresChange = filters.setSelectedGenres
+  const onEventsChange = filters.setSelectedEvents
+  const onAreasChange = filters.setSelectedAreas
+  const onCurrentLocationClick = handlers.handleCurrentLocationClick
+  const onTabChange = handlers.handleTabChange
+  const onFavoritesClick = handlers.handleFavoritesClick
+  const onFavoritesClose = handlers.handleFavoritesClose
+  const onHistoryClick = handlers.handleHistoryClick
+  const onHistoryClose = handlers.handleHistoryClose
+  const onFavoriteToggle = handlers.handleFavoriteToggle
+  const onCouponsClick = handlers.handleCouponsClick
+  const onMyPageViewChange = navigation.navigateToMyPage
+  const onEditProfile = handlers.handleEditProfile
+  const onChangeEmail = handlers.handleChangeEmail
+  const onChangePassword = handlers.handleChangePassword
+  const onViewPlan = handlers.handleViewPlan
+  const onChangePlan = handlers.handleChangePlan
+  const onPlanChangeSubmit = handlers.handlePlanChangeSubmit
+  const onViewUsageHistory = handlers.handleViewUsageHistory
+  const onViewPaymentHistory = handlers.handleViewPaymentHistory
+  const onCancelSubscription = handlers.handleCancelSubscription
+  const onWithdraw = handlers.handleWithdraw
+  const onWithdrawConfirm = handlers.handleWithdrawConfirm
+  const onWithdrawCancel = handlers.handleWithdrawCancel
+  const onWithdrawComplete = handlers.handleWithdrawComplete
+  const onLogout = handlers.handleLogout
+  const onLogin = handlers.handleLogin
+  const onSignup = handlers.handleSignup
+  const onForgotPassword = handlers.handleForgotPassword
+  const onBackToHome = handlers.handleBackToHome
+  const onBackToLogin = handlers.handleBackToLogin
+  const onEmailSubmit = handlers.handleEmailSubmit
+  const onEmailRegistrationBackToLogin = handlers.handleEmailRegistrationBackToLogin
+  const onEmailRegistrationResend = handlers.handleEmailRegistrationResend
+  const onSignupSubmit = handlers.handleSignupSubmit
+  const onSignupCancel = handlers.handleSignupCancel
+  const onConfirmRegister = handlers.handleConfirmRegister
+  const onConfirmEdit = handlers.handleConfirmEdit
+  const onSubscribe = handlers.handleSubscribe
+  const onPasswordResetSubmit = handlers.handlePasswordResetSubmit
+  const onPasswordResetCancel = handlers.handlePasswordResetCancel
+  const onPasswordResetResend = handlers.handlePasswordResetResend
+  const onNotificationClick = handlers.handleNotificationClick
+  const onNotificationItemClick = handlers.handleNotificationItemClick
+  const onMarkAllNotificationsRead = handlers.handleMarkAllNotificationsRead
+  const onMenuItemClick = handlers.handleMenuItemClick
+  const onPlanChangeBack = handlers.handlePlanChangeBack
+  const onLogoClick = handlers.handleLogoClick
+  const onStoreClick = handlers.handleStoreClick
+  const loginStep = state.loginStep
+  const loginEmail = state.loginEmail
+  const onResendOtp = handlers.handleResendOtp
+  const onBackToEmailLogin = handlers.handleBackToEmailLogin
+  const onCouponListClose = handlers.handleCouponListClose
+  const onCouponListBack = handlers.handleCouponListBack
+  const onUseCoupon = handlers.handleUseCoupon
+  const onUseSameCoupon = handlers.handleUseSameCoupon
+  const onConfirmCoupon = handlers.handleConfirmCoupon
+  const onCancelCoupon = handlers.handleCancelCoupon
+  const onUsageGuideClick = handlers.handleUsageGuideClick
+  const onUsageGuideBack = handlers.handleUsageGuideBack
+  const isSuccessModalOpen = state.isSuccessModalOpen
+  const onSuccessModalClose = handlers.handleSuccessModalClose
+  const isLoginRequiredModalOpen = state.isLoginRequiredModalOpen
+  const onLoginRequiredModalClose = handlers.handleLoginRequiredModalClose
+  const onLoginRequiredModalLogin = handlers.handleLoginRequiredModalLogin
+  const onProfileEditSubmit = handlers.handleProfileEditSubmit
+  const onEmailChangeSubmit = handlers.handleEmailChangeSubmit
+  const onPasswordChangeSubmit = handlers.handlePasswordChangeSubmit
+  const onEmailChangeResend = handlers.handleEmailChangeResend
+  const emailChangeStep = state.emailChangeStep
+  const passwordChangeStep = state.passwordChangeStep
+  const newEmail = state.newEmail
+  const onStoreDetailClose = handlers.handleStoreDetailPopupClose
+  const isStoreDetailOpen = false // TODO: 実装
+  const isStoreDetailPopupOpen = state.isStoreDetailPopupOpen
+  const currentUserRank = computedValues.currentUserRank
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
- const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
+  const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
 
   // ランクに基づく背景色を取得
   const getBackgroundColorByRank = (rank: string | null, isAuth: boolean) => {
     if (!isAuth || !rank) {
       return "bg-gradient-to-br from-green-50 to-green-100" // 非会員・ブロンズ
     }
-    
+
     switch (rank) {
       case "bronze":
         return "bg-gradient-to-br from-green-50 to-green-100"
@@ -304,7 +177,7 @@ export function HomeLayout({
     }
   }
 
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank, isAuthenticated)
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null, isAuthenticated)
   if (currentView === "coupon-confirmation") {
     return (
       <CouponConfirmationPage
@@ -312,7 +185,6 @@ export function HomeLayout({
         onConfirm={onConfirmCoupon}
         onCancel={onCancelCoupon}
         onUsageGuideClick={onUsageGuideClick}
-        onLogoClick={onLogoClick}
       />
     )
   }
@@ -401,10 +273,9 @@ export function HomeLayout({
         onShowStoreOnHome={onBackToHome}
         onUseSameCoupon={onUseSameCoupon}
         onLogoClick={onLogoClick}
-        onProfileEditSubmit={onProfileEditSubmit || (() => {})}
+        onProfileEditSubmit={onProfileEditSubmit || (() => { })}
         onEmailChangeSubmit={onEmailChangeSubmit}
         onPasswordChangeSubmit={onPasswordChangeSubmit}
-        onBackToLogin={onBackToLogin}
         onEmailChangeResend={onEmailChangeResend}
         emailChangeStep={emailChangeStep}
         passwordChangeStep={passwordChangeStep}
@@ -450,7 +321,7 @@ export function HomeLayout({
   if (currentView === "email-registration") {
     return (
       <EmailRegistrationLayout
-        currentStep={emailRegistrationStep}
+        currentStep={emailRegistrationStep ?? "form"}
         email={emailRegistrationEmail}
         onSubmit={onEmailSubmit}
         onBack={onBackToHome}
@@ -506,20 +377,19 @@ export function HomeLayout({
           </div>
         </div>
       </div>
-    
+
       {/* バナーカルーセル */}
       <BannerCarousel />
-    
+
       {/* フィルターボタン */}
       <div className="bg-white border-b border-gray-100">
         <div className="grid grid-cols-3 gap-1 px-2 py-4">
           <button
             onClick={onCurrentLocationClick}
-            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-              isNearbyFilter
-                ? "border-green-500 bg-green-50 text-green-700"
-                : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
-            }`}
+            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${isNearbyFilter
+              ? "border-green-500 bg-green-50 text-green-700"
+              : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+              }`}
           >
             {isNearbyFilter && (
               <span className="text-green-600 text-xs">✓</span>
@@ -528,31 +398,29 @@ export function HomeLayout({
           </button>
           <button
             onClick={() => setIsAreaPopupOpen(true)}
-            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-              selectedAreas.length > 0
-                ? "border-green-500 bg-green-50 text-green-700"
-                : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
-            }`}
+            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${(selectedAreas?.length ?? 0) > 0
+              ? "border-green-500 bg-green-50 text-green-700"
+              : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+              }`}
           >
             <span>エリア</span>
-            {selectedAreas.length > 0 && (
+            {(selectedAreas?.length ?? 0) > 0 && (
               <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
-                {selectedAreas.length}
+                {selectedAreas?.length ?? 0}
               </span>
             )}
           </button>
           <button
             onClick={() => setIsGenrePopupOpen(true)}
-            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-              selectedGenres.length > 0
-                ? "border-green-700 bg-green-100 text-green-800"
-                : "border-gray-300 bg-white text-gray-700 hover:border-green-400 hover:bg-green-100"
-            }`}
+            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${(selectedGenres?.length ?? 0) > 0
+              ? "border-green-700 bg-green-100 text-green-800"
+              : "border-gray-300 bg-white text-gray-700 hover:border-green-400 hover:bg-green-100"
+              }`}
           >
             <span>ジャンル</span>
-            {selectedGenres.length > 0 && (
+            {(selectedGenres?.length ?? 0) > 0 && (
               <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
-                {selectedGenres.length}
+                {selectedGenres?.length ?? 0}
               </span>
             )}
           </button>
@@ -562,11 +430,12 @@ export function HomeLayout({
       {/* エリア選択ポップアップ */}
       <AreaPopup
         isOpen={isAreaPopupOpen}
-        selectedAreas={selectedAreas}
+        selectedAreas={selectedAreas ?? []}
         onAreaToggle={(area) => {
-          const newAreas = selectedAreas.includes(area)
-            ? selectedAreas.filter((a) => a !== area)
-            : [...selectedAreas, area]
+          const currentAreas = selectedAreas ?? []
+          const newAreas = currentAreas.includes(area)
+            ? currentAreas.filter((a: string) => a !== area)
+            : [...currentAreas, area]
           onAreasChange(newAreas)
         }}
         onClose={() => setIsAreaPopupOpen(false)}
@@ -576,11 +445,12 @@ export function HomeLayout({
       {/* ジャンル選択ポップアップ */}
       <GenrePopup
         isOpen={isGenrePopupOpen}
-        selectedGenres={selectedGenres}
+        selectedGenres={selectedGenres ?? []}
         onGenreToggle={(genre) => {
-          const newGenres = selectedGenres.includes(genre)
-            ? selectedGenres.filter((g) => g !== genre)
-            : [...selectedGenres, genre]
+          const currentGenres = selectedGenres ?? []
+          const newGenres = currentGenres.includes(genre)
+            ? currentGenres.filter((g) => g !== genre)
+            : [...currentGenres, genre]
           onGenresChange(newGenres)
         }}
         onClose={() => setIsGenrePopupOpen(false)}
@@ -592,16 +462,16 @@ export function HomeLayout({
 
       <div className="flex-1 overflow-hidden">
         <HomeContainer
-        selectedGenres={selectedGenres}
-        selectedEvents={selectedEvents}
-         isNearbyFilter={isNearbyFilter}
-        isFavoritesFilter={isFavoritesFilter}
-        stores={stores}
-        onStoreClick={onStoreClick}
-        onFavoriteToggle={onFavoriteToggle}
-        onCouponsClick={onCouponsClick}
+          selectedGenres={selectedGenres}
+          selectedEvents={selectedEvents}
+          isNearbyFilter={isNearbyFilter}
+          isFavoritesFilter={isFavoritesFilter}
+          stores={stores}
+          onStoreClick={onStoreClick}
+          onFavoriteToggle={onFavoriteToggle}
+          onCouponsClick={onCouponsClick}
           isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
-        backgroundColorClass={backgroundColorClass}
+          backgroundColorClass={backgroundColorClass}
         />
       </div>
 
@@ -613,23 +483,20 @@ export function HomeLayout({
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
       />
-      
+
       {/* 閲覧履歴ポップアップ */}
       <HistoryPopup
         isOpen={isHistoryOpen}
         stores={historyStores}
-        onClose={onHistoryClose}
+        onClose={onHistoryClose ?? (() => { })}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
       />
-      
+
       <StoreDetailPopup
-        isOpen={isStoreDetailPopupOpen}
+        isOpen={isStoreDetailPopupOpen ?? false}
         store={selectedStore}
         onClose={() => {
-          console.log("StoreDetailPopup onClose called")
-          console.log("current isStoreDetailPopupOpen:", isStoreDetailPopupOpen)
-          console.log("selectedStore:", selectedStore?.name)
           if (onStoreDetailClose) {
             onStoreDetailClose()
           }
@@ -637,7 +504,7 @@ export function HomeLayout({
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
       />
-      
+
       {/* クーポン関連ポップアップ */}
       <CouponListPopup
         isOpen={isCouponListOpen}
@@ -646,37 +513,32 @@ export function HomeLayout({
         onClose={onCouponListClose}
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
-       onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
+        onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
       />
-      
-     {/* 使用方法ガイドモーダル */}
-     <UsageGuideModal
-       isOpen={isUsageGuideModalOpen}
-       onClose={() => setIsUsageGuideModalOpen(false)}
-     />
-     
+
+      {/* 使用方法ガイドモーダル */}
+      <UsageGuideModal
+        isOpen={isUsageGuideModalOpen}
+        onClose={() => setIsUsageGuideModalOpen(false)}
+      />
+
       {/* クーポン使用成功モーダル */}
       <CouponUsedSuccessModal
         isOpen={isSuccessModalOpen}
         coupon={selectedCoupon}
-        onClose={onSuccessModalClose}
+        onClose={onSuccessModalClose ?? (() => { })}
       />
-      
+
       {/* ログインが必要なモーダル */}
       <LoginRequiredModal
         isOpen={isLoginRequiredModalOpen}
         onClose={onLoginRequiredModalClose}
         onLogin={onLoginRequiredModalLogin}
       />
-      
+
       {/* フッターナビゲーション */}
-      <FooterNavigation
-        activeTab={activeTab}
-        onTabChange={onTabChange}
-        isAuthenticated={isAuthenticated}
-        onFavoritesClick={onFavoritesClick}
-      />
-      
+      <FooterNavigation />
+
     </div>
   )
 }

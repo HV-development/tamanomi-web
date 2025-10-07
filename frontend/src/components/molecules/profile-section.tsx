@@ -1,6 +1,6 @@
 "use client"
 
-import { User, CreditCard as Edit } from "lucide-react"
+import { User, CreditCard as Edit, Settings } from "lucide-react"
 import { RankBadge } from "../atoms/rank-badge"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "../../utils/rank-calculator"
 import type { User as UserType } from "../../types/user"
@@ -15,9 +15,9 @@ interface ProfileSectionProps {
 export function ProfileSection({ user, onEdit, className = "", currentUserRank }: ProfileSectionProps) {
   // ランク計算
   const contractStartDate = user.contractStartDate || user.createdAt
-  const nextRank = currentUserRank ? getNextRankInfo(currentUserRank) : null
-  const monthsToNext = currentUserRank ? getMonthsToNextRank(contractStartDate, currentUserRank) : null
-  const currentRankInfo = currentUserRank ? RANK_INFO[currentUserRank] : null
+  const nextRank = currentUserRank ? getNextRankInfo(currentUserRank as any) : null
+  const monthsToNext = currentUserRank ? getMonthsToNextRank(contractStartDate, currentUserRank as any) : null
+  const currentRankInfo = currentUserRank ? (RANK_INFO as any)[currentUserRank] : null
 
   // ランクが計算されていない場合は基本情報のみ表示
   if (!currentUserRank || !currentRankInfo) {
@@ -101,10 +101,10 @@ export function ProfileSection({ user, onEdit, className = "", currentUserRank }
           <div className="flex items-center justify-center mb-4">
             <span className="text-sm font-medium text-gray-700">メンバーランク</span>
           </div>
-          
+
           {/* ランクバッジを中央に配置 */}
           <div className="flex justify-center mb-4">
-            <RankBadge rank={currentUserRank} size="lg" />
+            <RankBadge rank={currentUserRank as any} size="lg" />
           </div>
 
           {/* ランク説明 */}

@@ -23,4 +23,15 @@ export interface Store {
     digitalPayments: string[]
   }
   usageScenes?: string[]
+  // 追加のプロパティ
+  status: "active" | "inactive" | "suspended"
+  merchantId: string
+  email: string
+  paymentSaicoin: boolean
+  paymentTamapon: boolean
+  paymentCash: boolean
+  scenes?: string
+  createdAt: string
+  updatedAt: string
+  merchant?: any
 }
