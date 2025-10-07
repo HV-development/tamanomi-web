@@ -1,5 +1,5 @@
 # Next.jsアプリケーション用Dockerfile（ローカル開発用）
-FROM node:18-alpine
+FROM node:20-alpine
 
 # 依存関係のインストール
 RUN apk add --no-cache libc6-compat
@@ -14,9 +14,9 @@ COPY tamanomi-web/frontend/package.json tamanomi-web/frontend/pnpm-lock.yaml* ./
 # スキーマパッケージをコピー（存在する場合）
 COPY tamanomi-schemas ./tamanomi-schemas
 
-# package.jsonのパスを修正（Dockerコンテキスト用）
+# 開発環境ではローカルパッケージを参照するようにpackage.jsonを修正
 RUN if [ -f "tamanomi-schemas/package.json" ]; then \
-      sed -i 's|"@tamanomi/schemas": "workspace:\*"|"@tamanomi/schemas": "file:./tamanomi-schemas"|g' package.json; \
+      sed -i 's|"@hv-development/schemas": "\^1\.4\.0"|"@hv-development/schemas": "file:./tamanomi-schemas"|g' package.json; \
     fi
 
 RUN pnpm install --no-frozen-lockfile

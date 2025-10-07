@@ -2,6 +2,7 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { PlanRegistrationForm } from "../molecules/plan-registration-form"
+import { PlanListResponse } from '@hv-development/schemas'
 
 interface PlanRegistrationContainerProps {
   onPaymentMethodRegister: (planId: string) => void
@@ -9,6 +10,8 @@ interface PlanRegistrationContainerProps {
   onLogoClick: () => void
   isLoading?: boolean
   backgroundColorClass?: string
+  plans: PlanListResponse['plans']
+  error?: string
 }
 
 export function PlanRegistrationContainer({
@@ -17,6 +20,8 @@ export function PlanRegistrationContainer({
   onLogoClick,
   isLoading,
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
+  plans,
+  error,
 }: PlanRegistrationContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
@@ -31,6 +36,8 @@ export function PlanRegistrationContainer({
               onPaymentMethodRegister={onPaymentMethodRegister}
               onCancel={onCancel}
               isLoading={isLoading}
+              plans={plans}
+              error={error}
             />
           </div>
         </div>
