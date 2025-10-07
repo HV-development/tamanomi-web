@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { SignupLayout } from '@/components/templates/signup-layout'
-import { type UserRegistrationComplete } from '@tamanomi/schemas'
+import { type UserRegistrationComplete } from '@hv-development/schemas'
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -50,11 +50,18 @@ export default function SignupPage() {
 
       const result = await response.json()
 
-      if (result.success) {
-        // 登録完了後は確認画面に遷移
-        router.push('/?view=confirmation')
+      // デバッグログ
+      console.log('Signup response:', {
+        status: response.status,
+        ok: response.ok,
+        result: result
+      })
+
+      if (response.ok) {
+        // 登録完了後はプラン登録画面に遷移
+        router.push('/plan-registration?email=' + encodeURIComponent(searchParams.email || ''))
       } else {
-        alert(result.message || 'エラーが発生しました')
+        alert(result.message || result.error?.message || 'エラーが発生しました')
       }
     } catch (error) {
       alert('ネットワークエラーが発生しました')

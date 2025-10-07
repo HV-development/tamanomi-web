@@ -67,7 +67,14 @@ export default function RegisterConfirmationPage() {
 
       const result = await response.json()
 
-      if (response.ok && result.success) {
+      // デバッグログ
+      console.log('Register response:', {
+        status: response.status,
+        ok: response.ok,
+        result: result
+      })
+
+      if (response.ok) {
         // 登録成功後はセッションストレージをクリア
         sessionStorage.removeItem('registerFormData')
 
@@ -75,7 +82,7 @@ export default function RegisterConfirmationPage() {
         router.push('/plan-registration?email=' + encodeURIComponent(email))
       } else {
         // エラーハンドリング
-        const errorMessage = result.message || '登録に失敗しました'
+        const errorMessage = result.message || result.error?.message || '登録に失敗しました'
         alert(errorMessage)
       }
     } catch (error) {

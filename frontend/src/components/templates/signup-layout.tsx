@@ -1,7 +1,7 @@
 "use client"
 
 import { SignupContainer } from "../organisms/signup-container"
-import { type UserRegistrationComplete } from "@tamanomi/schemas"
+import { type UserRegistrationComplete } from "@hv-development/schemas"
 
 interface SignupLayoutProps {
   initialData?: Partial<UserRegistrationComplete>

@@ -14,14 +14,7 @@ interface EmailRegistrationLayoutProps {
   isLoading?: boolean
   currentUserRank?: string | null
   errorMessage?: string
-
-  //テスト用
-  debugInfo?: {
-    registrationId?: string
-    verificationUrl?: string
-    otp?: string
-    requestId?: string
-  }
+  successMessage?: string
 }
 
 export function EmailRegistrationLayout({
@@ -35,8 +28,7 @@ export function EmailRegistrationLayout({
   isLoading,
   currentUserRank,
   errorMessage,
-  //テスト用
-  debugInfo
+  successMessage,
 }: EmailRegistrationLayoutProps) {
   // ランクに基づく背景色を取得
   const getBackgroundColorByRank = (rank: string | null | undefined) => {
@@ -57,8 +49,8 @@ export function EmailRegistrationLayout({
       onLogoClick={onLogoClick}
       isLoading={isLoading}
       backgroundColorClass={backgroundColorClass}
-      debugInfo={debugInfo}
       errorMessage={errorMessage}
+      successMessage={successMessage}
     />
   )
 }

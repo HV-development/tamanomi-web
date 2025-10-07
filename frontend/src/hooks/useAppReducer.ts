@@ -1,4 +1,4 @@
-import type { AppState, AppAction } from '@tamanomi/schemas'
+import type { AppState, AppAction } from '@hv-development/schemas'
 
 // 初期状態
 export const initialState: AppState = {

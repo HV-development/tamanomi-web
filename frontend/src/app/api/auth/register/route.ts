@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { UseRregistrationCompleteSchema } from '@/schemas/auth'
 
-const TAMAYOI_API_URL = process.env.TAMAYOI_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api/v1', '') || 'http://localhost:3002'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
-    const fullUrl = `${TAMAYOI_API_URL}/api/v1/auth/register`;
+    const fullUrl = `${API_BASE_URL}/api/v1/register`;
 
     try {
       const response = await fetch(fullUrl, {

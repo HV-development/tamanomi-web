@@ -15,13 +15,7 @@ interface EmailRegistrationContainerProps {
   isLoading?: boolean
   backgroundColorClass?: string
   errorMessage?: string
-  //テスト用
-  debugInfo?: {
-    registrationId?: string
-    verificationUrl?: string
-    otp?: string
-    requestId?: string
-  }
+  successMessage?: string
 }
 
 export function EmailRegistrationContainer({
@@ -35,8 +29,7 @@ export function EmailRegistrationContainer({
   isLoading,
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
   errorMessage,
-  //テスト用
-  debugInfo
+  successMessage,
 }: EmailRegistrationContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
@@ -64,8 +57,9 @@ export function EmailRegistrationContainer({
                 email={email}
                 onBackToLogin={onBackToLogin}
                 onResend={onResend}
-                //テスト用
-                debugInfo={debugInfo}
+                isLoading={isLoading}
+                errorMessage={errorMessage}
+                successMessage={successMessage}
               />
             )}
           </div>

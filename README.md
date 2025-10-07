@@ -27,31 +27,33 @@ tamanomi-web/
 └── README.md
 ```
 
-## 📦 ローカルパッケージ化
+## 📦 パッケージ管理
 
-このプロジェクトは`@tamanomi/schemas`パッケージを使用しており、ローカル開発環境では以下の手順でセットアップします。
+このプロジェクトは`@hv-development/schemas`パッケージをGitHub Package Registryから取得します。
 
 ### 前提条件
 
-- Node.js 18以上
+- Node.js 20以上
 - pnpm
 - Docker（Docker Compose使用時）
-- `tamanomi-schemas`パッケージがビルド済み
+- GitHub Package Registryへのアクセス権限
 
 ### セットアップ手順
 
-1. **ワークスペースルートで依存関係をインストール**
+1. **GitHubパーソナルアクセストークンの設定**
+
+GitHub Package Registryからパッケージを取得するため、`~/.npmrc`に以下を設定：
 
 ```bash
-cd /path/to/tamanomi
-pnpm install
+@hv-development:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
 ```
 
-2. **ローカルパッケージをインストール**
+2. **依存関係のインストール**
 
 ```bash
 cd tamanomi-web/frontend
-pnpm add @tamanomi/schemas@file:../../tamanomi-schemas
+pnpm install
 ```
 
 3. **開発サーバーを起動**
@@ -62,13 +64,17 @@ pnpm dev
 
 # またはDocker開発環境
 cd ../infrastructure/docker
-docker-compose --profile dev up --build
+docker-compose up --build
 ```
 
-### 開発中の注意点
+### パッケージの更新
 
-- `@tamanomi/schemas`パッケージを変更した場合は、`tamanomi-schemas`ディレクトリで`pnpm build`を実行してください
-- 型定義の変更は自動的に反映されます
+- `@hv-development/schemas`パッケージの新しいバージョンがリリースされた場合：
+
+```bash
+cd tamanomi-web/frontend
+pnpm update @hv-development/schemas
+```
 
 ## 開発環境の起動
 
@@ -80,49 +86,35 @@ pnpm dev
 ```
 
 ### Docker開発環境
+
+Docker環境でビルドする場合は、`tamanomi-schemas/.env`から環境変数を読み込んでください：
+
 ```bash
 cd infrastructure/docker
 
-# 初回起動時（ビルドが必要）
-docker-compose --profile dev up --build
-
-# 2回目以降の起動
-docker-compose --profile dev up
-
-# バックグラウンドで起動
-docker-compose --profile dev up -d
-
-# ログを確認
-docker-compose --profile dev logs -f
-
-# 停止
-docker-compose --profile dev down
-```
-
-### 本番環境
-```bash
-cd infrastructure/docker
+# .envファイルから環境変数を読み込む（exportも同時に実行）
+set -a && source ../../../tamanomi-schemas/.env && set +a
 
 # 初回起動時（ビルドが必要）
-docker-compose --profile prod up --build
+docker-compose build
+docker-compose up -d
 
 # 2回目以降の起動
-docker-compose --profile prod up
-
-# バックグラウンドで起動
-docker-compose --profile prod up -d
+docker-compose up -d
 
 # ログを確認
-docker-compose --profile prod logs -f
+docker-compose logs -f
 
 # 停止
-docker-compose --profile prod down
+docker-compose down
 ```
+
+**注意**: 
+- `set -a`を使用することで、sourceで読み込んだ変数を自動的にexportします
+- `GITHUB_TOKEN`が設定されていない場合、パッケージのインストールに失敗します
 
 ### ポート番号
-- **開発環境**: http://localhost:3001
-- **本番環境**: http://localhost:3000
-- **Nginx**: http://localhost:80, https://localhost:443
+- **開発環境**: http://localhost:3000
 
 ## 技術スタック
 
@@ -157,17 +149,17 @@ docker-compose logs
 
 # コンテナを再作成
 docker-compose down
-docker-compose --profile dev up --build
+docker-compose up --build
 ```
 
 #### イメージの再ビルドが必要な場合
 ```bash
 # キャッシュを使わずに再ビルド
-docker-compose --profile dev build --no-cache
+docker-compose build --no-cache
 
 # 全イメージを削除して再ビルド
 docker-compose down --rmi all
-docker-compose --profile dev up --build
+docker-compose up --build
 ```
 
 #### ボリュームのクリーンアップ

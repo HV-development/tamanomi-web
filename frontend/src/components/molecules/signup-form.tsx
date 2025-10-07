@@ -7,7 +7,7 @@ import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 import { RadioButton } from "../atoms/radio-button"
 import { DateInput } from "../atoms/date-input"
-import { UseRregistrationCompleteSchema, type UserRegistrationComplete } from "@tamanomi/schemas"
+import { UseRregistrationCompleteSchema, type UserRegistrationComplete } from "@hv-development/schemas"
 import { z } from "zod"
 
 interface SignupFormProps {
@@ -27,6 +27,7 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
     address: "",
     birthDate: "",
     gender: "male",
+    saitamaAppId: "",
   })
 
   const [errors, setErrors] = useState<Partial<Record<keyof UserRegistrationComplete, string>>>({})
@@ -46,6 +47,7 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
         address: initialData.address || "",
         birthDate: initialData.birthDate || "",
         gender: initialData.gender || "male",
+        saitamaAppId: initialData.saitamaAppId || "",
       })
     }
   }, [initialData])
@@ -181,16 +183,21 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
           <div className="flex-1">
             <input
               type="text"
-              placeholder="123-4567 または 1234567"
+              placeholder="1234567"
               value={formData.postalCode}
-              onChange={(e) => handleInputChange("postalCode", e.target.value)}
+              onChange={(e) => {
+                // 数字のみを許可、7桁まで
+                const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 7)
+                handleInputChange("postalCode", value)
+              }}
+              maxLength={7}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
             />
           </div>
           <Button
             type="button"
             onClick={handleAddressSearch}
-            disabled={isSearchingAddress}
+            disabled={isSearchingAddress || formData.postalCode.length !== 7}
             variant="secondary"
             className="px-6 py-3 whitespace-nowrap"
           >
@@ -198,31 +205,79 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
           </Button>
         </div>
         {errors.postalCode && <p className="mt-1 text-sm text-red-500">{errors.postalCode}</p>}
+        <p className="mt-1 text-xs text-gray-500">※ハイフンなしで7桁の数字を入力してください</p>
       </div>
 
-      {/* 住所入力 */}
+      {/* 住所表示 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           住所
         </label>
-        <input
-          ref={addressInputRef}
-          type="text"
-          placeholder="住所を入力するか、上記の住所検索ボタンをご利用ください"
-          value={formData.address}
-          onChange={(e) => handleInputChange("address", e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
-        />
+        <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 min-h-[48px]">
+          {formData.address || '郵便番号を入力すると表示されます'}
+        </div>
         {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
       </div>
 
-      {/* 生年月日 */}
-      <DateInput
-        label="生年月日"
-        value={formData.birthDate}
-        onChange={(value) => handleInputChange("birthDate", value)}
-        error={errors.birthDate}
-      />
+      {/* 生年月日（ドロップダウン形式） */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          生年月日
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {/* 年 */}
+          <select
+            value={formData.birthDate ? formData.birthDate.split('-')[0] : ''}
+            onChange={(e) => {
+              const year = e.target.value
+              const month = formData.birthDate?.split('-')[1] || '01'
+              const day = formData.birthDate?.split('-')[2] || '01'
+              handleInputChange("birthDate", year ? `${year}-${month}-${day}` : '')
+            }}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+          >
+            <option value="">年</option>
+            {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+              <option key={year} value={year}>{year}年</option>
+            ))}
+          </select>
+
+          {/* 月 */}
+          <select
+            value={formData.birthDate ? formData.birthDate.split('-')[1] : ''}
+            onChange={(e) => {
+              const year = formData.birthDate?.split('-')[0] || new Date().getFullYear().toString()
+              const month = e.target.value
+              const day = formData.birthDate?.split('-')[2] || '01'
+              handleInputChange("birthDate", month ? `${year}-${month}-${day}` : '')
+            }}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+          >
+            <option value="">月</option>
+            {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+              <option key={month} value={month.toString().padStart(2, '0')}>{month}月</option>
+            ))}
+          </select>
+
+          {/* 日 */}
+          <select
+            value={formData.birthDate ? formData.birthDate.split('-')[2] : ''}
+            onChange={(e) => {
+              const year = formData.birthDate?.split('-')[0] || new Date().getFullYear().toString()
+              const month = formData.birthDate?.split('-')[1] || '01'
+              const day = e.target.value
+              handleInputChange("birthDate", day ? `${year}-${month}-${day}` : '')
+            }}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+          >
+            <option value="">日</option>
+            {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+              <option key={day} value={day.toString().padStart(2, '0')}>{day}日</option>
+            ))}
+          </select>
+        </div>
+        {errors.birthDate && <p className="mt-1 text-sm text-red-500">{errors.birthDate}</p>}
+      </div>
 
       {/* 性別 */}
       <RadioButton
@@ -234,6 +289,25 @@ export function SignupForm({ initialData, email, onSubmit, onCancel, isLoading =
         error={errors.gender}
       />
 
+      {/* さいたま市みんなのアプリID */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          さいたま市みんなのアプリID（任意）
+        </label>
+        <input
+          type="text"
+          placeholder="例: user_12345"
+          value={formData.saitamaAppId || ''}
+          onChange={(e) => {
+            // 半角英数字とアンダースコアのみを許可
+            const value = e.target.value.replace(/[^a-zA-Z0-9_]/g, '')
+            handleInputChange("saitamaAppId", value)
+          }}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+        />
+        {errors.saitamaAppId && <p className="mt-1 text-sm text-red-500">{errors.saitamaAppId}</p>}
+        <p className="mt-1 text-xs text-gray-500">※半角英数字とアンダースコア(_)のみ使用できます</p>
+      </div>
 
       {/* パスワード */}
       <Input

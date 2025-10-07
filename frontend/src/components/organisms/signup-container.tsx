@@ -2,7 +2,7 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { SignupForm } from "../molecules/signup-form"
-import { type UserRegistrationComplete } from "@tamanomi/schemas"
+import { type UserRegistrationComplete } from "@hv-development/schemas"
 
 interface SignupContainerProps {
   initialData?: Partial<UserRegistrationComplete>

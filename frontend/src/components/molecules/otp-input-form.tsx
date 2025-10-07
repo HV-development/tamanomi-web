@@ -13,6 +13,7 @@ interface OtpInputFormProps {
   onResendOtp: () => void
   onBack: () => void
   isLoading?: boolean
+  error?: string // 外部エラーを追加
   requestId?: string // OTP検証に必要なrequestIdを追加
 }
 
@@ -22,10 +23,18 @@ export function OtpInputForm({
   onResendOtp,
   onBack,
   isLoading = false,
+  error: externalError,
   requestId = "" // デフォルト値を設定
 }: OtpInputFormProps) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [error, setError] = useState("")
+  
+  // 外部エラーが変更されたら内部エラーを更新
+  useEffect(() => {
+    if (externalError) {
+      setError(externalError)
+    }
+  }, [externalError])
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   // 入力フィールドの参照を初期化

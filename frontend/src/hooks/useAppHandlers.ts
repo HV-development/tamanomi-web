@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useCallback } from "react"
-import type { AppAction, AppState, AppHandlers } from '@tamanomi/schemas'
+import type { AppAction, AppState, AppHandlers } from '@hv-development/schemas'
 import type { Store } from "@/types/store"
 import { appConfig } from '@/config/appConfig'
 
