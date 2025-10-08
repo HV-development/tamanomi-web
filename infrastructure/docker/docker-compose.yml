@@ -9,7 +9,6 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ../../../tamanomi-schemas/.env
       - ../../frontend/.env
     volumes:
       - ../../frontend/src:/app/src
@@ -22,3 +21,8 @@ services:
     environment:
       - NODE_ENV=development
     command: pnpm dev 
+
+networks:
+  tamanomi-network:
+    external: true
+    name: tamanomi-network
