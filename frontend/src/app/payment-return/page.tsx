@@ -15,16 +15,32 @@ function PaymentReturnContent() {
         const customerId = searchParams.get('customer_id')
         const customerCardId = searchParams.get('customer_card_id')
         const errorCode = searchParams.get('error_code')
+        const responseCode = searchParams.get('response_code') // ペイジェントからのレスポンスコード
         
         console.log('Payment return parameters:', {
           customerId,
           customerCardId,
-          errorCode
+          errorCode,
+          responseCode
         })
 
-        // エラーがある場合
-        if (errorCode) {
-          throw new Error(`カード登録に失敗しました（エラーコード: ${errorCode}）`)
+        // エラーがある場合（error_code または response_codeをチェック）
+        const finalErrorCode = errorCode || responseCode
+        if (finalErrorCode && finalErrorCode !== '0' && finalErrorCode !== '00000') {
+          // エラーコードに応じたメッセージを表示
+          let errorMessage = `カード登録に失敗しました（エラーコード: ${finalErrorCode}）`
+          
+          if (finalErrorCode === '6005') {
+            errorMessage = 'エラーが発生しました。店舗へ連絡してください。（6005）\n\n操作対象のカードが存在しません。新規登録の場合は、このエラーは発生しないはずです。店舗にお問い合わせください。'
+          } else if (finalErrorCode === 'P006') {
+            errorMessage = 'カード登録に失敗しました。必要な情報が不足しています。'
+          } else if (finalErrorCode === 'P008') {
+            errorMessage = 'カード登録に失敗しました。入力形式に誤りがあります。'
+          } else if (finalErrorCode === 'P009') {
+            errorMessage = 'カード登録に失敗しました。入力値の長さが不正です。'
+          }
+          
+          throw new Error(errorMessage)
         }
 
         if (!customerId) {
