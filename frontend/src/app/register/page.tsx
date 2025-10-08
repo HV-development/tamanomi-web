@@ -29,14 +29,14 @@ export default function RegisterPage() {
       const email = urlParams.get('email') || undefined
       const token = urlParams.get('token') || undefined
       const isEdit = urlParams.get('edit') === 'true'
-      
+
       // トークンが存在しない場合はメール登録画面にリダイレクト
       if (!token || token.trim() === '') {
         console.log('❌ Token is missing or empty, redirecting to email registration')
         router.push('/email-registration')
         return
       }
-      
+
       setSearchParams({
         email,
         token,
@@ -50,20 +50,20 @@ export default function RegisterPage() {
             const parsedData = JSON.parse(savedData)
             setInitialFormData(parsedData)
             sessionStorage.removeItem('registerFormData')
-          } catch (error) {
-            console.error('Failed to parse saved form data:', error)
+          } catch {
+            // エラーを無視
           }
         }
       }
     }
   }, [router])
 
-  const handleRegisterSubmit = async (data: any) => {
+  const handleRegisterSubmit = async (data: Record<string, string>) => {
     setIsLoading(true)
-    
+
     // フォームデータをセッションストレージに保存
     sessionStorage.setItem('registerFormData', JSON.stringify(data))
-    
+
     // 確認画面に遷移
     router.push(`/register-confirmation?email=${encodeURIComponent(searchParams.email || '')}&token=${encodeURIComponent(searchParams.token || '')}`)
     setIsLoading(false)

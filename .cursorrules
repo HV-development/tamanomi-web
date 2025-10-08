@@ -40,3 +40,164 @@ git checkout -b feature/[作業内容]
 - `tamanomi-schemas/` 以外での型定義・バリデーション管理は禁止
 
 このルールにより、開発作業の履歴管理とチーム開発の効率化を図ります。
+
+## フロントエンドアーキテクチャルール
+
+### 1. page.tsx の責務（薄いコンテナパターン）
+`app/*/page.tsx` は以下の責務のみを持つ薄いコンテナとして実装する：
+
+#### 許可される処理
+- ルーティング処理（`router.push` など）
+- UI コンポーネントへの props 受け渡し
+- 軽い URL パラメータの読取（`useSearchParams` 推奨）
+- `Suspense` によるローディング境界の設定
+
+#### 禁止される処理
+- API 呼び出し（fetch など）
+- ビジネスロジック
+- 状態機械の実装
+- モック処理
+- 複雑な状態管理
+
+### 2. レイヤー分離
+
+#### services/ - API クライアント層
+- **責務**: API 呼び出しの実装、fetch 処理の隔離
+- **配置**: `src/services/`
+- **実装例**:
+  ```typescript
+  export async function preRegister(email: string): Promise<Response> {
+    const response = await fetch('/api/auth/pre-register', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    })
+    if (!response.ok) {
+      // エラーメッセージの正規化
+      throw new Error('API呼び出しに失敗しました')
+    }
+    return response.json()
+  }
+  ```
+
+#### hooks/ - ビジネスロジック層
+- **責務**: 状態管理、ビジネスロジック、副作用の管理
+- **配置**: `src/hooks/`
+- **管理する状態**: フォーム状態、ローディング状態、エラー状態、ステップ管理など
+- **実装例**:
+  ```typescript
+  export function useEmailRegistration() {
+    const [isLoading, setIsLoading] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
+    
+    const handleSubmit = async (email: string) => {
+      setIsLoading(true)
+      try {
+        await preRegister(email)
+      } catch (error) {
+        setErrorMessage(error.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    return { isLoading, errorMessage, handleSubmit }
+  }
+  ```
+
+#### components/templates/ - プレゼンテーション層
+- **責務**: UI の描画のみ
+- **禁止事項**: ビジネスロジック、API 呼び出し、状態管理
+- **受け取るもの**: props として渡された値とコールバック関数
+
+### 3. データフロー
+
+```
+page.tsx (薄いコンテナ)
+  ↓ useRouter
+  ↓ useCustomHook (hooks/)
+    ↓ API クライアント (services/)
+      ↓ fetch
+  ↓ props
+components/templates/ (プレゼンテーション)
+```
+
+### 4. useSearchParams の使用
+- URL パラメータの読み取りには `useSearchParams` を使用
+- `useSearchParams` を使用するコンポーネントは `Suspense` でラップする
+
+### 5. 開発用モックの扱い
+- 本番コードに開発用モックを混在させない
+- モックが必要な場合は、MSW（Mock Service Worker）などの適切なツールを使用
+- 環境分岐（`process.env.NODE_ENV`）を page.tsx に直接記述しない
+
+このルールにより、保守性、テスタビリティ、再利用性の高いコードを実現します。
+
+## API構造とバージョニングルール
+
+### 1. API の 2層構造
+
+プロジェクトは以下の2層構造を採用：
+
+```
+Browser → 内部API (Next.js) → バックエンドAPI (tamanomi-api)
+```
+
+#### 内部API（Next.js API Routes）
+- **パス**: `/app/api/*/route.ts`
+- **URL**: `/api/auth/pre-register` など（バージョン番号なし）
+- **責務**: プロキシ、バリデーション、エラーハンドリング
+
+#### バックエンドAPI（tamanomi-api）
+- **URL**: `/api/v1/*`（バージョン番号あり）
+- **責務**: ビジネスロジック、DB操作、メール送信
+
+### 2. バージョニング戦略
+
+#### 内部API: バージョン番号なし
+- ブラウザから見たエンドポイントはシンプルに保つ
+- 例: `/api/auth/pre-register`, `/api/auth/register`
+
+#### バックエンドAPI: バージョン番号あり
+- バックエンドAPIは `/api/v1/` でバージョン管理
+- 例: `/api/v1/pre-register`, `/api/v1/register`
+
+### 3. 実装ルール
+
+#### services/ での API 呼び出し
+```typescript
+// 内部APIを呼び出す（バージョン番号なし）
+const response = await fetch('/api/auth/pre-register', {
+  method: 'POST',
+  body: JSON.stringify({ email })
+})
+```
+
+#### API Routes での実装
+```typescript
+// バックエンドAPIを呼び出す（バージョン番号あり）
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+const fullUrl = `${API_BASE_URL}/api/v1/pre-register`
+
+const response = await fetch(fullUrl, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, campaignCode })
+})
+```
+
+### 4. 環境変数
+
+```bash
+# バックエンドAPIのベースURL（バージョン番号は含めない）
+NEXT_PUBLIC_API_URL=http://localhost:3002
+```
+
+### 5. エンドポイント対応表
+
+| 内部API（バージョンなし） | バックエンドAPI（v1あり） |
+|--------------------------|-------------------------|
+| `/api/auth/pre-register` | `/api/v1/pre-register` |
+| `/api/auth/register` | `/api/v1/register` |
+| `/api/auth/login` | `/api/v1/login` |
+
+この設計により、バックエンドのバージョンアップ時もフロントエンドコードの変更が不要になります。

@@ -23,6 +23,7 @@ interface ProfileEditFormProps {
   user: User
   onSubmit: (data: ProfileEditFormData, updatedFields: string[]) => void
   onCancel: () => void
+  onWithdraw?: () => void
   isLoading?: boolean
 }
 
@@ -49,7 +50,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
 
   const [errors, setErrors] = useState<Partial<ProfileEditFormData>>({})
   const [isSearchingAddress, setIsSearchingAddress] = useState(false)
-  
+
   // 住所フィールドへの参照を追加
   const addressInputRef = useRef<HTMLInputElement>(null)
 
@@ -61,7 +62,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
       address: user.address || "",
       birthDate: user.birthDate || "",
       gender: user.gender || "",
-      saitamaAppId: user.saitamaAppId || "",
+      saitamaAppId: (user as any).saitamaAppId || "",
       registeredStore: user.registeredStore || "",
     }
     setFormData(initialData)
@@ -145,19 +146,16 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
 
   const handleAddressSearch = async () => {
     const cleanedPostalCode = formData.postalCode.replace(/-/g, "")
-    
-    console.log("🔍 住所検索開始:", cleanedPostalCode)
-    
+
+
     // 郵便番号の基本バリデーション
     if (!formData.postalCode) {
       setErrors({ ...errors, postalCode: "郵便番号を入力してください。" })
-      console.log("❌ 郵便番号が空です")
       return
     }
-    
+
     if (!/^\d{7}$/.test(cleanedPostalCode)) {
       setErrors({ ...errors, postalCode: "郵便番号は7桁の数字で入力してください。" })
-      console.log("❌ 郵便番号の形式が正しくありません:", cleanedPostalCode)
       return
     }
 
@@ -166,45 +164,30 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
 
 
     setIsSearchingAddress(true)
-    
+
     const apiUrl = `/api/address/search?zipcode=${cleanedPostalCode}`
-    console.log("📡 API URL:", apiUrl)
-    
+
     try {
       // Next.js API ルート経由で住所検索
-      console.log("📡 APIリクエスト送信中...")
       const response = await fetch(apiUrl)
-      console.log("📡 APIレスポンス受信:", {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok
-      })
-      
+
       const data = await response.json()
-      console.log("📡 APIレスポンスデータ:", data)
-      
+
       if (data.success && data.address) {
         // 住所が見つかった場合
-        console.log("📍 住所検索結果:", data.data)
-        console.log("📍 完全住所:", data.address)
-        
-        setFormData(prev => ({ 
-          ...prev, 
-          address: data.address 
+
+        setFormData(prev => ({
+          ...prev,
+          address: data.address
         }))
         setErrors(prev => ({ ...prev, address: undefined }))
-        console.log("✅ 住所検索成功:", data.address)
       } else {
         // 住所が見つからない場合
-        console.log("❌ 住所が見つかりません:", {
-          postalCode: cleanedPostalCode,
-          message: data.message
-        })
         setErrors(prev => ({
           ...prev,
           address: data.message || "該当する住所が見つかりませんでした。手入力で住所を入力してください。"
         }))
-        
+
         // 住所フィールドにフォーカスを移す
         setTimeout(() => {
           if (addressInputRef.current) {
@@ -212,19 +195,13 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
           }
         }, 100)
       }
-      
+
     } catch (error) {
-      console.error("❌ 住所検索エラー:", {
-        error: error,
-        message: error instanceof Error ? error.message : 'Unknown error',
-        postalCode: cleanedPostalCode,
-        apiUrl: apiUrl
-      })
       setErrors(prev => ({
         ...prev,
         address: "住所検索サービスに接続できませんでした。ネットワーク接続を確認するか、手入力で住所を入力してください。"
       }))
-      
+
       // エラー時も住所フィールドにフォーカス
       setTimeout(() => {
         if (addressInputRef.current) {
@@ -233,8 +210,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
       }, 100)
     } finally {
       setIsSearchingAddress(false)
-      console.log("🔍 住所検索処理完了")
-     }
+    }
   }
 
   const updateFormData = (field: keyof ProfileEditFormData, value: string) => {
@@ -313,16 +289,16 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
         error={errors.gender}
       />
 
-     {/* 登録店舗 */}
-     <div>
-       <label className="block text-sm font-medium text-gray-700 mb-2">
-         登録店舗
-       </label>
-       <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 min-h-[48px] flex items-center">
-         {formData.registeredStore || "店舗QRコードから登録された店舗です"}
-       </div>
-       <p className="mt-1 text-xs text-gray-500">※店舗QRコードから登録された店舗です</p>
-     </div>
+      {/* 登録店舗 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          登録店舗
+        </label>
+        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 min-h-[48px] flex items-center">
+          {formData.registeredStore || "店舗QRコードから登録された店舗です"}
+        </div>
+        <p className="mt-1 text-xs text-gray-500">※店舗QRコードから登録された店舗です</p>
+      </div>
 
       {/* ボタン */}
       <div className="space-y-3">

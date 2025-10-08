@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
-    "@hv-development/schemas": "^1.4.0",
+    "@hv-development/schemas": "^1.5.2",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -76,6 +76,8 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   },
-  "engines": { "node": "20.x" },
+  "engines": {
+    "node": "22.x"
+  },
   "packageManager": "pnpm@8.15.8"
 }

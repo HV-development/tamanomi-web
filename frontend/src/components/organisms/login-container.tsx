@@ -1,59 +1,57 @@
 "use client"
 
-import { useState } from "react"
 import { HeaderLogo } from "../atoms/header-logo"
 import { LoginForm } from "../molecules/login-form"
 import { OtpInputForm } from "../molecules/otp-input-form"
 
 interface LoginContainerProps {
-  onLogin: (email: string, otp: string) => void
+  onLogin: (email: string, password: string) => void
+  onVerifyOtp: (otp: string) => void
   onSignup: () => void
   onForgotPassword: () => void
+  onResendOtp: () => void
   onBack: () => void
   onLogoClick: () => void
   isLoading?: boolean
-  loginStep?: "email" | "otp"
+  error?: string
+  loginStep?: "password" | "otp"
   email?: string
-  onResendOtp?: () => void
   backgroundColorClass?: string
 }
 
 export function LoginContainer({
   onLogin,
+  onVerifyOtp,
   onSignup,
   onForgotPassword,
+  onResendOtp,
   onBack,
   onLogoClick,
   isLoading,
-  loginStep = "email",
+  error,
+  loginStep = "password",
   email = "",
-  onResendOtp = () => {},
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: LoginContainerProps) {
-  const handleBackToEmail = () => {
-    // メールアドレス入力画面に戻る処理は親コンポーネントで処理
-    onBack()
-  }
-
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
-      <HeaderLogo 
-        onLogoClick={onLogoClick} 
-        showBackButton={true} 
-        onBackClick={loginStep === "email" ? onBack : handleBackToEmail} 
+      <HeaderLogo
+        onLogoClick={onLogoClick}
+        showBackButton={loginStep === "otp"} // OTP画面のみ戻るボタンを表示
+        onBackClick={onBack}
       />
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            {loginStep === "email" ? (
+            {loginStep === "password" ? (
               <>
                 {/* 説明文 */}
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">ログイン</h2>
-                  <p className="text-gray-600">TAMAYOIでさいたまの美味しいお店を見つけよう</p>
+                  <p className="text-gray-600">たまのみでさいたまの美味しいお店を見つけよう</p>
                 </div>
 
                 {/* ログインフォーム */}
@@ -62,15 +60,17 @@ export function LoginContainer({
                   onSignup={onSignup}
                   onForgotPassword={onForgotPassword}
                   isLoading={isLoading}
+                  error={error}
                 />
               </>
             ) : (
               <OtpInputForm
                 email={email}
-                onVerifyOtp={(otp) => onLogin(email, otp)}
+                onVerifyOtp={onVerifyOtp}
                 onResendOtp={onResendOtp}
-                onBack={handleBackToEmail}
+                onBack={onBack}
                 isLoading={isLoading}
+                error={error}
               />
             )}
           </div>

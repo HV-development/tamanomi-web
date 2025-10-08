@@ -4,9 +4,12 @@ services:
     build:
       context: ../../../
       dockerfile: tamanomi-web/infrastructure/docker/Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
     ports:
       - "3000:3000"
     env_file:
+      - ../../../tamanomi-schemas/.env
       - ../../frontend/.env
     volumes:
       - ../../frontend/src:/app/src
@@ -16,7 +19,6 @@ services:
       - ../../frontend/tsconfig.json:/app/tsconfig.json
       - ../../frontend/postcss.config.mjs:/app/postcss.config.mjs
       - ../../frontend/components.json:/app/components.json
-      - ../../../tamanomi-schemas:/app/tamanomi-schemas
     environment:
       - NODE_ENV=development
     command: pnpm dev 

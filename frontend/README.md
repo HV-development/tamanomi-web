@@ -7,7 +7,7 @@ Tamanomi Web Frontend - Next.js + TypeScript + Tailwind CSS
 - **Next.js 14**: React フレームワーク
 - **TypeScript**: 型安全な開発
 - **Tailwind CSS**: ユーティリティファーストのCSS
-- **型安全性**: `@tamanomi/schemas`パッケージを使用した型安全なAPI通信
+- **型安全性**: `@hv-development/schemas`パッケージを使用した型安全なAPI通信
 
 ## 🛠️ 環境構築
 

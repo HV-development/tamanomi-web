@@ -13,10 +13,10 @@ interface PaymentHistoryListProps {
   currentUserRank?: string | null
 }
 
-export function PaymentHistoryList({ 
-  history, 
-  onBackToMyPage, 
-  onBackToTop, 
+export function PaymentHistoryList({
+  history,
+  onBackToMyPage,
+  onBackToTop,
   className = "",
   currentUserRank
 }: PaymentHistoryListProps) {
@@ -26,7 +26,7 @@ export function PaymentHistoryList({
     return "bg-gradient-to-br from-green-50 to-green-100"
   }
 
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
 
   const formatDate = (date: Date) => {
     return format(date, "yyyy年M月d日 HH:mm", { locale: ja })
@@ -64,8 +64,8 @@ export function PaymentHistoryList({
         {/* ヘッダー */}
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="flex items-center justify-between">
-            <button 
-              onClick={onBackToMyPage} 
+            <button
+              onClick={onBackToMyPage}
               className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
             >
               ← 戻る
@@ -86,7 +86,7 @@ export function PaymentHistoryList({
         {/* メインコンテンツ */}
         <div className="p-6">
           <h1 className="text-2xl font-bold text-gray-900 text-center mb-8">決済履歴</h1>
-          
+
           {/* 空の状態 */}
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -105,15 +105,15 @@ export function PaymentHistoryList({
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-between">
-          <button 
-            onClick={onBackToMyPage} 
+          <button
+            onClick={onBackToMyPage}
             className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
           >
             ← 戻る
           </button>
-          <img 
+          <img
             src="/logo.svg"
-            alt="TAMAYOI" 
+            alt="TAMAYOI"
             className="h-8 object-contain"
           />
           <div className="w-12"></div>

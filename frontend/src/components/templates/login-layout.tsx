@@ -1,28 +1,30 @@
 import { LoginContainer } from "../organisms/login-container"
 
 interface LoginLayoutProps {
-  onLogin: (email: string, otp: string) => void
+  onLogin: (email: string, password: string) => void
+  onVerifyOtp: (otp: string) => void
   onSignup: () => void
   onForgotPassword: () => void
-  onBack: () => void
-  onLogoClick: () => void
+  onResendOtp: () => void
+  onBackToPassword: () => void
   isLoading?: boolean
-  loginStep?: "email" | "otp"
+  error?: string
+  loginStep?: "password" | "otp"
   email?: string
-  onResendOtp?: () => void
   currentUserRank?: string | null
 }
 
 export function LoginLayout({
   onLogin,
+  onVerifyOtp,
   onSignup,
   onForgotPassword,
-  onBack,
-  onLogoClick,
+  onResendOtp,
+  onBackToPassword,
   isLoading,
-  loginStep = "email",
+  error,
+  loginStep = "password",
   email = "",
-  onResendOtp = () => {},
   currentUserRank,
 }: LoginLayoutProps) {
   // ランクに基づく背景色を取得
@@ -31,19 +33,35 @@ export function LoginLayout({
     return "bg-gradient-to-br from-green-50 to-green-100"
   }
 
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
+
+  // ダミーのハンドラー（バック・ロゴクリックはログイン画面では不要だが、
+  // ルートページで使用するため、空の関数を渡す）
+  const handleBack = () => {
+    // OTP画面の場合はパスワード画面に戻る
+    if (loginStep === "otp") {
+      onBackToPassword()
+    }
+    // パスワード画面の場合は何もしない
+  }
+
+  const handleLogoClick = () => {
+    // ロゴクリックも何もしない（すでにトップページにいるため）
+  }
 
   return (
     <LoginContainer
       onLogin={onLogin}
+      onVerifyOtp={onVerifyOtp}
       onSignup={onSignup}
       onForgotPassword={onForgotPassword}
-      onBack={onBack}
-      onLogoClick={onLogoClick}
+      onResendOtp={onResendOtp}
+      onBack={handleBack}
+      onLogoClick={handleLogoClick}
       isLoading={isLoading}
+      error={error}
       loginStep={loginStep}
       email={email}
-      onResendOtp={onResendOtp}
       backgroundColorClass={backgroundColorClass}
     />
   )

@@ -1,5 +1,8 @@
-# Next.jsアプリケーション用Dockerfile（ローカル開発用）
-FROM node:20-alpine
+# Next.jsアプリケーション用Dockerfile
+FROM node:22-alpine
+
+# ビルド引数としてGitHub tokenを受け取る
+ARG GITHUB_TOKEN
 
 # 依存関係のインストール
 RUN apk add --no-cache libc6-compat
@@ -11,15 +14,22 @@ RUN npm install -g pnpm
 # 依存関係ファイルのコピー
 COPY tamanomi-web/frontend/package.json tamanomi-web/frontend/pnpm-lock.yaml* ./
 
-# スキーマパッケージをコピー（存在する場合）
-COPY tamanomi-schemas ./tamanomi-schemas
+# .npmrcファイルのコピー（GitHub Package Registryの設定）
+COPY tamanomi-web/frontend/.npmrc ./
 
-# 開発環境ではローカルパッケージを参照するようにpackage.jsonを修正
-RUN if [ -f "tamanomi-schemas/package.json" ]; then \
-      sed -i 's|"@hv-development/schemas": "\^1\.4\.0"|"@hv-development/schemas": "file:./tamanomi-schemas"|g' package.json; \
+# ビルド時にGitHub tokenを設定（トークンが提供された場合のみ）
+RUN if [ -n "$GITHUB_TOKEN" ]; then \
+      echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc; \
     fi
 
+# 依存関係のインストール（公開パッケージから）
 RUN pnpm install --no-frozen-lockfile
+
+# ソースコードをコピー
+COPY tamanomi-web/frontend ./
+
+# トークンを含む.npmrcを削除（セキュリティのため）
+RUN rm -f .npmrc
 
 # 環境変数の設定
 ENV NEXT_TELEMETRY_DISABLED 1

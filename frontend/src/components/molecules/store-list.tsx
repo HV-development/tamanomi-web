@@ -8,7 +8,7 @@ interface StoreListProps {
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
   onStoreClick?: (store: Store) => void
-   showDistance?: boolean
+  showDistance?: boolean
   emptyMessage?: string
   emptyEmoji?: string
   className?: string
@@ -19,7 +19,7 @@ export function StoreList({
   onFavoriteToggle,
   onCouponsClick,
   onStoreClick,
-   showDistance = false,
+  showDistance = false,
   emptyMessage = "店舗が見つかりませんでした",
   emptyEmoji = "🔍",
   className = "",
@@ -42,12 +42,12 @@ export function StoreList({
           className="animate-in slide-in-from-bottom-4 duration-300"
           style={{ animationDelay: `${index * 100}ms` }}
         >
-          <StoreCard 
-            store={store} 
-            onFavoriteToggle={onFavoriteToggle} 
+          <StoreCard
+            store={store}
+            onFavoriteToggle={onFavoriteToggle}
             onCouponsClick={onCouponsClick}
-            onStoreClick={onStoreClick}
-             showDistance={showDistance}
+            onStoreClick={onStoreClick ?? (() => { })}
+            showDistance={showDistance}
           />
         </div>
       ))}

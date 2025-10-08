@@ -1,15 +1,26 @@
 "use client"
 
-import { Mail, CheckCircle, AlertTriangle, RefreshCw, ArrowLeft } from "lucide-react"
+import { Mail, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react"
 import { Button } from "../atoms/button"
 
 interface EmailRegistrationCompleteProps {
   email: string
   onBackToLogin: () => void
   onResend: () => void
+  isLoading?: boolean
+  errorMessage?: string
+  successMessage?: string
 }
 
-export function EmailRegistrationComplete({ email, onBackToLogin, onResend }: EmailRegistrationCompleteProps) {
+export function EmailRegistrationComplete({ 
+  email, 
+  onBackToLogin, 
+  onResend, 
+  isLoading = false,
+  errorMessage = '',
+  successMessage = ''
+}: EmailRegistrationCompleteProps) {
+
   return (
     <div className="space-y-6">
       {/* 送信完了メッセージ */}
@@ -26,6 +37,20 @@ export function EmailRegistrationComplete({ email, onBackToLogin, onResend }: Em
           <p className="text-sm text-green-800 font-medium mb-2">送信先メールアドレス</p>
           <p className="text-green-900 font-bold">{email}</p>
         </div>
+
+        {/* 成功メッセージ */}
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+            <p className="text-sm text-green-800">{successMessage}</p>
+          </div>
+        )}
+
+        {/* エラーメッセージ */}
+        {errorMessage && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+            <p className="text-sm text-red-800">{errorMessage}</p>
+          </div>
+        )}
       </div>
 
       {/* 手順説明 */}
@@ -56,8 +81,6 @@ export function EmailRegistrationComplete({ email, onBackToLogin, onResend }: Em
         </ol>
       </div>
 
-
-
       {/* ボタン */}
       <div className="space-y-3">
         <Button
@@ -72,9 +95,10 @@ export function EmailRegistrationComplete({ email, onBackToLogin, onResend }: Em
           onClick={onResend}
           variant="secondary"
           className="w-full py-3 text-base font-medium flex items-center justify-center gap-2"
+          disabled={isLoading}
         >
-          <RefreshCw className="w-4 h-4" />
-          認証メールを再送信
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          {isLoading ? '送信中...' : '認証メールを再送信'}
         </Button>
       </div>
     </div>

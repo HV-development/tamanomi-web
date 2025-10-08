@@ -6,4 +6,5 @@ export interface Coupon {
   storeId: string
   storeName: string
   expiresAt?: Date
+  uuid: string
 }

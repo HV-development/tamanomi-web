@@ -4,6 +4,8 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "../atoms/button"
+import { otpVerifySchema } from '@/schemas/auth'
+import { z } from "zod"
 
 interface OtpInputFormProps {
   email: string
@@ -11,11 +13,28 @@ interface OtpInputFormProps {
   onResendOtp: () => void
   onBack: () => void
   isLoading?: boolean
+  error?: string // 外部エラーを追加
+  requestId?: string // OTP検証に必要なrequestIdを追加
 }
 
-export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoading = false }: OtpInputFormProps) {
+export function OtpInputForm({
+  email,
+  onVerifyOtp,
+  onResendOtp,
+  onBack,
+  isLoading = false,
+  error: externalError,
+  requestId = "" // デフォルト値を設定
+}: OtpInputFormProps) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [error, setError] = useState("")
+  
+  // 外部エラーが変更されたら内部エラーを更新
+  useEffect(() => {
+    if (externalError) {
+      setError(externalError)
+    }
+  }, [externalError])
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   // 入力フィールドの参照を初期化
@@ -30,24 +49,25 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
     }
   }, [])
 
+  // Zodスキーマを使ったバリデーション
   const validateOtp = (otpArray: string[]) => {
     const otpString = otpArray.join("")
-    if (!otpString) {
-      return "ワンタイムパスワードを入力してください。"
+    try {
+      // otpVerifySchemaのotpフィールドのみをバリデーション
+      otpVerifySchema.pick({ otp: true }).parse({ otp: otpString })
+      return ""
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return error.errors[0]?.message || "OTPの入力エラーです"
+      }
+      return "OTPの入力エラーです"
     }
-    if (otpString.length !== 6) {
-      return "6桁の数字を入力してください。"
-    }
-    if (!/^\d{6}$/.test(otpString)) {
-      return "6桁の数字を入力してください。"
-    }
-    return ""
   }
 
   const handleInputChange = (index: number, value: string) => {
     // 数字のみ許可
     const numericValue = value.replace(/\D/g, "")
-    
+
     if (numericValue.length <= 1) {
       const newOtp = [...otp]
       newOtp[index] = numericValue
@@ -62,17 +82,6 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
       if (numericValue && index < 5) {
         inputRefs.current[index + 1]?.focus()
       }
-
-      // 自動送信を無効化 - ユーザーが明示的に送信ボタンを押すまで待機
-      // if (index === 5 && numericValue) {
-      //   const completeOtp = [...newOtp]
-      //   completeOtp[5] = numericValue
-      //   if (completeOtp.every(digit => digit !== "")) {
-      //     setTimeout(() => {
-      //       handleSubmit(completeOtp)
-      //     }, 100)
-      //   }
-      // }
     }
   }
 
@@ -81,7 +90,7 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus()
     }
-    
+
     // 左右矢印キーでの移動
     if (e.key === "ArrowLeft" && index > 0) {
       inputRefs.current[index - 1]?.focus()
@@ -100,14 +109,14 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault()
     const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6)
-    
+
     if (pastedData.length === 6) {
       const newOtp = pastedData.split("")
       setOtp(newOtp)
-      
+
       // 最後のフィールドにフォーカス
       inputRefs.current[5]?.focus()
-      
+
       // エラーをクリア
       if (error) {
         setError("")
@@ -147,7 +156,7 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
         <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
           ワンタイムパスワード（6桁）
         </label>
-        
+
         {/* OTP入力ボックス */}
         <div className="flex justify-center gap-1 sm:gap-3 mb-4 px-2">
           {otp.map((digit, index) => (
@@ -161,11 +170,10 @@ export function OtpInputForm({ email, onVerifyOtp, onResendOtp, onBack, isLoadin
               onChange={(e) => handleInputChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={index === 0 ? handlePaste : undefined}
-              className={`w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-bold border-2 rounded-lg transition-all duration-200 ${
-                digit
+              className={`w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-bold border-2 rounded-lg transition-all duration-200 ${digit
                   ? "border-green-500 bg-green-50 text-green-900"
                   : "border-gray-300 bg-white text-gray-900"
-              } focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500`}
+                } focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500`}
               maxLength={1}
               autoComplete="off"
             />

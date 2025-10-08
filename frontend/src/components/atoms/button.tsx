@@ -10,16 +10,18 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset"
   variant?: "primary" | "secondary" | "location"
   className?: string
+  disabled?: boolean
 }
 
-export function Button({ children, onClick, type = "button", variant = "primary", className = "" }: ButtonProps) {
+export function Button({ children, onClick, type = "button", variant = "primary", className = "", disabled = false }: ButtonProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("🔍 Button clicked:", children)
+    // type="submit"の場合はonClickを無視（フォームのonSubmitが処理する）
+    if (type === "submit") {
+      return
+    }
+
     if (onClick) {
-      console.log("🔍 Button onClick handler exists, calling it")
       onClick(e)
-    } else {
-      console.log("🔍 Button onClick handler is undefined")
     }
   }
 
@@ -34,7 +36,12 @@ export function Button({ children, onClick, type = "button", variant = "primary"
   }
 
   return (
-    <button type={type} onClick={handleClick} className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
+    <button
+      type={type}
+      onClick={handleClick}
+      disabled={disabled}
+      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
+    >
       {children}
     </button>
   )

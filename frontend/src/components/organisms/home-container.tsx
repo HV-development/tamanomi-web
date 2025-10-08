@@ -5,11 +5,11 @@ import type { Store } from "../../types/store";
 import { mockStores } from "../../data/mock-stores";
 
 interface HomeContainerProps {
-  selectedGenres: string[]
-  selectedEvents: string[]
-   isNearbyFilter: boolean
+  selectedGenres: string[] | undefined
+  selectedEvents: string[] | undefined
+  isNearbyFilter: boolean
   isFavoritesFilter: boolean
-  stores: Store[]
+  stores: Store[] | undefined
   onStoreClick: (store: Store) => void
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick?: (storeId: string) => void
@@ -19,14 +19,14 @@ interface HomeContainerProps {
 
 export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, isModalOpen = false, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: HomeContainerProps) {
   // 店舗データをフィルタリング
-  const filteredStores = stores.filter(store => {
+  const filteredStores = (stores ?? []).filter(store => {
     // ジャンルフィルター
-    if (selectedGenres.length > 0 && !selectedGenres.includes(store.genre)) {
+    if ((selectedGenres?.length ?? 0) > 0 && !selectedGenres?.includes(store.genre)) {
       return false
     }
     // イベントフィルター
-    if (selectedEvents.length > 0 && store.usageScenes) {
-      const hasMatchingEvent = selectedEvents.some(event => {
+    if ((selectedEvents?.length ?? 0) > 0 && store.usageScenes) {
+      const hasMatchingEvent = selectedEvents?.some(event => {
         // イベント値を店舗の利用シーンにマッピング
         const eventMapping: Record<string, string[]> = {
           date: ["デート"],
@@ -42,11 +42,11 @@ export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, 
           lunch: ["ランチ"],
           dinner: ["ディナー"],
         }
-        
+
         const mappedScenes = eventMapping[event] || []
         return mappedScenes.some(scene => store.usageScenes?.includes(scene))
       })
-      
+
       if (!hasMatchingEvent) {
         return false
       }
@@ -67,7 +67,7 @@ export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, 
         <StoreList
           stores={filteredStores}
           onFavoriteToggle={onFavoriteToggle}
-          onCouponsClick={onCouponsClick || (() => {})}
+          onCouponsClick={onCouponsClick || (() => { })}
           onStoreClick={onStoreClick}
           showDistance={isNearbyFilter}
           emptyMessage="条件に合う店舗が見つかりませんでした"

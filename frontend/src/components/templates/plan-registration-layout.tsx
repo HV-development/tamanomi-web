@@ -28,7 +28,7 @@ export function PlanRegistrationLayout({
     return "bg-gradient-to-br from-green-50 to-green-100"
   }
 
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
 
   return (
     <PlanRegistrationContainer

@@ -23,6 +23,7 @@ interface ProfileEditContainerProps {
   onWithdraw: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  backgroundColorClass?: string
 }
 
 export function ProfileEditContainer({ user, onSubmit, onCancel, onWithdraw, onLogoClick, isLoading, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: ProfileEditContainerProps) {

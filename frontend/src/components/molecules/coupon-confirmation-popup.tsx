@@ -70,5 +70,46 @@ export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }:
               </div>
 
               {/* 使用方法について */}
+              <div className="mb-6">
+                <h5 className="font-semibold text-gray-900 mb-3">使用方法</h5>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <p>1. 店員の方にこの画面をお見せください</p>
+                  <p>2. 店員の方が確認後、クーポンを使用してください</p>
+                  <p>3. 使用後は自動的にクーポンが無効になります</p>
+                </div>
+              </div>
+
+              {/* 注意事項 */}
+              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                <h5 className="font-semibold text-yellow-800 mb-2">注意事項</h5>
+                <ul className="text-sm text-yellow-700 space-y-1">
+                  <li>• 他のクーポンと併用できません</li>
+                  <li>• 有効期限: {coupon.expiresAt ? new Date(coupon.expiresAt).toLocaleDateString('ja-JP') : '未設定'}</li>
+                  <li>• 使用後は取り消しできません</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* フッター */}
+          <div className="p-6 bg-gray-50 border-t border-gray-200 flex-shrink-0">
+            <div className="flex gap-3">
+              <button
+                onClick={onCancel || (() => { })}
+                className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors"
+              >
+                使用する
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }

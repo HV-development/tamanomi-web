@@ -3,86 +3,101 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
-import { Gift } from "lucide-react"
+import { UserRegistrationRequestSchema } from '@/schemas/auth'
+import { z } from "zod"
 
 interface EmailRegistrationFormProps {
   initialEmail?: string
   onSubmit: (email: string, campaignCode?: string) => void
   onBack: () => void
   isLoading?: boolean
+  errorMessage?: string
 }
 
-export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isLoading = false }: EmailRegistrationFormProps) {
+export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isLoading = false, errorMessage }: EmailRegistrationFormProps) {
   const [email, setEmail] = useState(initialEmail)
   const [campaignCode, setCampaignCode] = useState("")
-  const [error, setError] = useState("")
-  const [campaignCodeError, setCampaignCodeError] = useState("")
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   // initialEmailが変更された時にemailを更新
   useEffect(() => {
     setEmail(initialEmail)
   }, [initialEmail])
 
-  const validateEmail = (email: string) => {
-    // メールアドレス - 必須チェック
-    if (!email) {
-      return "メールアドレスを入力してください。"
+  // Zodスキーマを使った統一バリデーション関数
+  const validateField = (fieldName: string, value: any) => {
+    try {
+      // 部分的なバリデーションのために、該当フィールドのみをテスト
+      const testData = { email: "", campaignCode: "" }
+      testData[fieldName as keyof typeof testData] = value
+
+      UserRegistrationRequestSchema.pick({ [fieldName]: true } as any).parse({ [fieldName]: value })
+
+      // エラーをクリア
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors[0]?.message || "入力エラーです"
+        setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
+      }
     }
-    // メールアドレス - メールフォーマットチェック
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return "正しいメールアドレスを入力してください。"
-    }
-    return ""
   }
 
   // リアルタイムバリデーション（input時）
   const handleEmailChange = (value: string) => {
     setEmail(value)
-    // エラーをクリア（リアルタイムでエラー表示しない）
-    if (error) {
-      setError("")
+    // 空文字の場合はバリデーションをスキップ（必須チェックは送信時のみ）
+    if (value.trim()) {
+      validateField('email', value)
+    } else {
+      // エラーをクリア
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors.email
+        return newErrors
+      })
     }
+  }
+
+  const handleCampaignCodeChange = (value: string) => {
+    const upperValue = value.toUpperCase()
+    setCampaignCode(upperValue)
+
+    // 常にバリデーションを実行（空文字でも必須チェックが働く）
+    validateField('campaignCode', upperValue)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const emailError = validateEmail(email)
-    const campaignError = validateCampaignCode(campaignCode)
-    
-    if (emailError || campaignError) {
-      setError(emailError)
-      setCampaignCodeError(campaignError)
-      return
+
+    try {
+      const validatedData = UserRegistrationRequestSchema.parse({
+        email,
+        campaignCode
+      })
+
+      // バリデーション成功時はエラーをクリア
+      setErrors({})
+      onSubmit(validatedData.email, validatedData.campaignCode)
+
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // 全てのエラーを収集してstateに設定
+        const newErrors: Record<string, string> = {}
+        error.errors.forEach(err => {
+          const fieldName = err.path[0] as string
+          newErrors[fieldName] = err.message
+        })
+        setErrors(newErrors)
+      }
     }
-    setError("")
-    setCampaignCodeError("")
-    onSubmit(email, campaignCode)
   }
 
-  const validateCampaignCode = (code: string) => {
-    if (!code) return "キャンペーンコードを入力してください"
-    
-    // 英数字のみ許可
-    if (!/^[A-Za-z0-9]+$/.test(code)) {
-      return "キャンペーンコードは英数字のみ入力可能です"
-    }
-    
-    // 長さチェック（4-20文字）
-    if (code.length < 4 || code.length > 20) {
-      return "キャンペーンコードは4文字以上20文字以下で入力してください"
-    }
-    
-    return ""
-  }
-
-  const handleCampaignCodeChange = (value: string) => {
-    setCampaignCode(value)
-    // リアルタイムバリデーション
-    const error = validateCampaignCode(value)
-    setCampaignCodeError(error)
-  }
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center mb-6">
@@ -92,6 +107,22 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
           <p>入力されたメールアドレスに認証用のリンクをお送りします。</p>
         </div>
       </div>
+
+      {/* エラーメッセージ表示 */}
+      {errorMessage && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-800">{errorMessage}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -104,7 +135,7 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
           onChange={(e) => handleEmailChange(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
         />
-        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
       </div>
 
       {/* キャンペーンコード入力 */}
@@ -112,17 +143,17 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
         <label className="block text-sm font-medium text-gray-700 mb-2">
           キャンペーンコード
         </label>
-        
+
         <div className="space-y-3">
           <input
             type="text"
             placeholder="例: WELCOME2024"
             value={campaignCode}
-            onChange={(e) => handleCampaignCodeChange(e.target.value.toUpperCase())}
+            onChange={(e) => handleCampaignCodeChange(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
           />
-          {campaignCodeError && <p className="text-sm text-red-500">{campaignCodeError}</p>}
-          
+          {errors.campaignCode && <p className="text-sm text-red-500">{errors.campaignCode}</p>}
+
           {/* キャンペーンコード案内リンク */}
           <div className="text-center">
             <button
@@ -135,11 +166,12 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
           </div>
         </div>
       </div>
+
       <div className="space-y-3">
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base font-medium"
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? "送信中..." : "認証メールを送信"}
         </Button>

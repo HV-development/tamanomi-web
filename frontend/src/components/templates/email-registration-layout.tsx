@@ -1,6 +1,5 @@
 "use client"
 
-"use client"
 
 import { EmailRegistrationContainer } from "../organisms/email-registration-container"
 
@@ -14,38 +13,44 @@ interface EmailRegistrationLayoutProps {
   onLogoClick: () => void
   isLoading?: boolean
   currentUserRank?: string | null
+  errorMessage?: string
+  successMessage?: string
 }
 
-export function EmailRegistrationLayout({ 
-  currentStep, 
-  email, 
-  onSubmit, 
-  onBack, 
-  onBackToLogin, 
-  onResend, 
-  onLogoClick, 
+export function EmailRegistrationLayout({
+  currentStep,
+  email,
+  onSubmit,
+  onBack,
+  onBackToLogin,
+  onResend,
+  onLogoClick,
   isLoading,
-  currentUserRank
+  currentUserRank,
+  errorMessage,
+  successMessage,
 }: EmailRegistrationLayoutProps) {
   // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
+  const getBackgroundColorByRank = (rank: string | null | undefined) => {
     // 全ての背景色をブロンズ・非会員色に統一
     return "bg-gradient-to-br from-green-50 to-green-100"
   }
 
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank)
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   return (
-    <EmailRegistrationContainer 
+    <EmailRegistrationContainer
       currentStep={currentStep}
       email={email}
-      onSubmit={onSubmit} 
-      onBack={onBack} 
+      onSubmit={onSubmit}
+      onBack={onBack}
       onBackToLogin={onBackToLogin}
       onResend={onResend}
-      onLogoClick={onLogoClick} 
-      isLoading={isLoading} 
+      onLogoClick={onLogoClick}
+      isLoading={isLoading}
       backgroundColorClass={backgroundColorClass}
+      errorMessage={errorMessage}
+      successMessage={successMessage}
     />
   )
 }
