@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json()
     return NextResponse.json(data, { status: response.status })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, message: 'リクエストの処理に失敗しました' },
       { status: 500 }

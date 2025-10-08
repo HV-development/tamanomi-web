@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const TAMAYOI_API_URL = process.env.TAMAYOI_API_URL || 'http://localhost:3001'
-
 export async function GET(
     request: NextRequest,
     { params }: { params: { token: string } }
@@ -34,10 +32,10 @@ export async function GET(
             signupUrl.searchParams.set('token', token)
 
             return NextResponse.redirect(signupUrl)
-        } catch (decodeError) {
+        } catch {
             return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
         }
-    } catch (error) {
+    } catch {
         return NextResponse.redirect(new URL('/email-registration?error=verification_failed', request.url))
     }
 }

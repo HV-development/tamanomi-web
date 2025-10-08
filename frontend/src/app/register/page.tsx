@@ -50,14 +50,15 @@ export default function RegisterPage() {
             const parsedData = JSON.parse(savedData)
             setInitialFormData(parsedData)
             sessionStorage.removeItem('registerFormData')
-          } catch (error) {
+          } catch {
+            // エラーを無視
           }
         }
       }
     }
   }, [router])
 
-  const handleRegisterSubmit = async (data: any) => {
+  const handleRegisterSubmit = async (data: Record<string, string>) => {
     setIsLoading(true)
 
     // フォームデータをセッションストレージに保存

@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlanRegistrationLayout } from '@/components/templates/plan-registration-layout'
 import { 
-  PlanListResponse, 
-  CreateUserPlan,
-  CreateUserPlanSchema 
+  PlanListResponse
 } from '@hv-development/schemas'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'

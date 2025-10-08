@@ -6,7 +6,7 @@ import { RegisterConfirmationLayout } from '@/components/templates/register-conf
 
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState<any>(null)
+  const [formData, setFormData] = useState<Record<string, string> | null>(null)
   const [email, setEmail] = useState<string>('')
   const [token, setToken] = useState<string>('')
   const [isClient, setIsClient] = useState(false)
@@ -85,7 +85,7 @@ export default function RegisterConfirmationPage() {
         const errorMessage = result.message || result.error?.message || '登録に失敗しました'
         alert(errorMessage)
       }
-    } catch (error) {
+    } catch {
       alert('ネットワークエラーが発生しました。再度お試しください。')
     } finally {
       setIsLoading(false)

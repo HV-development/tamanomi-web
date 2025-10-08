@@ -63,7 +63,7 @@ export default function SignupPage() {
       } else {
         alert(result.message || result.error?.message || 'エラーが発生しました')
       }
-    } catch (error) {
+    } catch {
       alert('ネットワークエラーが発生しました')
     } finally {
       setIsLoading(false)

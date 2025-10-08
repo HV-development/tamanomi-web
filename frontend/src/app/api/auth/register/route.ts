@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { UseRregistrationCompleteSchema } from '@/schemas/auth'
 
 export const dynamic = 'force-dynamic'
 

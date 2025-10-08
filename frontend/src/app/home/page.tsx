@@ -63,14 +63,14 @@ export default function HomePage() {
   const [state, dispatch] = useReducer(appReducer, initialState)
 
   // データ読み込みの最適化
-  const { loadData, isLoading: dataLoading, error: dataError } = useDataLoader()
+  const { loadData } = useDataLoader()
 
   // データの遅延読み込み
   useEffect(() => {
     const initializeData = async () => {
       const data = await loadData()
-      dispatch({ type: 'SET_STORES', payload: data.stores as any })
-      dispatch({ type: 'SET_NOTIFICATIONS', payload: data.notifications as any })
+      dispatch({ type: 'SET_STORES', payload: data.stores })
+      dispatch({ type: 'SET_NOTIFICATIONS', payload: data.notifications })
       dispatch({ type: 'SET_DATA_LOADED', payload: true })
     }
 
@@ -85,8 +85,8 @@ export default function HomePage() {
 
   // 計算値をカスタムフックで分離
   const computedValues = useComputedValues(
-    state.stores as any[],
-    state.notifications as any[],
+    state.stores,
+    state.notifications,
     auth,
     filters
   )
