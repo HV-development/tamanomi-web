@@ -10,7 +10,10 @@ export async function GET(
 ) {
   try {
     const customerId = params.customer_id
-    const fullUrl = `${API_BASE_URL}/api/v1/payment/session/${customerId}`
+    
+    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
+    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+    const fullUrl = `${baseUrl}/api/v1/payment/session/${customerId}`
     
     console.log('Payment session API request:', {
       method: 'GET',

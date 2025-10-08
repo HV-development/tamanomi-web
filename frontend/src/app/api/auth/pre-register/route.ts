@@ -8,10 +8,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
+    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+
     // デバッグ: 環境変数の確認
     console.log('Environment check:', {
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
       API_BASE_URL: API_BASE_URL,
+      baseUrl: baseUrl,
       NODE_ENV: process.env.NODE_ENV
     });
 
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
-    const fullUrl = `${API_BASE_URL}/api/v1/pre-register`;
+    const fullUrl = `${baseUrl}/api/v1/pre-register`;
 
     try {
       const response = await fetch(fullUrl, {
