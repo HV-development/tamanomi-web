@@ -68,12 +68,16 @@ export function PlanCard({
       {/* 価格 */}
       {price && (
         <div className="mb-4">
-          {originalPrice && (
-            <span className={`text-sm line-through mr-2 ${disabled ? "text-gray-400" : "text-gray-500"}`}>
-              {originalPrice}
-            </span>
+          {originalPrice ? (
+            <div className="flex flex-col items-start">
+              <span className={`text-sm line-through ${disabled ? "text-gray-400" : "text-gray-500"}`}>
+                {originalPrice}
+              </span>
+              <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-green-600"}`}>{price}</span>
+            </div>
+          ) : (
+            <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-green-600"}`}>{price}</span>
           )}
-          <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-green-600"}`}>{price}</span>
         </div>
       )}
 

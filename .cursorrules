@@ -23,4 +23,20 @@ git pull origin develop
 git checkout -b feature/[作業内容]
 ```
 
+## 型定義とバリデーション管理ルール
+
+### 1. 型定義・バリデーションの一元管理
+- **型定義・バリデーション追加**: `tamanomi-schemas/` ディレクトリを修正
+- **パッケージ公開**: GitHub Packages (`@hv-development/schemas`) に自動公開
+- **開発環境**: ローカル参照 (`pnpm add @hv-development/schemas@file:../tamanomi-schemas`)
+- **本番環境**: GitHub Packages (`pnpm add @hv-development/schemas`)
+
+### 2. インポート方法
+- 型定義やバリデーション関数は `@hv-development/schemas` からインポート
+- 例: `import { UserSchema, validateUser } from '@hv-development/schemas'`
+
+### 3. 禁止事項
+- 各プロジェクト内で独自の型定義やバリデーション関数を作成しない
+- `tamanomi-schemas/` 以外での型定義・バリデーション管理は禁止
+
 このルールにより、開発作業の履歴管理とチーム開発の効率化を図ります。

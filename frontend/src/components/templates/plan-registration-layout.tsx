@@ -1,6 +1,7 @@
 "use client"
 
 import { PlanRegistrationContainer } from "../organisms/plan-registration-container"
+import { PlanListResponse } from '@hv-development/schemas'
 
 interface PlanRegistrationLayoutProps {
   onPaymentMethodRegister: (planId: string) => void
@@ -8,6 +9,8 @@ interface PlanRegistrationLayoutProps {
   onLogoClick: () => void
   isLoading?: boolean
   currentUserRank?: string | null
+  plans: PlanListResponse['plans']
+  error?: string
 }
 
 export function PlanRegistrationLayout({ 
@@ -15,7 +18,9 @@ export function PlanRegistrationLayout({
   onCancel, 
   onLogoClick, 
   isLoading, 
-  currentUserRank 
+  currentUserRank,
+  plans,
+  error
 }: PlanRegistrationLayoutProps) {
   // ランクに基づく背景色を取得
   const getBackgroundColorByRank = (rank: string | null) => {
@@ -32,6 +37,8 @@ export function PlanRegistrationLayout({
       onLogoClick={onLogoClick}
       isLoading={isLoading}
       backgroundColorClass={backgroundColorClass}
+      plans={plans}
+      error={error}
     />
   )
 }
