@@ -9,7 +9,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { customerId, userEmail, planId, customerFamilyName, customerName, companyName } = body
     
-    const fullUrl = `${API_BASE_URL}/api/v1/payment/register`
+    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
+    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+    const fullUrl = `${baseUrl}/api/v1/payment/register`
     
     console.log('Payment register API request:', {
       method: 'POST',
