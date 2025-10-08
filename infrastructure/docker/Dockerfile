@@ -1,5 +1,5 @@
 # Next.jsアプリケーション用Dockerfile
-FROM node:20-alpine
+FROM node:22-alpine
 
 # ビルド引数としてGitHub tokenを受け取る
 ARG GITHUB_TOKEN

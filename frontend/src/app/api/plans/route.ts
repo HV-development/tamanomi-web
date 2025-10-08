@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function GET(request: NextRequest) {
@@ -7,6 +9,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status') || 'active'
     const limit = searchParams.get('limit') || '50'
+    
+    // デバッグ: 環境変数の確認
+    console.log('Environment check:', {
+      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+      API_BASE_URL: API_BASE_URL,
+      NODE_ENV: process.env.NODE_ENV
+    })
     
     const fullUrl = `${API_BASE_URL}/api/v1/plans?status=${status}&limit=${limit}`
     

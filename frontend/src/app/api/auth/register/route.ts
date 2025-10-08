@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { UseRregistrationCompleteSchema } from '@/schemas/auth'
 
+export const dynamic = 'force-dynamic'
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function POST(request: NextRequest) {
