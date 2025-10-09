@@ -11,21 +11,25 @@ export async function POST(request: NextRequest) {
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 
-    // 一時的にスキーマバリデーションをスキップ
-    // const validatedData = UseRregistrationCompleteSchema.parse(body)
+    // バックエンドが期待するデータ構造に変換
+    // passwordConfirmは送信しない
     const validatedData = {
       email: body.email,
       password: body.password,
-      accountType: 'user', // デフォルトでuserを設定
-      displayName: body.displayName,
-      phone: body.phone
+      nickname: body.nickname,
+      postalCode: body.postalCode,
+      address: body.address,
+      birthDate: body.birthDate,
+      gender: body.gender,
+      saitamaAppId: body.saitamaAppId,
+      token: body.token
     };
 
     // タイムアウト設定付きのfetch
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
-    const fullUrl = `${baseUrl}/api/v1/register`;
+    const fullUrl = `${baseUrl}/api/v1/register/complete`;
 
     try {
       const response = await fetch(fullUrl, {
