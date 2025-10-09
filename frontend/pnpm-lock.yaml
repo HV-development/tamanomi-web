@@ -536,7 +536,7 @@ packages:
     dev: true
 
   /@hv-development/schemas@1.5.4:
-    resolution: {integrity: sha512-zela1aJhJv70FgTLOmL6m1U4RFvDRTW1uzrMFrPb3J1jHTTlpYXS8sqnSGIUQdrc2Ulqpe7nEg==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.5.4/a144c9423c3cc4be9f2023481bf0b6c4307c6dde}
+    resolution: {integrity: sha512-zela1aJhJv70F11hQR24jVI+eBeczF/3TX54ylu+WhKi0at2fijwoveBsFONo5qjAozd9fdIidrc2Ulqpe7nEg==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.5.4/a144c9423c3cc4be9f2023481bf0b6c4307c6dde}
     engines: {node: '>=18.0.0'}
     dependencies:
       zod: 3.25.76
