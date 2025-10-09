@@ -56,7 +56,19 @@ echo ""
 echo "🔑 Step 2: GITHUB_TOKENの設定"
 echo "-----------------------------------"
 
-# .envファイルからGITHUB_TOKENを読み込む
+REPO_ROOT="$(cd "$PROJECT_ROOT/../.." && pwd)"
+SHARED_ENV="$REPO_ROOT/.env.shared"
+
+# 共有環境ファイルからGITHUB_TOKENを読み込む（優先）
+if [ -f "$SHARED_ENV" ] && [ -z "$GITHUB_TOKEN" ]; then
+  SHARED_GITHUB_TOKEN=$(grep "^GITHUB_TOKEN=" "$SHARED_ENV" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+  if [ -n "$SHARED_GITHUB_TOKEN" ]; then
+    GITHUB_TOKEN="$SHARED_GITHUB_TOKEN"
+    echo "✅ 共有環境ファイルからGITHUB_TOKENを読み込みました"
+  fi
+fi
+
+# .envファイルからGITHUB_TOKENを読み込む（フォールバック）
 if [ -f ".env" ] && [ -z "$GITHUB_TOKEN" ]; then
   EXISTING_TOKEN=$(grep "^GITHUB_TOKEN=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
   if [ -n "$EXISTING_TOKEN" ] && [ "$EXISTING_TOKEN" != "your_github_token_here" ]; then
