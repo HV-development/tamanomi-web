@@ -2,6 +2,8 @@
  * 認証関連のAPIクライアント
  */
 
+import { apiPost } from '@/lib/api'
+
 export interface PreRegisterRequest {
   email: string
   campaignCode?: string
@@ -21,32 +23,11 @@ export async function preRegister(
   campaignCode?: string
 ): Promise<PreRegisterResponse> {
   try {
-    const response = await fetch('/api/auth/pre-register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        campaignCode,
-      }),
+    const data = await apiPost<PreRegisterResponse>('/api/auth/pre-register', {
+      email,
+      campaignCode,
     })
 
-    // デバッグログ
-    console.log('preRegister response:', {
-      status: response.status,
-      ok: response.ok,
-      statusText: response.statusText
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      // エラーメッセージの正規化
-      const message = errorData.message || '認証メールの送信に失敗しました'
-      throw new Error(message)
-    }
-
-    const data = await response.json()
     console.log('preRegister success data:', data)
     return data
   } catch (error) {

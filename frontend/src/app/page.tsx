@@ -11,6 +11,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { LoginLayout } from "@/components/templates/login-layout"
 import { Suspense, useState } from "react"
+import { apiPost } from "@/lib/api"
 
 function LoginPageContent() {
   const router = useRouter()
@@ -45,36 +46,18 @@ function LoginPageContent() {
 
     try {
       // パスワード認証を実行
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: userEmail, password }),
+      const data = await apiPost<{ success?: boolean; error?: string }>('/api/auth/login', {
+        email: userEmail,
+        password,
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'パスワード認証に失敗しました')
-      }
 
       console.log('Password authentication successful:', data)
 
       // OTP送信
-      const otpResponse = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: userEmail }),
+      const otpData = await apiPost<{ requestId: string }>('/api/auth/send-otp', {
+        email: userEmail,
       })
 
-      if (!otpResponse.ok) {
-        throw new Error('ワンタイムパスワードの送信に失敗しました')
-      }
-
-      const otpData = await otpResponse.json()
       console.log('OTP sent successfully:', otpData)
 
       // パスワード認証成功 → OTP入力画面へ
@@ -95,19 +78,11 @@ function LoginPageContent() {
     setError("")
 
     try {
-      const response = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, otp, requestId }),
+      const data = await apiPost<{ accessToken?: string; refreshToken?: string }>('/api/auth/verify-otp', {
+        email,
+        otp,
+        requestId,
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'ワンタイムパスワードの認証に失敗しました')
-      }
 
       // ログイン成功
       console.log('OTP verification successful:', data)
@@ -144,19 +119,10 @@ function LoginPageContent() {
     setError("")
 
     try {
-      const response = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
+      const otpData = await apiPost<{ requestId: string }>('/api/auth/send-otp', {
+        email,
       })
 
-      if (!response.ok) {
-        throw new Error('ワンタイムパスワードの再送信に失敗しました')
-      }
-
-      const otpData = await response.json()
       setRequestId(otpData.requestId) // 新しいrequestIdを保存
       console.log('OTP resent successfully:', otpData)
     } catch (err) {
