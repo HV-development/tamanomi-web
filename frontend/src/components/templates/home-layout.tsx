@@ -1,12 +1,10 @@
 "use client"
 
-import { FilterControls } from "../molecules/filter-controls"
-import { NavigationBar } from "../molecules/navigation-bar"
+import Image from "next/image"
 import { HomeContainer } from "../organisms/home-container"
-import { MapPin, Phone, Globe, Ticket } from "lucide-react"
 import { LoginLayout } from "./login-layout"
 import { EmailRegistrationLayout } from "./email-registration-layout"
-import { SignupLayout } from "./signup-layout"
+import { RegisterLayout } from "./register-layout"
 import { ConfirmationLayout } from "./confirmation-layout"
 import { SubscriptionLayout } from "./subscription-layout"
 import { PasswordResetLayout } from "./password-reset-layout"
@@ -16,7 +14,6 @@ import { MyPageLayout } from "./mypage-layout"
 import { PlanManagementLayout } from "./plan-management-layout"
 import { PlanChangeLayout } from "./plan-change-layout"
 import { CouponListPopup } from "../molecules/coupon-list-popup"
-import { CouponConfirmationPopup } from "../molecules/coupon-confirmation-popup"
 import { CouponUsedSuccessModal } from "../molecules/coupon-used-success-modal"
 import { LoginRequiredModal } from "../molecules/login-required-modal"
 import { StoreDetailPopup } from "../molecules/store-detail-popup"
@@ -30,12 +27,8 @@ import { GenrePopup } from "../molecules/genre-popup"
 import { HamburgerMenu } from "../molecules/hamburger-menu"
 import { Logo } from "../atoms/logo"
 import { UsageGuideModal } from "../molecules/usage-guide-modal"
-import { useState } from "react"
 import { useAppContext } from "../../contexts/AppContext"
 import type { Store } from "../../types/store"
-import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
-import type { Notification } from "../../types/notification"
-import type { Coupon } from "../../types/coupon"
 
 
 export function HomeLayout() {
@@ -49,17 +42,14 @@ export function HomeLayout() {
   const isNearbyFilter = filters.isNearbyFilter
   const isFavoritesFilter = filters.isFavoritesFilter
   const stores = state.stores
-  const activeTab = navigation.activeTab
   const currentView = navigation.currentView
   const isAuthenticated = auth.isAuthenticated
   const isLoading = auth.isLoading
   const signupData = state.signupData
-  const hasNotification = computedValues.hasNotification
   const favoriteStores = computedValues.favoriteStores
   const historyStores: Store[] = [] // TODO: 履歴データの実装
   const isHistoryOpen = state.isHistoryOpen
   const isFavoritesOpen = state.isFavoritesOpen
-  const notifications = state.notifications
   const user = auth.user
   const plan = auth.plan
   const usageHistory = auth.usageHistory || []
@@ -80,10 +70,7 @@ export function HomeLayout() {
   const onEventsChange = filters.setSelectedEvents
   const onAreasChange = filters.setSelectedAreas
   const onCurrentLocationClick = handlers.handleCurrentLocationClick
-  const onTabChange = handlers.handleTabChange
-  const onFavoritesClick = handlers.handleFavoritesClick
   const onFavoritesClose = handlers.handleFavoritesClose
-  const onHistoryClick = handlers.handleHistoryClick
   const onHistoryClose = handlers.handleHistoryClose
   const onFavoriteToggle = handlers.handleFavoriteToggle
   const onCouponsClick = handlers.handleCouponsClick
@@ -92,7 +79,6 @@ export function HomeLayout() {
   const onChangeEmail = handlers.handleChangeEmail
   const onChangePassword = handlers.handleChangePassword
   const onViewPlan = handlers.handleViewPlan
-  const onChangePlan = handlers.handleChangePlan
   const onPlanChangeSubmit = handlers.handlePlanChangeSubmit
   const onViewUsageHistory = handlers.handleViewUsageHistory
   const onViewPaymentHistory = handlers.handleViewPaymentHistory
@@ -118,9 +104,6 @@ export function HomeLayout() {
   const onPasswordResetSubmit = handlers.handlePasswordResetSubmit
   const onPasswordResetCancel = handlers.handlePasswordResetCancel
   const onPasswordResetResend = handlers.handlePasswordResetResend
-  const onNotificationClick = handlers.handleNotificationClick
-  const onNotificationItemClick = handlers.handleNotificationItemClick
-  const onMarkAllNotificationsRead = handlers.handleMarkAllNotificationsRead
   const onMenuItemClick = handlers.handleMenuItemClick
   const onPlanChangeBack = handlers.handlePlanChangeBack
   const onLogoClick = handlers.handleLogoClick
@@ -132,7 +115,6 @@ export function HomeLayout() {
   const onCouponListClose = handlers.handleCouponListClose
   const onCouponListBack = handlers.handleCouponListBack
   const onUseCoupon = handlers.handleUseCoupon
-  const onUseSameCoupon = handlers.handleUseSameCoupon
   const onConfirmCoupon = handlers.handleConfirmCoupon
   const onCancelCoupon = handlers.handleCancelCoupon
   const onUsageGuideClick = handlers.handleUsageGuideClick
@@ -150,12 +132,8 @@ export function HomeLayout() {
   const passwordChangeStep = state.passwordChangeStep
   const newEmail = state.newEmail
   const onStoreDetailClose = handlers.handleStoreDetailPopupClose
-  const isStoreDetailOpen = false // TODO: 実装
   const isStoreDetailPopupOpen = state.isStoreDetailPopupOpen
   const currentUserRank = computedValues.currentUserRank
-  const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
-  const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
-  const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
 
   // ランクに基づく背景色を取得
   const getBackgroundColorByRank = (rank: string | null, isAuth: boolean) => {
@@ -306,14 +284,14 @@ export function HomeLayout() {
     return (
       <LoginLayout
         onLogin={onLogin}
+        onVerifyOtp={onLogin}
         onSignup={onSignup}
         onForgotPassword={onForgotPassword}
-        onBack={loginStep === "email" ? onBackToHome : onBackToEmailLogin}
-        onLogoClick={onLogoClick}
+        onResendOtp={onResendOtp}
+        onBackToPassword={loginStep === "email" ? onBackToHome : onBackToEmailLogin}
         isLoading={isLoading}
         loginStep={loginStep}
         email={loginEmail}
-        onResendOtp={onResendOtp}
       />
     )
   }
@@ -335,9 +313,17 @@ export function HomeLayout() {
 
   if (currentView === "signup") {
     return (
-      <SignupLayout
-        initialData={signupData}
+      <RegisterLayout
         email={signupData?.email}
+        initialFormData={signupData ? {
+          nickname: signupData.nickname || "",
+          postalCode: signupData.postalCode || "",
+          address: signupData.address || "",
+          birthDate: signupData.birthDate || "",
+          gender: signupData.gender || "",
+          password: "",
+          passwordConfirm: "",
+        } : null}
         onSubmit={onSignupSubmit}
         onCancel={onSignupCancel}
         onLogoClick={onLogoClick}
@@ -366,11 +352,14 @@ export function HomeLayout() {
             {isAuthenticated ? (
               user && currentUserRank && (
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
-                  <img
-                    src={`/${currentUserRank}.png`}
-                    alt={`${currentUserRank}ランク`}
-                    className="w-5 h-5 object-contain"
-                  />
+                  <div className="relative w-5 h-5">
+                    <Image
+                      src={`/${currentUserRank}.png`}
+                      alt={`${currentUserRank}ランク`}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
                 </div>
               )
             ) : null}
@@ -449,7 +438,7 @@ export function HomeLayout() {
         onGenreToggle={(genre) => {
           const currentGenres = selectedGenres ?? []
           const newGenres = currentGenres.includes(genre)
-            ? currentGenres.filter((g) => g !== genre)
+            ? currentGenres.filter((g: string) => g !== genre)
             : [...currentGenres, genre]
           onGenresChange(newGenres)
         }}

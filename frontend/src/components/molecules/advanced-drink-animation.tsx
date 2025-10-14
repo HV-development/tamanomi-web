@@ -17,7 +17,6 @@ export default function AdvancedDrinkAnimation({
   className = '',
   width = 200,
   height = 200,
-  duration = 2000,
   onAnimationComplete,
   autoStart = false,
   showButton = true
@@ -25,24 +24,19 @@ export default function AdvancedDrinkAnimation({
   const [currentImage, setCurrentImage] = useState<'drink1' | 'drink2'>('drink1');
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [animationPhase, setAnimationPhase] = useState<'idle' | 'switching' | 'drinking' | 'resetting'>('idle');
 
   useEffect(() => {
     if (autoStart && !isAnimating && !hasAnimated) {
       setCurrentImage('drink1');
-      setAnimationPhase('idle');
       setIsAnimating(true);
     }
   }, [autoStart, isAnimating, hasAnimated]);
 
   useEffect(() => {
     if (isAnimating) {
-      setAnimationPhase('switching');
-      
       // 0.5秒後にdrink2に切り替え
       const switchTimer = setTimeout(() => {
         setCurrentImage('drink2');
-        setAnimationPhase('drinking');
         
         // drink2で停止（ループしない）
         setTimeout(() => {
@@ -58,19 +52,17 @@ export default function AdvancedDrinkAnimation({
         clearTimeout(switchTimer);
       };
     }
-  }, [isAnimating]);
+  }, [isAnimating, hasAnimated, onAnimationComplete]);
 
   const startAnimation = useCallback(() => {
     if (!isAnimating && !hasAnimated) {
       setCurrentImage('drink1');
-      setAnimationPhase('idle');
       setIsAnimating(true);
     }
   }, [isAnimating, hasAnimated]);
 
   const resetAnimation = () => {
     setCurrentImage('drink1');
-    setAnimationPhase('idle');
     setIsAnimating(false);
     setHasAnimated(false);
   };

@@ -28,6 +28,12 @@ jobs:
         with:
           version: 10
 
+      - name: Setup GitHub Packages authentication
+        run: |
+          echo "@hv-development:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.PERSONAL_ACCESS_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:always-auth=true" >> .npmrc
+
       - name: Get pnpm store directory
         shell: bash
         run: |
@@ -40,12 +46,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
-      - name: Setup GitHub Packages authentication
-        run: |
-          echo "@hv-development:registry=https://npm.pkg.github.com" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
-          echo "//npm.pkg.github.com/:always-auth=true" >> .npmrc
 
       - name: Install dependencies
         run: pnpm install

@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 
 interface PasswordResetFormProps {
@@ -19,11 +18,11 @@ export function PasswordResetForm({ onSubmit, onCancel, isLoading = false }: Pas
   const validateEmail = (email: string) => {
     // メールアドレス - 必須チェック
     if (!email) {
-      return "メールアドレスを入力してください。"
+      return "有効なメールアドレスを入力してください。"
     }
     // メールアドレス - メールフォーマットチェック
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return "正しいメールアドレスを入力してください。"
+      return "正しい有効なメールアドレスを入力してください。"
     }
     return ""
   }
@@ -56,7 +55,7 @@ export function PasswordResetForm({ onSubmit, onCancel, isLoading = false }: Pas
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center mb-6">
         <p className="text-gray-600 leading-relaxed">
-          ご登録いただいているメールアドレスを入力してください。
+          ご登録いただいている有効なメールアドレスを入力してください。
           <br />
           パスワード再設定用のリンクをお送りします。
         </p>

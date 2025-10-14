@@ -84,12 +84,12 @@ export default function HomePage() {
   }, [state.isDataLoaded, state.stores.length, state.notifications.length, navigation.currentView, auth.isAuthenticated])
 
   // 計算値をカスタムフックで分離
-  const computedValues = useComputedValues(
-    state.stores,
-    state.notifications,
+  const computedValues = useComputedValues({
+    stores: state.stores,
+    notifications: state.notifications,
     auth,
     filters
-  )
+  })
 
   // ハンドラーを作成
   const handlers = useAppHandlers(dispatch, auth, navigation, filters, router, state)

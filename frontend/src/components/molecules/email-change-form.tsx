@@ -3,100 +3,95 @@
 import type React from "react"
 import { useState } from "react"
 import { Settings } from "lucide-react"
+import { emailChangeSchema, type EmailChangeInput } from "@hv-development/schemas"
+import { z } from "zod"
 
 interface EmailChangeFormProps {
   currentEmail: string
   initialNewEmail?: string
-  onSubmit: (currentPassword: string, newEmail: string) => void
+  onSubmit: (data: EmailChangeInput) => void
   onCancel: () => void
   isLoading?: boolean
 }
 
 export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, onCancel, isLoading = false }: EmailChangeFormProps) {
-  const [currentPassword, setCurrentPassword] = useState("")
-  const [newEmail, setNewEmail] = useState(initialNewEmail)
-  const [confirmEmail, setConfirmEmail] = useState("")
-  const [errors, setErrors] = useState<{
-    currentPassword?: string
-    newEmail?: string
-    confirmEmail?: string
-  }>({})
+  const [formData, setFormData] = useState<EmailChangeInput>({
+    currentPassword: "",
+    newEmail: initialNewEmail,
+    confirmEmail: "",
+  })
+  const [errors, setErrors] = useState<Partial<EmailChangeInput>>({})
 
   const validateForm = () => {
-    const newErrors: typeof errors = {}
+    try {
+      // tamanomi-schemasのスキーマを使用してバリデーション
+      emailChangeSchema.parse(formData)
 
-    // 現在のパスワード
-    if (!currentPassword) {
-      newErrors.currentPassword = "現在のパスワードを入力してください。"
+      // 追加のビジネスロジックバリデーション
+      if (formData.newEmail === currentEmail) {
+        setErrors({ newEmail: "現在のメールアドレスと同じです。" })
+        return false
+      }
+
+      setErrors({})
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Partial<EmailChangeInput> = {}
+        error.errors.forEach((err) => {
+          const field = err.path[0] as keyof EmailChangeInput
+          if (field) {
+            newErrors[field] = err.message
+          }
+        })
+        setErrors(newErrors)
+      }
+      return false
     }
-
-    // 新しいメールアドレス
-    if (!newEmail) {
-      newErrors.newEmail = "新しいメールアドレスを入力してください。"
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-      newErrors.newEmail = "正しいメールアドレスを入力してください。"
-    } else if (newEmail === currentEmail) {
-      newErrors.newEmail = "現在のメールアドレスと同じです。"
-    }
-
-    // メールアドレス確認
-    if (!confirmEmail) {
-      newErrors.confirmEmail = "メールアドレス確認を入力してください。"
-    } else if (newEmail !== confirmEmail) {
-      newErrors.confirmEmail = "メールアドレスが一致しません。"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
-  const validateFieldOnInput = (field: keyof typeof errors, value: string) => {
+  const validateFieldOnInput = (field: keyof EmailChangeInput, value: string) => {
     const newErrors = { ...errors }
-    
+
     if (field === 'currentPassword') {
       if (value) {
         delete newErrors.currentPassword
       }
     }
-    
+
     if (field === 'newEmail') {
       if (!value) {
         // 入力中は必須エラーを表示しない
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        newErrors.newEmail = "正しいメールアドレスを入力してください。"
+        newErrors.newEmail = "正しい有効なメールアドレスを入力してください。"
       } else if (value === currentEmail) {
         newErrors.newEmail = "現在のメールアドレスと同じです。"
       } else {
         delete newErrors.newEmail
       }
     }
-    
+
     if (field === 'confirmEmail') {
-      if (value && newEmail !== value) {
+      if (value && formData.newEmail !== value) {
         newErrors.confirmEmail = "メールアドレスが一致しません。"
-      } else if (value && newEmail === value) {
+      } else if (value && formData.newEmail === value) {
         delete newErrors.confirmEmail
       }
     }
-    
+
     setErrors(newErrors)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      onSubmit(currentPassword, newEmail)
+      onSubmit(formData)
     }
   }
 
-  const updateField = (field: keyof typeof errors, value: string) => {
-    if (field === "currentPassword") setCurrentPassword(value)
-    if (field === "newEmail") setNewEmail(value)
-    if (field === "confirmEmail") setConfirmEmail(value)
-
-    if (field === 'currentPassword' || field === 'newEmail' || field === 'confirmEmail') {
-      validateFieldOnInput(field, value)
-    }
+  const updateField = (field: keyof EmailChangeInput, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    validateFieldOnInput(field, value)
   }
 
   return (
@@ -125,7 +120,7 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
             <input
               type="password"
               placeholder=""
-              value={currentPassword}
+              value={formData.currentPassword}
               onChange={(e) => updateField("currentPassword", e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
             />
@@ -140,7 +135,7 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
             <input
               type="email"
               placeholder=""
-              value={newEmail}
+              value={formData.newEmail}
               onChange={(e) => updateField("newEmail", e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
             />
@@ -155,7 +150,7 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
             <input
               type="email"
               placeholder=""
-              value={confirmEmail}
+              value={formData.confirmEmail}
               onChange={(e) => updateField("confirmEmail", e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
             />

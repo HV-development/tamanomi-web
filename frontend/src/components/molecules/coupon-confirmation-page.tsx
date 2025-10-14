@@ -1,8 +1,8 @@
 "use client"
 
+import Image from "next/image"
 import React from 'react'
 
-import { useCouponAudio } from "../../hooks/use-audio"
 
 interface Coupon {
   id: string
@@ -23,16 +23,9 @@ export default function CouponConfirmationPage({
   coupon,
   onConfirm,
   onCancel,
-  onUsageGuideClick,
-  currentUserRank
 }: CouponConfirmationPageProps) {
-  // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
+  // 全ての背景色をブロンズ・非会員色に統一
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   if (!coupon) return null
 
@@ -65,11 +58,12 @@ export default function CouponConfirmationPage({
               {/* クーポンカード */}
               <div className="bg-gray-50 rounded-xl border border-gray-200 mb-6 overflow-hidden max-w-fit mx-auto">
                 {/* クーポン画像 */}
-                <div className="w-full h-32 overflow-hidden">
-                  <img
+                <div className="w-full h-32 overflow-hidden relative">
+                  <Image
                     src={coupon.imageUrl || "/placeholder.svg"}
                     alt={coupon.name}
-                    className="w-full h-full object-cover object-center"
+                    fill
+                    className="object-cover object-center"
                   />
                 </div>
 

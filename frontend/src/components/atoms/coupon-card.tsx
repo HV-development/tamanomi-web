@@ -1,6 +1,7 @@
 "use client"
 
-import { Ticket, Clock } from "lucide-react"
+import Image from "next/image"
+import { Clock } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import type { Coupon } from "../../types/coupon"
@@ -22,7 +23,7 @@ export function CouponCard({ coupon, onUse, className = "" }: CouponCardProps) {
     >
       {/* クーポン画像 */}
       <div className="relative h-48 overflow-hidden">
-        <img src={coupon.imageUrl || "/placeholder.svg"} alt={coupon.name} className="w-full h-full object-cover object-center" />
+        <Image src={coupon.imageUrl || "/placeholder.svg"} alt={coupon.name} fill className="object-cover object-center" />
       </div>
 
       {/* クーポン情報 */}

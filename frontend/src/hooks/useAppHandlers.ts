@@ -4,14 +4,18 @@ import React, { useCallback } from "react"
 import type { AppAction, AppState, AppHandlers } from '@hv-development/schemas'
 import type { Store } from "@/types/store"
 import { appConfig } from '@/config/appConfig'
+import type { useAuth } from './useAuth'
+import type { useNavigation } from './useNavigation'
+import type { useFilters } from './useFilters'
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
 // ハンドラー作成フック
 export const useAppHandlers = (
     dispatch: React.Dispatch<AppAction>,
-    auth: any,
-    navigation: any,
-    filters: any,
-    router: any,
+    auth: ReturnType<typeof useAuth>,
+    navigation: ReturnType<typeof useNavigation>,
+    filters: ReturnType<typeof useFilters>,
+    router: AppRouterInstance,
     state: AppState
 ): AppHandlers => {
 
@@ -67,7 +71,7 @@ export const useAppHandlers = (
 
                     dispatch({ type: 'RESET_LOGIN_STATE' })
                     auth.setIsLoading(false)
-                } catch (error) {
+                } catch {
                     auth.setIsLoading(false)
                     // エラーが発生した場合はデフォルトのユーザーデータを使用
                     const defaultUser = {
@@ -148,10 +152,21 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_EMAIL_REGISTRATION_STEP', payload: "form" })
     }, [dispatch])
 
-    const handleSignupSubmit = useCallback((data: any) => {
-        dispatch({ type: 'SET_SIGNUP_DATA', payload: data })
+    const handleSignupSubmit = useCallback((data: Record<string, string>) => {
+        // RegisterFormのデータ構造に合わせて変換
+        const signupData = {
+            nickname: data.nickname,
+            postalCode: data.postalCode,
+            address: data.address,
+            birthDate: data.birthDate,
+            gender: data.gender,
+            password: data.password,
+            passwordConfirm: data.passwordConfirm,
+            email: state.emailRegistrationEmail || ""
+        }
+        dispatch({ type: 'SET_SIGNUP_DATA', payload: signupData })
         navigation.navigateToView("confirmation")
-    }, [navigation, dispatch])
+    }, [navigation, dispatch, state.emailRegistrationEmail])
 
     const handleSignupCancel = useCallback(() => {
         navigation.navigateToView("login")
@@ -185,7 +200,7 @@ export const useAppHandlers = (
         navigation.navigateToView("signup")
     }, [navigation, dispatch, state.signupData])
 
-    const handleSubscribe = useCallback(async (planId: string) => {
+    const handleSubscribe = useCallback(async () => {
         auth.setIsLoading(true)
         setTimeout(() => {
             auth.setIsLoading(false)
@@ -366,12 +381,12 @@ export const useAppHandlers = (
         navigation.resetNavigation()
     }, [auth, navigation])
 
-    const handleShowStoreOnHome = useCallback((storeId: string) => {
+    const handleShowStoreOnHome = useCallback(() => {
         navigation.navigateToView("home", "home")
         navigation.navigateToMyPage("main")
     }, [navigation])
 
-    const handleUseSameCoupon = useCallback((couponId: string) => {
+    const handleUseSameCoupon = useCallback(() => {
         if (!auth.isAuthenticated) {
             dispatch({ type: 'SET_LOGIN_REQUIRED_MODAL_OPEN', payload: true })
             return
@@ -454,7 +469,7 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_SELECTED_STORE', payload: null })
     }, [dispatch])
 
-    const handleProfileEditSubmit = useCallback(async (data: any) => {
+    const handleProfileEditSubmit = useCallback(async () => {
         auth.setIsLoading(true)
         setTimeout(() => {
             // プロフィール更新処理
@@ -475,7 +490,7 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "form" })
     }, [dispatch])
 
-    const handlePasswordChangeSubmit = useCallback(async (currentPassword: string, newPassword: string) => {
+    const handlePasswordChangeSubmit = useCallback(async () => {
         auth.setIsLoading(true)
 
         setTimeout(() => {

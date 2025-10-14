@@ -6,22 +6,12 @@ import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 import { RadioButton } from "../atoms/radio-button"
 import { DateInput } from "../atoms/date-input"
-import { validatePassword, validatePasswordRealtime, validatePasswordConfirm, validatePasswordConfirmRealtime } from "../../utils/validation"
-
-interface RegisterFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  password: string
-  passwordConfirm: string
-}
+import { UseRregistrationCompleteSchema, type UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterFormProps {
   email?: string
-  initialFormData?: RegisterFormData | null
-  onSubmit: (data: RegisterFormData) => void
+  initialFormData?: UserRegistrationComplete | null
+  onSubmit: (data: UserRegistrationComplete) => void
   onCancel: () => void
   isLoading?: boolean
 }
@@ -33,17 +23,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [formData, setFormData] = useState<RegisterFormData>({
+  console.log('🟠 RegisterForm: Component rendered with props:', { email, initialFormData, isLoading })
+  const [formData, setFormData] = useState<UserRegistrationComplete>({
+    email: email || "",
     nickname: "",
     postalCode: "",
     address: "",
     birthDate: "",
-    gender: "",
+    gender: "male",
+    saitamaAppId: "",
     password: "",
     passwordConfirm: "",
   })
 
-  const [errors, setErrors] = useState<Partial<RegisterFormData>>({})
+  const [errors, setErrors] = useState<Partial<Record<keyof UserRegistrationComplete, string>>>({})
   const [isSearchingAddress, setIsSearchingAddress] = useState(false)
 
   // 住所フィールドへの参照を追加
@@ -51,15 +44,19 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   // initialFormDataが変更された時にフォームデータを設定
   useEffect(() => {
+    console.log('🟣 RegisterForm: useEffect triggered with initialFormData:', initialFormData, 'email:', email)
     if (initialFormData) {
-      setFormData({
+      const newFormData = {
         ...initialFormData,
+        email: email || "", // emailプロパティを優先
         // セキュリティのためパスワードフィールドはクリア
         password: "",
         passwordConfirm: "",
-      })
+      }
+      console.log('🟣 RegisterForm: Setting formData to:', newFormData)
+      setFormData(newFormData)
     }
-  }, [initialFormData])
+  }, [initialFormData, email])
 
   const genderOptions = [
     { value: "male", label: "男性" },
@@ -67,68 +64,77 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     { value: "other", label: "その他" },
   ]
 
-  const validateForm = () => {
-    const newErrors: Partial<RegisterFormData> = {}
-
-    // ニックネーム - 必須チェック
-    if (!formData.nickname.trim()) {
-      newErrors.nickname = "ニックネームを入力してください。"
-    }
-
-    // 郵便番号 - 必須チェック、桁数チェック
-    if (!formData.postalCode) {
-      newErrors.postalCode = "郵便番号を入力してください。"
-    } else if (!/^\d{7}$/.test(formData.postalCode.replace(/-/g, ""))) {
-      newErrors.postalCode = "郵便番号は7桁の数字で入力してください。"
-    }
-
-    // 住所 - 必須チェック
-    if (!formData.address.trim()) {
-      newErrors.address = "住所を入力してください。"
-    }
-
-    // 生年月日 - 必須チェック、日付形式チェック
-    if (!formData.birthDate) {
-      newErrors.birthDate = "生年月日を入力してください。"
-    } else {
-      const birthDate = new Date(formData.birthDate)
-      const today = new Date()
-      if (isNaN(birthDate.getTime())) {
-        newErrors.birthDate = "正しい日付形式で入力してください。"
-      } else if (birthDate >= today) {
-        newErrors.birthDate = "生年月日は今日より前の日付を入力してください。"
-      } else if (today.getFullYear() - birthDate.getFullYear() > 120) {
-        newErrors.birthDate = "正しい生年月日を入力してください。"
+  const validateField = (fieldName: keyof UserRegistrationComplete, value: string) => {
+    try {
+      UseRregistrationCompleteSchema.pick({ [fieldName]: true } as Record<string, boolean>).parse({ [fieldName]: value })
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    } catch (error) {
+      if (error instanceof Error && 'errors' in error) {
+        const zodError = error as { errors: Array<{ message: string }> }
+        const errorMessage = zodError.errors[0]?.message || "入力エラーです"
+        setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
       }
     }
+  }
 
-    // 性別 - 選択チェック
-    if (!formData.gender) {
-      newErrors.gender = "性別を選択してください。"
+  const validateForm = () => {
+    console.log('🟡 RegisterForm: validateForm called with formData:', formData)
+
+    try {
+      // スキーマを使用してバリデーション
+      const result = UseRregistrationCompleteSchema.parse(formData)
+      console.log('🟢 RegisterForm: Validation successful:', result)
+      setErrors({})
+      return true
+    } catch (error) {
+      console.log('🔴 RegisterForm: Validation failed with error:', error)
+
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> }
+        console.log('🔴 RegisterForm: ZodError details:', zodError.errors)
+
+        const newErrors: Partial<Record<keyof UserRegistrationComplete, string>> = {}
+
+        zodError.errors.forEach((err) => {
+          const field = err.path?.[0] as keyof UserRegistrationComplete
+          console.log(`🔴 RegisterForm: Field error - ${field}:`, err.message)
+          if (field) {
+            newErrors[field] = err.message
+          }
+        })
+
+        console.log('🔴 RegisterForm: Setting new errors:', newErrors)
+        setErrors(() => newErrors)
+      }
+      return false
     }
-
-    // パスワードバリデーション
-    const passwordValidation = validatePassword(formData.password)
-    if (!passwordValidation.isValid) {
-      newErrors.password = passwordValidation.errors[0]
-    }
-
-    // パスワード確認バリデーション
-    const passwordConfirmValidation = validatePasswordConfirm(formData.password, formData.passwordConfirm)
-    if (!passwordConfirmValidation.isValid) {
-      newErrors.passwordConfirm = passwordConfirmValidation.error
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e: React.FormEvent) => {
+    console.log('🔵 RegisterForm: handleSubmit called')
     e.preventDefault()
-    if (validateForm()) {
+
+    console.log('🔵 RegisterForm: Current formData:', formData)
+    console.log('🔵 RegisterForm: Current errors:', errors)
+
+    const isValid = validateForm()
+    console.log('🔵 RegisterForm: Validation result:', isValid)
+
+    if (isValid) {
+      console.log('🔵 RegisterForm: Calling onSubmit with formData:', formData)
       onSubmit(formData)
+      console.log('🔵 RegisterForm: onSubmit called successfully')
+    } else {
+      console.log('🔵 RegisterForm: Validation failed, onSubmit not called')
+      console.log('🔵 RegisterForm: Updated errors after validation:', errors)
     }
   }
+
 
   const handleAddressSearch = async () => {
     const cleanedPostalCode = formData.postalCode.replace(/-/g, "")
@@ -166,7 +172,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }, 100)
       }
 
-    } catch (error) {
+    } catch {
       // エラー時も住所フィールドにフォーカス
       setTimeout(() => {
         if (addressInputRef.current) {
@@ -178,8 +184,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     }
   }
 
-  const updateFormData = (field: keyof RegisterFormData, value: string) => {
+  const updateFormData = (field: keyof UserRegistrationComplete, value: string): void => {
     setFormData({ ...formData, [field]: value })
+
+    // リアルタイムバリデーション実行
+    if (value.trim()) {
+      validateField(field, value)
+    } else {
+      // 空の場合はエラーをクリア
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
   }
 
 
@@ -269,6 +287,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         value={formData.gender}
         onChange={(value) => updateFormData("gender", value)}
         error={errors.gender}
+      />
+
+      {/* 埼玉県アプリID */}
+      <Input
+        type="text"
+        label="埼玉県アプリID（任意）"
+        placeholder="埼玉県アプリIDを入力"
+        value={formData.saitamaAppId || ""}
+        onChange={(value) => updateFormData("saitamaAppId", value)}
+        error={errors.saitamaAppId || undefined}
       />
 
       {/* パスワード */}

@@ -53,7 +53,7 @@ export function FooterNavigation({
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className="flex flex-col items-center gap-0.5 py-1 min-w-0 flex-1"
+              className={`flex flex-col items-center gap-0.5 py-1 min-w-0 flex-1 ${isActive ? 'opacity-100' : 'opacity-70'}`}
             >
               <Icon className="w-5 h-5 text-white" />
               <span className="text-xs font-medium text-white">

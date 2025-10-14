@@ -3,11 +3,12 @@
 import { HeaderLogo } from "../atoms/header-logo"
 import { EmailRegistrationForm } from "../molecules/email-registration-form"
 import { EmailRegistrationComplete } from "../molecules/email-registration-complete"
+import { type UserRegistrationRequest } from "@hv-development/schemas"
 
 interface EmailRegistrationContainerProps {
   currentStep: "form" | "complete"
   email?: string
-  onSubmit: (email: string, campaignCode?: string) => void
+  onSubmit: (data: UserRegistrationRequest) => void
   onBack: () => void
   onBackToLogin: () => void
   onResend: () => void

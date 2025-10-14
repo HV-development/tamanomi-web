@@ -1,20 +1,14 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
-import { z } from "zod"
-
-// ログインフォーム用のバリデーションスキーマ
-const loginSchema = z.object({
-  email: z.string().email('有効なメールアドレスを入力してください'),
-  password: z.string().min(1, 'パスワードを入力してください')
-})
+import { adminLoginSchema, type AdminLoginInput } from "@hv-development/schemas"
+import { ZodError } from "zod"
 
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => void
+  onLogin: (data: AdminLoginInput) => void
   onSignup: () => void
   onForgotPassword: () => void
   isLoading?: boolean
@@ -22,39 +16,38 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = false, error: externalError }: LoginFormProps) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+  const [formData, setFormData] = useState<AdminLoginInput>({
+    email: "",
+    password: ""
+  })
+  const [errors, setErrors] = useState<Partial<Record<keyof AdminLoginInput, string>>>({})
 
-  // Zodスキーマを使った統一バリデーション関数
-  const validateField = (fieldName: string, value: string) => {
+  const validateField = (fieldName: keyof AdminLoginInput, value: string) => {
     try {
-      loginSchema.pick({ [fieldName]: true } as any).parse({ [fieldName]: value })
-
-      // エラーをクリア
+      adminLoginSchema.pick({ [fieldName]: true } as Record<string, boolean>).parse({ [fieldName]: value })
       setErrors(prev => {
         const newErrors = { ...prev }
-        delete newErrors[fieldName as keyof typeof newErrors]
+        delete newErrors[fieldName]
         return newErrors
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
+      if (error instanceof ZodError) {
         const errorMessage = error.errors[0]?.message || "入力エラーです"
         setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
       }
     }
   }
 
-  const validateForm = () => {
+  const validateForm = (): boolean => {
     try {
-      loginSchema.parse({ email, password })
+      adminLoginSchema.parse(formData)
       setErrors({})
       return true
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: { email?: string; password?: string } = {}
-        error.errors.forEach(err => {
-          const fieldName = err.path[0] as string
+      if (error instanceof ZodError) {
+        const newErrors: Partial<Record<keyof AdminLoginInput, string>> = {}
+        error.errors.forEach((err) => {
+          const fieldName = err.path[0] as keyof AdminLoginInput
           if (fieldName === 'email' || fieldName === 'password') {
             newErrors[fieldName] = err.message
           }
@@ -65,14 +58,11 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
     }
   }
 
-  // リアルタイムバリデーション（input時）
   const handleEmailChange = (value: string) => {
-    setEmail(value)
-    // 空文字の場合はバリデーションをスキップ（必須チェックは送信時のみ）
+    setFormData(prev => ({ ...prev, email: value }))
     if (value.trim()) {
       validateField('email', value)
     } else {
-      // エラーをクリア
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors.email
@@ -82,12 +72,10 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
   }
 
   const handlePasswordChange = (value: string) => {
-    setPassword(value)
-    // 空文字の場合はバリデーションをスキップ（必須チェックは送信時のみ）
+    setFormData(prev => ({ ...prev, password: value }))
     if (value.trim()) {
-      validateField('password', value)
+      validateField('password', value)  // 追加: リアルタイムバリデーション
     } else {
-      // エラーをクリア
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors.password
@@ -99,18 +87,17 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      onLogin(email, password)
+      onLogin(formData)
     }
   }
 
   const handleSignupClick = (e: React.MouseEvent) => {
-    e.preventDefault() // フォーム送信を防ぐ
+    e.preventDefault()
     onSignup()
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* 外部エラー表示 */}
       {externalError && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
           <p className="text-sm text-red-800">{externalError}</p>
@@ -121,7 +108,7 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
         type="email"
         label="メールアドレス"
         placeholder="example@email.com"
-        value={email}
+        value={formData.email}
         onChange={handleEmailChange}
         error={errors.email}
       />
@@ -130,7 +117,7 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
         type="password"
         label="パスワード"
         placeholder="パスワードを入力"
-        value={password}
+        value={formData.password}
         onChange={handlePasswordChange}
         error={errors.password}
       />

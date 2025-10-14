@@ -5,7 +5,7 @@ import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import { PlanCard } from "../atoms/plan-card"
 import { Button } from "../atoms/button"
-import { AlertTriangle, Calendar, CreditCard } from "lucide-react"
+import { Calendar } from "lucide-react"
 import type { Plan } from "../../types/user"
 
 interface PlanOption {

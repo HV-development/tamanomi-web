@@ -2,8 +2,6 @@
 
 import type React from "react"
 
-import { MapPin } from "lucide-react"
-
 interface ButtonProps {
   children: React.ReactNode
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
@@ -15,11 +13,7 @@ interface ButtonProps {
 
 export function Button({ children, onClick, type = "button", variant = "primary", className = "", disabled = false }: ButtonProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // type="submit"の場合はonClickを無視（フォームのonSubmitが処理する）
-    if (type === "submit") {
-      return
-    }
-
+    // type="submit"の場合でもonClickを実行（フォームのonSubmitと併用可能）
     if (onClick) {
       onClick(e)
     }

@@ -27,7 +27,7 @@ interface ProfileEditFormProps {
   isLoading?: boolean
 }
 
-export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoading = false }: ProfileEditFormProps) {
+export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }: ProfileEditFormProps) {
   const [formData, setFormData] = useState<ProfileEditFormData>({
     nickname: "",
     postalCode: "",
@@ -62,7 +62,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
       address: user.address || "",
       birthDate: user.birthDate || "",
       gender: user.gender || "",
-      saitamaAppId: (user as any).saitamaAppId || "",
+      saitamaAppId: (user as User & { saitamaAppId?: string }).saitamaAppId || "",
       registeredStore: user.registeredStore || "",
     }
     setFormData(initialData)
@@ -196,7 +196,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
         }, 100)
       }
 
-    } catch (error) {
+    } catch {
       setErrors(prev => ({
         ...prev,
         address: "住所検索サービスに接続できませんでした。ネットワーク接続を確認するか、手入力で住所を入力してください。"

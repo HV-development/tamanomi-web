@@ -98,7 +98,7 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
       {isOpen && (
         <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
           <div className="py-2">
-            {menuItems.map((item, index) => {
+            {menuItems.map((item) => {
               return (
                 <button
                   key={item.id}

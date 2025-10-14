@@ -2,26 +2,12 @@
 
 import { ArrowLeft, Ticket, CheckCircle, AlertTriangle, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
 
-export default function UsageGuidePage({ currentUserRank }: { currentUserRank?: string | null }) {
+export default function UsageGuidePage() {
   const router = useRouter()
-  const [clientUserRank, setClientUserRank] = useState<string | null>(null)
 
-  // クライアントサイドでランク情報を取得
-  useEffect(() => {
-    // 実際の実装では、ここでユーザー情報を取得してランクを計算
-    // 今回はシルバーランクとして設定
-    setClientUserRank("silver")
-  }, [])
-
-  // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
-  const backgroundColorClass = getBackgroundColorByRank(clientUserRank)
+  // 全ての背景色をブロンズ・非会員色に統一
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   const handleBack = () => {
     router.back()

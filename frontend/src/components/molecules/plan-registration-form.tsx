@@ -1,6 +1,6 @@
 "use client"
 
-import { Crown, CreditCard, Check, Calendar, AlertCircle } from "lucide-react"
+import { CreditCard, AlertCircle } from "lucide-react"
 import { useState } from "react"
 import { PlanCard } from "../atoms/plan-card"
 import { Button } from "../atoms/button"
@@ -16,14 +16,11 @@ interface PlanRegistrationFormProps {
 
 export function PlanRegistrationForm({ 
   onPaymentMethodRegister, 
-  onCancel, 
   isLoading = false,
   plans,
   error
 }: PlanRegistrationFormProps) {
   const [selectedPlan, setSelectedPlan] = useState<string>(plans.length > 0 ? plans[0].id : "")
-
-  const selectedPlanData = plans.find(plan => plan.id === selectedPlan)
 
   const handlePlanSelect = (planId: string) => {
     setSelectedPlan(planId)

@@ -1,7 +1,7 @@
 import { LoginContainer } from "../organisms/login-container"
 
 interface LoginLayoutProps {
-  onLogin: (email: string, password: string) => void
+  onLogin: (loginData: { email: string; password: string }) => void
   onVerifyOtp: (otp: string) => void
   onSignup: () => void
   onForgotPassword: () => void
@@ -11,7 +11,6 @@ interface LoginLayoutProps {
   error?: string
   loginStep?: "password" | "otp"
   email?: string
-  currentUserRank?: string | null
 }
 
 export function LoginLayout({
@@ -25,15 +24,9 @@ export function LoginLayout({
   error,
   loginStep = "password",
   email = "",
-  currentUserRank,
 }: LoginLayoutProps) {
   // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   // ダミーのハンドラー（バック・ロゴクリックはログイン画面では不要だが、
   // ルートページで使用するため、空の関数を渡す）

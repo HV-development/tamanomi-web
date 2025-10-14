@@ -10,7 +10,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { LoginLayout } from "@/components/templates/login-layout"
-import { Suspense, useState } from "react"
+import { Suspense, useState, useEffect, useCallback, useMemo } from "react"
 
 function LoginPageContent() {
   const router = useRouter()
@@ -21,25 +21,39 @@ function LoginPageContent() {
   const [email, setEmail] = useState<string>("")
   const [requestId, setRequestId] = useState<string>("")
 
-  // URLパラメータから payment-success を確認（カード登録完了後の遷移用）
-  const paymentSuccess = searchParams.get('payment-success')
-  const view = searchParams.get('view')
+  // URLパラメータをメモ化して不要な再レンダリングを防ぐ
+  const urlParams = useMemo(() => ({
+    paymentSuccess: searchParams.get('payment-success'),
+    view: searchParams.get('view'),
+    error: searchParams.get('error'),
+    email: searchParams.get('email')
+  }), [searchParams])
 
-  // payment-success パラメータがある場合、またはviewがmypageの場合は元のページに遷移
-  if (paymentSuccess === 'true' || view === 'mypage') {
-    // 元のホーム画面（店舗一覧）に遷移
-    // TODO: 正式リリース時に有効化
-    // router.push(`/home?view=${view || 'stores'}&payment-success=${paymentSuccess}`)
-    
-    // 現時点ではログイン画面にリダイレクト
-    // ログイン後にマイページに遷移するようにする
-    if (typeof window !== 'undefined' && view === 'mypage') {
-      sessionStorage.setItem('redirectAfterLogin', `/home?view=mypage${paymentSuccess ? '&payment-success=true' : ''}`)
+  // URLパラメータの処理をuseEffectに移動
+  useEffect(() => {
+    const { paymentSuccess, view } = urlParams
+
+    // payment-success パラメータがある場合、またはviewがmypageの場合は元のページに遷移
+    if (paymentSuccess === 'true' || view === 'mypage') {
+      // 現時点ではログイン画面にリダイレクト
+      // ログイン後にマイページに遷移するようにする
+      if (typeof window !== 'undefined' && view === 'mypage') {
+        sessionStorage.setItem('redirectAfterLogin', `/home?view=mypage${paymentSuccess ? '&payment-success=true' : ''}`)
+      }
     }
-  }
+  }, [urlParams])
 
-  // ステップ1: パスワード認証 + OTP送信
-  const handlePasswordLogin = async (userEmail: string, password: string) => {
+  // URLパラメータからエラーメッセージを取得
+  useEffect(() => {
+    const { error: errorParam, email: emailParam } = urlParams
+
+    if (errorParam === 'already_registered') {
+      setError(`このメールアドレス（${emailParam}）は既に登録されています。ログイン画面からログインしてください。`)
+    }
+  }, [urlParams])
+
+  // ステップ1: パスワード認証 + OTP送信（useCallbackでメモ化）
+  const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {
     setIsLoading(true)
     setError("")
 
@@ -50,7 +64,7 @@ function LoginPageContent() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: userEmail, password }),
+        body: JSON.stringify({ email: loginData.email, password: loginData.password }),
       })
 
       const data = await response.json()
@@ -67,7 +81,7 @@ function LoginPageContent() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: userEmail }),
+        body: JSON.stringify({ email: loginData.email }),
       })
 
       if (!otpResponse.ok) {
@@ -78,7 +92,7 @@ function LoginPageContent() {
       console.log('OTP sent successfully:', otpData)
 
       // パスワード認証成功 → OTP入力画面へ
-      setEmail(userEmail)
+      setEmail(loginData.email)
       setRequestId(otpData.requestId) // requestIdを保存
       setLoginStep("otp")
     } catch (err) {
@@ -87,10 +101,10 @@ function LoginPageContent() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
-  // ステップ2: OTP認証
-  const handleOtpVerify = async (otp: string) => {
+  // ステップ2: OTP認証（useCallbackでメモ化）
+  const handleOtpVerify = useCallback(async (otp: string) => {
     setIsLoading(true)
     setError("")
 
@@ -136,10 +150,10 @@ function LoginPageContent() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [email, requestId, router])
 
-  // OTP再送信
-  const handleResendOtp = async () => {
+  // OTP再送信（useCallbackでメモ化）
+  const handleResendOtp = useCallback(async () => {
     setIsLoading(true)
     setError("")
 
@@ -165,21 +179,21 @@ function LoginPageContent() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [email])
 
-  // パスワード入力画面に戻る
-  const handleBackToPassword = () => {
+  // パスワード入力画面に戻る（useCallbackでメモ化）
+  const handleBackToPassword = useCallback(() => {
     setLoginStep("password")
     setError("")
-  }
+  }, [])
 
-  const handleSignup = () => {
+  const handleSignup = useCallback(() => {
     router.push('/email-registration')
-  }
+  }, [router])
 
-  const handleForgotPassword = () => {
+  const handleForgotPassword = useCallback(() => {
     router.push('/password-reset')
-  }
+  }, [router])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">

@@ -19,7 +19,9 @@ export const useCouponAudio = () => {
     try {
       // AudioContextを作成（ユーザーインタラクション内で実行）
       if (!globalAudioContext) {
-        globalAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        type AudioContextConstructor = typeof AudioContext | typeof webkitAudioContext;
+        const AudioContextClass = (window.AudioContext || (window as typeof window & { webkitAudioContext?: AudioContextConstructor }).webkitAudioContext) as AudioContextConstructor;
+        globalAudioContext = new AudioContextClass();
       }
       
       // AudioContextを再開
@@ -37,18 +39,18 @@ export const useCouponAudio = () => {
           onload: () => {
             isGlobalAudioReady = true;
           },
-          onloaderror: (id, error) => {
+          onloaderror: () => {
             isGlobalAudioReady = false;
           },
           onplay: () => {
           },
-          onplayerror: (id, error) => {
+          onplayerror: () => {
           }
         });
       }
       
       initializationRef.current = true;
-    } catch (error) {
+    } catch {
     }
   }, [])
 
@@ -79,7 +81,7 @@ export const useCouponAudio = () => {
         // 直接再生
         globalCouponSound.play()
       }
-    } catch (error) {
+    } catch {
     }
   }, [initializeAudio])
 

@@ -12,10 +12,10 @@ export async function POST(request: NextRequest) {
     const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 
     // バックエンドが期待するデータ構造に変換
-    // passwordConfirmは送信しない
     const validatedData = {
       email: body.email,
       password: body.password,
+      passwordConfirm: body.passwordConfirm,
       nickname: body.nickname,
       postalCode: body.postalCode,
       address: body.address,
@@ -46,6 +46,19 @@ export async function POST(request: NextRequest) {
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
+
+        // 409エラー（既存アカウント）の場合は特別な処理
+        if (response.status === 409) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
+              errorCode: 'USER_ALREADY_EXISTS',
+              error: errorData
+            },
+            { status: 409 }
+          )
+        }
 
         return NextResponse.json(
           {

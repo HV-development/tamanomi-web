@@ -3,7 +3,7 @@
 import { User, CreditCard as Edit, Settings } from "lucide-react"
 import { RankBadge } from "../atoms/rank-badge"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "../../utils/rank-calculator"
-import type { User as UserType } from "../../types/user"
+import type { User as UserType, UserRank } from "../../types/user"
 
 interface ProfileSectionProps {
   user: UserType
@@ -15,9 +15,9 @@ interface ProfileSectionProps {
 export function ProfileSection({ user, onEdit, className = "", currentUserRank }: ProfileSectionProps) {
   // ランク計算
   const contractStartDate = user.contractStartDate || user.createdAt
-  const nextRank = currentUserRank ? getNextRankInfo(currentUserRank as any) : null
-  const monthsToNext = currentUserRank ? getMonthsToNextRank(contractStartDate, currentUserRank as any) : null
-  const currentRankInfo = currentUserRank ? (RANK_INFO as any)[currentUserRank] : null
+  const nextRank = currentUserRank ? getNextRankInfo(currentUserRank as UserRank) : null
+  const monthsToNext = currentUserRank ? getMonthsToNextRank(contractStartDate, currentUserRank as UserRank) : null
+  const currentRankInfo = currentUserRank ? RANK_INFO[currentUserRank as UserRank] : null
 
   // ランクが計算されていない場合は基本情報のみ表示
   if (!currentUserRank || !currentRankInfo) {
@@ -104,7 +104,7 @@ export function ProfileSection({ user, onEdit, className = "", currentUserRank }
 
           {/* ランクバッジを中央に配置 */}
           <div className="flex justify-center mb-4">
-            <RankBadge rank={currentUserRank as any} size="lg" />
+            <RankBadge rank={currentUserRank as UserRank} size="lg" />
           </div>
 
           {/* ランク説明 */}

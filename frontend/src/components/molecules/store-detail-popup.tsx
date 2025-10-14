@@ -1,8 +1,6 @@
 "use client"
 
-import { X, MapPin, Phone, Globe, Ticket, Clock, Calendar, JapaneseYen, Cigarette, CreditCard, Users } from "lucide-react"
-import { FavoriteButton } from "../atoms/favorite-button"
-import { getGenreColor } from "../../utils/genre-colors"
+import { X } from "lucide-react"
 import type { Store } from "../../types/store"
 
 interface StoreDetailPopupProps {
@@ -17,53 +15,9 @@ export function StoreDetailPopup({
   isOpen, 
   store, 
   onClose, 
-  onFavoriteToggle, 
   onCouponsClick 
 }: StoreDetailPopupProps) {
   if (!isOpen || !store) return null
-
-  
-  const getStoreInteriorImage = (genre: string) => {
-    const interiorImages: Record<string, string> = {
-      izakaya: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      japanese: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      bar: "https://images.pexels.com/photos/274192/pexels-photo-274192.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      default: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"
-    }
-    return interiorImages[genre] || interiorImages.default
-  }
-
-  // ジャンルに応じた料理画像を取得
-  const getStoreFoodImage = (genre: string) => {
-    const foodImages: Record<string, string> = {
-      izakaya: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      japanese: "https://images.pexels.com/photos/1283219/pexels-photo-1283219.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      bar: "https://images.pexels.com/photos/1407846/pexels-photo-1407846.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
-      default: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"
-    }
-    return foodImages[genre] || foodImages.default
-  }
-
-  const handlePhoneClick = () => {
-    window.open(`tel:${store.phone}`, "_self")
-  }
-
-  const handleWebsiteClick = () => {
-    if (store.website) {
-      window.open(store.website, "_blank")
-    }
-  }
-
-  const handleMapClick = () => {
-    // Googleマップで店舗を検索
-    const query = encodeURIComponent(`${store.name} ${store.address}`)
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`
-    window.open(googleMapsUrl, "_blank")
-  }
 
   // 喫煙ポリシーのテキスト変換
   const getSmokingPolicyText = (policy: string) => {

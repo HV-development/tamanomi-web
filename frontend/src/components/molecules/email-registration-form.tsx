@@ -4,58 +4,72 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { Button } from "../atoms/button"
-import { UserRegistrationRequestSchema } from '@/schemas/auth'
-import { z } from "zod"
+import { Input } from "../atoms/input"
+import { UserRegistrationRequestSchema, type UserRegistrationRequest } from "@hv-development/schemas"
+import { ZodError } from "zod"
 
 interface EmailRegistrationFormProps {
   initialEmail?: string
-  onSubmit: (email: string, campaignCode?: string) => void
+  onSubmit: (data: UserRegistrationRequest) => void
   onBack: () => void
   isLoading?: boolean
   errorMessage?: string
 }
 
 export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isLoading = false, errorMessage }: EmailRegistrationFormProps) {
-  const [email, setEmail] = useState(initialEmail)
-  const [campaignCode, setCampaignCode] = useState("")
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [formData, setFormData] = useState<UserRegistrationRequest>({
+    email: "",
+    campaignCode: ""
+  })
+  const [errors, setErrors] = useState<Partial<Record<keyof UserRegistrationRequest, string>>>({})
 
   // initialEmailが変更された時にemailを更新
   useEffect(() => {
-    setEmail(initialEmail)
+    setFormData(prev => ({ ...prev, email: initialEmail }))
   }, [initialEmail])
 
-  // Zodスキーマを使った統一バリデーション関数
-  const validateField = (fieldName: string, value: any) => {
+  const validateField = (fieldName: keyof UserRegistrationRequest, value: string) => {
     try {
-      // 部分的なバリデーションのために、該当フィールドのみをテスト
-      const testData = { email: "", campaignCode: "" }
-      testData[fieldName as keyof typeof testData] = value
-
-      UserRegistrationRequestSchema.pick({ [fieldName]: true } as any).parse({ [fieldName]: value })
-
-      // エラーをクリア
+      UserRegistrationRequestSchema.pick({ [fieldName]: true } as Record<string, boolean>).parse({ [fieldName]: value })
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
         return newErrors
       })
     } catch (error) {
-      if (error instanceof z.ZodError) {
+      if (error instanceof ZodError) {
         const errorMessage = error.errors[0]?.message || "入力エラーです"
         setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
       }
     }
   }
 
+  const validateForm = (): boolean => {
+    try {
+      UserRegistrationRequestSchema.parse(formData)
+      setErrors({})
+      return true
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const newErrors: Partial<Record<keyof UserRegistrationRequest, string>> = {}
+        error.errors.forEach((err) => {
+          const fieldName = err.path[0] as keyof UserRegistrationRequest
+          if (fieldName === 'email' || fieldName === 'campaignCode') {
+            newErrors[fieldName] = err.message
+          }
+        })
+        setErrors(newErrors)
+      }
+      return false
+    }
+  }
+
   // リアルタイムバリデーション（input時）
   const handleEmailChange = (value: string) => {
-    setEmail(value)
-    // 空文字の場合はバリデーションをスキップ（必須チェックは送信時のみ）
+    setFormData(prev => ({ ...prev, email: value }))
     if (value.trim()) {
       validateField('email', value)
     } else {
-      // エラーをクリア
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors.email
@@ -66,35 +80,22 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
 
   const handleCampaignCodeChange = (value: string) => {
     const upperValue = value.toUpperCase()
-    setCampaignCode(upperValue)
-
-    // 常にバリデーションを実行（空文字でも必須チェックが働く）
-    validateField('campaignCode', upperValue)
+    setFormData(prev => ({ ...prev, campaignCode: upperValue }))
+    if (upperValue.trim()) {
+      validateField('campaignCode', upperValue)
+    } else {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors.campaignCode
+        return newErrors
+      })
+    }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
-    try {
-      const validatedData = UserRegistrationRequestSchema.parse({
-        email,
-        campaignCode
-      })
-
-      // バリデーション成功時はエラーをクリア
-      setErrors({})
-      onSubmit(validatedData.email, validatedData.campaignCode)
-
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        // 全てのエラーを収集してstateに設定
-        const newErrors: Record<string, string> = {}
-        error.errors.forEach(err => {
-          const fieldName = err.path[0] as string
-          newErrors[fieldName] = err.message
-        })
-        setErrors(newErrors)
-      }
+    if (validateForm()) {
+      onSubmit(formData)
     }
   }
 
@@ -124,46 +125,35 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
         </div>
       )}
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          メールアドレス
-        </label>
-        <input
-          type="email"
-          placeholder="example@email.com"
-          value={email}
-          onChange={(e) => handleEmailChange(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-        />
-        {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
-      </div>
+      <Input
+        type="email"
+        label="メールアドレス"
+        placeholder="example@email.com"
+        value={formData.email}
+        onChange={handleEmailChange}
+        error={errors.email}
+      />
 
       {/* キャンペーンコード入力 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          キャンペーンコード
-        </label>
+        <Input
+          type="text"
+          label="キャンペーンコード"
+          placeholder="例: WELCOME2024"
+          value={formData.campaignCode}
+          onChange={handleCampaignCodeChange}
+          error={errors.campaignCode}
+        />
 
-        <div className="space-y-3">
-          <input
-            type="text"
-            placeholder="例: WELCOME2024"
-            value={campaignCode}
-            onChange={(e) => handleCampaignCodeChange(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-          />
-          {errors.campaignCode && <p className="text-sm text-red-500">{errors.campaignCode}</p>}
-
-          {/* キャンペーンコード案内リンク */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => window.open("/モニターキャンペーン.pdf", "_blank")}
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
-            >
-              キャンペーンコードはこちら
-            </button>
-          </div>
+        {/* キャンペーンコード案内リンク */}
+        <div className="text-center mt-3">
+          <button
+            type="button"
+            onClick={() => window.open("/モニターキャンペーン.pdf", "_blank")}
+            className="text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
+          >
+            キャンペーンコードはこちら
+          </button>
         </div>
       </div>
 

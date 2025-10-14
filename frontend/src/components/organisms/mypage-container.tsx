@@ -1,9 +1,9 @@
 "use client"
 
-import { ArrowLeft, SquarePen, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
+import Image from "next/image"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/logo"
-import { RankBadge } from "../atoms/rank-badge"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "../../utils/rank-calculator"
 import { UsageHistoryList } from "../molecules/usage-history-list"
 import { PaymentHistoryList } from "../molecules/payment-history-list"
@@ -47,7 +47,7 @@ interface MyPageContainerProps {
   onShowStoreOnHome: (storeId: string) => void
   onUseSameCoupon: (couponId: string) => void
   onLogoClick: () => void
-  onProfileEditSubmit: (data: any) => void
+  onProfileEditSubmit: (data: Record<string, string>, updatedFields: string[]) => void
   onPasswordChangeBackToLogin?: () => void
   onEmailChangeSubmit?: (currentPassword: string, newEmail: string) => void
   onEmailChangeResend?: () => void
@@ -71,15 +71,12 @@ export function MyPageContainer({
   onViewPlan,
   onViewUsageHistory,
   onViewPaymentHistory,
-  onCancelSubscription,
   onWithdraw,
   onWithdrawConfirm,
   onWithdrawCancel,
   onWithdrawComplete,
   onLogout,
   onBack,
-  onShowStoreOnHome,
-  onUseSameCoupon,
   onLogoClick,
   onProfileEditSubmit,
   onPasswordChangeBackToLogin = () => { },
@@ -91,12 +88,6 @@ export function MyPageContainer({
   newEmail = "",
   currentUserRank,
 }: MyPageContainerProps) {
-  // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null | undefined) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   // 防御的チェック：userとplanが存在しない場合はnullを返す
@@ -280,11 +271,14 @@ export function MyPageContainer({
             <div className="flex items-center justify-center gap-4">
               <span className="text-base font-medium text-gray-700">現在のメンバーランク</span>
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-gray-300 shadow-sm">
-                <img
-                  src={`/${currentUserRank}.png`}
-                  alt={`${currentUserRank}ランク`}
-                  className="w-8 h-8 object-contain"
-                />
+                <div className="relative w-8 h-8">
+                  <Image
+                    src={`/${currentUserRank}.png`}
+                    alt={`${currentUserRank}ランク`}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
               </div>
             </div>
 
@@ -302,11 +296,14 @@ export function MyPageContainer({
                     <div className="text-base font-bold text-gray-900">{nextRank.label}にランクアップ！</div>
                   </div>
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300 shadow-sm">
-                    <img
-                      src={`/${nextRank.rank}.png`}
-                      alt={`${nextRank.label}ランク`}
-                      className="w-8 h-8 object-contain"
-                    />
+                    <div className="relative w-8 h-8">
+                      <Image
+                        src={`/${nextRank.rank}.png`}
+                        alt={`${nextRank.label}ランク`}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -319,11 +316,14 @@ export function MyPageContainer({
                 <div className="flex items-center justify-center gap-4">
                   <span className="text-base font-medium text-gray-700">あと10ヶ月でゴールドにランクアップ！</span>
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300 shadow-sm">
-                    <img
-                      src="/gold.png"
-                      alt="ゴールドランク"
-                      className="w-8 h-8 object-contain"
-                    />
+                    <div className="relative w-8 h-8">
+                      <Image
+                        src="/gold.png"
+                        alt="ゴールドランク"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

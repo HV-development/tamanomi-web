@@ -1,14 +1,12 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import type { Store } from "@/types/store"
-import type { Notification } from "@/types/notification"
 
 // データ読み込みの最適化
 export const useDataLoader = () => {
     const [dataCache, setDataCache] = useState<{
-        stores: any[] | null;
-        notifications: any[] | null;
+        stores: unknown[] | null;
+        notifications: unknown[] | null;
     }>({ stores: null, notifications: null })
 
     const [isLoading, setIsLoading] = useState(false)
@@ -24,10 +22,10 @@ export const useDataLoader = () => {
 
         try {
             const [storesData, notificationsData] = await Promise.all([
-                import("@/data/mock-stores").then(mod => mod.mockStores).catch(err => {
+                import("@/data/mock-stores").then(mod => mod.mockStores).catch(() => {
                     return []
                 }),
-                import("@/data/mock-notifications").then(mod => mod.mockNotifications).catch(err => {
+                import("@/data/mock-notifications").then(mod => mod.mockNotifications).catch(() => {
                     return []
                 })
             ])
@@ -36,7 +34,7 @@ export const useDataLoader = () => {
             setDataCache(newData)
             setIsLoading(false)
             return newData
-        } catch (err) {
+        } catch {
             setError('データの読み込みに失敗しました')
             setIsLoading(false)
             return { stores: [], notifications: [] }

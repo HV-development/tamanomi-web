@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle, X, Crown, Sparkles, Gift } from "lucide-react"
+import { CheckCircle, X, Gift } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface PlanChangeSuccessModalProps {

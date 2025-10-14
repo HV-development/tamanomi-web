@@ -28,7 +28,7 @@ export function MenuDropdown({ isOpen, onClose, items, className = "" }: MenuDro
         className={`absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 ${className}`}
       >
         <div className="py-2">
-          {items.map((item, index) => (
+          {items.map((item) => (
             <button
               key={item.id}
               onClick={() => {
