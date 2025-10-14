@@ -149,9 +149,20 @@ export const useAppHandlers = (
     }, [dispatch])
 
     const handleSignupSubmit = useCallback((data: any) => {
-        dispatch({ type: 'SET_SIGNUP_DATA', payload: data })
+        // RegisterFormのデータ構造に合わせて変換
+        const signupData = {
+            nickname: data.nickname,
+            postalCode: data.postalCode,
+            address: data.address,
+            birthDate: data.birthDate,
+            gender: data.gender,
+            password: data.password,
+            passwordConfirm: data.passwordConfirm,
+            email: state.emailRegistrationEmail || ""
+        }
+        dispatch({ type: 'SET_SIGNUP_DATA', payload: signupData })
         navigation.navigateToView("confirmation")
-    }, [navigation, dispatch])
+    }, [navigation, dispatch, state.emailRegistrationEmail])
 
     const handleSignupCancel = useCallback(() => {
         navigation.navigateToView("login")

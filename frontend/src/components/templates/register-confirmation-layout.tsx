@@ -1,19 +1,10 @@
 "use client"
 
 import { RegisterConfirmationContainer } from "../organisms/register-confirmation-container"
-
-interface RegisterFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  password: string
-  passwordConfirm: string
-}
+import { UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterConfirmationLayoutProps {
-  data: RegisterFormData
+  data: UserRegistrationComplete
   email?: string
   onRegister: () => void
   onEdit: () => void
@@ -22,14 +13,14 @@ interface RegisterConfirmationLayoutProps {
   currentUserRank?: string | null
 }
 
-export function RegisterConfirmationLayout({ 
-  data, 
-  email, 
-  onRegister, 
-  onEdit, 
-  onLogoClick, 
-  isLoading, 
-  currentUserRank 
+export function RegisterConfirmationLayout({
+  data,
+  email,
+  onRegister,
+  onEdit,
+  onLogoClick,
+  isLoading,
+  currentUserRank
 }: RegisterConfirmationLayoutProps) {
   // ランクに基づく背景色を取得
   const getBackgroundColorByRank = (rank: string | null) => {

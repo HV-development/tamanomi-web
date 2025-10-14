@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { preRegister } from '@/services/auth'
+import { UserRegistrationRequestSchema, type UserRegistrationRequest } from "@hv-development/schemas"
 
 type Step = 'form' | 'complete'
 
@@ -10,7 +11,7 @@ export interface UseEmailRegistrationReturn {
   errorMessage: string
   successMessage: string
   email: string
-  handleEmailSubmit: (email: string, campaignCode?: string) => Promise<void>
+  handleEmailSubmit: (data: UserRegistrationRequest) => Promise<void>
   handleResend: () => Promise<void>
   clearError: () => void
 }
@@ -47,14 +48,14 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
   /**
    * メールアドレス送信処理
    */
-  const handleEmailSubmit = async (email: string, campaignCode?: string) => {
+  const handleEmailSubmit = async (data: UserRegistrationRequest) => {
     setIsLoading(true)
     setErrorMessage('')
 
     try {
-      await preRegister(email, campaignCode)
+      await preRegister(data.email, data.campaignCode)
       // メールアドレスを保存
-      setLastEmail(email)
+      setLastEmail(data.email)
       // 送信完了画面に遷移
       setCurrentStep('complete')
     } catch (error) {

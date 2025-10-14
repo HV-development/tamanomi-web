@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { RegisterConfirmationLayout } from '@/components/templates/register-confirmation-layout'
+import { UserRegistrationComplete } from "@hv-development/schemas"
 
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState<Record<string, string> | null>(null)
+  const [formData, setFormData] = useState<UserRegistrationComplete | null>(null)
   const [email, setEmail] = useState<string>('')
   const [token, setToken] = useState<string>('')
   const [isClient, setIsClient] = useState(false)
@@ -30,7 +31,7 @@ export default function RegisterConfirmationPage() {
       }
 
       try {
-        const parsedData = JSON.parse(storedData)
+        const parsedData = JSON.parse(storedData) as UserRegistrationComplete
         setFormData(parsedData)
         setEmail(emailParam)
         setToken(tokenParam)
@@ -47,7 +48,6 @@ export default function RegisterConfirmationPage() {
     setIsLoading(true)
 
     try {
-
       // バックエンドAPIに登録リクエストを送信
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -57,10 +57,13 @@ export default function RegisterConfirmationPage() {
         body: JSON.stringify({
           email: email,
           password: formData.password,
-          displayName: formData.displayName,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
+          passwordConfirm: formData.passwordConfirm,
+          nickname: formData.nickname,
+          postalCode: formData.postalCode,
+          address: formData.address,
+          birthDate: formData.birthDate,
+          gender: formData.gender,
+          saitamaAppId: formData.saitamaAppId,
           token: token,
         }),
       })
@@ -83,7 +86,14 @@ export default function RegisterConfirmationPage() {
       } else {
         // エラーハンドリング
         const errorMessage = result.message || result.error?.message || '登録に失敗しました'
-        alert(errorMessage)
+
+        // 409エラー（既存アカウント）の場合は特別な処理
+        if (response.status === 409 && result.errorCode === 'USER_ALREADY_EXISTS') {
+          // ログイン画面にリダイレクト
+          router.push(`/?error=already_registered&email=${encodeURIComponent(email)}`)
+        } else {
+          alert(errorMessage)
+        }
       }
     } catch {
       alert('ネットワークエラーが発生しました。再度お試しください。')

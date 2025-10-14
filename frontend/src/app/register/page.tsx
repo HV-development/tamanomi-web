@@ -3,22 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { RegisterLayout } from '@/components/templates/register-layout'
-
-interface RegisterFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  password: string
-  passwordConfirm: string
-}
+import { UserRegistrationComplete } from "@hv-development/schemas"
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [searchParams, setSearchParams] = useState<{ email?: string; token?: string }>({})
   const [isClient, setIsClient] = useState(false)
-  const [initialFormData, setInitialFormData] = useState<RegisterFormData | null>(null)
+  const [initialFormData, setInitialFormData] = useState<UserRegistrationComplete | null>(null)
   const router = useRouter()
 
   // クライアントサイドでのみ searchParams を取得
@@ -47,7 +38,7 @@ export default function RegisterPage() {
         const savedData = sessionStorage.getItem('registerFormData')
         if (savedData) {
           try {
-            const parsedData = JSON.parse(savedData)
+            const parsedData = JSON.parse(savedData) as UserRegistrationComplete
             setInitialFormData(parsedData)
             sessionStorage.removeItem('registerFormData')
           } catch {
@@ -58,7 +49,7 @@ export default function RegisterPage() {
     }
   }, [router])
 
-  const handleRegisterSubmit = async (data: Record<string, string>) => {
+  const handleRegisterSubmit = async (data: UserRegistrationComplete) => {
     setIsLoading(true)
 
     // フォームデータをセッションストレージに保存

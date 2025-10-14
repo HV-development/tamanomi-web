@@ -2,35 +2,26 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { RegisterForm } from "../molecules/register-form"
-
-interface RegisterFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  password: string
-  passwordConfirm: string
-}
+import { UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterContainerProps {
   email?: string
-  initialFormData?: RegisterFormData | null
-  onSubmit: (data: RegisterFormData) => void
+  initialFormData?: UserRegistrationComplete | null
+  onSubmit: (data: UserRegistrationComplete) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean
   backgroundColorClass?: string
 }
 
-export function RegisterContainer({ 
-  email, 
+export function RegisterContainer({
+  email,
   initialFormData,
-  onSubmit, 
-  onCancel, 
-  onLogoClick, 
-  isLoading, 
-  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" 
+  onSubmit,
+  onCancel,
+  onLogoClick,
+  isLoading,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 }: RegisterContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>

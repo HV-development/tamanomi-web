@@ -3,9 +3,10 @@
 import { HeaderLogo } from "../atoms/header-logo"
 import { LoginForm } from "../molecules/login-form"
 import { OtpInputForm } from "../molecules/otp-input-form"
+import { adminLoginSchema, type AdminLoginInput } from "@hv-development/schemas"
 
 interface LoginContainerProps {
-  onLogin: (email: string, password: string) => void
+  onLogin: (loginData: AdminLoginInput) => void
   onVerifyOtp: (otp: string) => void
   onSignup: () => void
   onForgotPassword: () => void

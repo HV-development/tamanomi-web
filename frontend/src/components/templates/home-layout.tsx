@@ -6,7 +6,7 @@ import { HomeContainer } from "../organisms/home-container"
 import { MapPin, Phone, Globe, Ticket } from "lucide-react"
 import { LoginLayout } from "./login-layout"
 import { EmailRegistrationLayout } from "./email-registration-layout"
-import { SignupLayout } from "./signup-layout"
+import { RegisterLayout } from "./register-layout"
 import { ConfirmationLayout } from "./confirmation-layout"
 import { SubscriptionLayout } from "./subscription-layout"
 import { PasswordResetLayout } from "./password-reset-layout"
@@ -306,14 +306,14 @@ export function HomeLayout() {
     return (
       <LoginLayout
         onLogin={onLogin}
+        onVerifyOtp={onLogin}
         onSignup={onSignup}
         onForgotPassword={onForgotPassword}
-        onBack={loginStep === "email" ? onBackToHome : onBackToEmailLogin}
-        onLogoClick={onLogoClick}
+        onResendOtp={onResendOtp}
+        onBackToPassword={loginStep === "email" ? onBackToHome : onBackToEmailLogin}
         isLoading={isLoading}
         loginStep={loginStep}
         email={loginEmail}
-        onResendOtp={onResendOtp}
       />
     )
   }
@@ -335,9 +335,17 @@ export function HomeLayout() {
 
   if (currentView === "signup") {
     return (
-      <SignupLayout
-        initialData={signupData}
+      <RegisterLayout
         email={signupData?.email}
+        initialFormData={signupData ? {
+          nickname: signupData.nickname || "",
+          postalCode: signupData.postalCode || "",
+          address: signupData.address || "",
+          birthDate: signupData.birthDate || "",
+          gender: signupData.gender || "",
+          password: "",
+          passwordConfirm: "",
+        } : null}
         onSubmit={onSignupSubmit}
         onCancel={onSignupCancel}
         onLogoClick={onLogoClick}
@@ -449,7 +457,7 @@ export function HomeLayout() {
         onGenreToggle={(genre) => {
           const currentGenres = selectedGenres ?? []
           const newGenres = currentGenres.includes(genre)
-            ? currentGenres.filter((g) => g !== genre)
+            ? currentGenres.filter((g: string) => g !== genre)
             : [...currentGenres, genre]
           onGenresChange(newGenres)
         }}

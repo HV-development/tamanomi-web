@@ -1,7 +1,7 @@
 import { LoginContainer } from "../organisms/login-container"
 
 interface LoginLayoutProps {
-  onLogin: (email: string, password: string) => void
+  onLogin: (loginData: { email: string; password: string }) => void
   onVerifyOtp: (otp: string) => void
   onSignup: () => void
   onForgotPassword: () => void
