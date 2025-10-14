@@ -3,7 +3,7 @@
 import { HeaderLogo } from "../atoms/header-logo"
 import { LoginForm } from "../molecules/login-form"
 import { OtpInputForm } from "../molecules/otp-input-form"
-import { adminLoginSchema, type AdminLoginInput } from "@hv-development/schemas"
+import { type AdminLoginInput } from "@hv-development/schemas"
 
 interface LoginContainerProps {
   onLogin: (loginData: AdminLoginInput) => void

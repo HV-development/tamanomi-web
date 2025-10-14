@@ -9,7 +9,7 @@ interface EmailChangeCompleteProps {
   onResend: () => void
 }
 
-export function EmailChangeComplete({ currentEmail, newEmail, onBackToMyPage, onResend = () => {} }: EmailChangeCompleteProps) {
+export function EmailChangeComplete({ onBackToMyPage }: EmailChangeCompleteProps) {
   return (
     <div className="space-y-6">
       {/* メインメッセージカード */}

@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Button } from "../atoms/button"
 import { validatePassword, validatePasswordRealtime, validatePasswordConfirm, validatePasswordConfirmRealtime } from "../../utils/validation"
 
 interface PasswordChangeFormProps {

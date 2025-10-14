@@ -8,21 +8,14 @@ import { EmailConfirmationComplete } from "../molecules/email-confirmation-compl
 interface EmailConfirmationLayoutProps {
   email: string
   onLogoClick: () => void
-  currentUserRank?: string | null
 }
 
 export function EmailConfirmationLayout({
   email,
   onLogoClick,
-  currentUserRank,
 }: EmailConfirmationLayoutProps) {
   // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>

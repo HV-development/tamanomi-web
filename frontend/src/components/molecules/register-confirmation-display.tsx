@@ -15,7 +15,6 @@ interface RegisterConfirmationDisplayProps {
 
 export function RegisterConfirmationDisplay({
   data,
-  email,
   onRegister,
   onEdit,
   isLoading = false

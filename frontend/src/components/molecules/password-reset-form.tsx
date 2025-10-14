@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 
 interface PasswordResetFormProps {

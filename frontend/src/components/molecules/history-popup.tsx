@@ -1,7 +1,7 @@
 "use client"
 
 import { StoreList } from "./store-list"
-import { Clock, X } from "lucide-react"
+import { X } from "lucide-react"
 import type { Store } from "../../types/store"
 
 interface HistoryPopupProps {

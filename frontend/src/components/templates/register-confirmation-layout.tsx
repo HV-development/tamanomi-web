@@ -10,7 +10,6 @@ interface RegisterConfirmationLayoutProps {
   onEdit: () => void
   onLogoClick: () => void
   isLoading?: boolean
-  currentUserRank?: string | null
 }
 
 export function RegisterConfirmationLayout({
@@ -20,15 +19,9 @@ export function RegisterConfirmationLayout({
   onEdit,
   onLogoClick,
   isLoading,
-  currentUserRank
 }: RegisterConfirmationLayoutProps) {
   // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   return (
     <RegisterConfirmationContainer

@@ -63,9 +63,9 @@ export function validatePasswordConfirmRealtime(password: string, passwordConfir
 }
 
 // ヘルパー関数
-function validateField(field: string, value: any): PasswordValidationResult {
+function validateField(field: string, value: string): PasswordValidationResult {
   try {
-    const fieldSchema = UseRregistrationCompleteSchema.pick({ [field]: true } as any)
+    const fieldSchema = UseRregistrationCompleteSchema.pick({ [field]: true } as Record<string, boolean>)
     fieldSchema.parse({ [field]: value })
     return { isValid: true, errors: [] }
   } catch (error) {

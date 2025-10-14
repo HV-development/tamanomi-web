@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import Image from "next/image"
 import type { UserRank } from "../../types/user"
 
 interface RankBadgeProps {
@@ -80,19 +80,15 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       {/* ランク画像または絵文字アイコン表示 */}
       <div className="flex items-center justify-center flex-shrink-0">
         {config.image && rank !== "diamond" ? (
-          <img
-            src={config.image}
-            alt={`${config.label}ランク`}
-            className={`${sizeClass.imageSize} object-contain`}
-            style={{
-              width: sizeClass.imageWidth,
-              height: sizeClass.imageHeight,
-              minWidth: sizeClass.imageWidth,
-              minHeight: sizeClass.imageHeight,
-              maxWidth: sizeClass.imageWidth,
-              maxHeight: sizeClass.imageHeight,
-            }}
-          />
+          <div className={`relative ${sizeClass.imageSize}`}>
+            <Image
+              src={config.image}
+              alt={`${config.label}ランク`}
+              width={parseInt(sizeClass.imageWidth)}
+              height={parseInt(sizeClass.imageHeight)}
+              className="object-contain"
+            />
+          </div>
         ) : (
           <span className={`${sizeClass.emoji} flex-shrink-0`}>🥉</span>
         )}

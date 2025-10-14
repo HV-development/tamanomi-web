@@ -66,15 +66,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   const validateField = (fieldName: keyof UserRegistrationComplete, value: string) => {
     try {
-      UseRregistrationCompleteSchema.pick({ [fieldName]: true } as any).parse({ [fieldName]: value })
+      UseRregistrationCompleteSchema.pick({ [fieldName]: true } as Record<string, boolean>).parse({ [fieldName]: value })
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
         return newErrors
       })
-    } catch (error: any) {
-      if (error && error.errors && Array.isArray(error.errors)) {
-        const errorMessage = error.errors[0]?.message || "入力エラーです"
+    } catch (error) {
+      if (error instanceof Error && 'errors' in error) {
+        const zodError = error as { errors: Array<{ message: string }> }
+        const errorMessage = zodError.errors[0]?.message || "入力エラーです"
         setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
       }
     }
@@ -93,13 +94,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       console.log('🔴 RegisterForm: Validation failed with error:', error)
 
       // ZodErrorかどうかをより確実にチェック
-      if (error && typeof error === 'object' && 'errors' in error && Array.isArray((error as any).errors)) {
-        const zodError = error as any
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> }
         console.log('🔴 RegisterForm: ZodError details:', zodError.errors)
 
         const newErrors: Partial<Record<keyof UserRegistrationComplete, string>> = {}
 
-        zodError.errors.forEach((err: any) => {
+        zodError.errors.forEach((err) => {
           const field = err.path?.[0] as keyof UserRegistrationComplete
           console.log(`🔴 RegisterForm: Field error - ${field}:`, err.message)
           if (field) {
@@ -171,7 +172,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }, 100)
       }
 
-    } catch (error) {
+    } catch {
       // エラー時も住所フィールドにフォーカス
       setTimeout(() => {
         if (addressInputRef.current) {

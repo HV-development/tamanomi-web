@@ -33,7 +33,7 @@ interface MyPageLayoutProps {
   onShowStoreOnHome: (storeId: string) => void
   onUseSameCoupon: (couponId: string) => void
   onLogoClick: () => void
-  onProfileEditSubmit: (data: any) => void
+  onProfileEditSubmit: (data: Record<string, string>, updatedFields: string[]) => void
   onEmailChangeSubmit?: (currentPassword: string, newEmail: string) => void
   onPasswordChangeSubmit?: (currentPassword: string, newPassword: string) => void
   onPasswordChangeBackToLogin?: () => void

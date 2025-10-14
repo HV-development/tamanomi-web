@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { Button } from "../atoms/button"
 import { Input } from "../atoms/input"
 import { UserRegistrationRequestSchema, type UserRegistrationRequest } from "@hv-development/schemas"
-import { z } from "zod"
+import { ZodError } from "zod"
 
 interface EmailRegistrationFormProps {
   initialEmail?: string
@@ -30,14 +30,14 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
 
   const validateField = (fieldName: keyof UserRegistrationRequest, value: string) => {
     try {
-      UserRegistrationRequestSchema.pick({ [fieldName]: true } as any).parse({ [fieldName]: value })
+      UserRegistrationRequestSchema.pick({ [fieldName]: true } as Record<string, boolean>).parse({ [fieldName]: value })
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
         return newErrors
       })
-    } catch (error: any) {
-      if (error && error.errors && Array.isArray(error.errors)) {
+    } catch (error) {
+      if (error instanceof ZodError) {
         const errorMessage = error.errors[0]?.message || "入力エラーです"
         setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
       }
@@ -49,10 +49,10 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
       UserRegistrationRequestSchema.parse(formData)
       setErrors({})
       return true
-    } catch (error: any) {
-      if (error && error.errors && Array.isArray(error.errors)) {
+    } catch (error) {
+      if (error instanceof ZodError) {
         const newErrors: Partial<Record<keyof UserRegistrationRequest, string>> = {}
-        error.errors.forEach((err: any) => {
+        error.errors.forEach((err) => {
           const fieldName = err.path[0] as keyof UserRegistrationRequest
           if (fieldName === 'email' || fieldName === 'campaignCode') {
             newErrors[fieldName] = err.message

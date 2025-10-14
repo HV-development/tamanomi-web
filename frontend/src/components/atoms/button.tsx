@@ -2,8 +2,6 @@
 
 import type React from "react"
 
-import { MapPin } from "lucide-react"
-
 interface ButtonProps {
   children: React.ReactNode
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void

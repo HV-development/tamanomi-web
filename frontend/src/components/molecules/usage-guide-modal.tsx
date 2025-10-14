@@ -1,4 +1,4 @@
-import { X, Ticket, CheckCircle, AlertTriangle, Info } from 'lucide-react'
+import { X, CheckCircle, AlertTriangle, Info } from 'lucide-react'
 
 interface UsageGuideModalProps {
   isOpen: boolean

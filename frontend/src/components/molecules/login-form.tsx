@@ -1,10 +1,11 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 import { adminLoginSchema, type AdminLoginInput } from "@hv-development/schemas"
+import { ZodError } from "zod"
 
 interface LoginFormProps {
   onLogin: (data: AdminLoginInput) => void
@@ -23,14 +24,14 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
 
   const validateField = (fieldName: keyof AdminLoginInput, value: string) => {
     try {
-      adminLoginSchema.pick({ [fieldName]: true } as any).parse({ [fieldName]: value })
+      adminLoginSchema.pick({ [fieldName]: true } as Record<string, boolean>).parse({ [fieldName]: value })
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
         return newErrors
       })
-    } catch (error: any) {
-      if (error && error.errors && Array.isArray(error.errors)) {
+    } catch (error) {
+      if (error instanceof ZodError) {
         const errorMessage = error.errors[0]?.message || "入力エラーです"
         setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
       }
@@ -42,10 +43,10 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
       adminLoginSchema.parse(formData)
       setErrors({})
       return true
-    } catch (error: any) {
-      if (error && error.errors && Array.isArray(error.errors)) {
+    } catch (error) {
+      if (error instanceof ZodError) {
         const newErrors: Partial<Record<keyof AdminLoginInput, string>> = {}
-        error.errors.forEach((err: any) => {
+        error.errors.forEach((err) => {
           const fieldName = err.path[0] as keyof AdminLoginInput
           if (fieldName === 'email' || fieldName === 'password') {
             newErrors[fieldName] = err.message

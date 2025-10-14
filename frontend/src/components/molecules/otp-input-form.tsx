@@ -22,9 +22,7 @@ export function OtpInputForm({
   onVerifyOtp,
   onResendOtp,
   onBack,
-  isLoading = false,
   error: externalError,
-  requestId = "" // デフォルト値を設定
 }: OtpInputFormProps) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [error, setError] = useState("")

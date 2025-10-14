@@ -13,7 +13,7 @@ export const RANK_INFO: Record<UserRank, RankInfo> = {
     label: "ブロンズ",
     color: "text-amber-700",
     bgColor: "bg-amber-100",
-    icon: null as any, // 画像を使用するため不要
+    icon: null, // 画像を使用するため不要
     description: "初回ランク",
     monthsRequired: 0,
   },
@@ -22,7 +22,7 @@ export const RANK_INFO: Record<UserRank, RankInfo> = {
     label: "シルバー",
     color: "text-gray-700",
     bgColor: "bg-gray-100",
-    icon: null as any, // 画像を使用するため不要
+    icon: null, // 画像を使用するため不要
     description: "契約から1年以上の優良メンバー",
     monthsRequired: 12,
   },
@@ -31,7 +31,7 @@ export const RANK_INFO: Record<UserRank, RankInfo> = {
     label: "ゴールド",
     color: "text-yellow-700",
     bgColor: "bg-yellow-100",
-    icon: null as any, // 画像を使用するため不要
+    icon: null, // 画像を使用するため不要
     description: "契約から3年以上のロイヤルメンバー",
     monthsRequired: 36,
   },
@@ -40,7 +40,7 @@ export const RANK_INFO: Record<UserRank, RankInfo> = {
     label: "ダイヤモンド",
     color: "text-blue-700",
     bgColor: "bg-blue-100",
-    icon: null as any, // 画像を使用するため不要
+    icon: null, // 画像を使用するため不要
     description: "5年継続利用のレジェンドメンバー",
     monthsRequired: 60,
   },

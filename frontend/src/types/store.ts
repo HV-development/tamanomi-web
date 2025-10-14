@@ -33,5 +33,5 @@ export interface Store {
   scenes?: string
   createdAt: string
   updatedAt: string
-  merchant?: any
+  merchant?: unknown
 }

@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Bell, AlertTriangle, CheckCircle, Gift, Info } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
@@ -85,11 +86,14 @@ export function NotificationItem({ notification, onClick, className = "" }: Noti
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-400">{formatDate(notification.createdAt)}</span>
             {notification.imageUrl && (
-              <img
-                src={notification.imageUrl || "/placeholder.svg"}
-                alt=""
-                className="w-8 h-8 rounded-lg object-cover border border-gray-200"
-              />
+              <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-gray-200">
+                <Image
+                  src={notification.imageUrl || "/placeholder.svg"}
+                  alt=""
+                  fill
+                  className="object-cover"
+                />
+              </div>
             )}
           </div>
         </div>

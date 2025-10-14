@@ -1,7 +1,7 @@
 "use client"
 
-import { ArrowLeft, Ticket, X } from "lucide-react"
-import { CouponCard } from "../atoms/coupon-card"
+import Image from "next/image"
+import { Ticket, X } from "lucide-react"
 import type { Coupon } from "../../types/coupon"
 
 interface CouponListPopupProps {
@@ -14,7 +14,7 @@ interface CouponListPopupProps {
  onUsageGuideClick: () => void
 }
 
-export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, onUseCoupon, onUsageGuideClick }: CouponListPopupProps) {
+export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick }: CouponListPopupProps) {
   if (!isOpen) return null
 
 
@@ -70,11 +70,12 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onBack, o
                     className="bg-white rounded-2xl border-2 border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                   >
                     {/* クーポン画像 */}
-                    <div className="w-full h-48 overflow-hidden">
-                      <img
+                    <div className="w-full h-48 overflow-hidden relative">
+                      <Image
                         src={coupon.imageUrl || "/placeholder.svg"}
                         alt={coupon.name}
-                        className="w-full h-full object-cover object-center"
+                        fill
+                        className="object-cover object-center"
                       />
                     </div>
                     

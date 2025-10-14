@@ -41,7 +41,7 @@ function LoginPageContent() {
         sessionStorage.setItem('redirectAfterLogin', `/home?view=mypage${paymentSuccess ? '&payment-success=true' : ''}`)
       }
     }
-  }, [urlParams.paymentSuccess, urlParams.view])
+  }, [urlParams])
 
   // URLパラメータからエラーメッセージを取得
   useEffect(() => {
@@ -50,7 +50,7 @@ function LoginPageContent() {
     if (errorParam === 'already_registered') {
       setError(`このメールアドレス（${emailParam}）は既に登録されています。ログイン画面からログインしてください。`)
     }
-  }, [urlParams.error, urlParams.email])
+  }, [urlParams])
 
   // ステップ1: パスワード認証 + OTP送信（useCallbackでメモ化）
   const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {

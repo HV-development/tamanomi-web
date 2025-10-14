@@ -1,12 +1,17 @@
 "use client"
 
 import { useMemo } from "react"
-import type { Store } from "@/types/store"
-import type { Notification } from "@/types/notification"
 import { calculateUserRank } from "@/utils/rank-calculator"
 
+interface UseComputedValuesParams {
+    stores: { isFavorite: boolean }[]
+    notifications: { isRead: boolean }[]
+    auth: { isAuthenticated: boolean; user?: { contractStartDate?: Date; createdAt: Date } }
+    filters: { isFavoritesFilter: boolean }
+}
+
 // メモ化された計算値を分離
-export const useComputedValues = (stores: any[], notifications: any[], auth: any, filters: any) => {
+export const useComputedValues = ({ stores, notifications, auth, filters }: UseComputedValuesParams) => {
     const currentUserRank = useMemo(() => {
         if (auth.isAuthenticated && auth.user) {
             const contractStartDate = auth.user.contractStartDate || auth.user.createdAt

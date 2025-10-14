@@ -3,7 +3,7 @@
 import { HeaderLogo } from "../atoms/header-logo"
 import { EmailRegistrationForm } from "../molecules/email-registration-form"
 import { EmailRegistrationComplete } from "../molecules/email-registration-complete"
-import { UserRegistrationRequestSchema, type UserRegistrationRequest } from "@hv-development/schemas"
+import { type UserRegistrationRequest } from "@hv-development/schemas"
 
 interface EmailRegistrationContainerProps {
   currentStep: "form" | "complete"

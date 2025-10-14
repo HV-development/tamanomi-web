@@ -12,7 +12,6 @@ interface EmailRegistrationLayoutProps {
   onResend: () => void
   onLogoClick: () => void
   isLoading?: boolean
-  currentUserRank?: string | null
   errorMessage?: string
   successMessage?: string
 }
@@ -26,16 +25,10 @@ export function EmailRegistrationLayout({
   onResend,
   onLogoClick,
   isLoading,
-  currentUserRank,
   errorMessage,
   successMessage,
 }: EmailRegistrationLayoutProps) {
   // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null | undefined) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   return (

@@ -1,17 +1,12 @@
 "use client"
 
+import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 import { Logo } from "../atoms/logo"
 import { HamburgerMenu } from "./hamburger-menu"
-import { PopupButton } from "../atoms/popup-button"
-import { Button } from "../atoms/button"
 import { GenrePopup } from "./genre-popup"
 import { AreaPopup } from "./area-popup"
-import { Heart, LogIn, MoreVertical, LogOut } from "lucide-react"
-import { User } from "lucide-react"
-import { RankBadge } from "../atoms/rank-badge"
 import { calculateUserRank } from "../../utils/rank-calculator"
-import type { Notification } from "../../types/notification"
 import type { User as UserType } from "../../types/user"
 
 // ユーザーランク計算のヘルパー関数
@@ -35,47 +30,32 @@ function getUserRankValue(user?: UserType): string | null {
 
 interface FilterControlsProps {
   selectedGenres: string[]
-  selectedEvents: string[]
   selectedArea: string
-  isFavoritesFilter: boolean
-  notifications: Notification[]
   isAuthenticated: boolean
   user?: UserType
   onGenresChange: (genres: string[]) => void
   onEventsChange: (events: string[]) => void
   onAreaChange: (area: string) => void
   onCurrentLocationClick: () => void
-  onFavoritesClick: () => void
   onMenuItemClick: (itemId: string) => void
   onLogoClick: () => void
-  onTabChange: (tab: string) => void
-  onLogout?: () => void
-  favoriteCount?: number
 }
 
 
 export function FilterControls({
   selectedGenres,
-  selectedEvents,
   selectedArea,
-  isFavoritesFilter,
-  notifications,
   isAuthenticated,
   user,
   onGenresChange,
   onEventsChange,
   onAreaChange,
   onCurrentLocationClick,
-  onFavoritesClick,
   onMenuItemClick,
   onLogoClick,
-  onTabChange,
-  onLogout,
-  favoriteCount = 0,
 }: FilterControlsProps) {
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
-  const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
@@ -107,13 +87,6 @@ export function FilterControls({
       ? selectedGenres.filter((g) => g !== genre)
       : [...selectedGenres, genre]
     onGenresChange(newGenres)
-  }
-
-  const handleEventToggle = (event: string) => {
-    const newEvents = selectedEvents.includes(event)
-      ? selectedEvents.filter((e) => e !== event)
-      : [...selectedEvents, event]
-    onEventsChange(newEvents)
   }
 
   const handleGenresClear = () => {
@@ -149,33 +122,6 @@ export function FilterControls({
     onCurrentLocationClick()
   }
 
-  const handleNotificationClick = () => {
-    setIsNotificationPanelOpen(true)
-  }
-
-  const handleNotificationClose = () => {
-    setIsNotificationPanelOpen(false)
-  }
-
-  const handleNotificationItemClick = (notificationId: string) => {
-    // 通知項目クリック処理は親コンポーネントに委譲
-  }
-
-  const handleMarkAllNotificationsRead = () => {
-    // 全て既読処理は親コンポーネントに委譲
-  }
-
-  const handleUserMenuToggle = () => {
-    setIsUserMenuOpen(!isUserMenuOpen)
-  }
-
-  const handleLogout = () => {
-    setIsUserMenuOpen(false)
-    if (onLogout) {
-      onLogout()
-    }
-  }
-
   // ユーザーのランクを計算
   const userRank = getUserRankValue(user)
 
@@ -198,11 +144,14 @@ export function FilterControls({
           {isClient && isAuthenticated ? (
             userRank && (
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
-                <img
-                  src={`/${userRank}.png`}
-                  alt={`${userRank}ランク`}
-                  className="w-5 h-5 object-contain"
-                />
+                <div className="relative w-5 h-5">
+                  <Image
+                    src={`/${userRank}.png`}
+                    alt={`${userRank}ランク`}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
               </div>
             )
           ) : null}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { preRegister } from '@/services/auth'
-import { UserRegistrationRequestSchema, type UserRegistrationRequest } from "@hv-development/schemas"
+import type { UserRegistrationRequest } from "@hv-development/schemas"
 
 type Step = 'form' | 'complete'
 
