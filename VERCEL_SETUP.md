@@ -84,9 +84,13 @@ Environment Variables:
 
 ### エラー: `ECONNREFUSED 127.0.0.1:3002`
 
-**原因**: `NEXT_PUBLIC_API_URL`が設定されていない
+**原因**: `API_BASE_URL`が設定されていない（サーバーサイドAPIルートがlocalhostに接続しようとしている）
 
-**解決方法**: 上記手順で`NEXT_PUBLIC_API_URL`を設定し、再デプロイ
+**解決方法**: 
+1. 上記手順で`API_BASE_URL`を設定（RailwayのURL + `/api/v1`）
+2. 再デプロイ
+
+> **注意**: このエラーはサーバーサイドのAPI routeで発生します。`NEXT_PUBLIC_API_URL`ではなく`API_BASE_URL`（プレフィックスなし）の設定が必要です。
 
 ### エラー: `ERR_PNPM_FETCH_401`
 
