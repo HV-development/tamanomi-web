@@ -164,6 +164,14 @@ export default function PlanRegistrationPage() {
         isUUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planId),
       })
       
+      // トークンの確認（デバッグ用）
+      const accessToken = localStorage.getItem('accessToken')
+      console.log('🔍 [plan-registration] accessToken check before payment:', {
+        hasToken: !!accessToken,
+        tokenLength: accessToken?.length,
+        tokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : 'null'
+      })
+      
       // メールアドレスの検証
       if (!email || email.trim() === '') {
         setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
