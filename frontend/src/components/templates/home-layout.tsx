@@ -38,6 +38,7 @@ export function HomeLayout() {
   
   // エリアポップアップの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
+  const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres
