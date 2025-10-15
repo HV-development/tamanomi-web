@@ -90,6 +90,8 @@ function PaymentReturnContent() {
         // ユーザープラン作成APIを呼び出す（プランIDがある場合）
         if (selectedPlanId) {
           console.log('🔍 [payment-return] Creating user plan with planId:', selectedPlanId)
+          console.log('🔍 [payment-return] planId type:', typeof selectedPlanId)
+          console.log('🔍 [payment-return] planId length:', selectedPlanId.length)
           
           try {
             // アクセストークンを取得
@@ -97,6 +99,9 @@ function PaymentReturnContent() {
             if (!accessToken) {
               throw new Error('認証情報が見つかりません。ログインしてください。')
             }
+
+            console.log('🔍 [payment-return] Sending request to /api/user-plans/create')
+            console.log('🔍 [payment-return] Request body:', { planId: selectedPlanId })
 
             // プラン作成APIを呼び出し
             const createPlanResponse = await fetch('/api/user-plans/create', {
@@ -109,6 +114,9 @@ function PaymentReturnContent() {
                 planId: selectedPlanId,
               }),
             })
+
+            console.log('🔍 [payment-return] Response status:', createPlanResponse.status)
+            console.log('🔍 [payment-return] Response ok:', createPlanResponse.ok)
 
             if (!createPlanResponse.ok) {
               const errorData = await createPlanResponse.json().catch(() => ({}))
