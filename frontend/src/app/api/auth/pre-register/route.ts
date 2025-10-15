@@ -33,6 +33,9 @@ export async function POST(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
     const fullUrl = `${baseUrl}/api/v1/pre-register`;
+    
+    console.log('🔍 [pre-register] Sending request to:', fullUrl);
+    console.log('🔍 [pre-register] Request body:', JSON.stringify({ email: body.email, campaignCode: body.campaignCode }));
 
     try {
       const response = await fetch(fullUrl, {
@@ -49,9 +52,13 @@ export async function POST(request: NextRequest) {
 
       clearTimeout(timeoutId);
 
+      console.log('🔍 [pre-register] Response status:', response.status);
+      console.log('🔍 [pre-register] Response ok:', response.ok);
+
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.log('🔍 [pre-register] Error data:', errorData);
 
         return NextResponse.json(
           {
