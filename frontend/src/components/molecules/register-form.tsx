@@ -39,6 +39,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const [errors, setErrors] = useState<Partial<Record<keyof UserRegistrationComplete, string>>>({})
   const [isSearchingAddress, setIsSearchingAddress] = useState(false)
   const [touchedFields, setTouchedFields] = useState<Set<keyof UserRegistrationComplete>>(new Set())
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [termsError, setTermsError] = useState("")
 
   // 住所フィールドへの参照を追加
   const addressInputRef = useRef<HTMLInputElement>(null)
@@ -141,6 +143,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     console.log('🔵 RegisterForm: Current formData:', formData)
     console.log('🔵 RegisterForm: Current errors:', errors)
+
+    // 利用規約の同意チェック
+    if (!agreedToTerms) {
+      setTermsError("利用規約とプライバシーポリシーに同意してください")
+      return
+    }
+    setTermsError("")
 
     const isValid = validateForm()
     console.log('🔵 RegisterForm: Validation result:', isValid)
@@ -372,6 +381,49 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         onBlur={() => handleFieldBlur("passwordConfirm")}
         error={errors.passwordConfirm}
       />
+
+      {/* 利用規約とプライバシーポリシーの同意 */}
+      <div className="space-y-2">
+        <div className="flex items-start">
+          <input
+            type="checkbox"
+            id="terms"
+            checked={agreedToTerms}
+            onChange={(e) => {
+              setAgreedToTerms(e.target.checked)
+              if (e.target.checked) {
+                setTermsError("")
+              }
+            }}
+            className="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
+          />
+          <label htmlFor="terms" className="ml-2 text-sm text-gray-700 cursor-pointer">
+            <a
+              href="/たまのみサービス利用規約.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:text-green-700 underline font-medium"
+              onClick={(e) => e.stopPropagation()}
+            >
+              利用規約
+            </a>
+            と
+            <a
+              href="/プライバシーポリシー.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:text-green-700 underline font-medium"
+              onClick={(e) => e.stopPropagation()}
+            >
+              プライバシーポリシー
+            </a>
+            に同意する
+          </label>
+        </div>
+        {termsError && (
+          <p className="text-sm text-red-600 ml-6">{termsError}</p>
+        )}
+      </div>
 
       {/* ボタン */}
       <div className="space-y-3">
