@@ -106,6 +106,7 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
         <div className="text-gray-600 space-y-2">
           <p>新規登録にはメールアドレスの認証が必要です。</p>
           <p>入力されたメールアドレスに認証用のリンクをお送りします。</p>
+          <p className="text-sm text-amber-600 font-medium">※現在、キャンペーンコードの入力が必須です</p>
         </div>
       </div>
 
@@ -138,11 +139,12 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
       <div>
         <Input
           type="text"
-          label="キャンペーンコード"
+          label="キャンペーンコード（必須）"
           placeholder="例: WELCOME2024"
           value={formData.campaignCode}
           onChange={handleCampaignCodeChange}
           error={errors.campaignCode}
+          required={true}
         />
 
         {/* キャンペーンコード案内リンク */}

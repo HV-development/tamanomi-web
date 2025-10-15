@@ -117,6 +117,7 @@ export function HomeLayout() {
   const onUseCoupon = handlers.handleUseCoupon
   const onConfirmCoupon = handlers.handleConfirmCoupon
   const onCancelCoupon = handlers.handleCancelCoupon
+  const onUseSameCoupon = handlers.handleUseSameCoupon
   const onUsageGuideClick = handlers.handleUsageGuideClick
   const onUsageGuideBack = handlers.handleUsageGuideBack
   const isSuccessModalOpen = state.isSuccessModalOpen

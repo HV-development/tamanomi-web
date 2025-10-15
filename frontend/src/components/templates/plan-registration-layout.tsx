@@ -10,6 +10,8 @@ interface PlanRegistrationLayoutProps {
   isLoading?: boolean
   plans: PlanListResponse['plans']
   error?: string
+  saitamaAppLinked?: boolean
+  onSaitamaAppLinked?: () => void
 }
 
 export function PlanRegistrationLayout({ 
@@ -18,7 +20,9 @@ export function PlanRegistrationLayout({
   onLogoClick, 
   isLoading, 
   plans,
-  error
+  error,
+  saitamaAppLinked,
+  onSaitamaAppLinked,
 }: PlanRegistrationLayoutProps) {
   // ランクに基づく背景色を取得
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
@@ -32,6 +36,8 @@ export function PlanRegistrationLayout({
       backgroundColorClass={backgroundColorClass}
       plans={plans}
       error={error}
+      saitamaAppLinked={saitamaAppLinked}
+      onSaitamaAppLinked={onSaitamaAppLinked}
     />
   )
 }

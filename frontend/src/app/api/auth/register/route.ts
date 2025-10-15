@@ -8,10 +8,20 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
+    console.log('🔍 [register/route] Received body:', {
+      email: body.email,
+      nickname: body.nickname,
+      saitamaAppId: body.saitamaAppId,
+      saitamaAppIdType: typeof body.saitamaAppId,
+      saitamaAppIdLength: body.saitamaAppId?.length,
+      saitamaAppIdValue: `"${body.saitamaAppId}"`,
+    })
+
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 
     // バックエンドが期待するデータ構造に変換
+    // 空文字列のsaitamaAppIdは除外
     const validatedData = {
       email: body.email,
       password: body.password,
@@ -21,9 +31,16 @@ export async function POST(request: NextRequest) {
       address: body.address,
       birthDate: body.birthDate,
       gender: body.gender,
-      saitamaAppId: body.saitamaAppId,
+      ...(body.saitamaAppId && body.saitamaAppId.trim() !== '' ? { saitamaAppId: body.saitamaAppId.trim() } : {}),
       token: body.token
     };
+
+    console.log('🔍 [register/route] Validated data:', {
+      email: validatedData.email,
+      nickname: validatedData.nickname,
+      hasSaitamaAppId: 'saitamaAppId' in validatedData,
+      saitamaAppId: (validatedData as any).saitamaAppId,
+    })
 
     // タイムアウト設定付きのfetch
     const controller = new AbortController()

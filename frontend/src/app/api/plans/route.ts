@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status') || 'active'
     const limit = searchParams.get('limit') || '50'
+    const saitamaAppLinked = searchParams.get('saitamaAppLinked')
 
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
@@ -18,16 +19,28 @@ export async function GET(request: NextRequest) {
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
       API_BASE_URL: API_BASE_URL,
       baseUrl: baseUrl,
-      NODE_ENV: process.env.NODE_ENV
+      NODE_ENV: process.env.NODE_ENV,
+      saitamaAppLinked: saitamaAppLinked
     })
 
-    const fullUrl = `${baseUrl}/api/v1/plans?status=${status}&limit=${limit}`
+    // クエリパラメータを構築
+    const queryParams = new URLSearchParams({
+      status,
+      limit,
+    })
+    
+    if (saitamaAppLinked !== null) {
+      queryParams.append('saitamaAppLinked', saitamaAppLinked)
+    }
+
+    const fullUrl = `${baseUrl}/api/v1/plans?${queryParams.toString()}`
 
     console.log('Plans API request:', {
       method: 'GET',
       url: fullUrl,
       status,
-      limit
+      limit,
+      saitamaAppLinked
     })
 
     const response = await fetch(fullUrl, {

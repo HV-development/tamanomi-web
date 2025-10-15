@@ -50,9 +50,9 @@ export function RegisterConfirmationDisplay({
 
       <div className="bg-gray-50 rounded-lg p-6 space-y-4">
         {confirmationItems.map((item, index) => (
-          <div key={index} className="flex justify-between items-start">
-            <span className="text-sm font-medium text-gray-700 w-1/3">{item.label}</span>
-            <span className="text-sm text-gray-900 w-2/3 text-right break-words">{item.value}</span>
+          <div key={index} className="space-y-1">
+            <span className="block text-sm font-medium text-gray-700">{item.label}</span>
+            <span className="block text-base text-gray-900 break-words">{item.value}</span>
           </div>
         ))}
       </div>

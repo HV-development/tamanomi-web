@@ -12,6 +12,8 @@ interface PlanRegistrationContainerProps {
   backgroundColorClass?: string
   plans: PlanListResponse['plans']
   error?: string
+  saitamaAppLinked?: boolean
+  onSaitamaAppLinked?: () => void
 }
 
 export function PlanRegistrationContainer({
@@ -22,6 +24,8 @@ export function PlanRegistrationContainer({
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
   plans,
   error,
+  saitamaAppLinked,
+  onSaitamaAppLinked,
 }: PlanRegistrationContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
@@ -38,6 +42,8 @@ export function PlanRegistrationContainer({
               isLoading={isLoading}
               plans={plans}
               error={error}
+              saitamaAppLinked={saitamaAppLinked}
+              onSaitamaAppLinked={onSaitamaAppLinked}
             />
           </div>
         </div>

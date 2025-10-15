@@ -18,6 +18,7 @@ export default function PlanRegistrationPage() {
   const [email, setEmail] = useState<string>('')
   const [isClient, setIsClient] = useState(false)
   const [error, setError] = useState<string>('')
+  const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const router = useRouter()
 
   // クライアントサイドでのみ searchParams を取得
@@ -30,34 +31,75 @@ export default function PlanRegistrationPage() {
     }
   }, [])
 
-  // プラン一覧を取得
+  // ユーザー情報を取得してさいたま市アプリ連携状態を確認
   useEffect(() => {
     if (isClient) {
-      fetchPlans()
+      fetchUserInfo()
     }
   }, [isClient])
 
-  const fetchPlans = async () => {
+  // プラン一覧を取得（連携状態が確定した後）
+  useEffect(() => {
+    if (isClient && saitamaAppLinked !== null) {
+      fetchPlans()
+    }
+  }, [isClient, saitamaAppLinked])
+
+  const fetchUserInfo = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken')
+      
+      if (!accessToken) {
+        setSaitamaAppLinked(false)
+        return
+      }
+
+      const response = await fetch('/api/user/me', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        cache: 'no-store',
+      })
+
+      if (response.ok) {
+        const userData = await response.json()
+        const newLinkedState = userData.saitamaAppLinked === true
+        setSaitamaAppLinked(newLinkedState)
+      } else {
+        setSaitamaAppLinked(false)
+      }
+    } catch (error) {
+      console.error('Failed to fetch user info:', error)
+      setSaitamaAppLinked(false)
+    }
+  }
+
+  const fetchPlans = async (explicitLinkedState?: boolean | null) => {
     try {
       setIsLoading(true)
-      console.log('Fetching plans from Next.js API route: /api/plans?status=active&limit=50')
       
-      const response = await fetch('/api/plans?status=active&limit=50')
+      // 明示的に渡された状態を優先、なければ現在の状態を使用
+      const linkedState = explicitLinkedState !== undefined ? explicitLinkedState : saitamaAppLinked
       
-      console.log('Plans API response:', {
-        status: response.status,
-        ok: response.ok,
-        statusText: response.statusText
+      // さいたま市アプリ連携状態に応じてクエリパラメータを構築
+      const queryParams = new URLSearchParams({
+        status: 'active',
+        limit: '50',
       })
+      
+      if (linkedState !== null) {
+        queryParams.append('saitamaAppLinked', String(linkedState))
+      }
+      
+      const apiUrl = `/api/plans?${queryParams.toString()}`
+      const response = await fetch(apiUrl)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.error('Plans API error response:', errorData)
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
       }
       
       const data = await response.json()
-      console.log('Plans data received:', data)
       
       // バリデーション（一時的に無効化）
       // const validatedData = PlanListResponseSchema.parse(data)
@@ -167,6 +209,36 @@ export default function PlanRegistrationPage() {
     }
   }
 
+  const handleSaitamaAppLinked = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken')
+      
+      if (!accessToken) {
+        return
+      }
+
+      const response = await fetch('/api/user/me', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        cache: 'no-store',
+      })
+
+      if (response.ok) {
+        const userData = await response.json()
+        const newLinkedState = userData.saitamaAppLinked === true
+        
+        // 状態を更新
+        setSaitamaAppLinked(newLinkedState)
+        
+        // 状態更新を待たずに、明示的に新しい状態でプランを再取得
+        await fetchPlans(newLinkedState)
+      }
+    } catch (error) {
+      console.error('Failed to refresh user data:', error)
+    }
+  }
+
   const handleCancel = () => router.push('/')
   const handleLogoClick = () => router.push('/')
 
@@ -182,13 +254,6 @@ export default function PlanRegistrationPage() {
     )
   }
 
-  // デバッグ情報をコンソールに出力
-  console.log('Plan registration page loaded:', {
-    API_BASE_URL,
-    isClient,
-    email
-  })
-
   return (
     <PlanRegistrationLayout
       onPaymentMethodRegister={handlePaymentMethodRegister}
@@ -197,6 +262,8 @@ export default function PlanRegistrationPage() {
       isLoading={isLoading}
       plans={plans}
       error={error}
+      saitamaAppLinked={saitamaAppLinked || false}
+      onSaitamaAppLinked={handleSaitamaAppLinked}
     />
   )
 }

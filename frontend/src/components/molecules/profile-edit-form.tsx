@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 import { RadioButton } from "../atoms/radio-button"
-import { DateInput } from "../atoms/date-input"
+import { DateSelect } from "../atoms/date-select"
 import type { User } from "../../types/user"
 
 interface ProfileEditFormData {
@@ -175,17 +175,22 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
 
       if (data.success && data.address) {
         // 住所が見つかった場合
-
         setFormData(prev => ({
           ...prev,
           address: data.address
         }))
-        setErrors(prev => ({ ...prev, address: undefined }))
+        
+        // 住所が見つかった場合は郵便番号と住所のエラーをクリア
+        setErrors(prev => ({ 
+          ...prev, 
+          postalCode: undefined,
+          address: undefined 
+        }))
       } else {
-        // 住所が見つからない場合
+        // 住所が見つからない場合はエラーメッセージを表示
         setErrors(prev => ({
           ...prev,
-          address: data.message || "該当する住所が見つかりませんでした。手入力で住所を入力してください。"
+          postalCode: '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。'
         }))
 
         // 住所フィールドにフォーカスを移す
@@ -196,10 +201,12 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
         }, 100)
       }
 
-    } catch {
+    } catch (error) {
+      // ネットワークエラーなどの場合
+      console.error('Address search error:', error)
       setErrors(prev => ({
         ...prev,
-        address: "住所検索サービスに接続できませんでした。ネットワーク接続を確認するか、手入力で住所を入力してください。"
+        postalCode: '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。'
       }))
 
       // エラー時も住所フィールドにフォーカス
@@ -272,7 +279,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       </div>
 
       {/* 生年月日 */}
-      <DateInput
+      <DateSelect
         label="生年月日"
         value={formData.birthDate}
         onChange={(value) => updateFormData("birthDate", value)}

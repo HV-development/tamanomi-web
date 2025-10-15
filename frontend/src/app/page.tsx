@@ -134,14 +134,36 @@ function LoginPageContent() {
         localStorage.setItem('refreshToken', data.refreshToken)
       }
 
+      // ユーザー情報とプラン情報を確認
+      let hasPlan = false
+      try {
+        // ユーザー情報を取得してプランの有無を確認
+        const userResponse = await fetch('/api/user/me', {
+          headers: {
+            'Authorization': `Bearer ${data.accessToken}`,
+          },
+        })
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json()
+          console.log('User data:', userData)
+          // プラン情報が存在するかチェック
+          hasPlan = userData.plan !== null && userData.plan !== undefined
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data:', error)
+      }
+
       // リダイレクト先を確認
       const redirectPath = sessionStorage.getItem('redirectAfterLogin')
       if (redirectPath) {
         sessionStorage.removeItem('redirectAfterLogin')
         router.push(redirectPath)
+      } else if (!hasPlan) {
+        // プラン未登録の場合はプラン登録画面に遷移
+        router.push(`/plan-registration?email=${encodeURIComponent(email)}`)
       } else {
-        // モニター登録期間中はマイページに遷移
-        // 正式リリース後は店舗一覧画面に変更
+        // プラン登録済みの場合はマイページに遷移
         router.push('/home?view=mypage&auto-login=true')
       }
     } catch (err) {
