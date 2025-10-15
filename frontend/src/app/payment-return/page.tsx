@@ -87,9 +87,40 @@ function PaymentReturnContent() {
           throw new Error('ユーザー情報が見つかりません')
         }
 
-        // TODO: ユーザープラン作成APIを呼び出す（プランIDがある場合）
+        // ユーザープラン作成APIを呼び出す（プランIDがある場合）
         if (selectedPlanId) {
-          console.log('TODO: Create user plan with planId:', selectedPlanId)
+          console.log('🔍 [payment-return] Creating user plan with planId:', selectedPlanId)
+          
+          try {
+            // アクセストークンを取得
+            const accessToken = localStorage.getItem('accessToken')
+            if (!accessToken) {
+              throw new Error('認証情報が見つかりません。ログインしてください。')
+            }
+
+            // プラン作成APIを呼び出し
+            const createPlanResponse = await fetch('/api/user-plans/create', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+              },
+              body: JSON.stringify({
+                planId: selectedPlanId,
+              }),
+            })
+
+            if (!createPlanResponse.ok) {
+              const errorData = await createPlanResponse.json().catch(() => ({}))
+              throw new Error(errorData.message || 'プラン登録に失敗しました')
+            }
+
+            const planData = await createPlanResponse.json()
+            console.log('✅ [payment-return] User plan created successfully:', planData)
+          } catch (planError) {
+            console.error('❌ [payment-return] Failed to create user plan:', planError)
+            throw new Error(`プラン登録に失敗しました: ${planError instanceof Error ? planError.message : 'Unknown error'}`)
+          }
         }
         
         // 処理完了
