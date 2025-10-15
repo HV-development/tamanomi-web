@@ -273,7 +273,7 @@ export function MyPageContainer({
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-gray-300 shadow-sm">
                 <div className="relative w-8 h-8">
                   <Image
-                    src={`/${currentUserRank}.png`}
+                    src={`/${currentUserRank}.svg`}
                     alt={`${currentUserRank}ランク`}
                     fill
                     className="object-contain"
@@ -298,7 +298,7 @@ export function MyPageContainer({
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300 shadow-sm">
                     <div className="relative w-8 h-8">
                       <Image
-                        src={`/${nextRank.rank}.png`}
+                        src={`/${nextRank.rank}.svg`}
                         alt={`${nextRank.label}ランク`}
                         fill
                         className="object-contain"
@@ -318,7 +318,7 @@ export function MyPageContainer({
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300 shadow-sm">
                     <div className="relative w-8 h-8">
                       <Image
-                        src="/gold.png"
+                        src="/gold.svg"
                         alt="ゴールドランク"
                         fill
                         className="object-contain"

@@ -17,28 +17,28 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
       color: "text-amber-700",
       bgColor: "bg-amber-100",
       borderColor: "border-amber-300",
-      image: "/bronze.png",
+      image: "/bronze.svg",
     },
     silver: {
       label: "シルバー",
       color: "text-gray-700",
       bgColor: "bg-gray-100",
       borderColor: "border-gray-300",
-      image: "/silver.png",
+      image: "/silver.svg",
     },
     gold: {
       label: "ゴールド",
       color: "text-yellow-700",
       bgColor: "bg-yellow-100",
       borderColor: "border-yellow-300",
-      image: "/gold.png",
+      image: "/gold.svg",
     },
     diamond: {
       label: "ダイヤモンド",
       color: "text-blue-700",
       bgColor: "bg-blue-100",
       borderColor: "border-blue-300",
-      image: "/diamond.png",
+      image: "/diamond.svg",
     },
   }
 
@@ -77,9 +77,9 @@ export function RankBadge({ rank, size = "md", showLabel = true, className = "" 
     <div
         className={`inline-flex items-center justify-start gap-2 text-left ${sizeClass.container} ${className}`}
     >
-      {/* ランク画像または絵文字アイコン表示 */}
+      {/* ランク画像表示 */}
       <div className="flex items-center justify-center flex-shrink-0">
-        {config.image && rank !== "diamond" ? (
+        {config.image ? (
           <div className={`relative ${sizeClass.imageSize}`}>
             <Image
               src={config.image}

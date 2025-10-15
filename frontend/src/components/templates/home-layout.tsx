@@ -355,7 +355,7 @@ export function HomeLayout() {
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
                   <div className="relative w-5 h-5">
                     <Image
-                      src={`/${currentUserRank}.png`}
+                      src={`/${currentUserRank}.svg`}
                       alt={`${currentUserRank}ランク`}
                       fill
                       className="object-contain"
