@@ -94,9 +94,13 @@ export default function RegisterConfirmationPage() {
       const result = await response.json()
 
       // デバッグログ
-      console.log('Register response:', {
+      console.log('🔍 [register-confirmation] Register response:', {
         status: response.status,
         ok: response.ok,
+        hasPointsGranted: 'pointsGranted' in result,
+        pointsGranted: result.pointsGranted,
+        pointsGrantedType: typeof result.pointsGranted,
+        resultKeys: Object.keys(result),
         result: result
       })
 
@@ -115,6 +119,10 @@ export default function RegisterConfirmationPage() {
         sessionStorage.removeItem('registerFormData')
 
         // さいたま市アプリ連携でポイント付与があった場合はモーダルを表示
+        console.log('🔍 [register-confirmation] Checking pointsGranted:', {
+          pointsGranted: result.pointsGranted,
+          willShowModal: !!result.pointsGranted,
+        });
         if (result.pointsGranted) {
           setPointsGranted(result.pointsGranted)
           setShowSuccessModal(true)

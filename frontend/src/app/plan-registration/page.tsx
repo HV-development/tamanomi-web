@@ -49,7 +49,12 @@ export default function PlanRegistrationPage() {
     try {
       const accessToken = localStorage.getItem('accessToken')
       
+      console.log('🔍 [plan-registration] fetchUserInfo called:', {
+        hasAccessToken: !!accessToken,
+      });
+      
       if (!accessToken) {
+        console.log('🔍 [plan-registration] No access token, setting saitamaAppLinked to false');
         setSaitamaAppLinked(false)
         return
       }
@@ -61,15 +66,28 @@ export default function PlanRegistrationPage() {
         cache: 'no-store',
       })
 
+      console.log('🔍 [plan-registration] User info response:', {
+        ok: response.ok,
+        status: response.status,
+      });
+
       if (response.ok) {
         const userData = await response.json()
+        console.log('🔍 [plan-registration] User data:', {
+          hasSaitamaAppLinked: 'saitamaAppLinked' in userData,
+          saitamaAppLinked: userData.saitamaAppLinked,
+          saitamaAppLinkedType: typeof userData.saitamaAppLinked,
+          userDataKeys: Object.keys(userData),
+        });
         const newLinkedState = userData.saitamaAppLinked === true
+        console.log('🔍 [plan-registration] Setting saitamaAppLinked to:', newLinkedState);
         setSaitamaAppLinked(newLinkedState)
       } else {
+        console.log('🔍 [plan-registration] Response not ok, setting saitamaAppLinked to false');
         setSaitamaAppLinked(false)
       }
     } catch (error) {
-      console.error('Failed to fetch user info:', error)
+      console.error('❌ [plan-registration] Failed to fetch user info:', error)
       setSaitamaAppLinked(false)
     }
   }
@@ -80,6 +98,12 @@ export default function PlanRegistrationPage() {
       
       // 明示的に渡された状態を優先、なければ現在の状態を使用
       const linkedState = explicitLinkedState !== undefined ? explicitLinkedState : saitamaAppLinked
+      
+      console.log('🔍 [plan-registration] fetchPlans called:', {
+        explicitLinkedState,
+        saitamaAppLinked,
+        linkedState,
+      });
       
       // さいたま市アプリ連携状態に応じてクエリパラメータを構築
       const queryParams = new URLSearchParams({
@@ -92,6 +116,7 @@ export default function PlanRegistrationPage() {
       }
       
       const apiUrl = `/api/plans?${queryParams.toString()}`
+      console.log('🔍 [plan-registration] Fetching plans from:', apiUrl);
       const response = await fetch(apiUrl)
       
       if (!response.ok) {
@@ -100,6 +125,11 @@ export default function PlanRegistrationPage() {
       }
       
       const data = await response.json()
+      
+      console.log('🔍 [plan-registration] Plans fetched:', {
+        planCount: data.plans?.length,
+        plans: data.plans?.map((p: any) => ({ id: p.id, name: p.name, price: p.price })),
+      });
       
       // バリデーション（一時的に無効化）
       // const validatedData = PlanListResponseSchema.parse(data)
