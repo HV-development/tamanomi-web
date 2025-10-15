@@ -33,11 +33,16 @@ export default function HomePage() {
       const urlParams = new URLSearchParams(window.location.search)
       const autoLogin = urlParams.get('auto-login')
       const view = urlParams.get('view')
+      
+      console.log('🔍 [home] URL params:', { autoLogin, view, url: window.location.href })
+      console.log('🔍 [home] Auth state:', { isAuthenticated: auth.isAuthenticated })
+      console.log('🔍 [home] localStorage accessToken:', !!localStorage.getItem('accessToken'))
 
       if (autoLogin === 'true') {
         // 自動ログイン処理（トークンがある場合）
         const accessToken = localStorage.getItem('accessToken')
         if (accessToken && !auth.isAuthenticated) {
+          console.log('🔍 [home] Auto login with access token')
           // モックユーザーでログイン（暫定対応）
           import("@/data/mock-user").then(({ mockUser, mockPlan, mockUsageHistory, mockPaymentHistory }) => {
             auth.login({
@@ -47,6 +52,7 @@ export default function HomePage() {
 
             // viewパラメータがmypageの場合はマイページに遷移
             if (view === 'mypage') {
+              console.log('🔍 [home] Navigating to mypage (auto-login)')
               navigation.navigateToView("mypage", "mypage")
               navigation.navigateToMyPage("main")
             }
@@ -59,9 +65,13 @@ export default function HomePage() {
         // view=mypageパラメータがある場合、マイページに遷移
         // アクセストークンがある場合は認証済みとみなす
         const accessToken = localStorage.getItem('accessToken')
+        console.log('🔍 [home] view=mypage detected, accessToken:', !!accessToken, 'isAuthenticated:', auth.isAuthenticated)
         if (accessToken || auth.isAuthenticated) {
+          console.log('🔍 [home] Navigating to mypage')
           navigation.navigateToView("mypage", "mypage")
           navigation.navigateToMyPage("main")
+        } else {
+          console.log('❌ [home] Cannot navigate to mypage: no accessToken and not authenticated')
         }
       }
     }

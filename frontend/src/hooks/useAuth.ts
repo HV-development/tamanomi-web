@@ -18,13 +18,16 @@ export function useAuth() {
 
             if (autoLogin === 'true' && loginEmail) {
                 // 自動ログイン処理
+                console.log('🔍 [useAuth] Auto login with email:', loginEmail);
                 setIsAuthenticated(true);
                 // URLパラメータをクリア
                 window.history.replaceState({}, '', '/');
             } else {
                 // localStorage にアクセストークンがある場合は認証済みとする
                 const accessToken = localStorage.getItem('accessToken');
+                console.log('🔍 [useAuth] Checking localStorage accessToken:', !!accessToken);
                 if (accessToken) {
+                    console.log('🔍 [useAuth] Setting isAuthenticated to true');
                     setIsAuthenticated(true);
                 }
             }
