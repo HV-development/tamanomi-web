@@ -161,8 +161,8 @@ export default function RegisterConfirmationPage() {
 
   const handleModalClose = () => {
     setShowSuccessModal(false)
-    // モーダルを閉じた後、プラン登録画面に遷移
-    router.push('/plan-registration?email=' + encodeURIComponent(email))
+    // モーダルを閉じた後、プラン登録画面に遷移（連携済みフラグを追加）
+    router.push('/plan-registration?email=' + encodeURIComponent(email) + '&saitamaAppLinked=true')
   }
 
   // クライアントサイドでの初期化が完了するまでローディング表示

@@ -27,13 +27,22 @@ export default function PlanRegistrationPage() {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
       const emailParam = urlParams.get('email') || ''
+      const saitamaAppLinkedParam = urlParams.get('saitamaAppLinked')
+      
       setEmail(emailParam)
+      
+      // URLパラメータでsaitamaAppLinked=trueが指定されている場合（ポイント付与後）
+      if (saitamaAppLinkedParam === 'true') {
+        console.log('🔍 [plan-registration] saitamaAppLinked=true from URL params, setting directly')
+        setSaitamaAppLinked(true)
+      }
     }
   }, [])
 
   // ユーザー情報を取得してさいたま市アプリ連携状態を確認
   useEffect(() => {
-    if (isClient) {
+    if (isClient && saitamaAppLinked === null) {
+      // URLパラメータでsaitamaAppLinkedが設定されていない場合のみ取得
       fetchUserInfo()
     }
   }, [isClient])
