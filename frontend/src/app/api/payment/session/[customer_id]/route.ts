@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildApiUrl } from '@/lib/api-config'
 
 export const dynamic = 'force-dynamic'
 
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function GET(
   request: NextRequest,
@@ -12,8 +12,7 @@ export async function GET(
     const customerId = params.customer_id
     
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
-    const fullUrl = `${baseUrl}/api/v1/payment/session/${customerId}`
+    const fullUrl = buildApiUrl(`/payment/session/${customerId}`)
     
     console.log('Payment session API request:', {
       method: 'GET',

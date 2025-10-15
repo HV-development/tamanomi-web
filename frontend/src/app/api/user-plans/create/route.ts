@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { buildApiUrl } from '@/lib/api-config';
 
 export const dynamic = 'force-dynamic';
-
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
 console.log('🔍 [user-plans/create] Route loaded');
 
@@ -30,14 +29,11 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 [user-plans/create] Creating user plan:', { planId, validUntil });
 
-    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
-
     // バックエンドAPIを呼び出し
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
-    const fullUrl = `${baseUrl}/api/v1/plans/user-plans`;
+    const fullUrl = buildApiUrl('/plans/user-plans');
     console.log('🔍 [user-plans/create] Request URL:', fullUrl);
 
     try {

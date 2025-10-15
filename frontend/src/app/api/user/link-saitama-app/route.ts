@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildApiUrl } from '@/lib/api-config'
 
 export const dynamic = 'force-dynamic'
-
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,8 +24,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const backendBaseUrl = process.env.API_BASE_URL || 'http://api:3002/api/v1'
-    const fullUrl = `${backendBaseUrl}/users/me/link-saitama-app`
+    const fullUrl = buildApiUrl('/users/me/link-saitama-app')
 
     const response = await fetch(fullUrl, {
       method: 'POST',

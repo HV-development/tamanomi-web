@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildApiUrl } from '@/lib/api-config'
 
 export const dynamic = 'force-dynamic'
-
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,18 +9,6 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') || 'active'
     const limit = searchParams.get('limit') || '50'
     const saitamaAppLinked = searchParams.get('saitamaAppLinked')
-
-    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
-
-    // デバッグ: 環境変数の確認
-    console.log('Environment check:', {
-      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-      API_BASE_URL: API_BASE_URL,
-      baseUrl: baseUrl,
-      NODE_ENV: process.env.NODE_ENV,
-      saitamaAppLinked: saitamaAppLinked
-    })
 
     // クエリパラメータを構築
     const queryParams = new URLSearchParams({
@@ -33,15 +20,9 @@ export async function GET(request: NextRequest) {
       queryParams.append('saitamaAppLinked', saitamaAppLinked)
     }
 
-    const fullUrl = `${baseUrl}/api/v1/plans?${queryParams.toString()}`
+    const fullUrl = `${buildApiUrl('/plans')}?${queryParams.toString()}`
 
-    console.log('Plans API request:', {
-      method: 'GET',
-      url: fullUrl,
-      status,
-      limit,
-      saitamaAppLinked
-    })
+    console.log('🔍 [plans] Request:', { url: fullUrl, status, limit, saitamaAppLinked })
 
     const response = await fetch(fullUrl, {
       method: 'GET',
