@@ -166,15 +166,6 @@ export default function PlanRegistrationPage() {
         return
       }
       
-      // 選択されたプランをsessionStorageに保存（カード登録後に使用）
-      sessionStorage.setItem('selectedPlanId', planId)
-      sessionStorage.setItem('userEmail', email)
-      
-      console.log('Saved to sessionStorage:', {
-        selectedPlanId: planId,
-        userEmail: email
-      })
-      
       // カード登録APIを呼び出し
       // customerId: メールアドレスのハッシュ値を使用して25文字以内に収める
       const generateCustomerId = (email: string): string => {
@@ -201,7 +192,7 @@ export default function PlanRegistrationPage() {
         body: JSON.stringify({
           customerId: customerId,
           userEmail: email, // セッション管理用
-          planId: planId, // セッション管理用
+          planId: planId, // セッション管理用（これがPaymentSessionに保存される）
           // customerFamilyName, customerName, companyNameは任意項目なので省略可能
         })
       })
@@ -218,6 +209,10 @@ export default function PlanRegistrationPage() {
       
       const data = await response.json()
       console.log('Payment register data:', data)
+      
+      // PaymentSessionにplanIdが保存されたので、sessionStorageには保存しない
+      // （Paygentへのリダイレクト時にsessionStorageが消える可能性があるため）
+      // 代わりにPaymentSessionから取得する方式に統一
       
       // ペイジェントのカード登録画面にリダイレクト
       // リンクタイプ方式では、redirectUrlにGETパラメータを付与してリダイレクト
