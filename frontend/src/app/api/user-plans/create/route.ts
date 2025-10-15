@@ -4,6 +4,8 @@ export const dynamic = 'force-dynamic';
 
 const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
+console.log('🔍 [user-plans/create] Route loaded');
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
