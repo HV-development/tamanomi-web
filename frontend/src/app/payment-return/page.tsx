@@ -93,6 +93,15 @@ function PaymentReturnContent() {
           console.log('🔍 [payment-return] planId type:', typeof selectedPlanId)
           console.log('🔍 [payment-return] planId length:', selectedPlanId.length)
           
+          // プランIDの形式をチェック（UUID形式であることを確認）
+          const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+          if (!uuidPattern.test(selectedPlanId)) {
+            console.error('❌ Invalid plan ID format (not UUID):', selectedPlanId)
+            sessionStorage.removeItem('selectedPlanId')
+            sessionStorage.removeItem('userEmail')
+            throw new Error('プランIDの形式が正しくありません。プラン選択画面からやり直してください。')
+          }
+          
           try {
             // アクセストークンを取得
             const accessToken = localStorage.getItem('accessToken')
