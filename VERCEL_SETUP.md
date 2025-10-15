@@ -14,7 +14,7 @@ Vercelのプロジェクト設定で以下の環境変数を設定してくだ�
 ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### 2. バックエンドAPI URL
+### 2. バックエンドAPI URL（クライアントサイド）
 
 **変数名**: `NEXT_PUBLIC_API_URL`  
 **値**: RailwayでデプロイされたバックエンドAPIのURL  
@@ -24,13 +24,27 @@ ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 https://your-railway-api-domain.railway.app
 ```
 
-> **重要**: この環境変数が設定されていないと、フロントエンドが`localhost:3002`に接続しようとしてエラーになります。
+> **重要**: `/api/v1`は含めないでください。
+
+### 3. バックエンドAPI URL（サーバーサイド）
+
+**変数名**: `API_BASE_URL`  
+**値**: RailwayでデプロイされたバックエンドAPIのURL（`/api/v1`を含む）  
+**環境**: Production, Preview, Development（全て）
+
+```
+https://your-railway-api-domain.railway.app/api/v1
+```
+
+> **重要**: 
+> - この環境変数が設定されていないと、Next.js APIルートが`http://api:3002/api/v1`（Dockerコンテナ名）に接続しようとしてエラーになります。
+> - `/api/v1`を末尾に含めてください。
 
 ## 設定手順
 
 1. Vercelのプロジェクトページにアクセス
 2. **Settings** → **Environment Variables** を開く
-3. 上記の環境変数を追加：
+3. 1つ目の環境変数を追加：
    - Name: `GITHUB_TOKEN`
    - Value: GitHubトークンの値
    - Environments: Production, Preview, Development にチェック
@@ -40,9 +54,14 @@ https://your-railway-api-domain.railway.app
    - Value: RailwayのバックエンドURL（例: `https://tamanomi-api-production.up.railway.app`）
    - Environments: Production, Preview, Development にチェック
    - **Add** をクリック
-5. **Deployments** タブに移動
-6. 最新のデプロイメントの右側の **...** メニューから **Redeploy** を選択
-7. **Redeploy** をクリック
+5. 3つ目の環境変数を追加：
+   - Name: `API_BASE_URL`
+   - Value: RailwayのバックエンドURL + `/api/v1`（例: `https://tamanomi-api-production.up.railway.app/api/v1`）
+   - Environments: Production, Preview, Development にチェック
+   - **Add** をクリック
+6. **Deployments** タブに移動
+7. 最新のデプロイメントの右側の **...** メニューから **Redeploy** を選択
+8. **Redeploy** をクリック
 
 ## 環境変数の確認
 
@@ -56,6 +75,12 @@ Environment Variables:
 ```
 
 ## トラブルシューティング
+
+### エラー: `ENOTFOUND api` または `getaddrinfo ENOTFOUND api`
+
+**原因**: `API_BASE_URL`が設定されていない（サーバーサイドAPIルートがDockerコンテナ名`api`を使おうとしている）
+
+**解決方法**: 上記手順で`API_BASE_URL`を設定し、再デプロイ
 
 ### エラー: `ECONNREFUSED 127.0.0.1:3002`
 
