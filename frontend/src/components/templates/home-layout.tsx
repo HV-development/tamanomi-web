@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import { HomeContainer } from "../organisms/home-container"
 import { LoginLayout } from "./login-layout"
@@ -34,6 +35,9 @@ import type { Store } from "../../types/store"
 export function HomeLayout() {
   // Context から必要な値を取得
   const { state, handlers, auth, navigation, filters, computedValues } = useAppContext()
+  
+  // エリアポップアップの状態管理
+  const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres

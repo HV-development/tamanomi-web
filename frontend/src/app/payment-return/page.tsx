@@ -17,11 +17,12 @@ function PaymentReturnContent() {
         const errorCode = searchParams.get('error_code')
         const responseCode = searchParams.get('response_code') // ペイジェントからのレスポンスコード
         
-        console.log('Payment return parameters:', {
+        console.log('🔍 [payment-return] Payment return parameters:', {
           customerId,
           customerCardId,
           errorCode,
-          responseCode
+          responseCode,
+          allParams: Object.fromEntries(searchParams.entries())
         })
 
         // エラーがある場合（error_code または response_codeをチェック）
