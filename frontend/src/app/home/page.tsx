@@ -55,10 +55,14 @@ export default function HomePage() {
 
         // URLパラメータをクリア
         window.history.replaceState({}, '', window.location.pathname + (view ? `?view=${view}` : ''))
-      } else if (view === 'mypage' && auth.isAuthenticated) {
-        // ログイン済みでview=mypageパラメータがある場合、マイページに遷移
-        navigation.navigateToView("mypage", "mypage")
-        navigation.navigateToMyPage("main")
+      } else if (view === 'mypage') {
+        // view=mypageパラメータがある場合、マイページに遷移
+        // アクセストークンがある場合は認証済みとみなす
+        const accessToken = localStorage.getItem('accessToken')
+        if (accessToken || auth.isAuthenticated) {
+          navigation.navigateToView("mypage", "mypage")
+          navigation.navigateToMyPage("main")
+        }
       }
     }
   }, [auth, navigation])

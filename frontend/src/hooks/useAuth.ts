@@ -9,7 +9,7 @@ export function useAuth() {
     const [usageHistory, setUsageHistory] = useState<UsageHistory[]>([]);
     const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
 
-    // 自動ログイン処理
+    // 自動ログイン処理とトークンチェック
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const urlParams = new URLSearchParams(window.location.search);
@@ -21,6 +21,12 @@ export function useAuth() {
                 setIsAuthenticated(true);
                 // URLパラメータをクリア
                 window.history.replaceState({}, '', '/');
+            } else {
+                // localStorage にアクセストークンがある場合は認証済みとする
+                const accessToken = localStorage.getItem('accessToken');
+                if (accessToken) {
+                    setIsAuthenticated(true);
+                }
             }
         }
     }, []);
