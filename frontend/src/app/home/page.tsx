@@ -55,6 +55,10 @@ export default function HomePage() {
 
         // URLパラメータをクリア
         window.history.replaceState({}, '', window.location.pathname + (view ? `?view=${view}` : ''))
+      } else if (view === 'mypage' && auth.isAuthenticated) {
+        // ログイン済みでview=mypageパラメータがある場合、マイページに遷移
+        navigation.navigateToView("mypage", "mypage")
+        navigation.navigateToMyPage("main")
       }
     }
   }, [auth, navigation])
