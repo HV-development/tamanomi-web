@@ -66,8 +66,22 @@ export default function HomePage() {
         // アクセストークンがある場合は認証済みとみなす
         const accessToken = localStorage.getItem('accessToken')
         console.log('🔍 [home] view=mypage detected, accessToken:', !!accessToken, 'isAuthenticated:', auth.isAuthenticated)
-        if (accessToken || auth.isAuthenticated) {
-          console.log('🔍 [home] Navigating to mypage')
+        if (accessToken && !auth.isAuthenticated) {
+          console.log('🔍 [home] Auto login with access token for mypage')
+          // モックユーザーでログイン（暫定対応）
+          import("@/data/mock-user").then(({ mockUser, mockPlan, mockUsageHistory, mockPaymentHistory }) => {
+            auth.login({
+              ...mockUser,
+              contractStartDate: new Date("2019-01-01")
+            }, mockPlan, mockUsageHistory, mockPaymentHistory)
+
+            // ログイン後にマイページに遷移
+            console.log('🔍 [home] Navigating to mypage after login')
+            navigation.navigateToView("mypage", "mypage")
+            navigation.navigateToMyPage("main")
+          })
+        } else if (auth.isAuthenticated) {
+          console.log('🔍 [home] Already authenticated, navigating to mypage')
           navigation.navigateToView("mypage", "mypage")
           navigation.navigateToMyPage("main")
         } else {
