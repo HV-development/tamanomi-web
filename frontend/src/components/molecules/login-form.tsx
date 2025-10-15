@@ -132,7 +132,7 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
         </Button>
 
         <Button type="button" onClick={handleSignupClick} variant="secondary" className="w-full py-3 text-base font-medium">
-          z１z１
+          新規登録
         </Button>
       </div>
 
