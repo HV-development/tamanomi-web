@@ -157,7 +157,12 @@ export default function PlanRegistrationPage() {
       setIsLoading(true)
       setError('')
       
-      console.log('Starting payment registration for plan:', planId)
+      console.log('🔍 [handlePaymentMethodRegister] Received planId:', {
+        planId,
+        planIdType: typeof planId,
+        planIdLength: planId?.length,
+        isUUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planId),
+      })
       
       // メールアドレスの検証
       if (!email || email.trim() === '') {

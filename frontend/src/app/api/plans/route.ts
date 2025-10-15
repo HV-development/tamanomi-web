@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
       },
+      cache: 'no-store',  // キャッシュを無効化
     })
 
     console.log('Plans API response:', {
@@ -47,7 +48,11 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json()
-    console.log('Plans data received:', data)
+    console.log('🔍 [plans/route] Plans data received:', {
+      planCount: data.plans?.length,
+      planIds: data.plans?.map((p: any) => p.id),
+      fullPlans: data.plans?.map((p: any) => ({ id: p.id, name: p.name, options: p.options })),
+    })
 
     return NextResponse.json(data)
   } catch (error) {
