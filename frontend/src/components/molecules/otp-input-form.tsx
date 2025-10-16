@@ -80,6 +80,18 @@ export function OtpInputForm({
       if (numericValue && index < 5) {
         inputRefs.current[index + 1]?.focus()
       }
+
+      // 6桁目が入力されたら自動送信
+      if (numericValue && index === 5) {
+        // すべてのフィールドが入力されているか確認
+        const isComplete = newOtp.every(digit => digit !== "")
+        if (isComplete) {
+          // 少し遅延させて最後の入力が反映されるのを確認してから送信
+          setTimeout(() => {
+            handleSubmit(newOtp)
+          }, 100)
+        }
+      }
     }
   }
 
@@ -119,6 +131,11 @@ export function OtpInputForm({
       if (error) {
         setError("")
       }
+
+      // 6桁ペーストされたら自動送信
+      setTimeout(() => {
+        handleSubmit(newOtp)
+      }, 100)
     }
   }
 
