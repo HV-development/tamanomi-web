@@ -30,7 +30,8 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
 
   const validateField = (fieldName: keyof UserRegistrationRequest, value: string) => {
     try {
-      UserRegistrationRequestSchema.pick({ [fieldName]: true } as Record<string, boolean>).parse({ [fieldName]: value })
+      const fieldSchema = UserRegistrationRequestSchema.shape[fieldName];
+      fieldSchema.parse(value);
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
@@ -50,10 +51,12 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
       setErrors({})
       return true
     } catch (error) {
-      if (error instanceof ZodError) {
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> };
         const newErrors: Partial<Record<keyof UserRegistrationRequest, string>> = {}
-        error.errors.forEach((err) => {
-          const fieldName = err.path[0] as keyof UserRegistrationRequest
+        zodError.errors.forEach((err) => {
+          const fieldName = err.path?.[0] as keyof UserRegistrationRequest
           if (fieldName === 'email' || fieldName === 'campaignCode') {
             newErrors[fieldName] = err.message
           }
@@ -143,7 +146,7 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
           placeholder="例: WELCOME2024"
           value={formData.campaignCode}
           onChange={handleCampaignCodeChange}
-          error={errors.campaignCode}
+          error={errors.campaignCode as string}
           required={true}
         />
 

@@ -24,15 +24,18 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
 
   const validateField = (fieldName: keyof AdminLoginInput, value: string) => {
     try {
-      adminLoginSchema.pick({ [fieldName]: true } as Record<string, boolean>).parse({ [fieldName]: value })
+      const fieldSchema = adminLoginSchema.shape[fieldName];
+      fieldSchema.parse(value);
       setErrors(prev => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
         return newErrors
       })
     } catch (error) {
-      if (error instanceof ZodError) {
-        const errorMessage = error.errors[0]?.message || "入力エラーです"
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ message: string }> };
+        const errorMessage = zodError.errors[0]?.message || "入力エラーです"
         setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
       }
     }
@@ -44,10 +47,12 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
       setErrors({})
       return true
     } catch (error) {
-      if (error instanceof ZodError) {
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> };
         const newErrors: Partial<Record<keyof AdminLoginInput, string>> = {}
-        error.errors.forEach((err) => {
-          const fieldName = err.path[0] as keyof AdminLoginInput
+        zodError.errors.forEach((err) => {
+          const fieldName = err.path?.[0] as keyof AdminLoginInput
           if (fieldName === 'email' || fieldName === 'password') {
             newErrors[fieldName] = err.message
           }
@@ -60,34 +65,28 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
 
   const handleEmailChange = (value: string) => {
     setFormData(prev => ({ ...prev, email: value }))
-    if (value.trim()) {
-      validateField('email', value)
-    } else {
-      setErrors(prev => {
-        const newErrors = { ...prev }
-        delete newErrors.email
-        return newErrors
-      })
-    }
+    // 常にバリデーションを実行（空の文字列でもエラーを表示）
+    validateField('email', value)
   }
 
   const handlePasswordChange = (value: string) => {
     setFormData(prev => ({ ...prev, password: value }))
-    if (value.trim()) {
-      validateField('password', value)  // 追加: リアルタイムバリデーション
-    } else {
-      setErrors(prev => {
-        const newErrors = { ...prev }
-        delete newErrors.password
-        return newErrors
-      })
-    }
+    // 常にバリデーションを実行（空の文字列でもエラーを表示）
+    validateField('password', value)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (validateForm()) {
+
+    // バリデーションを実行してエラーを表示
+    const isValid = validateForm()
+
+    if (isValid) {
       onLogin(formData)
+    } else {
+      // バリデーションエラーがある場合は、すべてのフィールドを再検証
+      validateField('email', formData.email)
+      validateField('password', formData.password)
     }
   }
 

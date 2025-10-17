@@ -42,7 +42,7 @@ export async function preRegister(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       // エラーメッセージの正規化
-      const message = errorData.message || '認証メールの送信に失敗しました'
+      const message = errorData.error?.message || errorData.message || '認証メールの送信に失敗しました'
       throw new Error(message)
     }
 

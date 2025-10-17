@@ -39,54 +39,50 @@ export default function HomePage() {
       console.log('🔍 [home] localStorage accessToken:', !!localStorage.getItem('accessToken'))
 
       if (autoLogin === 'true') {
+        // ★URLパラメータからトークンを取得してlocalStorageに保存
+        if (token) {
+          localStorage.setItem('accessToken', token)
+        }
+
         // 自動ログイン処理（トークンがある場合）
         const accessToken = localStorage.getItem('accessToken')
         if (accessToken && !auth.isAuthenticated) {
-          console.log('🔍 [home] Auto login with access token')
-          // モックユーザーでログイン（暫定対応）
-          import("@/data/mock-user").then(({ mockUser, mockPlan, mockUsageHistory, mockPaymentHistory }) => {
-            auth.login({
-              ...mockUser,
-              contractStartDate: new Date("2019-01-01")
-            }, mockPlan, mockUsageHistory, mockPaymentHistory)
 
-            // viewパラメータがmypageの場合はマイページに遷移
-            if (view === 'mypage') {
-              console.log('🔍 [home] Navigating to mypage (auto-login)')
-              navigation.navigateToView("mypage", "mypage")
-              navigation.navigateToMyPage("main")
-            }
+          // トークンがある場合、ユーザー情報を取得
+          fetch('/api/user/me', {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
           })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to fetch user data')
+              }
+              return response.json()
+            })
+            .then(userData => {
+              // TODO: 実際のユーザーデータでauth.loginを呼び出す
+              // auth.login(userData, userData.plan, [], [])
+
+              // viewパラメータがmypageの場合はマイページに遷移
+              if (view === 'mypage') {
+                navigation.navigateToView("mypage", "mypage")
+                navigation.navigateToMyPage("main")
+              }
+            })
+            .catch(error => {
+              console.error('Auto-login failed:', error)
+              // トークンが無効な場合はクリア
+              localStorage.removeItem('accessToken')
+              localStorage.removeItem('refreshToken')
+            })
         }
 
-        // URLパラメータをクリア
-        window.history.replaceState({}, '', window.location.pathname + (view ? `?view=${view}` : ''))
-      } else if (view === 'mypage') {
-        // view=mypageパラメータがある場合、マイページに遷移
-        // アクセストークンがある場合は認証済みとみなす
-        const accessToken = localStorage.getItem('accessToken')
-        console.log('🔍 [home] view=mypage detected, accessToken:', !!accessToken, 'isAuthenticated:', auth.isAuthenticated)
-        if (accessToken && !auth.isAuthenticated) {
-          console.log('🔍 [home] Auto login with access token for mypage')
-          // モックユーザーでログイン（暫定対応）
-          import("@/data/mock-user").then(({ mockUser, mockPlan, mockUsageHistory, mockPaymentHistory }) => {
-            auth.login({
-              ...mockUser,
-              contractStartDate: new Date("2019-01-01")
-            }, mockPlan, mockUsageHistory, mockPaymentHistory)
-
-            // ログイン後にマイページに遷移
-            console.log('🔍 [home] Navigating to mypage after login')
-            navigation.navigateToView("mypage", "mypage")
-            navigation.navigateToMyPage("main")
-          })
-        } else if (auth.isAuthenticated) {
-          console.log('🔍 [home] Already authenticated, navigating to mypage')
-          navigation.navigateToView("mypage", "mypage")
-          navigation.navigateToMyPage("main")
-        } else {
-          console.log('❌ [home] Cannot navigate to mypage: no accessToken and not authenticated')
-        }
+        // window.history.replaceState({}, '', window.location.pathname + (view ? `?view=${view}` : ''))
+        // ★URLパラメータをクリア（tokenは残す）
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.delete('auto-login')
+        window.history.replaceState({}, '', newUrl.toString())
       }
     }
   }, [auth, navigation])

@@ -23,7 +23,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  console.log('🟠 RegisterForm: Component rendered with props:', { email, initialFormData, isLoading })
   const [formData, setFormData] = useState<UserRegistrationComplete>({
     email: email || "",
     nickname: "",
@@ -47,7 +46,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   // initialFormDataが変更された時にフォームデータを設定
   useEffect(() => {
-    console.log('🟣 RegisterForm: useEffect triggered with initialFormData:', initialFormData, 'email:', email)
     if (initialFormData) {
       const newFormData = {
         ...initialFormData,
@@ -56,7 +54,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         password: "",
         passwordConfirm: "",
       }
-      console.log('🟣 RegisterForm: Setting formData to:', newFormData)
       setFormData(newFormData)
     }
   }, [initialFormData, email])
@@ -74,10 +71,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     }
 
     try {
-      // 個別フィールドのバリデーション（フォーム全体のバリデーションではなく、単一フィールドのみ）
+      // 個別フィールドのバリデーション（フォーム全体をパースして該当フィールドのエラーのみを抽出）
       const testData = { ...formData, [fieldName]: value }
       UseRregistrationCompleteSchema.parse(testData)
-      
+
       // バリデーション成功時はエラーをクリア
       setErrors(prev => {
         const newErrors = { ...prev }
@@ -104,33 +101,25 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   }
 
   const validateForm = () => {
-    console.log('🟡 RegisterForm: validateForm called with formData:', formData)
-
     try {
       // スキーマを使用してバリデーション
       const result = UseRregistrationCompleteSchema.parse(formData)
-      console.log('🟢 RegisterForm: Validation successful:', result)
       setErrors({})
       return true
     } catch (error) {
-      console.log('🔴 RegisterForm: Validation failed with error:', error)
-
       // ZodErrorかどうかをより確実にチェック
       if (error && typeof error === 'object' && 'errors' in error) {
         const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> }
-        console.log('🔴 RegisterForm: ZodError details:', zodError.errors)
 
         const newErrors: Partial<Record<keyof UserRegistrationComplete, string>> = {}
 
         zodError.errors.forEach((err) => {
           const field = err.path?.[0] as keyof UserRegistrationComplete
-          console.log(`🔴 RegisterForm: Field error - ${field}:`, err.message)
           if (field) {
             newErrors[field] = err.message
           }
         })
 
-        console.log('🔴 RegisterForm: Setting new errors:', newErrors)
         setErrors(() => newErrors)
       }
       return false
@@ -138,11 +127,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    console.log('🔵 RegisterForm: handleSubmit called')
     e.preventDefault()
-
-    console.log('🔵 RegisterForm: Current formData:', formData)
-    console.log('🔵 RegisterForm: Current errors:', errors)
 
     // 利用規約の同意チェック
     if (!agreedToTerms) {
@@ -152,15 +137,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     setTermsError("")
 
     const isValid = validateForm()
-    console.log('🔵 RegisterForm: Validation result:', isValid)
 
     if (isValid) {
-      console.log('🔵 RegisterForm: Calling onSubmit with formData:', formData)
       onSubmit(formData)
-      console.log('🔵 RegisterForm: onSubmit called successfully')
-    } else {
-      console.log('🔵 RegisterForm: Validation failed, onSubmit not called')
-      console.log('🔵 RegisterForm: Updated errors after validation:', errors)
     }
   }
 
@@ -170,21 +149,21 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     // 郵便番号の形式チェック
     if (!formData.postalCode) {
-      setErrors(prev => ({ 
-        ...prev, 
-        postalCode: '郵便番号を入力してください。' 
+      setErrors(prev => ({
+        ...prev,
+        postalCode: '郵便番号を入力してください。'
       }))
       return
     }
-    
+
     if (!/^\d{7}$/.test(cleanedPostalCode)) {
-      setErrors(prev => ({ 
-        ...prev, 
-        postalCode: '郵便番号は7桁の数字で入力してください。' 
+      setErrors(prev => ({
+        ...prev,
+        postalCode: '郵便番号は7桁の数字で入力してください。'
       }))
       return
     }
-    
+
     setIsSearchingAddress(true)
 
     const apiUrl = `/api/address/search?zipcode=${cleanedPostalCode}`
@@ -201,16 +180,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }))
 
         // 住所が見つかった場合は郵便番号と住所のエラーをクリア
-        setErrors(prev => ({ 
-          ...prev, 
+        setErrors(prev => ({
+          ...prev,
           postalCode: undefined,
-          address: undefined 
+          address: undefined
         }))
       } else {
         // 住所が見つからない場合はエラーメッセージを表示
-        setErrors(prev => ({ 
-          ...prev, 
-          postalCode: '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。' 
+        setErrors(prev => ({
+          ...prev,
+          postalCode: '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。'
         }))
 
         // 住所フィールドにフォーカスを移す
@@ -223,12 +202,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     } catch (error) {
       // ネットワークエラーなどの場合
-      console.error('Address search error:', error)
-      setErrors(prev => ({ 
-        ...prev, 
-        postalCode: '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。' 
+      setErrors(prev => ({
+        ...prev,
+        postalCode: '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。'
       }))
-      
+
       // 住所フィールドにフォーカス
       setTimeout(() => {
         if (addressInputRef.current) {
