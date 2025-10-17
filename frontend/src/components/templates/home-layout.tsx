@@ -38,6 +38,8 @@ export function HomeLayout() {
 
   // エリアポップアップの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
+  const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
+  const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
 
   // ジャンルポップアップの状態管理
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)

@@ -157,7 +157,20 @@ export default function PlanRegistrationPage() {
       setIsLoading(true)
       setError('')
       
-      console.log('Starting payment registration for plan:', planId)
+      console.log('🔍 [handlePaymentMethodRegister] Received planId:', {
+        planId,
+        planIdType: typeof planId,
+        planIdLength: planId?.length,
+        isUUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planId),
+      })
+      
+      // トークンの確認（デバッグ用）
+      const accessToken = localStorage.getItem('accessToken')
+      console.log('🔍 [plan-registration] accessToken check before payment:', {
+        hasToken: !!accessToken,
+        tokenLength: accessToken?.length,
+        tokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : 'null'
+      })
       
       // メールアドレスの検証
       if (!email || email.trim() === '') {
@@ -165,15 +178,6 @@ export default function PlanRegistrationPage() {
         setIsLoading(false)
         return
       }
-      
-      // 選択されたプランをsessionStorageに保存（カード登録後に使用）
-      sessionStorage.setItem('selectedPlanId', planId)
-      sessionStorage.setItem('userEmail', email)
-      
-      console.log('Saved to sessionStorage:', {
-        selectedPlanId: planId,
-        userEmail: email
-      })
       
       // カード登録APIを呼び出し
       // customerId: メールアドレスのハッシュ値を使用して25文字以内に収める
@@ -201,7 +205,7 @@ export default function PlanRegistrationPage() {
         body: JSON.stringify({
           customerId: customerId,
           userEmail: email, // セッション管理用
-          planId: planId, // セッション管理用
+          planId: planId, // セッション管理用（これがPaymentSessionに保存される）
           // customerFamilyName, customerName, companyNameは任意項目なので省略可能
         })
       })
@@ -218,6 +222,10 @@ export default function PlanRegistrationPage() {
       
       const data = await response.json()
       console.log('Payment register data:', data)
+      
+      // PaymentSessionにplanIdが保存されたので、sessionStorageには保存しない
+      // （Paygentへのリダイレクト時にsessionStorageが消える可能性があるため）
+      // 代わりにPaymentSessionから取得する方式に統一
       
       // ペイジェントのカード登録画面にリダイレクト
       // リンクタイプ方式では、redirectUrlにGETパラメータを付与してリダイレクト

@@ -93,15 +93,31 @@ function PaymentReturnContent() {
           console.log('🔍 [payment-return] planId type:', typeof selectedPlanId)
           console.log('🔍 [payment-return] planId length:', selectedPlanId.length)
           
+          // プランIDの形式をチェック（UUID形式であることを確認）
+          const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+          if (!uuidPattern.test(selectedPlanId)) {
+            console.error('❌ Invalid plan ID format (not UUID):', selectedPlanId)
+            sessionStorage.removeItem('selectedPlanId')
+            sessionStorage.removeItem('userEmail')
+            throw new Error('プランIDの形式が正しくありません。プラン選択画面からやり直してください。')
+          }
+          
           try {
             // アクセストークンを取得
             const accessToken = localStorage.getItem('accessToken')
+            console.log('🔍 [payment-return] accessToken from localStorage:', {
+              hasToken: !!accessToken,
+              tokenLength: accessToken?.length,
+              tokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : 'null'
+            })
+            
             if (!accessToken) {
               throw new Error('認証情報が見つかりません。ログインしてください。')
             }
 
             console.log('🔍 [payment-return] Sending request to /api/user-plans/create')
             console.log('🔍 [payment-return] Request body:', { planId: selectedPlanId })
+            console.log('🔍 [payment-return] Authorization header:', `Bearer ${accessToken.substring(0, 20)}...`)
 
             // プラン作成APIを呼び出し
             const createPlanResponse = await fetch('/api/user-plans/create', {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildApiUrl } from '@/lib/api-config'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,8 +14,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const backendBaseUrl = process.env.API_BASE_URL || 'http://api:3002/api/v1'
-    const fullUrl = `${backendBaseUrl}/users/me`
+    const fullUrl = buildApiUrl('/users/me')
 
     const response = await fetch(fullUrl, {
       method: 'GET',

@@ -1,24 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { buildApiUrl } from '@/lib/api-config';
 
 export const dynamic = 'force-dynamic'
-
-// サーバーサイドでは API_BASE_URL を使用（NEXT_PUBLIC_ プレフィックスなし）
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
-
-    // デバッグ: 環境変数の確認
-    console.log('Environment check:', {
-      API_BASE_URL: process.env.API_BASE_URL,
-      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-      finalBaseUrl: baseUrl,
-      NODE_ENV: process.env.NODE_ENV
-    });
 
     // バリデーション
     if (!body.email) {
@@ -32,10 +19,9 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
-    const fullUrl = `${baseUrl}/api/v1/pre-register`;
+    const fullUrl = buildApiUrl('/pre-register');
     
-    console.log('🔍 [pre-register] Sending request to:', fullUrl);
-    console.log('🔍 [pre-register] Request body:', JSON.stringify({ email: body.email, campaignCode: body.campaignCode }));
+    console.log('🔍 [pre-register] Request:', { url: fullUrl, email: body.email, campaignCode: body.campaignCode });
 
     try {
       const response = await fetch(fullUrl, {

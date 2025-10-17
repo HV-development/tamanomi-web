@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildApiUrl } from '@/lib/api-config'
 
 export const dynamic = 'force-dynamic'
 
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
     const { email, otp, requestId } = body
 
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
     const fullUrl = `${baseUrl}/api/v1/otp/verify`
 
     const response = await fetch(fullUrl, {

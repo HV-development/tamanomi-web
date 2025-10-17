@@ -33,8 +33,10 @@ export default function HomePage() {
       const urlParams = new URLSearchParams(window.location.search)
       const autoLogin = urlParams.get('auto-login')
       const view = urlParams.get('view')
-      // ★URLパラメータからトークンを取得
-      const token = urlParams.get('token')
+      
+      console.log('🔍 [home] URL params:', { autoLogin, view, url: window.location.href })
+      console.log('🔍 [home] Auth state:', { isAuthenticated: auth.isAuthenticated })
+      console.log('🔍 [home] localStorage accessToken:', !!localStorage.getItem('accessToken'))
 
       if (autoLogin === 'true') {
         // ★URLパラメータからトークンを取得してlocalStorageに保存
@@ -45,6 +47,7 @@ export default function HomePage() {
         // 自動ログイン処理（トークンがある場合）
         const accessToken = localStorage.getItem('accessToken')
         if (accessToken && !auth.isAuthenticated) {
+
           // トークンがある場合、ユーザー情報を取得
           fetch('/api/user/me', {
             headers: {
@@ -74,7 +77,7 @@ export default function HomePage() {
               localStorage.removeItem('refreshToken')
             })
         }
-        // URLパラメータをクリア
+
         // window.history.replaceState({}, '', window.location.pathname + (view ? `?view=${view}` : ''))
         // ★URLパラメータをクリア（tokenは残す）
         const newUrl = new URL(window.location.href)

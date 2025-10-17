@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildApiUrl } from '@/lib/api-config'
 
 export const dynamic = 'force-dynamic'
 
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,9 +16,6 @@ export async function POST(request: NextRequest) {
       saitamaAppIdLength: body.saitamaAppId?.length,
       saitamaAppIdValue: `"${body.saitamaAppId}"`,
     })
-
-    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 
     // バックエンドが期待するデータ構造に変換
     // 空文字列のsaitamaAppIdは除外
@@ -46,7 +43,7 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
-    const fullUrl = `${baseUrl}/api/v1/register/complete`;
+    const fullUrl = buildApiUrl('/register/complete');
 
     try {
       const response = await fetch(fullUrl, {

@@ -108,7 +108,16 @@ export default function RegisterConfirmationPage() {
         // トークンをlocalStorageに保存
         if (result.accessToken) {
           localStorage.setItem('accessToken', result.accessToken)
-          console.log('✅ [register-confirmation] Access token saved to localStorage')
+          console.log('✅ [register-confirmation] Access token saved to localStorage:', {
+            tokenLength: result.accessToken.length,
+            tokenPreview: result.accessToken.substring(0, 20) + '...'
+          })
+          // 保存後、すぐに読み取って確認
+          const savedToken = localStorage.getItem('accessToken')
+          console.log('✅ [register-confirmation] Verification - token retrieved from localStorage:', {
+            hasToken: !!savedToken,
+            matches: savedToken === result.accessToken
+          })
         }
         if (result.refreshToken) {
           localStorage.setItem('refreshToken', result.refreshToken)

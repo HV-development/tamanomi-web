@@ -14,31 +14,20 @@ Vercelのプロジェクト設定で以下の環境変数を設定してくだ�
 ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### 2. バックエンドAPI URL（クライアントサイド）
+### 2. バックエンドAPI URL（サーバーサイド）
 
-**変数名**: `NEXT_PUBLIC_API_URL`  
-**値**: RailwayでデプロイされたバックエンドAPIのURL  
+**変数名**: `API_BASE_URL`  
+**値**: RailwayでデプロイされたバックエンドAPIのベースURL（**バージョンなし**）  
 **環境**: Production, Preview, Development（全て）
 
 ```
 https://your-railway-api-domain.railway.app
 ```
 
-> **重要**: `/api/v1`は含めないでください。
-
-### 3. バックエンドAPI URL（サーバーサイド）
-
-**変数名**: `API_BASE_URL`  
-**値**: RailwayでデプロイされたバックエンドAPIのURL（`/api/v1`を含む）  
-**環境**: Production, Preview, Development（全て）
-
-```
-https://your-railway-api-domain.railway.app/api/v1
-```
-
 > **重要**: 
-> - この環境変数が設定されていないと、Next.js APIルートが`http://api:3002/api/v1`（Dockerコンテナ名）に接続しようとしてエラーになります。
-> - `/api/v1`を末尾に含めてください。
+> - `/api/v1` は**含めないでください**。バージョン管理はプログラム側で行います。
+> - この環境変数が設定されていないと、エラーになります。
+> - 例: `https://tamanomi-api-develop.up.railway.app`
 
 ## 設定手順
 
@@ -50,15 +39,12 @@ https://your-railway-api-domain.railway.app/api/v1
    - Environments: Production, Preview, Development にチェック
    - **Add** をクリック
 4. 2つ目の環境変数を追加：
-   - Name: `NEXT_PUBLIC_API_URL`
+   - Name: `API_BASE_URL`
    - Value: RailwayのバックエンドURL（例: `https://tamanomi-api-production.up.railway.app`）
    - Environments: Production, Preview, Development にチェック
    - **Add** をクリック
-5. 3つ目の環境変数を追加：
-   - Name: `API_BASE_URL`
-   - Value: RailwayのバックエンドURL + `/api/v1`（例: `https://tamanomi-api-production.up.railway.app/api/v1`）
-   - Environments: Production, Preview, Development にチェック
-   - **Add** をクリック
+
+> **注意**: `/api/v1` は含めません。バージョン管理はプログラム側で自動的に行われます。
 6. **Deployments** タブに移動
 7. 最新のデプロイメントの右側の **...** メニューから **Redeploy** を選択
 8. **Redeploy** をクリック
