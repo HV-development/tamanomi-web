@@ -33,28 +33,53 @@ export default function HomePage() {
       const urlParams = new URLSearchParams(window.location.search)
       const autoLogin = urlParams.get('auto-login')
       const view = urlParams.get('view')
+      // ★URLパラメータからトークンを取得
+      const token = urlParams.get('token')
 
       if (autoLogin === 'true') {
+        // ★URLパラメータからトークンを取得してlocalStorageに保存
+        if (token) {
+          localStorage.setItem('accessToken', token)
+        }
+
         // 自動ログイン処理（トークンがある場合）
         const accessToken = localStorage.getItem('accessToken')
         if (accessToken && !auth.isAuthenticated) {
-          // モックユーザーでログイン（暫定対応）
-          import("@/data/mock-user").then(({ mockUser, mockPlan, mockUsageHistory, mockPaymentHistory }) => {
-            auth.login({
-              ...mockUser,
-              contractStartDate: new Date("2019-01-01")
-            }, mockPlan, mockUsageHistory, mockPaymentHistory)
-
-            // viewパラメータがmypageの場合はマイページに遷移
-            if (view === 'mypage') {
-              navigation.navigateToView("mypage", "mypage")
-              navigation.navigateToMyPage("main")
-            }
+          // トークンがある場合、ユーザー情報を取得
+          fetch('/api/user/me', {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
           })
-        }
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to fetch user data')
+              }
+              return response.json()
+            })
+            .then(userData => {
+              // TODO: 実際のユーザーデータでauth.loginを呼び出す
+              // auth.login(userData, userData.plan, [], [])
 
+              // viewパラメータがmypageの場合はマイページに遷移
+              if (view === 'mypage') {
+                navigation.navigateToView("mypage", "mypage")
+                navigation.navigateToMyPage("main")
+              }
+            })
+            .catch(error => {
+              console.error('Auto-login failed:', error)
+              // トークンが無効な場合はクリア
+              localStorage.removeItem('accessToken')
+              localStorage.removeItem('refreshToken')
+            })
+        }
         // URLパラメータをクリア
-        window.history.replaceState({}, '', window.location.pathname + (view ? `?view=${view}` : ''))
+        // window.history.replaceState({}, '', window.location.pathname + (view ? `?view=${view}` : ''))
+        // ★URLパラメータをクリア（tokenは残す）
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.delete('auto-login')
+        window.history.replaceState({}, '', newUrl.toString())
       }
     }
   }, [auth, navigation])

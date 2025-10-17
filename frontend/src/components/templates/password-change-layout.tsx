@@ -11,6 +11,8 @@ interface PasswordChangeLayoutProps {
   onBackToLogin: () => void
   onLogoClick: () => void
   isLoading?: boolean
+  errorMessage?: string | null
+  currentUserRank?: string | null
 }
 
 export function PasswordChangeLayout({
@@ -20,6 +22,8 @@ export function PasswordChangeLayout({
   onBackToLogin,
   onLogoClick,
   isLoading,
+  errorMessage,
+  currentUserRank,
 }: PasswordChangeLayoutProps) {
   // ランクに基づく背景色を取得
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
@@ -32,7 +36,9 @@ export function PasswordChangeLayout({
       onBackToLogin={onBackToLogin}
       onLogoClick={onLogoClick}
       isLoading={isLoading}
+      errorMessage={errorMessage}
       backgroundColorClass={backgroundColorClass}
+      currentUserRank={currentUserRank}
     />
   )
 }

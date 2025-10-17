@@ -7,15 +7,15 @@ interface MyPageLayoutProps {
   usageHistory: UsageHistory[]
   paymentHistory: PaymentHistory[]
   currentView:
-    | "main"
-    | "profile-edit"
-    | "email-change"
-    | "password-change"
-    | "usage-history"
-    | "payment-history"
-    | "plan-management"
-    | "withdrawal"
-    | "withdrawal-complete"
+  | "main"
+  | "profile-edit"
+  | "email-change"
+  | "password-change"
+  | "usage-history"
+  | "payment-history"
+  | "plan-management"
+  | "withdrawal"
+  | "withdrawal-complete"
   onViewChange: (view: string) => void
   onEditProfile: () => void
   onChangeEmail: () => void
@@ -40,6 +40,7 @@ interface MyPageLayoutProps {
   onEmailChangeResend?: () => void
   emailChangeStep?: "form" | "complete"
   passwordChangeStep?: "form" | "complete"
+  passwordChangeError?: string | null
   newEmail?: string
   currentUserRank?: string | null
 }
@@ -71,9 +72,10 @@ export function MyPageLayout({
   onEmailChangeSubmit,
   onPasswordChangeSubmit,
   onPasswordChangeBackToLogin,
-  onEmailChangeResend = () => {},
+  onEmailChangeResend = () => { },
   emailChangeStep,
   passwordChangeStep,
+  passwordChangeError,
   newEmail,
   currentUserRank,
 }: MyPageLayoutProps) {
@@ -98,7 +100,7 @@ export function MyPageLayout({
       onWithdrawComplete={onWithdrawComplete}
       onLogout={onLogout}
       onBack={onBack}
-              onShowStoreOnHome={onShowStoreOnHome}
+      onShowStoreOnHome={onShowStoreOnHome}
       onUseSameCoupon={onUseSameCoupon}
       onLogoClick={onLogoClick}
       onProfileEditSubmit={onProfileEditSubmit}
@@ -108,6 +110,7 @@ export function MyPageLayout({
       onEmailChangeResend={onEmailChangeResend}
       emailChangeStep={emailChangeStep}
       passwordChangeStep={passwordChangeStep}
+      passwordChangeError={passwordChangeError}
       newEmail={newEmail}
       currentUserRank={currentUserRank}
     />

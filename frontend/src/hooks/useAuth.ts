@@ -25,7 +25,7 @@ export function useAuth() {
         }
     }, []);
 
-    const login = (userData: User, planData: Plan, usage: UsageHistory[], payment: PaymentHistory[]) => {
+    const login = (userData: User, planData: Plan | undefined, usage: UsageHistory[], payment: PaymentHistory[]) => {
         setIsAuthenticated(true);
         setUser(userData);
         setPlan(planData);

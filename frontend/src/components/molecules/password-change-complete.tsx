@@ -8,6 +8,10 @@ interface PasswordChangeCompleteProps {
 }
 
 export function PasswordChangeComplete({ onBackToLogin }: PasswordChangeCompleteProps) {
+  const handleBackToLogin = () => {
+    onBackToLogin()
+  }
+
   return (
     <div className="space-y-6">
       {/* 完了メッセージ */}
@@ -50,7 +54,7 @@ export function PasswordChangeComplete({ onBackToLogin }: PasswordChangeComplete
       {/* ボタン */}
       <div className="space-y-3">
         <Button
-          onClick={onBackToLogin}
+          onClick={handleBackToLogin}
           className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-medium flex items-center justify-center gap-2"
         >
           <LogIn className="w-5 h-5" />

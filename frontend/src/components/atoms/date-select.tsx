@@ -30,7 +30,7 @@ export function DateSelect({ value, onChange, label, error, className = "" }: Da
   useEffect(() => {
     // 完全な日付形式（yyyy/MM/dd = 10文字）または空文字列の場合のみ更新
     const isCompleteDate = value === "" || (value.length === 10 && value.split("/").length === 3)
-    
+
     if (isCompleteDate && value !== lastEmittedValue.current) {
       setSelectedDate(parseDate(value))
       lastEmittedValue.current = value
@@ -64,12 +64,12 @@ export function DateSelect({ value, onChange, label, error, className = "" }: Da
     const newDate = { ...selectedDate, [field]: val }
     setSelectedDate(newDate)
 
-    // すべてのフィールドが選択されている場合のみonChangeを呼ぶ
+    // すべてのフィールドが選択されている場合は完全な日付形式で通知
     if (newDate.year && newDate.month && newDate.day) {
       const formattedMonth = newDate.month.padStart(2, "0")
       const formattedDay = newDate.day.padStart(2, "0")
       const newValue = `${newDate.year}/${formattedMonth}/${formattedDay}`
-      
+
       // 前回と異なる値の場合のみonChangeを呼ぶ
       if (newValue !== lastEmittedValue.current) {
         lastEmittedValue.current = newValue
@@ -81,8 +81,13 @@ export function DateSelect({ value, onChange, label, error, className = "" }: Da
         lastEmittedValue.current = ""
         onChange("")
       }
+    } else {
+      // 部分的な選択の場合も空文字列として通知（バリデーション用）
+      if (lastEmittedValue.current !== "") {
+        lastEmittedValue.current = ""
+        onChange("")
+      }
     }
-    // 部分的な選択の場合はonChangeを呼ばない（内部状態のみ更新）
   }
 
   const selectClassName =

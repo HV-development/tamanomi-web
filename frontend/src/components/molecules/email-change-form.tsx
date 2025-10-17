@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 import { Settings } from "lucide-react"
-import { emailChangeSchema, type EmailChangeInput } from "@hv-development/schemas"
+import { emailChangeInputSchema, type EmailChangeInput } from "@hv-development/schemas"
 import { z } from "zod"
 
 interface EmailChangeFormProps {
@@ -12,9 +12,10 @@ interface EmailChangeFormProps {
   onSubmit: (data: EmailChangeInput) => void
   onCancel: () => void
   isLoading?: boolean
+  errorMessage?: string
 }
 
-export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, onCancel, isLoading = false }: EmailChangeFormProps) {
+export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, onCancel, isLoading = false, errorMessage }: EmailChangeFormProps) {
   const [formData, setFormData] = useState<EmailChangeInput>({
     currentPassword: "",
     newEmail: initialNewEmail,
@@ -25,7 +26,7 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
   const validateForm = () => {
     try {
       // tamanomi-schemasのスキーマを使用してバリデーション
-      emailChangeSchema.parse(formData)
+      emailChangeInputSchema.parse(formData)
 
       // 追加のビジネスロジックバリデーション
       if (formData.newEmail === currentEmail) {
@@ -36,10 +37,12 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
       setErrors({})
       return true
     } catch (error) {
-      if (error instanceof z.ZodError) {
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> };
         const newErrors: Partial<EmailChangeInput> = {}
-        error.errors.forEach((err) => {
-          const field = err.path[0] as keyof EmailChangeInput
+        zodError.errors.forEach((err) => {
+          const field = err.path?.[0] as keyof EmailChangeInput
           if (field) {
             newErrors[field] = err.message
           }
@@ -54,7 +57,9 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
     const newErrors = { ...errors }
 
     if (field === 'currentPassword') {
-      if (value) {
+      if (!value) {
+        newErrors.currentPassword = "現在のパスワードを入力してください。"
+      } else {
         delete newErrors.currentPassword
       }
     }
@@ -72,9 +77,11 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
     }
 
     if (field === 'confirmEmail') {
-      if (value && formData.newEmail !== value) {
+      if (!value) {
+        newErrors.confirmEmail = "メールアドレス確認を入力してください。"
+      } else if (formData.newEmail !== value) {
         newErrors.confirmEmail = "メールアドレスが一致しません。"
-      } else if (value && formData.newEmail === value) {
+      } else if (formData.newEmail === value) {
         delete newErrors.confirmEmail
       }
     }
@@ -90,7 +97,10 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
   }
 
   const updateField = (field: keyof EmailChangeInput, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value }
+      return newData
+    })
     validateFieldOnInput(field, value)
   }
 
@@ -167,6 +177,13 @@ export function EmailChangeForm({ currentEmail, initialNewEmail = "", onSubmit, 
               <li>• 確認メールが届かない場合は、迷惑メールフォルダもご確認ください</li>
             </ul>
           </div>
+
+          {/* エラーメッセージ */}
+          {errorMessage && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <p className="text-sm text-red-800">{errorMessage}</p>
+            </div>
+          )}
 
           {/* 確認メール送信ボタン */}
           <button

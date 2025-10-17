@@ -35,9 +35,15 @@ import type { Store } from "../../types/store"
 export function HomeLayout() {
   // Context から必要な値を取得
   const { state, handlers, auth, navigation, filters, computedValues } = useAppContext()
-  
+
   // エリアポップアップの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
+
+  // ジャンルポップアップの状態管理
+  const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
+
+  // 使用方法ガイドモーダルの状態管理
+  const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres
@@ -93,6 +99,7 @@ export function HomeLayout() {
   const onWithdrawComplete = handlers.handleWithdrawComplete
   const onLogout = handlers.handleLogout
   const onLogin = handlers.handleLogin
+  const onVerifyOtp = handlers.handleVerifyOtp
   const onSignup = handlers.handleSignup
   const onForgotPassword = handlers.handleForgotPassword
   const onBackToHome = handlers.handleBackToHome
@@ -135,6 +142,7 @@ export function HomeLayout() {
   const onEmailChangeResend = handlers.handleEmailChangeResend
   const emailChangeStep = state.emailChangeStep
   const passwordChangeStep = state.passwordChangeStep
+  const passwordChangeError = state.passwordChangeError
   const newEmail = state.newEmail
   const onStoreDetailClose = handlers.handleStoreDetailPopupClose
   const isStoreDetailPopupOpen = state.isStoreDetailPopupOpen
@@ -259,9 +267,11 @@ export function HomeLayout() {
         onProfileEditSubmit={onProfileEditSubmit || (() => { })}
         onEmailChangeSubmit={onEmailChangeSubmit}
         onPasswordChangeSubmit={onPasswordChangeSubmit}
+        onPasswordChangeBackToLogin={handlers.handlePasswordChangeComplete}
         onEmailChangeResend={onEmailChangeResend}
         emailChangeStep={emailChangeStep}
         passwordChangeStep={passwordChangeStep}
+        passwordChangeError={passwordChangeError}
         newEmail={newEmail}
         currentUserRank={currentUserRank}
       />
@@ -286,10 +296,11 @@ export function HomeLayout() {
   }
 
   if (currentView === "login") {
+    console.log("🔧 HomeLayout: ログイン画面表示", { loginStep, loginEmail })
     return (
       <LoginLayout
         onLogin={onLogin}
-        onVerifyOtp={onLogin}
+        onVerifyOtp={onVerifyOtp}
         onSignup={onSignup}
         onForgotPassword={onForgotPassword}
         onResendOtp={onResendOtp}
@@ -321,6 +332,7 @@ export function HomeLayout() {
       <RegisterLayout
         email={signupData?.email}
         initialFormData={signupData ? {
+          email: signupData.email || "",
           nickname: signupData.nickname || "",
           postalCode: signupData.postalCode || "",
           address: signupData.address || "",
