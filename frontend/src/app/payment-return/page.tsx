@@ -156,7 +156,8 @@ function PaymentReturnContent() {
         sessionStorage.removeItem('paygentCustomerId')
         sessionStorage.removeItem('paygentCustomerCardId')
 
-        // マイページに遷移
+        // ★一時的な対応：決済完了後はマイページに遷移
+        // 正式リリース時には店舗一覧画面（/home）に遷移する予定
         setTimeout(() => {
           router.push('/home?view=mypage&payment-success=true')
         }, 2000)

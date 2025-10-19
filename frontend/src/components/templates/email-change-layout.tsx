@@ -7,7 +7,7 @@ interface EmailChangeLayoutProps {
   currentEmail: string
   newEmail?: string
   initialNewEmail?: string
-  onSubmit: (currentPassword: string, newEmail: string) => void
+  onSubmit: (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => void
   onCancel: () => void
   onBackToMyPage: () => void
   onResend: () => void

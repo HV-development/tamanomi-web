@@ -9,8 +9,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, otp, requestId } = body
 
-    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const fullUrl = `${baseUrl}/api/v1/otp/verify`
+    const fullUrl = buildApiUrl('/otp/verify')
 
     const response = await fetch(fullUrl, {
       method: 'POST',

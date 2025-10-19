@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { email, password } = body
-    const fullUrl = `${baseUrl}/api/v1/login`
+    const fullUrl = buildApiUrl('/login')
 
     const response = await fetch(fullUrl, {
       method: 'POST',

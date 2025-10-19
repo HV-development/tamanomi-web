@@ -134,10 +134,9 @@ function LoginPageContent() {
         localStorage.setItem('refreshToken', data.refreshToken)
       }
 
-      // ユーザー情報とプラン情報を確認
+      // プラン登録状況を確認
       let hasPlan = false
       try {
-        // ユーザー情報を取得してプランの有無を確認
         const userResponse = await fetch('/api/user/me', {
           headers: {
             'Authorization': `Bearer ${data.accessToken}`,
@@ -146,25 +145,35 @@ function LoginPageContent() {
         
         if (userResponse.ok) {
           const userData = await userResponse.json()
-          console.log('User data:', userData)
-          // プラン情報が存在するかチェック
+          console.log('🔍 [OTP] User data:', userData)
+          console.log('🔍 [OTP] User plan:', userData.plan)
           hasPlan = userData.plan !== null && userData.plan !== undefined
+          console.log('🔍 [OTP] hasPlan:', hasPlan)
         }
       } catch (error) {
-        console.error('Failed to fetch user data:', error)
+        console.error('❌ [OTP] Failed to fetch user data:', error)
       }
 
       // リダイレクト先を確認
       const redirectPath = sessionStorage.getItem('redirectAfterLogin')
+      console.log('🔍 [OTP] redirectPath:', redirectPath)
+      console.log('🔍 [OTP] hasPlan:', hasPlan)
+      
       if (redirectPath) {
         sessionStorage.removeItem('redirectAfterLogin')
+        console.log('🔍 [OTP] Redirecting to:', redirectPath)
         router.push(redirectPath)
-      } else if (!hasPlan) {
-        // プラン未登録の場合はプラン登録画面に遷移
-        router.push(`/plan-registration?email=${encodeURIComponent(email)}`)
       } else {
-        // プラン登録済みの場合はマイページに遷移
-        router.push('/home?view=mypage&auto-login=true')
+        // プラン登録状況によって遷移先を変更
+        if (!hasPlan) {
+          // プラン未登録の場合はプラン登録画面へ
+          console.log('🔍 [OTP] Redirecting to plan registration')
+          router.push('/home?view=plan-registration&auto-login=true')
+        } else {
+          // プラン登録済みの場合はマイページへ
+          console.log('🔍 [OTP] Redirecting to mypage')
+          router.push('/home?view=mypage&auto-login=true')
+        }
       }
     } catch (err) {
       console.error('OTP verification error:', err)

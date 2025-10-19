@@ -70,7 +70,7 @@ interface MyPageContainerProps {
   onLogoClick: () => void
   onProfileEditSubmit: (data: ProfileEditFormData) => void
   onPasswordChangeBackToLogin?: () => void
-  onEmailChangeSubmit?: (currentPassword: string, newEmail: string) => void
+  onEmailChangeSubmit?: (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => void
   onEmailChangeResend?: () => void
   onPasswordChangeSubmit?: (currentPassword: string, newPassword: string) => void
   emailChangeStep?: "form" | "complete"
@@ -259,12 +259,13 @@ const MenuButtons = React.memo(({
     {appConfig.myPageSettings.showPasswordChange && (
       <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
     )}
-    {appConfig.myPageSettings.showUsageHistory && (
+    {/* ★一時的にコメントアウト：正式リリースまで利用履歴と決済履歴を非表示 */}
+    {/* {appConfig.myPageSettings.showUsageHistory && (
       <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
     )}
     {appConfig.myPageSettings.showPaymentHistory && (
       <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
-    )}
+    )} */}
     <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
   </div>
 ))
@@ -489,7 +490,7 @@ const MyPageSubView = React.memo(({
   onWithdrawCancel: () => void
   onWithdrawComplete: () => void
   onPasswordChangeBackToLogin: () => void
-  onEmailChangeSubmit: (currentPassword: string, newEmail: string) => void
+  onEmailChangeSubmit: (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => void
   onEmailChangeResend: () => void
   onPasswordChangeSubmit: (currentPassword: string, newPassword: string) => void
   emailChangeStep: "form" | "complete"
