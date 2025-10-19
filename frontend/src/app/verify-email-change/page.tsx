@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react"
 
-export default function VerifyEmailChangePage() {
+function VerifyEmailChangeContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -136,6 +136,25 @@ export default function VerifyEmailChangePage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function VerifyEmailChangePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+          <div className="text-center">
+            <Loader2 className="w-16 h-16 text-green-600 animate-spin mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              読み込み中...
+            </h1>
+          </div>
+        </div>
+      </div>
+    }>
+      <VerifyEmailChangeContent />
+    </Suspense>
   )
 }
 
