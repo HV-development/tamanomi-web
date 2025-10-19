@@ -166,9 +166,9 @@ function LoginPageContent() {
       } else {
         // プラン登録状況によって遷移先を変更
         if (!hasPlan) {
-          // プラン未登録の場合はプラン登録画面へ
+          // プラン未登録の場合はプラン登録画面へ（独立したページ）
           console.log('🔍 [OTP] Redirecting to plan registration')
-          router.push('/home?view=plan-registration&auto-login=true')
+          router.push('/plan-registration')
         } else {
           // プラン登録済みの場合はマイページへ
           console.log('🔍 [OTP] Redirecting to mypage')
