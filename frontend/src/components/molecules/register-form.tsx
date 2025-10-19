@@ -5,23 +5,13 @@ import { useState, useRef, useEffect } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 import { RadioButton } from "../atoms/radio-button"
-import { DateInput } from "../atoms/date-input"
-import { validatePassword, validatePasswordRealtime, validatePasswordConfirm, validatePasswordConfirmRealtime } from "../../utils/validation"
-
-interface RegisterFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  password: string
-  passwordConfirm: string
-}
+import { DateSelect } from "../atoms/date-select"
+import { UseRregistrationCompleteSchema, type UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterFormProps {
   email?: string
-  initialFormData?: RegisterFormData | null
-  onSubmit: (data: RegisterFormData) => void
+  initialFormData?: UserRegistrationComplete | null
+  onSubmit: (data: UserRegistrationComplete) => void
   onCancel: () => void
   isLoading?: boolean
 }
@@ -33,18 +23,23 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [formData, setFormData] = useState<RegisterFormData>({
+  const [formData, setFormData] = useState<UserRegistrationComplete>({
+    email: email || "",
     nickname: "",
     postalCode: "",
     address: "",
     birthDate: "",
-    gender: "",
+    gender: "male",
+    saitamaAppId: "",
     password: "",
     passwordConfirm: "",
   })
 
-  const [errors, setErrors] = useState<Partial<RegisterFormData>>({})
+  const [errors, setErrors] = useState<Partial<Record<keyof UserRegistrationComplete, string>>>({})
   const [isSearchingAddress, setIsSearchingAddress] = useState(false)
+  const [touchedFields, setTouchedFields] = useState<Set<keyof UserRegistrationComplete>>(new Set())
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [termsError, setTermsError] = useState("")
 
   // 住所フィールドへの参照を追加
   const addressInputRef = useRef<HTMLInputElement>(null)
@@ -52,14 +47,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   // initialFormDataが変更された時にフォームデータを設定
   useEffect(() => {
     if (initialFormData) {
-      setFormData({
+      const newFormData = {
         ...initialFormData,
+        email: email || "", // emailプロパティを優先
         // セキュリティのためパスワードフィールドはクリア
         password: "",
         passwordConfirm: "",
-      })
+      }
+      setFormData(newFormData)
     }
-  }, [initialFormData])
+  }, [initialFormData, email])
 
   const genderOptions = [
     { value: "male", label: "男性" },
@@ -67,77 +64,106 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     { value: "other", label: "その他" },
   ]
 
-  const validateForm = () => {
-    const newErrors: Partial<RegisterFormData> = {}
-
-    // ニックネーム - 必須チェック
-    if (!formData.nickname.trim()) {
-      newErrors.nickname = "ニックネームを入力してください。"
+  const validateField = (fieldName: keyof UserRegistrationComplete, value: string) => {
+    // タッチされていないフィールドはバリデーションしない（入力中のリアルタイムバリデーションのみ）
+    if (!touchedFields.has(fieldName)) {
+      return
     }
 
-    // 郵便番号 - 必須チェック、桁数チェック
-    if (!formData.postalCode) {
-      newErrors.postalCode = "郵便番号を入力してください。"
-    } else if (!/^\d{7}$/.test(formData.postalCode.replace(/-/g, ""))) {
-      newErrors.postalCode = "郵便番号は7桁の数字で入力してください。"
-    }
+    try {
+      // 個別フィールドのバリデーション（フォーム全体をパースして該当フィールドのエラーのみを抽出）
+      const testData = { ...formData, [fieldName]: value }
+      UseRregistrationCompleteSchema.parse(testData)
 
-    // 住所 - 必須チェック
-    if (!formData.address.trim()) {
-      newErrors.address = "住所を入力してください。"
-    }
-
-    // 生年月日 - 必須チェック、日付形式チェック
-    if (!formData.birthDate) {
-      newErrors.birthDate = "生年月日を入力してください。"
-    } else {
-      const birthDate = new Date(formData.birthDate)
-      const today = new Date()
-      if (isNaN(birthDate.getTime())) {
-        newErrors.birthDate = "正しい日付形式で入力してください。"
-      } else if (birthDate >= today) {
-        newErrors.birthDate = "生年月日は今日より前の日付を入力してください。"
-      } else if (today.getFullYear() - birthDate.getFullYear() > 120) {
-        newErrors.birthDate = "正しい生年月日を入力してください。"
+      // バリデーション成功時はエラーをクリア
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    } catch (error) {
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> }
+        // 該当フィールドのエラーのみを抽出
+        const fieldError = zodError.errors.find(err => err.path?.[0] === fieldName)
+        if (fieldError) {
+          setErrors(prev => ({ ...prev, [fieldName]: fieldError.message }))
+        } else {
+          // 該当フィールドにエラーがない場合はエラーをクリア
+          setErrors(prev => {
+            const newErrors = { ...prev }
+            delete newErrors[fieldName]
+            return newErrors
+          })
+        }
       }
     }
+  }
 
-    // 性別 - 選択チェック
-    if (!formData.gender) {
-      newErrors.gender = "性別を選択してください。"
+  const validateForm = () => {
+    try {
+      // スキーマを使用してバリデーション
+      UseRregistrationCompleteSchema.parse(formData)
+      setErrors({})
+      return true
+    } catch (error) {
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> }
+
+        const newErrors: Partial<Record<keyof UserRegistrationComplete, string>> = {}
+
+        zodError.errors.forEach((err) => {
+          const field = err.path?.[0] as keyof UserRegistrationComplete
+          if (field) {
+            newErrors[field] = err.message
+          }
+        })
+
+        setErrors(() => newErrors)
+      }
+      return false
     }
-
-    // パスワードバリデーション
-    const passwordValidation = validatePassword(formData.password)
-    if (!passwordValidation.isValid) {
-      newErrors.password = passwordValidation.errors[0]
-    }
-
-    // パスワード確認バリデーション
-    const passwordConfirmValidation = validatePasswordConfirm(formData.password, formData.passwordConfirm)
-    if (!passwordConfirmValidation.isValid) {
-      newErrors.passwordConfirm = passwordConfirmValidation.error
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (validateForm()) {
+
+    // 利用規約の同意チェック
+    if (!agreedToTerms) {
+      setTermsError("利用規約とプライバシーポリシーに同意してください")
+      return
+    }
+    setTermsError("")
+
+    const isValid = validateForm()
+
+    if (isValid) {
       onSubmit(formData)
     }
   }
 
+
   const handleAddressSearch = async () => {
     const cleanedPostalCode = formData.postalCode.replace(/-/g, "")
 
-    // 住所検索時は郵便番号の基本チェックのみ（エラー表示なし）
-    if (!formData.postalCode || !/^\d{7}$/.test(cleanedPostalCode)) {
-      // 無効な郵便番号の場合は何もしない（エラー表示もしない）
+    // 郵便番号の形式チェック
+    if (!formData.postalCode) {
+      setErrors(prev => ({
+        ...prev,
+        postalCode: '郵便番号を入力してください。'
+      }))
       return
     }
+
+    if (!/^\d{7}$/.test(cleanedPostalCode)) {
+      setErrors(prev => ({
+        ...prev,
+        postalCode: '郵便番号は7桁の数字で入力してください。'
+      }))
+      return
+    }
+
     setIsSearchingAddress(true)
 
     const apiUrl = `/api/address/search?zipcode=${cleanedPostalCode}`
@@ -153,10 +179,18 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           address: data.address
         }))
 
-        setErrors(prev => ({ ...prev, address: undefined }))
+        // 住所が見つかった場合は郵便番号と住所のエラーをクリア
+        setErrors(prev => ({
+          ...prev,
+          postalCode: undefined,
+          address: undefined
+        }))
       } else {
-        // 住所が見つからない場合も住所検索時はエラー表示しない
-        // 住所フィールドは空のままにして、ユーザーが手入力できるようにする
+        // 住所が見つからない場合はエラーメッセージを表示
+        setErrors(prev => ({
+          ...prev,
+          postalCode: '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。'
+        }))
 
         // 住所フィールドにフォーカスを移す
         setTimeout(() => {
@@ -166,8 +200,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }, 100)
       }
 
-    } catch (error) {
-      // エラー時も住所フィールドにフォーカス
+    } catch {
+      // ネットワークエラーなどの場合
+      setErrors(prev => ({
+        ...prev,
+        postalCode: '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。'
+      }))
+
+      // 住所フィールドにフォーカス
       setTimeout(() => {
         if (addressInputRef.current) {
           addressInputRef.current.focus()
@@ -178,8 +218,21 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     }
   }
 
-  const updateFormData = (field: keyof RegisterFormData, value: string) => {
+  const updateFormData = (field: keyof UserRegistrationComplete, value: string): void => {
     setFormData({ ...formData, [field]: value })
+
+    // フィールドをタッチ済みとしてマーク
+    setTouchedFields(prev => new Set(prev).add(field))
+
+    // リアルタイムバリデーション実行（タッチ済みフィールドのみ）
+    validateField(field, value)
+  }
+
+  // フィールドのblurイベント時のバリデーション
+  const handleFieldBlur = (field: keyof UserRegistrationComplete) => {
+    setTouchedFields(prev => new Set(prev).add(field))
+    const value = formData[field] as string
+    validateField(field, value)
   }
 
 
@@ -205,6 +258,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         placeholder="ニックネームを入力"
         value={formData.nickname}
         onChange={(value) => updateFormData("nickname", value)}
+        onBlur={() => handleFieldBlur("nickname")}
         error={errors.nickname}
       />
 
@@ -218,9 +272,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             <input
               id="postalCode"
               type="text"
-              placeholder="123-4567 または 1234567"
+              placeholder="ハイフンなし"
               value={formData.postalCode}
               onChange={(e) => updateFormData("postalCode", e.target.value)}
+              onBlur={() => handleFieldBlur("postalCode")}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
             />
           </div>
@@ -248,13 +303,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           placeholder="住所を入力するか、上記の住所検索ボタンをご利用ください"
           value={formData.address}
           onChange={(e) => updateFormData("address", e.target.value)}
+          onBlur={() => handleFieldBlur("address")}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
         />
         {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
       </div>
 
       {/* 生年月日 */}
-      <DateInput
+      <DateSelect
         label="生年月日"
         value={formData.birthDate}
         onChange={(value) => updateFormData("birthDate", value)}
@@ -271,6 +327,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         error={errors.gender}
       />
 
+      {/* さいたま市みんなのアプリID */}
+      <Input
+        type="text"
+        label="さいたま市みんなのアプリ（任意）"
+        placeholder="さいたま市みんなのアプリIDを入力"
+        value={formData.saitamaAppId || ""}
+        onChange={(value) => updateFormData("saitamaAppId", value)}
+        onBlur={() => handleFieldBlur("saitamaAppId")}
+        error={errors.saitamaAppId || undefined}
+      />
+
       {/* パスワード */}
       <Input
         type="password"
@@ -278,6 +345,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         placeholder="8文字以上の英数字"
         value={formData.password}
         onChange={(value) => updateFormData("password", value)}
+        onBlur={() => handleFieldBlur("password")}
         error={errors.password}
       />
 
@@ -288,8 +356,52 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         placeholder="パスワードを再入力"
         value={formData.passwordConfirm}
         onChange={(value) => updateFormData("passwordConfirm", value)}
+        onBlur={() => handleFieldBlur("passwordConfirm")}
         error={errors.passwordConfirm}
       />
+
+      {/* 利用規約とプライバシーポリシーの同意 */}
+      <div className="space-y-2">
+        <div className="flex items-start">
+          <input
+            type="checkbox"
+            id="terms"
+            checked={agreedToTerms}
+            onChange={(e) => {
+              setAgreedToTerms(e.target.checked)
+              if (e.target.checked) {
+                setTermsError("")
+              }
+            }}
+            className="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
+          />
+          <label htmlFor="terms" className="ml-2 text-sm text-gray-700 cursor-pointer">
+            <a
+              href="/たまのみサービス利用規約.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:text-green-700 underline font-medium"
+              onClick={(e) => e.stopPropagation()}
+            >
+              利用規約
+            </a>
+            と
+            <a
+              href="/プライバシーポリシー.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:text-green-700 underline font-medium"
+              onClick={(e) => e.stopPropagation()}
+            >
+              プライバシーポリシー
+            </a>
+            に同意する
+          </label>
+        </div>
+        {termsError && (
+          <p className="text-sm text-red-600 ml-6">{termsError}</p>
+        )}
+      </div>
 
       {/* ボタン */}
       <div className="space-y-3">

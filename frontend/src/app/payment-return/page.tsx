@@ -17,11 +17,12 @@ function PaymentReturnContent() {
         const errorCode = searchParams.get('error_code')
         const responseCode = searchParams.get('response_code') // ペイジェントからのレスポンスコード
         
-        console.log('Payment return parameters:', {
+        console.log('🔍 [payment-return] Payment return parameters:', {
           customerId,
           customerCardId,
           errorCode,
-          responseCode
+          responseCode,
+          allParams: Object.fromEntries(searchParams.entries())
         })
 
         // エラーがある場合（error_code または response_codeをチェック）
@@ -86,9 +87,64 @@ function PaymentReturnContent() {
           throw new Error('ユーザー情報が見つかりません')
         }
 
-        // TODO: ユーザープラン作成APIを呼び出す（プランIDがある場合）
+        // ユーザープラン作成APIを呼び出す（プランIDがある場合）
         if (selectedPlanId) {
-          console.log('TODO: Create user plan with planId:', selectedPlanId)
+          console.log('🔍 [payment-return] Creating user plan with planId:', selectedPlanId)
+          console.log('🔍 [payment-return] planId type:', typeof selectedPlanId)
+          console.log('🔍 [payment-return] planId length:', selectedPlanId.length)
+          
+          // プランIDの形式をチェック（UUID形式であることを確認）
+          const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+          if (!uuidPattern.test(selectedPlanId)) {
+            console.error('❌ Invalid plan ID format (not UUID):', selectedPlanId)
+            sessionStorage.removeItem('selectedPlanId')
+            sessionStorage.removeItem('userEmail')
+            throw new Error('プランIDの形式が正しくありません。プラン選択画面からやり直してください。')
+          }
+          
+          try {
+            // アクセストークンを取得
+            const accessToken = localStorage.getItem('accessToken')
+            console.log('🔍 [payment-return] accessToken from localStorage:', {
+              hasToken: !!accessToken,
+              tokenLength: accessToken?.length,
+              tokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : 'null'
+            })
+            
+            if (!accessToken) {
+              throw new Error('認証情報が見つかりません。ログインしてください。')
+            }
+
+            console.log('🔍 [payment-return] Sending request to /api/user-plans/create')
+            console.log('🔍 [payment-return] Request body:', { planId: selectedPlanId })
+            console.log('🔍 [payment-return] Authorization header:', `Bearer ${accessToken.substring(0, 20)}...`)
+
+            // プラン作成APIを呼び出し
+            const createPlanResponse = await fetch('/api/user-plans/create', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+              },
+              body: JSON.stringify({
+                planId: selectedPlanId,
+              }),
+            })
+
+            console.log('🔍 [payment-return] Response status:', createPlanResponse.status)
+            console.log('🔍 [payment-return] Response ok:', createPlanResponse.ok)
+
+            if (!createPlanResponse.ok) {
+              const errorData = await createPlanResponse.json().catch(() => ({}))
+              throw new Error(errorData.message || 'プラン登録に失敗しました')
+            }
+
+            const planData = await createPlanResponse.json()
+            console.log('✅ [payment-return] User plan created successfully:', planData)
+          } catch (planError) {
+            console.error('❌ [payment-return] Failed to create user plan:', planError)
+            throw new Error(`プラン登録に失敗しました: ${planError instanceof Error ? planError.message : 'Unknown error'}`)
+          }
         }
         
         // 処理完了
@@ -100,7 +156,8 @@ function PaymentReturnContent() {
         sessionStorage.removeItem('paygentCustomerId')
         sessionStorage.removeItem('paygentCustomerCardId')
 
-        // マイページに遷移
+        // ★一時的な対応：決済完了後はマイページに遷移
+        // 正式リリース時には店舗一覧画面（/home）に遷移する予定
         setTimeout(() => {
           router.push('/home?view=mypage&payment-success=true')
         }, 2000)

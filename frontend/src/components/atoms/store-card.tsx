@@ -1,6 +1,7 @@
 "use client"
 
-import { Navigation, Phone, Globe, Ticket, Info } from "lucide-react"
+import Image from "next/image"
+import { Navigation, Phone } from "lucide-react"
 import { FavoriteButton } from "./favorite-button"
 import type { Store } from "../../types/store"
 import { getGenreColor } from "../../utils/genre-colors"
@@ -90,7 +91,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       }
     } else {
       // スワイプ距離が短い場合は通常のクリック処理
-      handleImageClick(e as any)
+      handleImageClick(e as unknown as React.MouseEvent)
     }
 
     // リセット
@@ -100,12 +101,6 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
 
   const handlePhoneClick = () => {
     window.open(`tel:${store.phone}`, "_self")
-  }
-
-  const handleWebsiteClick = () => {
-    if (store.website) {
-      window.open(store.website, "_blank")
-    }
   }
 
   const handleMapClick = () => {
@@ -183,16 +178,17 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       {/* 店舗写真カルーセル */}
       <div className="relative overflow-hidden">
         <div 
-          className="w-full aspect-[3/1] cursor-pointer select-none" 
+          className="w-full aspect-[3/1] cursor-pointer select-none relative rounded-lg overflow-hidden" 
           onClick={handleImageAreaClick}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <img
+          <Image
             src={images[currentImageIndex]}
             alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
-            className="w-full h-full object-cover rounded-lg transition-opacity duration-300 pointer-events-none"
+            fill
+            className="object-cover transition-opacity duration-300 pointer-events-none"
           />
         </div>
         

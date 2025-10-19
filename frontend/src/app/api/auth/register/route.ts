@@ -1,31 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildApiUrl } from '@/lib/api-config'
 
 export const dynamic = 'force-dynamic'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+    console.log('🔍 [register/route] Received body:', {
+      email: body.email,
+      nickname: body.nickname,
+      saitamaAppId: body.saitamaAppId,
+      saitamaAppIdType: typeof body.saitamaAppId,
+      saitamaAppIdLength: body.saitamaAppId?.length,
+      saitamaAppIdValue: `"${body.saitamaAppId}"`,
+    })
 
-    // 一時的にスキーマバリデーションをスキップ
-    // const validatedData = UseRregistrationCompleteSchema.parse(body)
+    // バックエンドが期待するデータ構造に変換
+    // 空文字列のsaitamaAppIdは除外
     const validatedData = {
       email: body.email,
       password: body.password,
-      accountType: 'user', // デフォルトでuserを設定
-      displayName: body.displayName,
-      phone: body.phone
+      passwordConfirm: body.passwordConfirm,
+      nickname: body.nickname,
+      postalCode: body.postalCode,
+      address: body.address,
+      birthDate: body.birthDate,
+      gender: body.gender,
+      ...(body.saitamaAppId && body.saitamaAppId.trim() !== '' ? { saitamaAppId: body.saitamaAppId.trim() } : {}),
+      token: body.token
     };
+
+    console.log('🔍 [register/route] Validated data:', {
+      email: validatedData.email,
+      nickname: validatedData.nickname,
+      hasSaitamaAppId: 'saitamaAppId' in validatedData,
+      saitamaAppId: 'saitamaAppId' in validatedData ? validatedData.saitamaAppId : undefined,
+    })
 
     // タイムアウト設定付きのfetch
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
-    const fullUrl = `${baseUrl}/api/v1/register`;
+    const fullUrl = buildApiUrl('/register/complete');
 
     try {
       const response = await fetch(fullUrl, {
@@ -42,6 +60,19 @@ export async function POST(request: NextRequest) {
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
+
+        // 409エラー（既存アカウント）の場合は特別な処理
+        if (response.status === 409) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
+              errorCode: 'USER_ALREADY_EXISTS',
+              error: errorData
+            },
+            { status: 409 }
+          )
+        }
 
         return NextResponse.json(
           {

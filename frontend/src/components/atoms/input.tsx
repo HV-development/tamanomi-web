@@ -7,9 +7,11 @@ interface InputProps {
   placeholder?: string
   value: string
   onChange: (value: string) => void
+  onBlur?: () => void
   label?: string
   error?: string
   required?: boolean
+  disabled?: boolean
   className?: string
 }
 
@@ -18,8 +20,11 @@ export function Input({
   placeholder,
   value,
   onChange,
+  onBlur,
   label,
   error,
+  required = false,
+  disabled = false,
   className = "",
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false)
@@ -30,6 +35,7 @@ export function Input({
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
       <div className="relative">
@@ -38,7 +44,9 @@ export function Input({
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+          onBlur={onBlur}
+          disabled={disabled}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
         {type === "password" && (
           <button

@@ -1,14 +1,10 @@
 "use client"
 
-import { Mail, CheckCircle } from "lucide-react"
-
 interface EmailConfirmationCompleteProps {
-  email: string
   className?: string
 }
 
 export function EmailConfirmationComplete({ 
-  email, 
   className = "" 
 }: EmailConfirmationCompleteProps) {
   return (

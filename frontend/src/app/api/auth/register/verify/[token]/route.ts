@@ -27,11 +27,11 @@ export async function GET(
             }
 
             // メールアドレスとトークンを含むクエリパラメータで新規登録画面にリダイレクト
-            const signupUrl = new URL('/signup', request.url)
-            signupUrl.searchParams.set('email', tokenData.email)
-            signupUrl.searchParams.set('token', token)
+            const registerUrl = new URL('/register', request.url)
+            registerUrl.searchParams.set('email', tokenData.email)
+            registerUrl.searchParams.set('token', token)
 
-            return NextResponse.redirect(signupUrl)
+            return NextResponse.redirect(registerUrl)
         } catch {
             return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
         }

@@ -1,10 +1,8 @@
 "use client"
 
-import { Crown, Calendar, Settings } from "lucide-react"
+import { Crown, Settings } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import { StatusBadge } from "../atoms/status-badge"
-import { Button } from "../atoms/button"
 import type { Plan } from "../../types/user"
 
 interface PlanManagementProps {
@@ -14,7 +12,7 @@ interface PlanManagementProps {
   className?: string
 }
 
-export function PlanManagement({ plan, onChangePlan, onCancelSubscription, className = "" }: PlanManagementProps) {
+export function PlanManagement({ plan, onChangePlan, className = "" }: PlanManagementProps) {
   const formatDate = (date: Date) => {
     return format(date, "yyyy年M月d日", { locale: ja })
   }

@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import { PlanCard } from "../atoms/plan-card"
 import { Button } from "../atoms/button"
-import { AlertTriangle, Calendar, CreditCard } from "lucide-react"
+import { Calendar } from "lucide-react"
 import type { Plan } from "../../types/user"
 
 interface PlanOption {
@@ -26,51 +26,122 @@ interface PlanChangeFormProps {
   isLoading?: boolean
 }
 
-const AVAILABLE_PLANS: PlanOption[] = [
-  {
-    id: "3days",
-    name: "3daysプラン",
-    price: 300,
-    description: "短期間でTAMAYOIを体験できるお試しプラン",
-    features: ["1日1杯お酒が無料", "3日目の0時まで有効", "気軽にお試し可能"],
-  },
-  {
-    id: "monthly",
-    name: "マンスリープラン",
-    price: 980,
-    description: "毎日お得にお酒を楽しめる定番プラン",
-    features: ["1日1杯お酒が無料", "さいたま市内の加盟店で利用可能", "いつでもキャンセル可能"],
-    badge: "人気No.1",
-    isRecommended: true,
-  },
-  {
-    id: "premium",
-    name: "プレミアムプラン",
-    price: 1980,
-    description: "より充実したサービスを楽しめる上位プラン",
-    features: [
-      "1日2杯お酒が無料",
-      "プレミアム店舗も利用可能",
-      "優先予約サービス",
-      "限定イベント参加権",
-      "専用サポート",
-    ],
-    badge: "NEW",
-    originalPrice: "¥2,480",
-  },
-]
-
 export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading = false }: PlanChangeFormProps) {
   const [selectedPlan, setSelectedPlan] = useState<string>("")
   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [availablePlans, setAvailablePlans] = useState<PlanOption[]>([])
+  const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
+  const [fetchError, setFetchError] = useState<string>("")
 
-  const selectedPlanData = AVAILABLE_PLANS.find((plan) => plan.id === selectedPlan)
+  const fetchUserInfo = useCallback(async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken')
+      
+      if (!accessToken) {
+        console.log('🔍 [plan-change] No access token, setting saitamaAppLinked to false')
+        setSaitamaAppLinked(false)
+        return
+      }
+
+      const response = await fetch('/api/user/me', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        cache: 'no-store',
+      })
+
+      if (response.ok) {
+        const userData = await response.json()
+        const newLinkedState = userData.saitamaAppLinked === true
+        console.log('🔍 [plan-change] User saitamaAppLinked:', newLinkedState)
+        setSaitamaAppLinked(newLinkedState)
+      } else {
+        console.log('🔍 [plan-change] Response not ok, setting saitamaAppLinked to false')
+        setSaitamaAppLinked(false)
+      }
+    } catch (error) {
+      console.error('❌ [plan-change] Failed to fetch user info:', error)
+      setSaitamaAppLinked(false)
+    }
+  }, [])
+
+  const fetchPlans = useCallback(async () => {
+    try {
+      // さいたま市アプリ連携状態に応じてクエリパラメータを構築
+      const queryParams = new URLSearchParams({
+        status: 'active',
+        limit: '50',
+      })
+      
+      if (saitamaAppLinked !== null) {
+        queryParams.append('saitamaAppLinked', String(saitamaAppLinked))
+      }
+      
+      const apiUrl = `/api/plans?${queryParams.toString()}`
+      console.log('🔍 [plan-change] Fetching plans from:', apiUrl)
+      const response = await fetch(apiUrl)
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      
+      console.log('🔍 [plan-change] Plans fetched:', {
+        planCount: data.plans?.length,
+        plans: data.plans?.map((p: { id: string; name: string; price: number }) => ({ id: p.id, name: p.name, price: p.price })),
+      })
+      
+      // APIから取得したプランをPlanOption形式に変換
+      const formattedPlans: PlanOption[] = data.plans.map((plan: { 
+        id: string; 
+        name: string; 
+        price: number; 
+        description?: string; 
+        features?: string[]; 
+        badge?: string; 
+        isRecommended?: boolean; 
+        originalPrice?: string 
+      }) => ({
+        id: plan.id,
+        name: plan.name,
+        price: plan.price,
+        description: plan.description || '',
+        features: plan.features || [],
+        badge: plan.badge,
+        isRecommended: plan.isRecommended,
+        originalPrice: plan.originalPrice,
+      }))
+      
+      setAvailablePlans(formattedPlans)
+    } catch (err) {
+      console.error('プラン取得エラー:', err)
+      setFetchError('プランの取得に失敗しました')
+    }
+  }, [saitamaAppLinked])
+
+  // ユーザー情報を取得してさいたま市アプリ連携状態を確認
+  useEffect(() => {
+    fetchUserInfo()
+  }, [fetchUserInfo])
+
+  // プラン一覧を取得（連携状態が確定した後）
+  useEffect(() => {
+    if (saitamaAppLinked !== null) {
+      fetchPlans()
+    }
+  }, [saitamaAppLinked, fetchPlans])
+
+  const selectedPlanData = availablePlans.find((plan) => plan.id === selectedPlan)
   const isUpgrade = selectedPlanData && selectedPlanData.price > currentPlan.price
   const isDowngrade = selectedPlanData && selectedPlanData.price < currentPlan.price
 
   // プランリストを現在のプランを基準に並び替え
   const getSortedPlans = () => {
-    const plans = [...AVAILABLE_PLANS]
+    if (availablePlans.length === 0) return []
+    
+    const plans = [...availablePlans]
 
     // 現在のプランのインデックスを見つける
     const currentPlanIndex = plans.findIndex((plan) => plan.id === currentPlan.id)
@@ -206,6 +277,36 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
   }
 
   const sortedPlans = getSortedPlans()
+
+  // ローディング状態
+  if (saitamaAppLinked === null || availablePlans.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">プラン変更</h2>
+          <p className="text-gray-600">プラン情報を読み込み中...</p>
+        </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      </div>
+    )
+  }
+
+  // エラー表示
+  if (fetchError) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">プラン変更</h2>
+          <p className="text-red-600">{fetchError}</p>
+        </div>
+        <Button onClick={onCancel} variant="secondary" className="w-full">
+          戻る
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

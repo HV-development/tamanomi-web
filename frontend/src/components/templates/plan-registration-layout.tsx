@@ -8,9 +8,10 @@ interface PlanRegistrationLayoutProps {
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean
-  currentUserRank?: string | null
   plans: PlanListResponse['plans']
   error?: string
+  saitamaAppLinked?: boolean
+  onSaitamaAppLinked?: () => void
 }
 
 export function PlanRegistrationLayout({ 
@@ -18,17 +19,13 @@ export function PlanRegistrationLayout({
   onCancel, 
   onLogoClick, 
   isLoading, 
-  currentUserRank,
   plans,
-  error
+  error,
+  saitamaAppLinked,
+  onSaitamaAppLinked,
 }: PlanRegistrationLayoutProps) {
   // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   return (
     <PlanRegistrationContainer
@@ -39,6 +36,8 @@ export function PlanRegistrationLayout({
       backgroundColorClass={backgroundColorClass}
       plans={plans}
       error={error}
+      saitamaAppLinked={saitamaAppLinked}
+      onSaitamaAppLinked={onSaitamaAppLinked}
     />
   )
 }

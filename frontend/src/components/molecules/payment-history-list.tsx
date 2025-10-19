@@ -1,6 +1,7 @@
 "use client"
 
-import { CreditCard, Check, Clock, X, ArrowLeft, Home } from "lucide-react"
+import Image from "next/image"
+import { CreditCard } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import type { PaymentHistory } from "../../types/user"
@@ -17,16 +18,10 @@ export function PaymentHistoryList({
   history,
   onBackToMyPage,
   onBackToTop,
-  className = "",
-  currentUserRank
+  className = ""
 }: PaymentHistoryListProps) {
-  // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
+  // 全ての背景色をブロンズ・非会員色に統一
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   const formatDate = (date: Date) => {
     return format(date, "yyyy年M月d日 HH:mm", { locale: ja })
@@ -34,17 +29,6 @@ export function PaymentHistoryList({
 
   const formatPaymentId = (paymentId: string) => {
     return paymentId.toUpperCase()
-  }
-
-  const getStatusIcon = (status: PaymentHistory["status"]) => {
-    switch (status) {
-      case "completed":
-        return <Check className="w-4 h-4 text-green-600" />
-      case "pending":
-        return <Clock className="w-4 h-4 text-yellow-600" />
-      case "failed":
-        return <X className="w-4 h-4 text-red-600" />
-    }
   }
 
   const getStatusText = (status: PaymentHistory["status"]) => {
@@ -111,9 +95,11 @@ export function PaymentHistoryList({
           >
             ← 戻る
           </button>
-          <img
+          <Image
             src="/logo.svg"
             alt="TAMAYOI"
+            width={144}
+            height={32}
             className="h-8 object-contain"
           />
           <div className="w-12"></div>

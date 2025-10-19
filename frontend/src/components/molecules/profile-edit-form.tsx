@@ -6,49 +6,46 @@ import { useState, useEffect, useRef } from "react"
 import { Input } from "../atoms/input"
 import { Button } from "../atoms/button"
 import { RadioButton } from "../atoms/radio-button"
-import { DateInput } from "../atoms/date-input"
+import { DateSelect } from "../atoms/date-select"
 import type { User } from "../../types/user"
-
-interface ProfileEditFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  saitamaAppId: string
-  registeredStore: string
-}
+import {
+  profileEditSchema,
+  type ProfileEditInput,
+  validateNicknameRealtime,
+  validatePostalCodeRealtime,
+  validateBirthDateRealtime,
+} from "@hv-development/schemas"
 
 interface ProfileEditFormProps {
   user: User
-  onSubmit: (data: ProfileEditFormData, updatedFields: string[]) => void
+  onSubmit: (data: ProfileEditInput, updatedFields: string[]) => void
   onCancel: () => void
   onWithdraw?: () => void
   isLoading?: boolean
 }
 
-export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoading = false }: ProfileEditFormProps) {
-  const [formData, setFormData] = useState<ProfileEditFormData>({
+export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }: ProfileEditFormProps) {
+  const [formData, setFormData] = useState<ProfileEditInput>({
     nickname: "",
     postalCode: "",
     address: "",
     birthDate: "",
-    gender: "",
+    gender: "male",
     saitamaAppId: "",
     registeredStore: "",
   })
 
-  const [originalData, setOriginalData] = useState<ProfileEditFormData>({
+  const [originalData, setOriginalData] = useState<ProfileEditInput>({
     nickname: "",
     postalCode: "",
     address: "",
     birthDate: "",
-    gender: "",
+    gender: "male",
     saitamaAppId: "",
     registeredStore: "",
   })
 
-  const [errors, setErrors] = useState<Partial<ProfileEditFormData>>({})
+  const [errors, setErrors] = useState<Partial<ProfileEditInput>>({})
   const [isSearchingAddress, setIsSearchingAddress] = useState(false)
 
   // 住所フィールドへの参照を追加
@@ -56,13 +53,20 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
 
   // ユーザーデータでフォームを初期化
   useEffect(() => {
-    const initialData = {
+    // 生年月日の形式をISO形式からyyyy/MM/dd形式に変換
+    const formatBirthDate = (dateStr: string | null | undefined): string => {
+      if (!dateStr) return ""
+      // ISO形式 (1990-05-15) を yyyy/MM/dd形式 (1990/05/15) に変換
+      return dateStr.replace(/-/g, "/")
+    }
+
+    const initialData: ProfileEditInput = {
       nickname: user.nickname || "",
       postalCode: user.postalCode || "",
       address: user.address || "",
-      birthDate: user.birthDate || "",
-      gender: user.gender || "",
-      saitamaAppId: (user as any).saitamaAppId || "",
+      birthDate: formatBirthDate(user.birthDate),
+      gender: (user.gender as "male" | "female" | "other") || "male",
+      saitamaAppId: (user as User & { saitamaAppId?: string }).saitamaAppId || "",
       registeredStore: user.registeredStore || "",
     }
     setFormData(initialData)
@@ -75,7 +79,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
     { value: "other", label: "その他" },
   ]
 
-  const fieldLabels = {
+  const fieldLabels: Record<keyof ProfileEditInput, string> = {
     nickname: "ニックネーム",
     postalCode: "郵便番号",
     address: "住所",
@@ -89,7 +93,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
     const updatedFields: string[] = []
 
     Object.keys(formData).forEach((key) => {
-      const fieldKey = key as keyof ProfileEditFormData
+      const fieldKey = key as keyof ProfileEditInput
       if (formData[fieldKey] !== originalData[fieldKey]) {
         updatedFields.push(fieldLabels[fieldKey])
       }
@@ -99,41 +103,26 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
   }
 
   const validateForm = () => {
-    const newErrors: Partial<ProfileEditFormData> = {}
-
-    // ニックネーム
-    if (!formData.nickname) {
-      newErrors.nickname = "ニックネームを入力してください。"
-    } else if (formData.nickname.length > 20) {
-      newErrors.nickname = "ニックネームは20文字以内で入力してください。"
-    } else if (formData.nickname.includes("-")) {
-      newErrors.nickname = "ニックネームにハイフンは使用できません。"
+    try {
+      // tamanomi-schemasのスキーマを使用してバリデーション
+      profileEditSchema.parse(formData)
+      setErrors({})
+      return true
+    } catch (error) {
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> };
+        const newErrors: Partial<ProfileEditInput> = {}
+        zodError.errors.forEach((err) => {
+          const field = err.path?.[0] as keyof ProfileEditInput
+          if (field) {
+            newErrors[field] = err.message
+          }
+        })
+        setErrors(newErrors)
+      }
+      return false
     }
-
-    // 郵便番号
-    if (!formData.postalCode) {
-      newErrors.postalCode = "郵便番号を入力してください。"
-    } else if (!/^\d{7}$/.test(formData.postalCode.replace(/-/g, ""))) {
-      newErrors.postalCode = "郵便番号は7桁の数字で入力してください。"
-    }
-
-    // 住所
-    if (!formData.address.trim()) {
-      newErrors.address = "住所を入力してください。"
-    }
-
-    // 生年月日
-    if (!formData.birthDate) {
-      newErrors.birthDate = "生年月日を入力してください。"
-    }
-
-    // 性別
-    if (!formData.gender) {
-      newErrors.gender = "性別を選択してください。"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -147,21 +136,15 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
   const handleAddressSearch = async () => {
     const cleanedPostalCode = formData.postalCode.replace(/-/g, "")
 
-
-    // 郵便番号の基本バリデーション
-    if (!formData.postalCode) {
-      setErrors({ ...errors, postalCode: "郵便番号を入力してください。" })
-      return
-    }
-
-    if (!/^\d{7}$/.test(cleanedPostalCode)) {
-      setErrors({ ...errors, postalCode: "郵便番号は7桁の数字で入力してください。" })
+    // tamanomi-schemasのバリデーション関数を使用
+    const postalCodeValidation = validatePostalCodeRealtime(formData.postalCode)
+    if (!postalCodeValidation.isValid) {
+      setErrors({ ...errors, postalCode: postalCodeValidation.errors[0] })
       return
     }
 
     // 郵便番号が正しい場合はエラーをクリア
     setErrors(prev => ({ ...prev, postalCode: undefined }))
-
 
     setIsSearchingAddress(true)
 
@@ -175,17 +158,22 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
 
       if (data.success && data.address) {
         // 住所が見つかった場合
-
         setFormData(prev => ({
           ...prev,
           address: data.address
         }))
-        setErrors(prev => ({ ...prev, address: undefined }))
-      } else {
-        // 住所が見つからない場合
+
+        // 住所が見つかった場合は郵便番号と住所のエラーをクリア
         setErrors(prev => ({
           ...prev,
-          address: data.message || "該当する住所が見つかりませんでした。手入力で住所を入力してください。"
+          postalCode: undefined,
+          address: undefined
+        }))
+      } else {
+        // 住所が見つからない場合はエラーメッセージを表示
+        setErrors(prev => ({
+          ...prev,
+          postalCode: '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。'
         }))
 
         // 住所フィールドにフォーカスを移す
@@ -196,10 +184,11 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
         }, 100)
       }
 
-    } catch (error) {
+    } catch {
+      // ネットワークエラーなどの場合
       setErrors(prev => ({
         ...prev,
-        address: "住所検索サービスに接続できませんでした。ネットワーク接続を確認するか、手入力で住所を入力してください。"
+        postalCode: '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。'
       }))
 
       // エラー時も住所フィールドにフォーカス
@@ -213,10 +202,33 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
     }
   }
 
-  const updateFormData = (field: keyof ProfileEditFormData, value: string) => {
+  const updateFormData = (field: keyof ProfileEditInput, value: string) => {
     setFormData({ ...formData, [field]: value })
-    // 住所フィールドは編集不可なので、住所以外のフィールドのエラーをクリア
-    if (field !== 'address' && errors[field]) {
+
+    // リアルタイムバリデーション
+    if (field === 'nickname') {
+      const nicknameValidation = validateNicknameRealtime(value)
+      if (nicknameValidation.isValid) {
+        setErrors({ ...errors, nickname: undefined })
+      } else if (nicknameValidation.errors.length > 0) {
+        setErrors({ ...errors, nickname: nicknameValidation.errors[0] })
+      }
+    } else if (field === 'postalCode') {
+      const postalCodeValidation = validatePostalCodeRealtime(value)
+      if (postalCodeValidation.isValid) {
+        setErrors({ ...errors, postalCode: undefined })
+      } else if (postalCodeValidation.errors.length > 0) {
+        setErrors({ ...errors, postalCode: postalCodeValidation.errors[0] })
+      }
+    } else if (field === 'birthDate') {
+      const birthDateValidation = validateBirthDateRealtime(value)
+      if (birthDateValidation.isValid) {
+        setErrors({ ...errors, birthDate: undefined })
+      } else if (birthDateValidation.errors.length > 0) {
+        setErrors({ ...errors, birthDate: birthDateValidation.errors[0] })
+      }
+    } else if (field !== 'address' && errors[field]) {
+      // 住所フィールドは編集不可なので、住所以外のフィールドのエラーをクリア
       setErrors({ ...errors, [field]: undefined })
     }
   }
@@ -242,7 +254,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
           <div className="flex-1">
             <input
               type="text"
-              placeholder="123-4567 または 1234567"
+              placeholder="ハイフンなし7桁数字"
               value={formData.postalCode}
               onChange={(e) => updateFormData("postalCode", e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
@@ -272,7 +284,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, onWithdraw, isLoadin
       </div>
 
       {/* 生年月日 */}
-      <DateInput
+      <DateSelect
         label="生年月日"
         value={formData.birthDate}
         onChange={(value) => updateFormData("birthDate", value)}

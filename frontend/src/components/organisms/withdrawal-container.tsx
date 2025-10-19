@@ -12,7 +12,7 @@ interface WithdrawalContainerProps {
   backgroundColorClass?: string
 }
 
-export function WithdrawalContainer({ onWithdraw, onCancel, onWithdrawCancel, onLogoClick, isLoading, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: WithdrawalContainerProps) {
+export function WithdrawalContainer({ onWithdraw, onWithdrawCancel, onLogoClick, isLoading, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: WithdrawalContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}

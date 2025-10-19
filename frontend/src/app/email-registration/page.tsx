@@ -20,11 +20,16 @@ function EmailRegistrationContent() {
   const handleBack = () => router.push('/')
   const handleLogoClick = () => router.push('/')
 
+  // EmailRegistrationLayoutの型に合わせるためのラッパー関数
+  const handleSubmit = (data: { email: string; campaignCode: string; }) => {
+    handleEmailSubmit(data)
+  }
+
   return (
     <EmailRegistrationLayout
       currentStep={currentStep}
       email={email}
-      onSubmit={handleEmailSubmit}
+      onSubmit={handleSubmit}
       onBack={handleBack}
       onBackToLogin={handleBack}
       onResend={handleResend}
