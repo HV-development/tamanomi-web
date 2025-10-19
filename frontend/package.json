@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preinstall": "if [ -n \"$GITHUB_TOKEN\" ]; then echo \"@hv-development:registry=https://npm.pkg.github.com\" > .npmrc && echo \"//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN\" >> .npmrc && echo \"//npm.pkg.github.com/:always-auth=true\" >> .npmrc && echo \"✓ GitHub Packages authentication configured\"; fi",
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
