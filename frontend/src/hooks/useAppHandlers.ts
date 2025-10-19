@@ -1,19 +1,25 @@
 "use client"
 
-import React, { useCallback } from "react"
+import React, { useCallback, useState } from "react"
 import type { AppAction, AppState, AppHandlers } from '@hv-development/schemas'
 import type { Store } from "@/types/store"
 import { appConfig } from '@/config/appConfig'
+import type { useAuth } from './useAuth'
+import type { useNavigation } from './useNavigation'
+import type { useFilters } from './useFilters'
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
 // ハンドラー作成フック
 export const useAppHandlers = (
     dispatch: React.Dispatch<AppAction>,
-    auth: any,
-    navigation: any,
-    filters: any,
-    router: any,
+    auth: ReturnType<typeof useAuth>,
+    navigation: ReturnType<typeof useNavigation>,
+    filters: ReturnType<typeof useFilters>,
+    router: AppRouterInstance,
     state: AppState
 ): AppHandlers => {
+    // OTP requestIdを管理するローカルstate
+    const [otpRequestId, setOtpRequestId] = useState<string>("")
 
     const handleCurrentLocationClick = useCallback(() => {
         filters.toggleNearbyFilter()
@@ -27,6 +33,7 @@ export const useAppHandlers = (
 
         if (tab === "mypage") {
             if (!auth.isAuthenticated) {
+                dispatch({ type: 'RESET_LOGIN_STATE' })
                 navigation.navigateToView("login")
             } else {
                 navigation.navigateToView("mypage", tab)
@@ -38,59 +45,122 @@ export const useAppHandlers = (
                 navigation.navigateToView("home")
             }
         }
+        // dispatch is intentionally omitted as it's a stable function from useReducer
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [auth.isAuthenticated, navigation])
 
-    const handleLogin = useCallback(async (email: string, otp: string) => {
+    // ステップ1: パスワード認証 + OTP送信
+    const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {
         auth.setIsLoading(true)
 
-        if (otp === "") {
-            // ワンタイムパスワード送信処理
+        try {
+            // パスワード認証を実行
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: loginData.email, password: loginData.password }),
+            })
 
-            setTimeout(() => {
-                dispatch({ type: 'SET_LOGIN_EMAIL', payload: email })
-                dispatch({ type: 'SET_LOGIN_STEP', payload: "otp" })
-                auth.setIsLoading(false)
-            }, 1500)
-        } else {
-            setTimeout(async () => {
-                try {
-                    const { mockUser, mockPlan, mockUsageHistory, mockPaymentHistory } = await import("../data/mock-user")
+            const data = await response.json()
 
-                    auth.login({
-                        ...mockUser,
-                        contractStartDate: new Date("2019-01-01")
-                    }, mockPlan, mockUsageHistory, mockPaymentHistory)
+            if (!response.ok) {
+                throw new Error(data.error || 'パスワード認証に失敗しました')
+            }
 
-                    // ログイン成功後はマイページに遷移
-                    navigation.navigateToView("mypage", "mypage")
-                    navigation.navigateToMyPage("main")
+            // OTP送信
+            const otpResponse = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: loginData.email }),
+            })
 
-                    dispatch({ type: 'RESET_LOGIN_STATE' })
-                    auth.setIsLoading(false)
-                } catch (error) {
-                    auth.setIsLoading(false)
-                    // エラーが発生した場合はデフォルトのユーザーデータを使用
-                    const defaultUser = {
-                        id: "user-1",
-                        email: email,
-                        nickname: "テストユーザー",
-                        postalCode: "330-0854",
-                        address: "埼玉県さいたま市大宮区桜木町1-7-5",
-                        birthDate: "1990-05-15",
-                        gender: "male",
-                        createdAt: new Date("2024-01-01"),
-                        contractStartDate: new Date("2019-01-01"),
-                        registeredStore: "さいたま酒場 大宮店",
-                    }
+            if (!otpResponse.ok) {
+                throw new Error('ワンタイムパスワードの送信に失敗しました')
+            }
 
-                    auth.login(defaultUser, null, [], [])
-                    navigation.navigateToView("mypage", "mypage")
-                    navigation.navigateToMyPage("main")
-                    dispatch({ type: 'RESET_LOGIN_STATE' })
-                }
-            }, 1500)
+            const otpData = await otpResponse.json()
+
+            // パスワード認証成功 → OTP入力画面へ
+            dispatch({ type: 'SET_LOGIN_EMAIL', payload: loginData.email })
+            setOtpRequestId(otpData.requestId)
+            dispatch({ type: 'SET_LOGIN_STEP', payload: "otp" })
+        } catch (err) {
+            console.error('Login error:', err)
+            // エラーはステート管理システムで処理する必要があります
+            // TODO: エラーステートの追加
+        } finally {
+            auth.setIsLoading(false)
         }
-    }, [auth, navigation, dispatch])
+    }, [auth, dispatch])
+
+    // ステップ2: OTP認証
+    const handleVerifyOtp = useCallback(async (otp: string) => {
+        auth.setIsLoading(true)
+
+        try {
+            const response = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: state.loginEmail,
+                    otp,
+                    requestId: otpRequestId
+                }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'ワンタイムパスワードの認証に失敗しました')
+            }
+
+            // ログイン成功
+            // トークンをlocalStorageに保存
+            if (data.accessToken) {
+                localStorage.setItem('accessToken', data.accessToken)
+            }
+            if (data.refreshToken) {
+                localStorage.setItem('refreshToken', data.refreshToken)
+            }
+
+            // ★一時的にコメントアウト：プランの有無に関わらずマイページに遷移するため
+            // 正式リリース時には以下のコメントを外して、プランの有無で遷移先を分岐する
+            // let hasPlan = false
+            // try {
+            //     const userResponse = await fetch('/api/user/me', {
+            //         headers: {
+            //             'Authorization': `Bearer ${data.accessToken}`,
+            //         },
+            //     })
+            //
+            //     if (userResponse.ok) {
+            //         const userData = await userResponse.json()
+            //         hasPlan = userData.plan !== null && userData.plan !== undefined
+            //     }
+            // } catch (error) {
+            //     console.error('Failed to fetch user data:', error)
+            // }
+
+            // ★一時的な対応：ログイン後は常にマイページに遷移
+            // 正式リリース時には、プラン未登録の場合はプラン登録画面、
+            // プラン登録済みの場合は店舗一覧画面（/home）に遷移する予定
+            router.push('/home?view=mypage&auto-login=true')
+
+            dispatch({ type: 'RESET_LOGIN_STATE' })
+        } catch (err) {
+            console.error('OTP verification error:', err)
+            // エラーはステート管理システムで処理する必要があります
+            // TODO: エラーステートの追加
+        } finally {
+            auth.setIsLoading(false)
+        }
+    }, [auth, state.loginEmail, otpRequestId, router, dispatch])
 
     const handleSignup = useCallback(() => {
         router.push('/email-registration')
@@ -119,12 +189,31 @@ export const useAppHandlers = (
         dispatch({ type: 'RESET_LOGIN_STATE' })
     }, [dispatch])
 
-    const handleResendOtp = useCallback(() => {
+    const handleResendOtp = useCallback(async () => {
         auth.setIsLoading(true)
-        setTimeout(() => {
+
+        try {
+            const response = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: state.loginEmail }),
+            })
+
+            if (!response.ok) {
+                throw new Error('ワンタイムパスワードの再送信に失敗しました')
+            }
+
+            const otpData = await response.json()
+            setOtpRequestId(otpData.requestId)
+        } catch (err) {
+            console.error('Resend OTP error:', err)
+            // TODO: エラーステートの追加
+        } finally {
             auth.setIsLoading(false)
-        }, 1500)
-    }, [auth])
+        }
+    }, [auth, state.loginEmail])
 
     const handleEmailSubmit = useCallback((email: string, campaignCode?: string) => {
         auth.setIsLoading(true)
@@ -139,6 +228,7 @@ export const useAppHandlers = (
     }, [auth, dispatch])
 
     const handleEmailRegistrationBackToLogin = useCallback(() => {
+        dispatch({ type: 'RESET_LOGIN_STATE' })
         navigation.navigateToView("login")
         dispatch({ type: 'SET_EMAIL_REGISTRATION_STEP', payload: "form" })
         dispatch({ type: 'SET_EMAIL_REGISTRATION_EMAIL', payload: "" })
@@ -148,12 +238,24 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_EMAIL_REGISTRATION_STEP', payload: "form" })
     }, [dispatch])
 
-    const handleSignupSubmit = useCallback((data: any) => {
-        dispatch({ type: 'SET_SIGNUP_DATA', payload: data })
+    const handleSignupSubmit = useCallback((data: Record<string, string>) => {
+        // RegisterFormのデータ構造に合わせて変換
+        const signupData = {
+            nickname: data.nickname,
+            postalCode: data.postalCode,
+            address: data.address,
+            birthDate: data.birthDate,
+            gender: data.gender,
+            password: data.password,
+            passwordConfirm: data.passwordConfirm,
+            email: state.emailRegistrationEmail || ""
+        }
+        dispatch({ type: 'SET_SIGNUP_DATA', payload: signupData })
         navigation.navigateToView("confirmation")
-    }, [navigation, dispatch])
+    }, [navigation, dispatch, state.emailRegistrationEmail])
 
     const handleSignupCancel = useCallback(() => {
+        dispatch({ type: 'RESET_LOGIN_STATE' })
         navigation.navigateToView("login")
         dispatch({ type: 'RESET_SIGNUP_STATE' })
     }, [navigation, dispatch])
@@ -185,7 +287,7 @@ export const useAppHandlers = (
         navigation.navigateToView("signup")
     }, [navigation, dispatch, state.signupData])
 
-    const handleSubscribe = useCallback(async (planId: string) => {
+    const handleSubscribe = useCallback(async () => {
         auth.setIsLoading(true)
         setTimeout(() => {
             auth.setIsLoading(false)
@@ -203,6 +305,7 @@ export const useAppHandlers = (
     }, [auth, dispatch])
 
     const handlePasswordResetCancel = useCallback(() => {
+        dispatch({ type: 'RESET_LOGIN_STATE' })
         navigation.navigateToView("login")
         dispatch({ type: 'SET_PASSWORD_RESET_STEP', payload: "form" })
         dispatch({ type: 'SET_PASSWORD_RESET_EMAIL', payload: "" })
@@ -359,19 +462,21 @@ export const useAppHandlers = (
     const handleWithdrawComplete = useCallback(() => {
         auth.logout()
         navigation.resetNavigation()
-    }, [auth, navigation])
+        router.push('/')
+    }, [auth, navigation, router])
 
     const handleLogout = useCallback(() => {
         auth.logout()
         navigation.resetNavigation()
-    }, [auth, navigation])
+        router.push('/')
+    }, [auth, navigation, router])
 
-    const handleShowStoreOnHome = useCallback((storeId: string) => {
+    const handleShowStoreOnHome = useCallback(() => {
         navigation.navigateToView("home", "home")
         navigation.navigateToMyPage("main")
     }, [navigation])
 
-    const handleUseSameCoupon = useCallback((couponId: string) => {
+    const handleUseSameCoupon = useCallback(() => {
         if (!auth.isAuthenticated) {
             dispatch({ type: 'SET_LOGIN_REQUIRED_MODAL_OPEN', payload: true })
             return
@@ -427,6 +532,7 @@ export const useAppHandlers = (
 
     const handleLoginRequiredModalLogin = useCallback(() => {
         dispatch({ type: 'SET_LOGIN_REQUIRED_MODAL_OPEN', payload: false })
+        dispatch({ type: 'RESET_LOGIN_STATE' })
         navigation.navigateToView("login")
     }, [navigation, dispatch])
 
@@ -454,22 +560,81 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_SELECTED_STORE', payload: null })
     }, [dispatch])
 
-    const handleProfileEditSubmit = useCallback(async (data: any) => {
+    const handleProfileEditSubmit = useCallback(async (data: Record<string, string>, updatedFields: string[]) => {
         auth.setIsLoading(true)
+        console.log('Profile update data:', data, 'Updated fields:', updatedFields)
         setTimeout(() => {
             // プロフィール更新処理
+            // TODO: 実際のAPI呼び出しを実装
             auth.setIsLoading(false)
         }, 1500)
     }, [auth])
 
-    const handleEmailChangeSubmit = useCallback(async (currentPassword: string, newEmail: string) => {
+    const handleEmailChangeSubmit = useCallback(async (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => {
         auth.setIsLoading(true)
-        setTimeout(() => {
-            dispatch({ type: 'SET_NEW_EMAIL', payload: newEmail })
+
+        try {
+            // 開発環境での認証バイパス機能
+            const isDevelopment = process.env.NODE_ENV === 'development';
+            const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
+
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            };
+
+            if (isDevelopment && bypassAuth) {
+                // 開発環境で認証バイパスが有効な場合、ダミートークンを使用
+                headers['Authorization'] = 'Bearer dev-bypass-token';
+            } else {
+                // 本番環境または認証バイパスが無効な場合、通常の認証処理
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('認証トークンが見つかりません。再度ログインしてください。');
+                }
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch('/api/auth/email/change', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    currentPassword: data.currentPassword,
+                    newEmail: data.newEmail,
+                    confirmEmail: data.confirmEmail,
+                }),
+            })
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                // トークン期限切れの場合（403エラー）
+                if (response.status === 403) {
+                    // トークンをクリア
+                    localStorage.removeItem('accessToken')
+                    localStorage.removeItem('refreshToken')
+                    // ログアウト
+                    auth.logout()
+                    // ルートURL（ログイン画面）に遷移
+                    router.push('/')
+                    throw new Error('セッションの有効期限が切れました。再度ログインしてください。')
+                }
+                throw new Error(result.error?.message || 'メールアドレス変更に失敗しました')
+            }
+
+            // 成功時
+            dispatch({ type: 'SET_NEW_EMAIL', payload: data.newEmail })
             dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "complete" })
+        } catch (error) {
+            // エラーを表示するための状態管理が必要
+            // TODO: エラー状態を管理する仕組みを追加
+            const errorMessage = error instanceof Error ? error.message : 'メールアドレス変更に失敗しました'
+            console.error('Email change error:', errorMessage)
+            // エラーメッセージをユーザーに表示する（TODO: UI実装）
+            alert(errorMessage)
+        } finally {
             auth.setIsLoading(false)
-        }, 1500)
-    }, [auth, dispatch])
+        }
+    }, [auth, dispatch, router])
 
     const handleEmailChangeResend = useCallback(() => {
         dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "form" })
@@ -477,27 +642,91 @@ export const useAppHandlers = (
 
     const handlePasswordChangeSubmit = useCallback(async (currentPassword: string, newPassword: string) => {
         auth.setIsLoading(true)
+        // エラー状態をクリア
+        dispatch({ type: 'SET_PASSWORD_CHANGE_ERROR', payload: null })
+        try {
+            // 開発環境での認証バイパス機能
+            const isDevelopment = process.env.NODE_ENV === 'development';
+            const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
 
-        setTimeout(() => {
-            auth.logout()
-            navigation.navigateToView("login", "map")
-            navigation.navigateToMyPage("main")
-            dispatch({ type: 'SET_PASSWORD_CHANGE_STEP', payload: "form" })
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            };
+
+            if (isDevelopment && bypassAuth) {
+                // 開発環境で認証バイパスが有効な場合、ダミートークンを使用
+                headers['Authorization'] = 'Bearer dev-bypass-token';
+            } else {
+                // 本番環境または認証バイパスが無効な場合、通常の認証処理
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    throw new Error('認証トークンが見つかりません。再度ログインしてください。');
+                }
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch('/api/auth/password/change', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword
+                }),
+            })
+            const result = await response.json()
+            if (!response.ok) {
+                // トークン期限切れの場合（403エラー）
+                if (response.status === 403) {
+                    // トークンをクリア
+                    localStorage.removeItem('accessToken')
+                    localStorage.removeItem('refreshToken')
+                    // ログアウト
+                    auth.logout()
+                    // ルートURL（ログイン画面）に遷移
+                    router.push('/')
+                    throw new Error('セッションの有効期限が切れました。再度ログインしてください。')
+                }
+                throw new Error(result.error?.message || 'パスワード変更に失敗しました')
+            }
+
+            // 成功時：変更完了画面を表示
+            dispatch({ type: 'SET_PASSWORD_CHANGE_STEP', payload: "complete" })
+        } catch (error) {
+            // エラー状態を設定
+            const errorMessage = error instanceof Error ? error.message : 'パスワード変更に失敗しました'
+            dispatch({ type: 'SET_PASSWORD_CHANGE_ERROR', payload: errorMessage })
+        } finally {
             auth.setIsLoading(false)
-        }, 1500)
-    }, [auth, navigation, dispatch])
+        }
+    }, [auth, dispatch, router])
 
     const handlePasswordChangeComplete = useCallback(() => {
+        console.log("🔧 handlePasswordChangeComplete: 開始")
+
+        // ログアウト処理
+        console.log("🔧 handlePasswordChangeComplete: ログアウト処理実行")
         auth.logout()
-        navigation.navigateToView("login", "map")
-        navigation.navigateToMyPage("main")
+
+        // パスワード変更ステップをリセット
+        console.log("🔧 handlePasswordChangeComplete: パスワード変更ステップをリセット")
         dispatch({ type: 'SET_PASSWORD_CHANGE_STEP', payload: "form" })
-    }, [auth, navigation, dispatch])
+
+        // ログイン状態をリセット（パスワード入力画面に戻す）
+        console.log("🔧 handlePasswordChangeComplete: ログイン状態をリセット")
+        dispatch({ type: 'RESET_LOGIN_STATE' })
+
+        // ルートURL（ログイン画面）に遷移
+        console.log("🔧 handlePasswordChangeComplete: ルートURLに遷移")
+        router.push('/')
+
+        console.log("🔧 handlePasswordChangeComplete: 完了")
+    }, [auth, dispatch, router])
 
     return {
         handleCurrentLocationClick,
         handleTabChange,
-        handleLogin,
+        handleLogin: handlePasswordLogin,
+        handleVerifyOtp,
         handleSignup,
         handleForgotPassword,
         handleBackToHome,

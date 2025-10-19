@@ -1,7 +1,5 @@
 "use client"
 
-"use client"
-
 import { ProfileEditContainer } from "../organisms/profile-edit-container"
 import type { User } from "../../types/user"
 
@@ -21,17 +19,10 @@ interface ProfileEditLayoutProps {
   onWithdraw: () => void
   onLogoClick: () => void
   isLoading?: boolean
-  currentUserRank?: string | null
 }
 
-export function ProfileEditLayout({ user, onSubmit, onCancel, onWithdraw, onLogoClick, isLoading, currentUserRank }: ProfileEditLayoutProps) {
-  // ランクに基づく背景色を取得
-  const getBackgroundColorByRank = (rank: string | null) => {
-    // 全ての背景色をブロンズ・非会員色に統一
-    return "bg-gradient-to-br from-green-50 to-green-100"
-  }
-
-  const backgroundColorClass = getBackgroundColorByRank(currentUserRank ?? null)
+export function ProfileEditLayout({ user, onSubmit, onCancel, onWithdraw, onLogoClick, isLoading }: ProfileEditLayoutProps) {
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   return (
     <ProfileEditContainer

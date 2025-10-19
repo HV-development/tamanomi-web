@@ -2,19 +2,10 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { RegisterConfirmationDisplay } from "../molecules/register-confirmation-display"
-
-interface RegisterFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  password: string
-  passwordConfirm: string
-}
+import { UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterConfirmationContainerProps {
-  data: RegisterFormData
+  data: UserRegistrationComplete
   email?: string
   onRegister: () => void
   onEdit: () => void
@@ -41,12 +32,12 @@ export function RegisterConfirmationContainer({
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            <RegisterConfirmationDisplay 
-              data={data} 
+            <RegisterConfirmationDisplay
+              data={data}
               email={email}
-              onRegister={onRegister} 
-              onEdit={onEdit} 
-              isLoading={isLoading} 
+              onRegister={onRegister}
+              onEdit={onEdit}
+              isLoading={isLoading}
             />
           </div>
         </div>

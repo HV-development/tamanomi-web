@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useCouponAudio } from "../../hooks/use-audio"
 import type { Coupon } from "../../types/coupon"
 
@@ -55,11 +56,12 @@ export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }:
               {/* クーポン情報カード */}
               <div className="mb-6 p-4 bg-gray-50 rounded-2xl border border-gray-200">
                 <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0">
-                    <img
+                  <div className="flex-shrink-0 relative w-20 h-20">
+                    <Image
                       src={coupon.imageUrl || "/placeholder.svg"}
                       alt={coupon.name}
-                      className="w-20 h-20 rounded-xl object-cover border border-gray-300"
+                      fill
+                      className="rounded-xl object-cover border border-gray-300"
                     />
                   </div>
                   <div className="flex-1 min-w-0">

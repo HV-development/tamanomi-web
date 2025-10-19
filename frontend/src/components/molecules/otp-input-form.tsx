@@ -5,7 +5,6 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "../atoms/button"
 import { otpVerifySchema } from '@/schemas/auth'
-import { z } from "zod"
 
 interface OtpInputFormProps {
   email: string
@@ -22,13 +21,11 @@ export function OtpInputForm({
   onVerifyOtp,
   onResendOtp,
   onBack,
-  isLoading = false,
   error: externalError,
-  requestId = "" // デフォルト値を設定
 }: OtpInputFormProps) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [error, setError] = useState("")
-  
+
   // 外部エラーが変更されたら内部エラーを更新
   useEffect(() => {
     if (externalError) {
@@ -57,8 +54,10 @@ export function OtpInputForm({
       otpVerifySchema.pick({ otp: true }).parse({ otp: otpString })
       return ""
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return error.errors[0]?.message || "OTPの入力エラーです"
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ message: string }> };
+        return zodError.errors[0]?.message || "OTPの入力エラーです"
       }
       return "OTPの入力エラーです"
     }
@@ -81,6 +80,18 @@ export function OtpInputForm({
       // 次のフィールドにフォーカス
       if (numericValue && index < 5) {
         inputRefs.current[index + 1]?.focus()
+      }
+
+      // 6桁目が入力されたら自動送信
+      if (numericValue && index === 5) {
+        // すべてのフィールドが入力されているか確認
+        const isComplete = newOtp.every(digit => digit !== "")
+        if (isComplete) {
+          // 少し遅延させて最後の入力が反映されるのを確認してから送信
+          setTimeout(() => {
+            handleSubmit(newOtp)
+          }, 100)
+        }
       }
     }
   }
@@ -121,6 +132,11 @@ export function OtpInputForm({
       if (error) {
         setError("")
       }
+
+      // 6桁ペーストされたら自動送信
+      setTimeout(() => {
+        handleSubmit(newOtp)
+      }, 100)
     }
   }
 
@@ -171,8 +187,8 @@ export function OtpInputForm({
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={index === 0 ? handlePaste : undefined}
               className={`w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-bold border-2 rounded-lg transition-all duration-200 ${digit
-                  ? "border-green-500 bg-green-50 text-green-900"
-                  : "border-gray-300 bg-white text-gray-900"
+                ? "border-green-500 bg-green-50 text-green-900"
+                : "border-gray-300 bg-white text-gray-900"
                 } focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500`}
               maxLength={1}
               autoComplete="off"

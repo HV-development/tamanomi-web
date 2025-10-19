@@ -3,31 +3,21 @@
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import { Button } from "../atoms/button"
-
-interface RegisterFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  password: string
-  passwordConfirm: string
-}
+import { UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterConfirmationDisplayProps {
-  data: RegisterFormData
+  data: UserRegistrationComplete
   email?: string
   onRegister: () => void
   onEdit: () => void
   isLoading?: boolean
 }
 
-export function RegisterConfirmationDisplay({ 
-  data, 
-  email, 
-  onRegister, 
-  onEdit, 
-  isLoading = false 
+export function RegisterConfirmationDisplay({
+  data,
+  onRegister,
+  onEdit,
+  isLoading = false
 }: RegisterConfirmationDisplayProps) {
   const genderLabels = {
     male: "男性",
@@ -46,6 +36,7 @@ export function RegisterConfirmationDisplay({
     { label: "住所", value: data.address },
     { label: "生年月日", value: formatDate(data.birthDate) },
     { label: "性別", value: genderLabels[data.gender as keyof typeof genderLabels] },
+    { label: "さいたま市みんなのアプリID", value: data.saitamaAppId },
     { label: "パスワード", value: "●".repeat(data.password.length) },
     { label: "パスワード確認", value: "●".repeat(data.passwordConfirm.length) },
   ]
@@ -59,9 +50,9 @@ export function RegisterConfirmationDisplay({
 
       <div className="bg-gray-50 rounded-lg p-6 space-y-4">
         {confirmationItems.map((item, index) => (
-          <div key={index} className="flex justify-between items-start">
-            <span className="text-sm font-medium text-gray-700 w-1/3">{item.label}</span>
-            <span className="text-sm text-gray-900 w-2/3 text-right break-words">{item.value}</span>
+          <div key={index} className="space-y-1">
+            <span className="block text-sm font-medium text-gray-700">{item.label}</span>
+            <span className="block text-base text-gray-900 break-words">{item.value}</span>
           </div>
         ))}
       </div>
@@ -75,9 +66,9 @@ export function RegisterConfirmationDisplay({
           {isLoading ? "登録中..." : "登録する"}
         </Button>
 
-        <Button 
-          onClick={onEdit} 
-          variant="secondary" 
+        <Button
+          onClick={onEdit}
+          variant="secondary"
           className="w-full py-3 text-base font-medium"
         >
           登録内容を修正する

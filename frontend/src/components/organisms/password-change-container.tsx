@@ -11,7 +11,9 @@ interface PasswordChangeContainerProps {
   onLogoClick: () => void
   onBackToLogin: () => void
   isLoading?: boolean
+  errorMessage?: string | null
   backgroundColorClass?: string
+  currentUserRank?: string | null
 }
 
 export function PasswordChangeContainer({
@@ -21,6 +23,7 @@ export function PasswordChangeContainer({
   onLogoClick,
   onBackToLogin,
   isLoading,
+  errorMessage,
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: PasswordChangeContainerProps) {
   const handleSubmit = (currentPassword: string, newPassword: string) => {
@@ -33,8 +36,8 @@ export function PasswordChangeContainer({
       {/* ヘッダー */}
       <HeaderLogo
         onLogoClick={onLogoClick}
-        showBackButton={true}
-        onBackClick={currentStep === "form" ? onCancel : onBackToLogin}
+        showBackButton={currentStep === "form"}
+        onBackClick={onCancel}
       />
 
       {/* メインコンテンツ */}
@@ -51,6 +54,7 @@ export function PasswordChangeContainer({
                   onSubmit={handleSubmit}
                   onCancel={onCancel}
                   isLoading={isLoading}
+                  errorMessage={errorMessage}
                 />
               </>
             ) : (

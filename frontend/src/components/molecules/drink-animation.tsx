@@ -15,22 +15,17 @@ export default function DrinkAnimation({
   className = '',
   width = 200,
   height = 200,
-  duration = 2000, // デフォルト2秒
   onAnimationComplete
 }: DrinkAnimationProps) {
   const [currentImage, setCurrentImage] = useState<'drink1' | 'drink2'>('drink1');
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [animationPhase, setAnimationPhase] = useState<'idle' | 'switching' | 'drinking' | 'resetting'>('idle');
 
   useEffect(() => {
     if (isAnimating) {
-      setAnimationPhase('switching');
-
       // 0.5秒後にdrink2に切り替え
       const switchTimer = setTimeout(() => {
         setCurrentImage('drink2');
-        setAnimationPhase('drinking');
       }, 500);
 
       // drink2で停止（ループしない）
@@ -45,7 +40,7 @@ export default function DrinkAnimation({
         clearTimeout(completeTimer);
       };
     }
-  }, [isAnimating]);
+  }, [isAnimating, onAnimationComplete]);
 
   const startAnimation = () => {
 
@@ -53,7 +48,6 @@ export default function DrinkAnimation({
       // 強制的にリセットしてから開始
       setCurrentImage('drink1');
       setIsAnimating(false);
-      setAnimationPhase('idle');
 
       // 少し遅延してからアニメーション開始
       setTimeout(() => {
@@ -110,7 +104,6 @@ export default function DrinkAnimation({
       {/* 状態表示 */}
       <div className="mt-2 text-center text-sm">
         <p>状態: {isAnimating ? 'アニメーション中' : '待機中'}</p>
-        <p>フェーズ: {animationPhase}</p>
         <p>画像: {currentImage}</p>
       </div>
     </div>

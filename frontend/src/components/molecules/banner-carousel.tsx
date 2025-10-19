@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
@@ -91,10 +92,11 @@ export function BannerCarousel({ className = "" }: BannerCarouselProps) {
         >
           {/* 背景画像 */}
           <div className="absolute inset-0 opacity-30">
-            <img
+            <Image
               src={currentBanner.imageUrl}
               alt={currentBanner.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           </div>
           

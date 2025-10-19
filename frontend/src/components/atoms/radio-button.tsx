@@ -16,7 +16,6 @@ interface RadioButtonProps {
 }
 
 export function RadioButton({
-  name,
   options,
   value,
   onChange,

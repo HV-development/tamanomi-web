@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback } from "react"
-import { GenreButton } from "../atoms/genre-button"
 import { Button } from "../atoms/button"
 import { getGenreColor } from "../../utils/genre-colors"
 import { cn } from "../../lib/utils"
@@ -33,13 +32,13 @@ const GENRES = [
 ]
 
 export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onClear }: GenrePopupProps) {
-  if (!isOpen) return null
-
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose()
     }
   }, [onClose])
+
+  if (!isOpen) return null
 
   return (
     <>
@@ -75,7 +74,6 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
             <div className="space-y-3">
               {/* イベントボタン（2カラム分） */}
               {GENRES.filter(genre => genre.value === "event").map((genre) => {
-                const genreColors = getGenreColor(genre.value)
                 const isSelected = selectedGenres.includes(genre.value)
                 
                 return (

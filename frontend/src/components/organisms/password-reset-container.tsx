@@ -44,7 +44,7 @@ export function PasswordResetContainer({
               <>
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">パスワード再設定</h2>
-                  <p className="text-gray-600">メールアドレスを入力してください</p>
+                  <p className="text-gray-600">有効なメールアドレスを入力してください</p>
                 </div>
                 <PasswordResetForm onSubmit={onSubmit} onCancel={onCancel} isLoading={isLoading} />
               </>

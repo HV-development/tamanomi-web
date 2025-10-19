@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 export default function SimpleDrinkTest2() {
@@ -49,11 +50,13 @@ export default function SimpleDrinkTest2() {
       </button>
 
       {/* 画像表示 */}
-      <div className="w-32 h-32 border-2 border-blue-300 bg-gray-50 flex items-center justify-center">
-        <img
+      <div className="w-32 h-32 border-2 border-blue-300 bg-gray-50 flex items-center justify-center relative">
+        <Image
           src={`/${currentImage}.svg`}
           alt={currentImage === 'drink1' ? '飲む前' : '飲んでいる'}
-          className="w-24 h-24 object-contain"
+          width={96}
+          height={96}
+          className="object-contain"
           onLoad={() => console.log(`Image loaded: ${currentImage}.svg`)}
           onError={() => { }}
         />

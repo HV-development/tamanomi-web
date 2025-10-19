@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 export default function BasicTest() {
@@ -19,22 +20,26 @@ export default function BasicTest() {
         画像切り替え ({showDrink2 ? 'drink2' : 'drink1'})
       </button>
 
-      <div className="w-32 h-32 border border-gray-300 bg-gray-100 flex items-center justify-center">
+      <div className="w-32 h-32 border border-gray-300 bg-gray-100 flex items-center justify-center relative">
         {showDrink2 ? (
-          <img
+          <Image
             src="/drink2.svg"
             alt="飲んでいる"
-            className="w-24 h-24"
+            width={96}
+            height={96}
+            className="object-contain"
             onLoad={() => console.log('drink2.svg loaded')}
-            onError={() => { }}
+            onError={() => {}}
           />
         ) : (
-          <img
+          <Image
             src="/drink1.svg"
             alt="飲む前"
-            className="w-24 h-24"
+            width={96}
+            height={96}
+            className="object-contain"
             onLoad={() => console.log('drink1.svg loaded')}
-            onError={() => { }}
+            onError={() => {}}
           />
         )}
       </div>

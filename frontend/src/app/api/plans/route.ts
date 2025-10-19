@@ -1,48 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { buildApiUrl } from '@/lib/api-config'
 
 export const dynamic = 'force-dynamic'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status') || 'active'
     const limit = searchParams.get('limit') || '50'
-    
-    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
-    const baseUrl = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
-    
-    // デバッグ: 環境変数の確認
-    console.log('Environment check:', {
-      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-      API_BASE_URL: API_BASE_URL,
-      baseUrl: baseUrl,
-      NODE_ENV: process.env.NODE_ENV
-    })
-    
-    const fullUrl = `${baseUrl}/api/v1/plans?status=${status}&limit=${limit}`
-    
-    console.log('Plans API request:', {
-      method: 'GET',
-      url: fullUrl,
+    const saitamaAppLinked = searchParams.get('saitamaAppLinked')
+
+    // クエリパラメータを構築
+    const queryParams = new URLSearchParams({
       status,
-      limit
+      limit,
     })
     
+    if (saitamaAppLinked !== null) {
+      queryParams.append('saitamaAppLinked', saitamaAppLinked)
+    }
+
+    const fullUrl = `${buildApiUrl('/plans')}?${queryParams.toString()}`
+
+    console.log('🔍 [plans] Request:', { url: fullUrl, status, limit, saitamaAppLinked })
+
     const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
+      cache: 'no-store',  // キャッシュを無効化
     })
-    
+
     console.log('Plans API response:', {
       status: response.status,
       ok: response.ok,
       statusText: response.statusText
     })
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('Plans API error:', errorData)
@@ -51,10 +46,14 @@ export async function GET(request: NextRequest) {
         { status: response.status }
       )
     }
-    
+
     const data = await response.json()
-    console.log('Plans data received:', data)
-    
+    console.log('🔍 [plans/route] Plans data received:', {
+      planCount: data.plans?.length,
+      planIds: data.plans?.map((p: { id: string }) => p.id),
+      fullPlans: data.plans?.map((p: { id: string; name: string; options: unknown }) => ({ id: p.id, name: p.name, options: p.options })),
+    })
+
     return NextResponse.json(data)
   } catch (error) {
     console.error('Plans API fetch error:', error)
