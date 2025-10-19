@@ -155,4 +155,3 @@ frontend/out/
 frontend/build/
 infrastructure/docker/ssl/
 .env
-frontend/.npmrc
