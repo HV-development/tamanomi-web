@@ -63,11 +63,19 @@ export default function PlanRegistrationPage() {
       if (response.ok) {
         const userData = await response.json()
         console.log('🔍 [plan-registration] User data:', {
+          email: userData.email,
           hasSaitamaAppLinked: 'saitamaAppLinked' in userData,
           saitamaAppLinked: userData.saitamaAppLinked,
           saitamaAppLinkedType: typeof userData.saitamaAppLinked,
           userDataKeys: Object.keys(userData),
         });
+        
+        // メールアドレスがURLパラメータにない場合は、ユーザーデータから取得
+        if (!email && userData.email) {
+          console.log('🔍 [plan-registration] Setting email from user data:', userData.email);
+          setEmail(userData.email)
+        }
+        
         const newLinkedState = userData.saitamaAppLinked === true
         console.log('🔍 [plan-registration] Setting saitamaAppLinked to:', newLinkedState);
         setSaitamaAppLinked(newLinkedState)
@@ -79,7 +87,7 @@ export default function PlanRegistrationPage() {
       console.error('❌ [plan-registration] Failed to fetch user info:', error)
       setSaitamaAppLinked(false)
     }
-  }, [])
+  }, [email])
 
   const fetchPlans = useCallback(async (explicitLinkedState?: boolean | null) => {
     try {
