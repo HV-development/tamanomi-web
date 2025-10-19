@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
 
     return NextResponse.json(data)
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'OTP検証処理中にエラーが発生しました' },
       { status: 500 }

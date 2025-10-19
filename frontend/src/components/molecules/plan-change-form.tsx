@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import { PlanCard } from "../atoms/plan-card"
@@ -33,19 +33,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const [fetchError, setFetchError] = useState<string>("")
 
-  // ユーザー情報を取得してさいたま市アプリ連携状態を確認
-  useEffect(() => {
-    fetchUserInfo()
-  }, [])
-
-  // プラン一覧を取得（連携状態が確定した後）
-  useEffect(() => {
-    if (saitamaAppLinked !== null) {
-      fetchPlans()
-    }
-  }, [saitamaAppLinked])
-
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = useCallback(async () => {
     try {
       const accessToken = localStorage.getItem('accessToken')
       
@@ -75,9 +63,9 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       console.error('❌ [plan-change] Failed to fetch user info:', error)
       setSaitamaAppLinked(false)
     }
-  }
+  }, [])
 
-  const fetchPlans = async () => {
+  const fetchPlans = useCallback(async () => {
     try {
       // さいたま市アプリ連携状態に応じてクエリパラメータを構築
       const queryParams = new URLSearchParams({
@@ -102,11 +90,20 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       
       console.log('🔍 [plan-change] Plans fetched:', {
         planCount: data.plans?.length,
-        plans: data.plans?.map((p: any) => ({ id: p.id, name: p.name, price: p.price })),
+        plans: data.plans?.map((p: { id: string; name: string; price: number }) => ({ id: p.id, name: p.name, price: p.price })),
       })
       
       // APIから取得したプランをPlanOption形式に変換
-      const formattedPlans: PlanOption[] = data.plans.map((plan: any) => ({
+      const formattedPlans: PlanOption[] = data.plans.map((plan: { 
+        id: string; 
+        name: string; 
+        price: number; 
+        description?: string; 
+        features?: string[]; 
+        badge?: string; 
+        isRecommended?: boolean; 
+        originalPrice?: string 
+      }) => ({
         id: plan.id,
         name: plan.name,
         price: plan.price,
@@ -122,7 +119,19 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       console.error('プラン取得エラー:', err)
       setFetchError('プランの取得に失敗しました')
     }
-  }
+  }, [saitamaAppLinked])
+
+  // ユーザー情報を取得してさいたま市アプリ連携状態を確認
+  useEffect(() => {
+    fetchUserInfo()
+  }, [fetchUserInfo])
+
+  // プラン一覧を取得（連携状態が確定した後）
+  useEffect(() => {
+    if (saitamaAppLinked !== null) {
+      fetchPlans()
+    }
+  }, [saitamaAppLinked, fetchPlans])
 
   const selectedPlanData = availablePlans.find((plan) => plan.id === selectedPlan)
   const isUpgrade = selectedPlanData && selectedPlanData.price > currentPlan.price

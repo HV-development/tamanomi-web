@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 // 実際のパフォーマンス測定用のフック
 export const useActualPerformanceTest = () => {
@@ -58,8 +58,8 @@ export const useActualPerformanceTest = () => {
       })
 
       // メモリ使用量測定
-      if ((performance as any).memory) {
-        results.memoryUsage.push((performance as any).memory.usedJSHeapSize / 1024 / 1024)
+      if ('memory' in performance && performance.memory) {
+        results.memoryUsage.push((performance.memory as { usedJSHeapSize: number }).usedJSHeapSize / 1024 / 1024)
       }
 
       // コンポーネント数をカウント（実際のMyPageコンポーネント数）

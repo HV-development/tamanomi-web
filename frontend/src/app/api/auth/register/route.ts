@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       email: validatedData.email,
       nickname: validatedData.nickname,
       hasSaitamaAppId: 'saitamaAppId' in validatedData,
-      saitamaAppId: (validatedData as any).saitamaAppId,
+      saitamaAppId: 'saitamaAppId' in validatedData ? validatedData.saitamaAppId : undefined,
     })
 
     // タイムアウト設定付きのfetch

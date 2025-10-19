@@ -1,16 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlanRegistrationLayout } from '@/components/templates/plan-registration-layout'
 import { 
   PlanListResponse
 } from '@hv-development/schemas'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
-
-// Note: NEXT_PUBLIC_API_URL は .env ファイルで設定してください
-// 例: NEXT_PUBLIC_API_URL=http://localhost:3002
 
 export default function PlanRegistrationPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -39,22 +34,7 @@ export default function PlanRegistrationPage() {
     }
   }, [])
 
-  // ユーザー情報を取得してさいたま市アプリ連携状態を確認
-  useEffect(() => {
-    if (isClient && saitamaAppLinked === null) {
-      // URLパラメータでsaitamaAppLinkedが設定されていない場合のみ取得
-      fetchUserInfo()
-    }
-  }, [isClient])
-
-  // プラン一覧を取得（連携状態が確定した後）
-  useEffect(() => {
-    if (isClient && saitamaAppLinked !== null) {
-      fetchPlans()
-    }
-  }, [isClient, saitamaAppLinked])
-
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = useCallback(async () => {
     try {
       const accessToken = localStorage.getItem('accessToken')
       
@@ -99,9 +79,9 @@ export default function PlanRegistrationPage() {
       console.error('❌ [plan-registration] Failed to fetch user info:', error)
       setSaitamaAppLinked(false)
     }
-  }
+  }, [])
 
-  const fetchPlans = async (explicitLinkedState?: boolean | null) => {
+  const fetchPlans = useCallback(async (explicitLinkedState?: boolean | null) => {
     try {
       setIsLoading(true)
       
@@ -137,7 +117,7 @@ export default function PlanRegistrationPage() {
       
       console.log('🔍 [plan-registration] Plans fetched:', {
         planCount: data.plans?.length,
-        plans: data.plans?.map((p: any) => ({ id: p.id, name: p.name, price: p.price })),
+        plans: data.plans?.map((p: { id: string; name: string; price: number }) => ({ id: p.id, name: p.name, price: p.price })),
       });
       
       // バリデーション（一時的に無効化）
@@ -150,7 +130,22 @@ export default function PlanRegistrationPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [saitamaAppLinked])
+
+  // ユーザー情報を取得してさいたま市アプリ連携状態を確認
+  useEffect(() => {
+    if (isClient && saitamaAppLinked === null) {
+      // URLパラメータでsaitamaAppLinkedが設定されていない場合のみ取得
+      fetchUserInfo()
+    }
+  }, [isClient, saitamaAppLinked, fetchUserInfo])
+
+  // プラン一覧を取得（連携状態が確定した後）
+  useEffect(() => {
+    if (isClient && saitamaAppLinked !== null) {
+      fetchPlans()
+    }
+  }, [isClient, saitamaAppLinked, fetchPlans])
 
   const handlePaymentMethodRegister = async (planId: string) => {
     try {

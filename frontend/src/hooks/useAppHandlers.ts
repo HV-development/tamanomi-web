@@ -45,6 +45,8 @@ export const useAppHandlers = (
                 navigation.navigateToView("home")
             }
         }
+        // dispatch is intentionally omitted as it's a stable function from useReducer
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [auth.isAuthenticated, navigation])
 
     // ステップ1: パスワード認証 + OTP送信
@@ -576,7 +578,7 @@ export const useAppHandlers = (
             const isDevelopment = process.env.NODE_ENV === 'development';
             const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
 
-            let headers: Record<string, string> = {
+            const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
             };
 
@@ -647,7 +649,7 @@ export const useAppHandlers = (
             const isDevelopment = process.env.NODE_ENV === 'development';
             const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
 
-            let headers: Record<string, string> = {
+            const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
             };
 

@@ -1,15 +1,16 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 
 // データプリロード用のカスタムフック
 export const useDataPreloader = () => {
     const [preloadedData, setPreloadedData] = useState<{
-        user: any | null
-        plan: any | null
-        usageHistory: any[] | null
-        paymentHistory: any[] | null
-        rankInfo: any | null
+        user: User | null
+        plan: Plan | null
+        usageHistory: UsageHistory[] | null
+        paymentHistory: PaymentHistory[] | null
+        rankInfo: unknown | null
     }>({
         user: null,
         plan: null,
@@ -63,7 +64,9 @@ export const useDataPreloader = () => {
         } finally {
             setIsPreloading(false)
         }
-    }, [preloadedData.user])
+        // preloadedData.user is intentionally omitted to avoid infinite loops
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     // コンポーネントマウント時にプリロード開始
     useEffect(() => {

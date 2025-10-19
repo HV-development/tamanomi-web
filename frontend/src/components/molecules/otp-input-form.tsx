@@ -5,7 +5,6 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "../atoms/button"
 import { otpVerifySchema } from '@/schemas/auth'
-import { z } from "zod"
 
 interface OtpInputFormProps {
   email: string

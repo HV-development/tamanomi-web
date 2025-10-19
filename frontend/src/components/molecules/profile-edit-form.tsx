@@ -14,9 +14,7 @@ import {
   validateNicknameRealtime,
   validatePostalCodeRealtime,
   validateBirthDateRealtime,
-  type ProfileValidationResult
 } from "@hv-development/schemas"
-import { z } from "zod"
 
 interface ProfileEditFormProps {
   user: User
@@ -62,7 +60,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       return dateStr.replace(/-/g, "/")
     }
 
-    const initialData = {
+    const initialData: ProfileEditInput = {
       nickname: user.nickname || "",
       postalCode: user.postalCode || "",
       address: user.address || "",
@@ -71,8 +69,8 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       saitamaAppId: (user as User & { saitamaAppId?: string }).saitamaAppId || "",
       registeredStore: user.registeredStore || "",
     }
-    setFormData(initialData as any)
-    setOriginalData(initialData as any)
+    setFormData(initialData)
+    setOriginalData(initialData)
   }, [user])
 
   const genderOptions = [
@@ -118,7 +116,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
         zodError.errors.forEach((err) => {
           const field = err.path?.[0] as keyof ProfileEditInput
           if (field) {
-            newErrors[field] = err.message as any
+            newErrors[field] = err.message
           }
         })
         setErrors(newErrors)
@@ -186,7 +184,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
         }, 100)
       }
 
-    } catch (error) {
+    } catch {
       // ネットワークエラーなどの場合
       setErrors(prev => ({
         ...prev,
@@ -205,7 +203,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
   }
 
   const updateFormData = (field: keyof ProfileEditInput, value: string) => {
-    setFormData({ ...formData, [field]: value as any })
+    setFormData({ ...formData, [field]: value })
 
     // リアルタイムバリデーション
     if (field === 'nickname') {

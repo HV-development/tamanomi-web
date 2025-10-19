@@ -24,6 +24,7 @@ export const SkeletonCard = React.memo(() => (
         </div>
     </div>
 ))
+SkeletonCard.displayName = 'SkeletonCard'
 
 export const SkeletonRankCard = React.memo(() => (
     <div className="bg-white rounded-2xl border border-green-200 p-4 animate-pulse">
@@ -49,6 +50,7 @@ export const SkeletonRankCard = React.memo(() => (
         </div>
     </div>
 ))
+SkeletonRankCard.displayName = 'SkeletonRankCard'
 
 export const SkeletonMenuButton = React.memo(() => (
     <div className="w-full bg-white rounded-2xl border border-green-200 p-4 animate-pulse">
@@ -61,6 +63,7 @@ export const SkeletonMenuButton = React.memo(() => (
         </div>
     </div>
 ))
+SkeletonMenuButton.displayName = 'SkeletonMenuButton'
 
 export const SkeletonMyPage = React.memo(() => (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
@@ -93,3 +96,4 @@ export const SkeletonMyPage = React.memo(() => (
         </div>
     </div>
 ))
+SkeletonMyPage.displayName = 'SkeletonMyPage'

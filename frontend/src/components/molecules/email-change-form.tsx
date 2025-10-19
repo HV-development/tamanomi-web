@@ -4,7 +4,6 @@ import type React from "react"
 import { useState } from "react"
 import { Settings } from "lucide-react"
 import { emailChangeInputSchema, type EmailChangeInput } from "@hv-development/schemas"
-import { z } from "zod"
 
 interface EmailChangeFormProps {
   currentEmail: string

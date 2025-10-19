@@ -25,7 +25,6 @@ export function PasswordChangeContainer({
   isLoading,
   errorMessage,
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
-  currentUserRank,
 }: PasswordChangeContainerProps) {
   const handleSubmit = (currentPassword: string, newPassword: string) => {
     // パスワード変更処理を実行してからログイン画面に遷移
