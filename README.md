@@ -41,12 +41,14 @@ pnpm lint
 ## 📦 主な機能
 
 ### ユーザー向け機能
+
 - 店舗検索・地図表示
 - クーポン取得・利用
 - ポイント確認・履歴
 - マイページ
 
 ### 技術スタック
+
 - **フロントエンド**: Next.js 14, React, TypeScript
 - **スタイリング**: Tailwind CSS, shadcn/ui
 - **UIコンポーネント**: Radix UI

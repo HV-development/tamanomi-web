@@ -224,7 +224,7 @@ export function PlanRegistrationForm({
                   rel="noopener noreferrer"
                   className="hover:opacity-80 transition-opacity"
                 >
-                  <img src="/app-store.svg" alt="App Storeからダウンロード" className="h-12" />
+                  <Image src="/app-store.svg" alt="App Storeからダウンロード" width={48} height={48} className="h-12" />
                 </a>
                 <a
                   href="http://play.google.com/store/apps/details?id=jp.saitamacity.rsa&hl=ja&pli=1"
@@ -232,7 +232,7 @@ export function PlanRegistrationForm({
                   rel="noopener noreferrer"
                   className="hover:opacity-80 transition-opacity"
                 >
-                  <img src="/google-play.svg" alt="Google Playで手に入れよう" className="h-12" />
+                  <Image src="/google-play.svg" alt="Google Playで手に入れよう" width={48} height={48} className="h-12" />
                 </a>
               </div>
               <div className="text-center">

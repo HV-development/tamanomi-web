@@ -2,6 +2,7 @@
 
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function SaitamaAppGuidePage() {
   return (
@@ -34,7 +35,7 @@ export default function SaitamaAppGuidePage() {
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-opacity"
             >
-              <img src="/app-store.svg" alt="App Storeからダウンロード" className="h-12" />
+              <Image src="/app-store.svg" alt="App Storeからダウンロード" width={48} height={48} className="h-12" />
             </a>
             <a
               href="http://play.google.com/store/apps/details?id=jp.saitamacity.rsa&hl=ja&pli=1"
@@ -42,7 +43,7 @@ export default function SaitamaAppGuidePage() {
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-opacity"
             >
-              <img src="/google-play.svg" alt="Google Playからダウンロード" className="h-12" />
+              <Image src="/google-play.svg" alt="Google Playからダウンロード" width={48} height={48} className="h-12" />
             </a>
           </div>
           <p className="text-center text-sm text-gray-600">
