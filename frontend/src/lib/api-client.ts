@@ -3,7 +3,7 @@
  * トークン期限切れ時の自動リフレッシュとログイン画面遷移を処理
  */
 
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   data?: T;
   error?: {
     code: string;
@@ -22,7 +22,7 @@ export class ApiClient {
   /**
    * API呼び出しの共通処理
    */
-  static async request<T = any>(
+  static async request<T = unknown>(
     endpoint: string,
     options: ApiOptions = {}
   ): Promise<ApiResponse<T>> {
@@ -37,7 +37,7 @@ export class ApiClient {
     if (requireAuth) {
       const accessToken = localStorage.getItem('accessToken');
       if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
+        (headers as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
       }
     }
 
@@ -59,7 +59,7 @@ export class ApiClient {
           // リフレッシュ成功時、元のリクエストを再実行
           const newAccessToken = localStorage.getItem('accessToken');
           if (newAccessToken) {
-            headers['Authorization'] = `Bearer ${newAccessToken}`;
+            (headers as Record<string, string>)['Authorization'] = `Bearer ${newAccessToken}`;
             const retryResponse = await fetch(`${this.baseUrl}${endpoint}`, {
               headers: {
                 'Content-Type': 'application/json',
@@ -142,14 +142,14 @@ export class ApiClient {
   /**
    * GET リクエスト
    */
-  static async get<T = any>(endpoint: string, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
+  static async get<T = unknown>(endpoint: string, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
   /**
    * POST リクエスト
    */
-  static async post<T = any>(endpoint: string, data?: any, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
+  static async post<T = unknown>(endpoint: string, data?: unknown, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       ...options,
       method: 'POST',
@@ -160,7 +160,7 @@ export class ApiClient {
   /**
    * PUT リクエスト
    */
-  static async put<T = any>(endpoint: string, data?: any, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
+  static async put<T = unknown>(endpoint: string, data?: unknown, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       ...options,
       method: 'PUT',
@@ -171,7 +171,7 @@ export class ApiClient {
   /**
    * DELETE リクエスト
    */
-  static async delete<T = any>(endpoint: string, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
+  static async delete<T = unknown>(endpoint: string, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 }

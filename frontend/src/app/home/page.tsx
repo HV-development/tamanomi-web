@@ -159,8 +159,8 @@ export default function HomePage() {
   useEffect(() => {
     const initializeData = async () => {
       const data = await loadData()
-      dispatch({ type: 'SET_STORES', payload: data.stores })
-      dispatch({ type: 'SET_NOTIFICATIONS', payload: data.notifications })
+      dispatch({ type: 'SET_STORES', payload: data.stores as Store[] })
+      dispatch({ type: 'SET_NOTIFICATIONS', payload: data.notifications as Notification[] })
       dispatch({ type: 'SET_DATA_LOADED', payload: true })
     }
 

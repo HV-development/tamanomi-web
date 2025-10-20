@@ -1,6 +1,6 @@
 "use client"
 
-import { CreditCard, AlertCircle, Link as LinkIcon, CheckCircle, Smartphone, Copy } from "lucide-react"
+import { CreditCard, AlertCircle, Link as LinkIcon, CheckCircle } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import { PlanCard } from "../atoms/plan-card"
@@ -120,8 +120,8 @@ export function PlanRegistrationForm({
         ) : (
           plans.map((plan) => {
             // 割引価格がある場合は割引価格を表示、ない場合は通常価格を表示
-            const displayPrice = plan.discount_price ? plan.discount_price : plan.price;
-            const hasDiscount = plan.discount_price && plan.discount_price < plan.price;
+            const displayPrice = plan.options?.discount_price ? plan.options.discount_price : plan.price;
+            const hasDiscount = plan.options?.discount_price && plan.options.discount_price < plan.price;
             
             // さいたま市アプリ連携済みの場合の価格表示
             const isSaitamaLinked = saitamaAppLinked || linkedSaitamaAppId;
