@@ -219,7 +219,8 @@ export function PlanRegistrationForm({
               <div>
                 <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリについて</h4>
                 <p className="text-xs text-gray-700 leading-relaxed">
-                  さいたま市が提供する公式アプリです。アプリと連携することで、特別な割引価格でご利用いただけます。
+                  さいたま市が提供する公式アプリです。<br />
+                  アプリと連携することで、特別な割引価格でご利用いただけます。
                 </p>
               </div>
             </div>
@@ -284,7 +285,7 @@ export function PlanRegistrationForm({
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <LinkIcon className="w-4 h-4" />
-              {isLinking ? "連携処理中..." : "アプリと連携して480円OFFで利用する"}
+              {isLinking ? "連携処理中..." : "アプリと連携して500円OFFで利用する"}
             </Button>
             <p className="text-xs text-center text-gray-600">
               ※ 連携後、すぐに割引価格が適用されます
