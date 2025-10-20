@@ -11,6 +11,7 @@ import { ZodError } from "zod"
 const OTP_LENGTH = 6 // OTPの桁数
 const AUTO_SUBMIT_DELAY_MS = 100 // 自動送信の遅延時間（ミリ秒）
 
+
 interface OtpInputFormProps {
   email: string
   onVerifyOtp: OtpVerifyCallback

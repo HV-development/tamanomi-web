@@ -34,7 +34,7 @@ interface MyPageLayoutProps {
   onUseSameCoupon: (couponId: string) => void
   onLogoClick: () => void
   onProfileEditSubmit: (data: Record<string, string>, updatedFields: string[]) => void
-  onEmailChangeSubmit?: (currentPassword: string, newEmail: string) => void
+  onEmailChangeSubmit?: (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => void
   onPasswordChangeSubmit?: (currentPassword: string, newPassword: string) => void
   onPasswordChangeBackToLogin?: () => void
   onEmailChangeResend?: () => void

@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
             throw fetchError;
         }
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: { message: 'パスワード変更に失敗しました' } },
             { status: 500 }

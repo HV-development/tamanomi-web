@@ -45,6 +45,8 @@ export const useAppHandlers = (
                 navigation.navigateToView("home")
             }
         }
+        // dispatch is intentionally omitted as it's a stable function from useReducer
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [auth.isAuthenticated, navigation])
 
     // ステップ1: パスワード認証 + OTP送信
@@ -127,7 +129,7 @@ export const useAppHandlers = (
                 localStorage.setItem('refreshToken', data.refreshToken)
             }
 
-            // ユーザー情報とプラン情報を確認
+            // プラン登録状況を確認
             let hasPlan = false
             try {
                 const userResponse = await fetch('/api/user/me', {
@@ -138,19 +140,23 @@ export const useAppHandlers = (
 
                 if (userResponse.ok) {
                     const userData = await userResponse.json()
-                    // プラン情報が存在するかチェック
+                    console.log('🔍 [OTP] User data:', userData)
+                    console.log('🔍 [OTP] User plan:', userData.plan)
                     hasPlan = userData.plan !== null && userData.plan !== undefined
+                    console.log('🔍 [OTP] hasPlan:', hasPlan)
                 }
             } catch (error) {
-                // ユーザーデータの取得に失敗した場合はプラン未登録として扱う
-                console.error('Failed to fetch user data:', error)
+                console.error('❌ [OTP] Failed to fetch user data:', error)
             }
 
-            // プラン未登録の場合はプラン登録画面に遷移
+            // プラン登録状況によって遷移先を変更
             if (!hasPlan) {
-                router.push(`/plan-registration?email=${encodeURIComponent(state.loginEmail)}`)
+                // プラン未登録の場合はプラン登録画面へ（独立したページ）
+                console.log('🔍 [OTP] Redirecting to plan registration')
+                router.push('/plan-registration')
             } else {
-                // プラン登録済みの場合はマイページに遷移
+                // プラン登録済みの場合はマイページへ
+                console.log('🔍 [OTP] Redirecting to mypage')
                 router.push('/home?view=mypage&auto-login=true')
             }
 
@@ -464,12 +470,14 @@ export const useAppHandlers = (
     const handleWithdrawComplete = useCallback(() => {
         auth.logout()
         navigation.resetNavigation()
-    }, [auth, navigation])
+        router.push('/')
+    }, [auth, navigation, router])
 
     const handleLogout = useCallback(() => {
         auth.logout()
         navigation.resetNavigation()
-    }, [auth, navigation])
+        router.push('/')
+    }, [auth, navigation, router])
 
     const handleShowStoreOnHome = useCallback(() => {
         navigation.navigateToView("home", "home")
@@ -560,10 +568,12 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_SELECTED_STORE', payload: null })
     }, [dispatch])
 
-    const handleProfileEditSubmit = useCallback(async () => {
+    const handleProfileEditSubmit = useCallback(async (data: Record<string, string>, updatedFields: string[]) => {
         auth.setIsLoading(true)
+        console.log('Profile update data:', data, 'Updated fields:', updatedFields)
         setTimeout(() => {
             // プロフィール更新処理
+            // TODO: 実際のAPI呼び出しを実装
             auth.setIsLoading(false)
         }, 1500)
     }, [auth])
@@ -576,7 +586,7 @@ export const useAppHandlers = (
             const isDevelopment = process.env.NODE_ENV === 'development';
             const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
 
-            let headers: Record<string, string> = {
+            const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
             };
 
@@ -595,12 +605,27 @@ export const useAppHandlers = (
             const response = await fetch('/api/auth/email/change', {
                 method: 'POST',
                 headers,
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    currentPassword: data.currentPassword,
+                    newEmail: data.newEmail,
+                    confirmEmail: data.confirmEmail,
+                }),
             })
 
             const result = await response.json()
 
             if (!response.ok) {
+                // トークン期限切れの場合（403エラー）
+                if (response.status === 403) {
+                    // トークンをクリア
+                    localStorage.removeItem('accessToken')
+                    localStorage.removeItem('refreshToken')
+                    // ログアウト
+                    auth.logout()
+                    // ルートURL（ログイン画面）に遷移
+                    router.push('/')
+                    throw new Error('セッションの有効期限が切れました。再度ログインしてください。')
+                }
                 throw new Error(result.error?.message || 'メールアドレス変更に失敗しました')
             }
 
@@ -612,10 +637,12 @@ export const useAppHandlers = (
             // TODO: エラー状態を管理する仕組みを追加
             const errorMessage = error instanceof Error ? error.message : 'メールアドレス変更に失敗しました'
             console.error('Email change error:', errorMessage)
+            // エラーメッセージをユーザーに表示する（TODO: UI実装）
+            alert(errorMessage)
         } finally {
             auth.setIsLoading(false)
         }
-    }, [auth, dispatch])
+    }, [auth, dispatch, router])
 
     const handleEmailChangeResend = useCallback(() => {
         dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "form" })
@@ -630,7 +657,7 @@ export const useAppHandlers = (
             const isDevelopment = process.env.NODE_ENV === 'development';
             const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
 
-            let headers: Record<string, string> = {
+            const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
             };
 
@@ -656,6 +683,17 @@ export const useAppHandlers = (
             })
             const result = await response.json()
             if (!response.ok) {
+                // トークン期限切れの場合（403エラー）
+                if (response.status === 403) {
+                    // トークンをクリア
+                    localStorage.removeItem('accessToken')
+                    localStorage.removeItem('refreshToken')
+                    // ログアウト
+                    auth.logout()
+                    // ルートURL（ログイン画面）に遷移
+                    router.push('/')
+                    throw new Error('セッションの有効期限が切れました。再度ログインしてください。')
+                }
                 throw new Error(result.error?.message || 'パスワード変更に失敗しました')
             }
 
@@ -668,7 +706,7 @@ export const useAppHandlers = (
         } finally {
             auth.setIsLoading(false)
         }
-    }, [auth, dispatch])
+    }, [auth, dispatch, router])
 
     const handlePasswordChangeComplete = useCallback(() => {
         console.log("🔧 handlePasswordChangeComplete: 開始")
@@ -685,12 +723,12 @@ export const useAppHandlers = (
         console.log("🔧 handlePasswordChangeComplete: ログイン状態をリセット")
         dispatch({ type: 'RESET_LOGIN_STATE' })
 
-        // ログイン画面に遷移
-        console.log("🔧 handlePasswordChangeComplete: ログイン画面に遷移")
-        navigation.navigateToView("login", "map")
+        // ルートURL（ログイン画面）に遷移
+        console.log("🔧 handlePasswordChangeComplete: ルートURLに遷移")
+        router.push('/')
 
         console.log("🔧 handlePasswordChangeComplete: 完了")
-    }, [auth, navigation, dispatch])
+    }, [auth, dispatch, router])
 
     return {
         handleCurrentLocationClick,

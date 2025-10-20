@@ -6,11 +6,13 @@
  *   例: https://tamanomi-api-develop.up.railway.app
  */
 
-const API_BASE_URL = process.env.API_BASE_URL;
+// ビルド時はダミー値を使用し、ランタイムで実際の値を使用
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002';
 const API_VERSION = '/api/v1';
 
-if (!API_BASE_URL) {
-  throw new Error('API_BASE_URL environment variable is not set');
+// ランタイムで環境変数が未設定の場合のみ警告
+if (typeof window !== 'undefined' && !process.env.API_BASE_URL) {
+  console.warn('API_BASE_URL environment variable is not set, using default: http://localhost:3002');
 }
 
 /**

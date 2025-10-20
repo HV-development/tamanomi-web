@@ -50,8 +50,8 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     console.log('🔍 [plans/route] Plans data received:', {
       planCount: data.plans?.length,
-      planIds: data.plans?.map((p: any) => p.id),
-      fullPlans: data.plans?.map((p: any) => ({ id: p.id, name: p.name, options: p.options })),
+      planIds: data.plans?.map((p: { id: string }) => p.id),
+      fullPlans: data.plans?.map((p: { id: string; name: string; options: unknown }) => ({ id: p.id, name: p.name, options: p.options })),
     })
 
     return NextResponse.json(data)

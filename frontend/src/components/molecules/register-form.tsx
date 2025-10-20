@@ -103,7 +103,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const validateForm = () => {
     try {
       // スキーマを使用してバリデーション
-      const result = UseRregistrationCompleteSchema.parse(formData)
+      UseRregistrationCompleteSchema.parse(formData)
       setErrors({})
       return true
     } catch (error) {
@@ -200,7 +200,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }, 100)
       }
 
-    } catch (error) {
+    } catch {
       // ネットワークエラーなどの場合
       setErrors(prev => ({
         ...prev,

@@ -36,15 +36,9 @@ export function HomeLayout() {
   // Context から必要な値を取得
   const { state, handlers, auth, navigation, filters, computedValues } = useAppContext()
 
-  // エリアポップアップの状態管理
+  // ポップアップとモーダルの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
-  const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
-
-  // ジャンルポップアップの状態管理
-  const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
-
-  // 使用方法ガイドモーダルの状態管理
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
 
   // 必要な値をローカル変数として定義
@@ -215,7 +209,20 @@ export function HomeLayout() {
     )
   }
 
-  if (currentView === "mypage" && user && plan) {
+  // マイページの表示
+  if (currentView === "mypage") {
+    // ユーザー情報とプラン情報が読み込まれていない場合はローディング表示
+    if (!user || !plan) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <p className="text-green-600 font-medium">ユーザー情報を読み込み中...</p>
+          </div>
+        </div>
+      )
+    }
+
     // プラン変更画面の場合
     if (myPageView === "plan-change") {
       return (

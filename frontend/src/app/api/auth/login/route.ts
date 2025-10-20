@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { email, password } = body
-    const fullUrl = `${baseUrl}/api/v1/login`
+    const fullUrl = buildApiUrl('/login')
 
     const response = await fetch(fullUrl, {
       method: 'POST',
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     // 現時点では単純にレスポンスを返す
 
     return NextResponse.json(data)
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'ログイン処理中にエラーが発生しました' },
       { status: 500 }

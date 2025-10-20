@@ -5,7 +5,7 @@
  * ログイン後にアクセスする画面
  */
 
-import { useEffect, useMemo, Suspense, useReducer } from "react"
+import { useEffect, useMemo, Suspense, useReducer, useRef } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useFilters } from "@/hooks/useFilters"
@@ -26,66 +26,114 @@ export default function HomePage() {
   const navigation = useNavigation();
   const filters = useFilters();
   const router = useRouter()
+  
+  // 初期化フラグ（初回のみ実行するため）
+  const isInitialized = useRef(false)
 
-  // URLパラメータからauto-loginとviewを取得
+  // ★一時的な対応：正式リリースまではマイページをデフォルト表示
+  // 正式リリース時には店舗一覧をデフォルト表示に変更
   useEffect(() => {
+    // 初回のみ実行
+    if (isInitialized.current) {
+      return
+    }
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
       const autoLogin = urlParams.get('auto-login')
       const view = urlParams.get('view')
+      const token = urlParams.get('token')
       
-      console.log('🔍 [home] URL params:', { autoLogin, view, url: window.location.href })
+      console.log('🔍 [home] URL params:', { autoLogin, view, token: !!token, url: window.location.href })
       console.log('🔍 [home] Auth state:', { isAuthenticated: auth.isAuthenticated })
       console.log('🔍 [home] localStorage accessToken:', !!localStorage.getItem('accessToken'))
 
-      if (autoLogin === 'true') {
-        // ★URLパラメータからトークンを取得してlocalStorageに保存
-        if (token) {
-          localStorage.setItem('accessToken', token)
-        }
+      // ★URLパラメータからトークンを取得してlocalStorageに保存（auto-loginの場合）
+      if (autoLogin === 'true' && token) {
+        localStorage.setItem('accessToken', token)
+      }
 
-        // 自動ログイン処理（トークンがある場合）
-        const accessToken = localStorage.getItem('accessToken')
-        if (accessToken && !auth.isAuthenticated) {
+      // アクセストークンを取得
+      const accessToken = localStorage.getItem('accessToken')
 
-          // トークンがある場合、ユーザー情報を取得
-          fetch('/api/user/me', {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-            },
+      // ログインしているかチェック（auto-loginパラメータがない場合のみ）
+      if (!accessToken && view !== 'map' && autoLogin !== 'true') {
+        // ログインしていない場合はログインページにリダイレクト（マップビュー以外）
+        console.log('🔍 [home] No access token, redirecting to login')
+        router.push('/')
+        return
+      }
+      
+      // 自動ログイン処理（トークンがあり、まだ認証されていない場合）
+      if (accessToken && !auth.isAuthenticated) {
+        console.log('🔍 [home] Auto-login: fetching user data...')
+        
+        // トークンがある場合、ユーザー情報を取得
+        fetch('/api/user/me', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch user data')
+            }
+            return response.json()
           })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Failed to fetch user data')
-              }
-              return response.json()
-            })
-            .then(userData => {
-              // TODO: 実際のユーザーデータでauth.loginを呼び出す
-              // auth.login(userData, userData.plan, [], [])
+          .then(userData => {
+            console.log('✅ [home] User data fetched:', userData)
+            // ユーザーデータでauth.loginを呼び出す
+            auth.login(userData, userData.plan, [], [])
 
-              // viewパラメータがmypageの場合はマイページに遷移
-              if (view === 'mypage') {
+            // プラン登録状況を確認して適切な画面に遷移
+            const hasPlan = userData.plan !== null && userData.plan !== undefined
+            console.log('🔍 [home] hasPlan:', hasPlan, 'view:', view)
+
+            // ビューパラメータがない場合のみプラン登録チェックを行う
+            if (!view) {
+              if (!hasPlan) {
+                // プラン未登録の場合はプラン登録画面へ
+                console.log('🔍 [home] No plan, redirecting to plan registration page')
+                router.push('/plan-registration')
+                return
+              } else {
+                // プラン登録済みの場合はマイページへ
+                console.log('🔍 [home] Has plan, showing mypage')
                 navigation.navigateToView("mypage", "mypage")
                 navigation.navigateToMyPage("main")
               }
-            })
-            .catch(error => {
-              console.error('Auto-login failed:', error)
-              // トークンが無効な場合はクリア
-              localStorage.removeItem('accessToken')
-              localStorage.removeItem('refreshToken')
-            })
+            } else if (view === 'mypage') {
+              // マイページに遷移
+              navigation.navigateToView("mypage", "mypage")
+              navigation.navigateToMyPage("main")
+            }
+          })
+          .catch(error => {
+            console.error('❌ [home] Auto-login failed:', error)
+            // トークンが無効な場合はクリア
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('refreshToken')
+            // ログインページにリダイレクト
+            router.push('/')
+          })
+      } else if (!accessToken && view !== 'map') {
+        // トークンがない場合でviewパラメータがある場合の処理
+        if (view === 'mypage') {
+          navigation.navigateToView("mypage", "mypage")
+          navigation.navigateToMyPage("main")
         }
+      }
 
-        // window.history.replaceState({}, '', window.location.pathname + (view ? `?view=${view}` : ''))
-        // ★URLパラメータをクリア（tokenは残す）
+      // ★URLパラメータをクリア（auto-loginパラメータのみ削除）
+      if (autoLogin === 'true') {
         const newUrl = new URL(window.location.href)
         newUrl.searchParams.delete('auto-login')
         window.history.replaceState({}, '', newUrl.toString())
       }
+      
+      // 初期化完了フラグを立てる
+      isInitialized.current = true
     }
-  }, [auth, navigation])
+  }, [auth, navigation, router])
 
   // useReducerで状態管理を統合
   const [state, dispatch] = useReducer(appReducer, initialState)

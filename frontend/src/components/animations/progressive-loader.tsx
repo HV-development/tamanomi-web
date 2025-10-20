@@ -29,6 +29,7 @@ export const ProgressiveLoader = React.memo(({
 
     return <>{children}</>
 })
+ProgressiveLoader.displayName = 'ProgressiveLoader'
 
 // 段階的表示用のコンテナ
 export const StaggeredContainer = React.memo(({
@@ -52,6 +53,7 @@ export const StaggeredContainer = React.memo(({
         </>
     )
 })
+StaggeredContainer.displayName = 'StaggeredContainer'
 
 // フェードインアニメーション付きコンポーネント
 export const FadeInComponent = React.memo(({
@@ -79,3 +81,4 @@ export const FadeInComponent = React.memo(({
         </div>
     )
 })
+FadeInComponent.displayName = 'FadeInComponent'

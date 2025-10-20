@@ -1,19 +1,13 @@
 "use client"
 
-import React, { useMemo, useState, useEffect } from "react"
+import React, { useMemo } from "react"
 import Image from "next/image"
-import { SquarePen, Crown, RefreshCw, Mail, Lock, History, CreditCard, LogOut } from "lucide-react"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "../../utils/rank-calculator"
-import { UsageHistoryList } from "../molecules/usage-history-list"
-import { PaymentHistoryList } from "../molecules/payment-history-list"
-import { WithdrawalLayout } from "../templates/withdrawal-layout"
 import { WithdrawalComplete } from "../molecules/withdrawal-complete"
 import type { User as UserType, Plan, UsageHistory, PaymentHistory } from "../../types/user"
-import { ProfileEditLayout } from "../templates/profile-edit-layout"
-import { EmailChangeLayout } from "../templates/email-change-layout"
-import { PasswordChangeLayout } from "../templates/password-change-layout"
 import { appConfig } from '@/config/appConfig'
 import { useDataPreloader } from "../../hooks/useDataPreloader"
 import { SkeletonMyPage, SkeletonCard, SkeletonRankCard, SkeletonMenuButton } from "../skeletons/mypage-skeleton"
@@ -70,7 +64,7 @@ interface MyPageContainerProps {
   onLogoClick: () => void
   onProfileEditSubmit: (data: ProfileEditFormData) => void
   onPasswordChangeBackToLogin?: () => void
-  onEmailChangeSubmit?: (currentPassword: string, newEmail: string) => void
+  onEmailChangeSubmit?: (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => void
   onEmailChangeResend?: () => void
   onPasswordChangeSubmit?: (currentPassword: string, newPassword: string) => void
   emailChangeStep?: "form" | "complete"
@@ -126,6 +120,7 @@ const ProfileCard = React.memo(({ user, onEditProfile }: { user: UserType, onEdi
     </div>
   </div>
 ))
+ProfileCard.displayName = 'ProfileCard'
 
 // ランク画像コンポーネント
 const RankImage = React.memo(({ rank, alt, className }: { rank: string, alt: string, className: string }) => (
@@ -140,6 +135,7 @@ const RankImage = React.memo(({ rank, alt, className }: { rank: string, alt: str
     />
   </div>
 ))
+RankImage.displayName = 'RankImage'
 
 // ランクカードコンポーネント
 const RankCard = React.memo(({ rankCalculations }: { rankCalculations: ReturnType<typeof useRankCalculations> }) => {
@@ -201,6 +197,7 @@ const RankCard = React.memo(({ rankCalculations }: { rankCalculations: ReturnTyp
     </div>
   )
 })
+RankCard.displayName = 'RankCard'
 
 // メニューボタンコンポーネント
 const MenuButton = React.memo(({
@@ -227,6 +224,7 @@ const MenuButton = React.memo(({
     <div className="text-gray-400">›</div>
   </button>
 ))
+MenuButton.displayName = 'MenuButton'
 
 // メニューボタン群コンポーネント
 const MenuButtons = React.memo(({
@@ -234,16 +232,12 @@ const MenuButtons = React.memo(({
   onViewPlan,
   onChangeEmail,
   onChangePassword,
-  onViewUsageHistory,
-  onViewPaymentHistory,
   onLogout
 }: {
   onEditProfile: () => void
   onViewPlan: () => void
   onChangeEmail: () => void
   onChangePassword: () => void
-  onViewUsageHistory: () => void
-  onViewPaymentHistory: () => void
   onLogout: () => void
 }) => (
   <div className="space-y-3">
@@ -259,15 +253,17 @@ const MenuButtons = React.memo(({
     {appConfig.myPageSettings.showPasswordChange && (
       <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
     )}
-    {appConfig.myPageSettings.showUsageHistory && (
+    {/* ★一時的にコメントアウト：正式リリースまで利用履歴と決済履歴を非表示 */}
+    {/* {appConfig.myPageSettings.showUsageHistory && (
       <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
     )}
     {appConfig.myPageSettings.showPaymentHistory && (
       <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
-    )}
+    )} */}
     <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
   </div>
 ))
+MenuButtons.displayName = 'MenuButtons'
 
 export const MyPageContainer = React.memo(function MyPageContainer({
   user,
@@ -301,7 +297,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   currentUserRank,
 }: MyPageContainerProps) {
   // データプリローダーを使用
-  const { preloadedData, isPreloading, preloadProgress } = useDataPreloader()
+  const { isPreloading, preloadProgress } = useDataPreloader()
 
   // 背景色をメモ化
   const backgroundColorClass = useMemo(() =>
@@ -489,7 +485,7 @@ const MyPageSubView = React.memo(({
   onWithdrawCancel: () => void
   onWithdrawComplete: () => void
   onPasswordChangeBackToLogin: () => void
-  onEmailChangeSubmit: (currentPassword: string, newEmail: string) => void
+  onEmailChangeSubmit: (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => void
   onEmailChangeResend: () => void
   onPasswordChangeSubmit: (currentPassword: string, newPassword: string) => void
   emailChangeStep: "form" | "complete"
@@ -593,3 +589,4 @@ const MyPageSubView = React.memo(({
       return null
   }
 })
+MyPageSubView.displayName = 'MyPageSubView'

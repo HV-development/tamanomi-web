@@ -46,10 +46,15 @@ export const RANK_INFO: Record<UserRank, RankInfo> = {
   },
 }
 
-export function calculateUserRank(contractStartDate: Date): UserRank {
+export function calculateUserRank(contractStartDate: Date | string): UserRank {
   const now = new Date()
+  // contractStartDateが文字列の場合はDateオブジェクトに変換
+  const startDate = typeof contractStartDate === 'string' 
+    ? new Date(contractStartDate) 
+    : contractStartDate
+  
   const monthsDiff = Math.floor(
-    (now.getTime() - contractStartDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44), // 平均月日数
+    (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44), // 平均月日数
   )
 
   if (monthsDiff >= RANK_THRESHOLDS.diamond) return "diamond"
@@ -69,12 +74,17 @@ export function getNextRankInfo(currentRank: UserRank): RankInfo | null {
   return RANK_INFO[ranks[currentIndex + 1]]
 }
 
-export function getMonthsToNextRank(contractStartDate: Date, currentRank: UserRank): number | null {
+export function getMonthsToNextRank(contractStartDate: Date | string, currentRank: UserRank): number | null {
   const nextRank = getNextRankInfo(currentRank)
   if (!nextRank) return null
 
   const now = new Date()
-  const monthsDiff = Math.floor((now.getTime() - contractStartDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44))
+  // contractStartDateが文字列の場合はDateオブジェクトに変換
+  const startDate = typeof contractStartDate === 'string' 
+    ? new Date(contractStartDate) 
+    : contractStartDate
+  
+  const monthsDiff = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44))
 
   return Math.max(0, nextRank.monthsRequired - monthsDiff)
 }
