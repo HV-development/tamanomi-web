@@ -108,6 +108,16 @@ export default function SaitamaAppGuidePage() {
           </div>
         </div>
 
+        {/* フッター */}
+        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+          <Link 
+            href="/plan-registration"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            プラン登録に戻る
+          </Link>
+        </div>
       </div>
     </div>
   )
