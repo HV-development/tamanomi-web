@@ -195,16 +195,20 @@ export function PlanRegistrationForm({
               <p className="text-sm font-bold">さらにお得に！</p>
             </div>
             <div className="mb-3">
-              <p className="text-4xl font-black text-blue-600 mb-1">
-                ¥480
-                <span className="text-xl ml-1">OFF</span>
-              </p>
-              <p className="text-gray-700 text-sm font-medium">
-                さいたま市みんなのアプリ連携で
-              </p>
-              <p className="text-lg font-bold text-indigo-700">
-                月額480円でご利用いただけます
-              </p>
+              <div className="flex flex-col items-center">
+                <span className="text-sm line-through text-gray-500 mb-1">
+                  ¥980/月
+                </span>
+                <p className="text-3xl font-bold text-blue-600 mb-1">
+                  ¥480/月
+                </p>
+                <p className="text-gray-700 text-sm font-medium">
+                  さいたま市みんなのアプリ連携で
+                </p>
+                <p className="text-sm font-bold text-indigo-700">
+                  月額480円でご利用いただけます
+                </p>
+              </div>
             </div>
           </div>
 
@@ -221,46 +225,35 @@ export function PlanRegistrationForm({
             </div>
 
             {/* ダウンロードリンク */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <p className="text-xs font-medium text-gray-900 text-center">
                 まだアプリをお持ちでない方はこちらからダウンロード
               </p>
-              <div className="flex flex-col gap-2">
+              <div className="flex justify-center gap-3">
                 <a
                   href="https://apps.apple.com/jp/app/%E3%81%95%E3%81%84%E3%81%9F%E3%81%BE%E5%B8%82%E3%81%BF%E3%82%93%E3%81%AA%E3%81%AE%E3%82%A2%E3%83%97%E3%83%AA/id6502677802"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                  className="hover:opacity-80 transition-opacity"
                 >
-                  <img src="/app-store.svg" alt="App Store" className="w-6 h-6" />
-                  App Storeからダウンロード
+                  <img src="/app-store.svg" alt="App Storeからダウンロード" className="h-12" />
                 </a>
                 <a
                   href="http://play.google.com/store/apps/details?id=jp.saitamacity.rsa&hl=ja&pli=1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                  className="hover:opacity-80 transition-opacity"
                 >
-                  <img src="/google-play.svg" alt="Google Play" className="w-6 h-6" />
-                  Google Playで手に入れよう
+                  <img src="/google-play.svg" alt="Google Playで手に入れよう" className="h-12" />
                 </a>
               </div>
-            </div>
-          </div>
-
-          {/* ID取得手順 */}
-          <div className="bg-white rounded-lg p-4">
-            <div className="flex items-start gap-2">
-              <Copy className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-bold text-gray-900 text-sm mb-2">ユーザーIDの確認方法</h4>
-                <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside">
-                  <li>さいたま市みんなのアプリを開く</li>
-                  <li>画面下部のメニューから「マイページ」をタップ</li>
-                  <li>「ユーザーID」が表示されます</li>
-                  <li>IDをタップしてコピー</li>
-                  <li>下記の入力欄に貼り付けてください</li>
-                </ol>
+              <div className="text-center">
+                <button
+                  onClick={() => window.open('/saitama-app-guide', '_blank')}
+                  className="text-xs text-blue-600 hover:text-blue-800 underline"
+                >
+                  アプリの使い方とユーザーID取得手順はこちら
+                </button>
               </div>
             </div>
           </div>
