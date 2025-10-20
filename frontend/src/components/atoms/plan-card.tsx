@@ -34,8 +34,8 @@ export function PlanCard({
         disabled
           ? "border-gray-300 bg-gray-100 cursor-not-allowed opacity-60" // グレーアウトスタイル
           : isSelected
-            ? "border-blue-500 bg-blue-50 shadow-lg cursor-pointer"
-            : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-md cursor-pointer"
+            ? "border-green-500 bg-green-50 shadow-lg cursor-pointer"
+            : "border-gray-200 bg-white hover:border-green-300 hover:shadow-md cursor-pointer"
       } ${className}`}
     >
       {/* バッジ */}
@@ -45,7 +45,7 @@ export function PlanCard({
             className={`px-4 py-1 rounded-full text-sm font-medium ${
               disabled
                 ? "bg-gray-400 text-gray-600" // グレーアウト時のバッジ
-                : "bg-blue-600 text-white"
+                : "bg-green-600 text-white"
             }`}
           >
             {badge}
@@ -56,7 +56,7 @@ export function PlanCard({
       {/* 選択状態のチェックマーク */}
       {isSelected && !disabled && (
         <div className="absolute top-4 right-4">
-          <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+          <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
             <Check className="w-4 h-4 text-white" />
           </div>
         </div>
@@ -73,7 +73,7 @@ export function PlanCard({
               <span className={`text-sm line-through ${disabled ? "text-gray-400" : "text-gray-500"}`}>
                 {originalPrice}
               </span>
-              <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-blue-600"}`}>{price}</span>
+              <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-green-600"}`}>{price}</span>
             </div>
           ) : (
             <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-blue-600"}`}>{price}</span>
