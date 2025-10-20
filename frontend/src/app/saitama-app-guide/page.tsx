@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export default function SaitamaAppGuidePage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* ヘッダー */}
         <div className="mb-8 text-center">
@@ -25,7 +25,7 @@ export default function SaitamaAppGuidePage() {
         </div>
 
         {/* Step 1: アプリのダウンロード */}
-        <div className="bg-white rounded-lg p-6 mb-6">
+        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
           <h2 className="text-sm font-bold text-gray-900 mb-4 text-center">Step 1: アプリのダウンロード</h2>
           <div className="flex justify-center gap-4 mb-4">
             <a
@@ -51,7 +51,7 @@ export default function SaitamaAppGuidePage() {
         </div>
 
         {/* Step 2: IDの確認 */}
-        <div className="bg-white rounded-lg p-6 mb-6">
+        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
           <h2 className="text-sm font-bold text-gray-900 mb-4 text-center">Step 2: IDの確認</h2>
           <div className="space-y-4">
             <div className="bg-gray-50 rounded-lg p-4">
@@ -85,7 +85,7 @@ export default function SaitamaAppGuidePage() {
         </div>
 
         {/* Step 3: IDの登録 */}
-        <div className="bg-white rounded-lg p-6 mb-6">
+        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
           <h2 className="text-sm font-bold text-gray-900 mb-4 text-center">Step 3: IDの登録</h2>
           <div className="space-y-4">
             <div>
