@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export default function SaitamaAppGuidePage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* ヘッダー */}
         <div className="mb-8 text-center">
@@ -20,7 +20,7 @@ export default function SaitamaAppGuidePage() {
             さいたま市みんなのアプリ 使い方ガイド
           </h1>
           <p className="text-sm text-gray-600">
-            アプリのダウンロードからユーザーID取得まで、詳しくご説明します。
+            ID連携の方法についてご説明します。
           </p>
         </div>
 
