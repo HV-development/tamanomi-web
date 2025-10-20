@@ -188,21 +188,21 @@ export function PlanRegistrationForm({
 
       {/* さいたま市みんなのアプリ連携フォーム（未連携の場合のみ表示） */}
       {!saitamaAppLinked && !linkedSaitamaAppId && (
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-5 space-y-4">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5 space-y-4">
           {/* 割引強調セクション */}
           <div className="text-center bg-white rounded-lg p-4 shadow-sm">
-            <div className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-full mb-3">
+            <div className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full mb-3">
               <p className="text-sm font-bold">さらにお得に！</p>
             </div>
             <div className="mb-3">
-              <p className="text-4xl font-black text-amber-600 mb-1">
+              <p className="text-4xl font-black text-blue-600 mb-1">
                 ¥480
                 <span className="text-xl ml-1">OFF</span>
               </p>
               <p className="text-gray-700 text-sm font-medium">
                 さいたま市みんなのアプリ連携で
               </p>
-              <p className="text-lg font-bold text-amber-700">
+              <p className="text-lg font-bold text-indigo-700">
                 月額480円でご利用いただけます
               </p>
             </div>
@@ -211,7 +211,7 @@ export function PlanRegistrationForm({
           {/* アプリ説明とダウンロードリンク */}
           <div className="bg-white rounded-lg p-4 space-y-3">
             <div className="flex items-start gap-2">
-              <Smartphone className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <Smartphone className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリについて</h4>
                 <p className="text-xs text-gray-700 leading-relaxed">
@@ -232,7 +232,7 @@ export function PlanRegistrationForm({
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
                 >
-                  <span>📱</span>
+                  <img src="/app-store.svg" alt="App Store" className="w-6 h-6" />
                   App Storeからダウンロード
                 </a>
                 <a
@@ -241,7 +241,7 @@ export function PlanRegistrationForm({
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
                 >
-                  <span>🤖</span>
+                  <img src="/google-play.svg" alt="Google Play" className="w-6 h-6" />
                   Google Playで手に入れよう
                 </a>
               </div>
@@ -251,7 +251,7 @@ export function PlanRegistrationForm({
           {/* ID取得手順 */}
           <div className="bg-white rounded-lg p-4">
             <div className="flex items-start gap-2">
-              <Copy className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <Copy className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-bold text-gray-900 text-sm mb-2">ユーザーIDの確認方法</h4>
                 <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside">
@@ -288,7 +288,7 @@ export function PlanRegistrationForm({
             <Button
               onClick={handleLinkSaitamaApp}
               disabled={isLinking || !saitamaAppId}
-              className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <LinkIcon className="w-4 h-4" />
               {isLinking ? "連携処理中..." : "アプリと連携して480円OFFで利用する"}
