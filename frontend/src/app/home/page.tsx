@@ -63,21 +63,6 @@ export default function HomePage() {
         return
       }
       
-      // ビューパラメータに応じて遷移
-      if (view === 'mypage') {
-        // マイページに遷移
-        navigation.navigateToView("mypage", "mypage")
-        navigation.navigateToMyPage("main")
-      } else if (view === 'plan-registration') {
-        // プラン登録画面に遷移
-        navigation.navigateToView("subscription", "subscription")
-      } else if (!view) {
-        // ★一時的な対応：デフォルトでマイページに遷移（正式リリース時に削除）
-        // 正式リリース時は、viewパラメータがない場合は店舗一覧を表示
-        navigation.navigateToView("mypage", "mypage")
-        navigation.navigateToMyPage("main")
-      }
-
       // 自動ログイン処理（トークンがあり、まだ認証されていない場合）
       if (accessToken && !auth.isAuthenticated) {
         console.log('🔍 [home] Auto-login: fetching user data...')
@@ -98,6 +83,29 @@ export default function HomePage() {
             console.log('✅ [home] User data fetched:', userData)
             // ユーザーデータでauth.loginを呼び出す
             auth.login(userData, userData.plan, [], [])
+
+            // プラン登録状況を確認して適切な画面に遷移
+            const hasPlan = userData.plan !== null && userData.plan !== undefined
+            console.log('🔍 [home] hasPlan:', hasPlan, 'view:', view)
+
+            // ビューパラメータがない場合のみプラン登録チェックを行う
+            if (!view) {
+              if (!hasPlan) {
+                // プラン未登録の場合はプラン登録画面へ
+                console.log('🔍 [home] No plan, redirecting to plan registration page')
+                router.push('/plan-registration')
+                return
+              } else {
+                // プラン登録済みの場合はマイページへ
+                console.log('🔍 [home] Has plan, showing mypage')
+                navigation.navigateToView("mypage", "mypage")
+                navigation.navigateToMyPage("main")
+              }
+            } else if (view === 'mypage') {
+              // マイページに遷移
+              navigation.navigateToView("mypage", "mypage")
+              navigation.navigateToMyPage("main")
+            }
           })
           .catch(error => {
             console.error('❌ [home] Auto-login failed:', error)
@@ -107,6 +115,12 @@ export default function HomePage() {
             // ログインページにリダイレクト
             router.push('/')
           })
+      } else if (!accessToken && view !== 'map') {
+        // トークンがない場合でviewパラメータがある場合の処理
+        if (view === 'mypage') {
+          navigation.navigateToView("mypage", "mypage")
+          navigation.navigateToMyPage("main")
+        }
       }
 
       // ★URLパラメータをクリア（auto-loginパラメータのみ削除）

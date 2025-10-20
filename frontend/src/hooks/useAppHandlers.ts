@@ -129,28 +129,36 @@ export const useAppHandlers = (
                 localStorage.setItem('refreshToken', data.refreshToken)
             }
 
-            // ★一時的にコメントアウト：プランの有無に関わらずマイページに遷移するため
-            // 正式リリース時には以下のコメントを外して、プランの有無で遷移先を分岐する
-            // let hasPlan = false
-            // try {
-            //     const userResponse = await fetch('/api/user/me', {
-            //         headers: {
-            //             'Authorization': `Bearer ${data.accessToken}`,
-            //         },
-            //     })
-            //
-            //     if (userResponse.ok) {
-            //         const userData = await userResponse.json()
-            //         hasPlan = userData.plan !== null && userData.plan !== undefined
-            //     }
-            // } catch (error) {
-            //     console.error('Failed to fetch user data:', error)
-            // }
+            // プラン登録状況を確認
+            let hasPlan = false
+            try {
+                const userResponse = await fetch('/api/user/me', {
+                    headers: {
+                        'Authorization': `Bearer ${data.accessToken}`,
+                    },
+                })
 
-            // ★一時的な対応：ログイン後は常にマイページに遷移
-            // 正式リリース時には、プラン未登録の場合はプラン登録画面、
-            // プラン登録済みの場合は店舗一覧画面（/home）に遷移する予定
-            router.push('/home?view=mypage&auto-login=true')
+                if (userResponse.ok) {
+                    const userData = await userResponse.json()
+                    console.log('🔍 [OTP] User data:', userData)
+                    console.log('🔍 [OTP] User plan:', userData.plan)
+                    hasPlan = userData.plan !== null && userData.plan !== undefined
+                    console.log('🔍 [OTP] hasPlan:', hasPlan)
+                }
+            } catch (error) {
+                console.error('❌ [OTP] Failed to fetch user data:', error)
+            }
+
+            // プラン登録状況によって遷移先を変更
+            if (!hasPlan) {
+                // プラン未登録の場合はプラン登録画面へ（独立したページ）
+                console.log('🔍 [OTP] Redirecting to plan registration')
+                router.push('/plan-registration')
+            } else {
+                // プラン登録済みの場合はマイページへ
+                console.log('🔍 [OTP] Redirecting to mypage')
+                router.push('/home?view=mypage&auto-login=true')
+            }
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
         } catch (err) {
