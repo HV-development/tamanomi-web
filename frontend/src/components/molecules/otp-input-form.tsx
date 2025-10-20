@@ -4,17 +4,19 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "../atoms/button"
-import { otpVerifySchema } from '@/schemas/auth'
-import { z } from "zod"
+import { otpVerifySchema, type OtpVerifyCallback } from "@hv-development/schemas"
+import { ZodError } from "zod"
+
+// 定数定義
+const OTP_LENGTH = 6 // OTPの桁数
+const AUTO_SUBMIT_DELAY_MS = 100 // 自動送信の遅延時間（ミリ秒）
 
 interface OtpInputFormProps {
   email: string
-  onVerifyOtp: (otp: string) => void
+  onVerifyOtp: OtpVerifyCallback
   onResendOtp: () => void
   onBack: () => void
-  isLoading?: boolean
   error?: string // 外部エラーを追加
-  requestId?: string // OTP検証に必要なrequestIdを追加
 }
 
 export function OtpInputForm({
@@ -24,7 +26,7 @@ export function OtpInputForm({
   onBack,
   error: externalError,
 }: OtpInputFormProps) {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""])
+  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""))
   const [error, setError] = useState("")
 
   // 外部エラーが変更されたら内部エラーを更新
@@ -37,7 +39,7 @@ export function OtpInputForm({
 
   // 入力フィールドの参照を初期化
   useEffect(() => {
-    inputRefs.current = inputRefs.current.slice(0, 6)
+    inputRefs.current = inputRefs.current.slice(0, OTP_LENGTH)
   }, [])
 
   // 最初の入力フィールドにフォーカス
@@ -56,9 +58,8 @@ export function OtpInputForm({
       return ""
     } catch (error) {
       // ZodErrorかどうかをより確実にチェック
-      if (error && typeof error === 'object' && 'errors' in error) {
-        const zodError = error as { errors: Array<{ message: string }> };
-        return zodError.errors[0]?.message || "OTPの入力エラーです"
+      if (error instanceof ZodError) {
+        return error.errors[0]?.message || "OTPの入力エラーです"
       }
       return "OTPの入力エラーです"
     }
@@ -78,20 +79,20 @@ export function OtpInputForm({
         setError("")
       }
 
-      // 次のフィールドにフォーカス
-      if (numericValue && index < 5) {
+      // 次のフィールドにフォーカス（最後のフィールド以外）
+      if (numericValue && index < OTP_LENGTH - 1) {
         inputRefs.current[index + 1]?.focus()
       }
 
-      // 6桁目が入力されたら自動送信
-      if (numericValue && index === 5) {
+      // 最後の桁が入力されたら自動送信
+      if (numericValue && index === OTP_LENGTH - 1) {
         // すべてのフィールドが入力されているか確認
         const isComplete = newOtp.every(digit => digit !== "")
         if (isComplete) {
           // 少し遅延させて最後の入力が反映されるのを確認してから送信
           setTimeout(() => {
             handleSubmit(newOtp)
-          }, 100)
+          }, AUTO_SUBMIT_DELAY_MS)
         }
       }
     }
@@ -107,7 +108,7 @@ export function OtpInputForm({
     if (e.key === "ArrowLeft" && index > 0) {
       inputRefs.current[index - 1]?.focus()
     }
-    if (e.key === "ArrowRight" && index < 5) {
+    if (e.key === "ArrowRight" && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus()
     }
 
@@ -120,24 +121,24 @@ export function OtpInputForm({
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault()
-    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6)
+    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH)
 
-    if (pastedData.length === 6) {
+    if (pastedData.length === OTP_LENGTH) {
       const newOtp = pastedData.split("")
       setOtp(newOtp)
 
       // 最後のフィールドにフォーカス
-      inputRefs.current[5]?.focus()
+      inputRefs.current[OTP_LENGTH - 1]?.focus()
 
       // エラーをクリア
       if (error) {
         setError("")
       }
 
-      // 6桁ペーストされたら自動送信
+      // すべての桁がペーストされたら自動送信
       setTimeout(() => {
         handleSubmit(newOtp)
-      }, 100)
+      }, AUTO_SUBMIT_DELAY_MS)
     }
   }
 
@@ -171,7 +172,7 @@ export function OtpInputForm({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
-          ワンタイムパスワード（6桁）
+          ワンタイムパスワード（{OTP_LENGTH}桁）
         </label>
 
         {/* OTP入力ボックス */}
@@ -218,7 +219,7 @@ export function OtpInputForm({
           <ul className="space-y-1">
             <li>• 有効期限は10分間です</li>
             <li>• メールが届かない場合は迷惑メールフォルダをご確認ください</li>
-            <li>• 6桁すべて入力すると自動で認証されます</li>
+            <li>• {OTP_LENGTH}桁すべて入力すると自動で認証されます</li>
             <li>• コピー&ペーストにも対応しています</li>
           </ul>
         </div>
