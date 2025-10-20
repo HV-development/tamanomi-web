@@ -16,17 +16,17 @@ export default function SaitamaAppGuidePage() {
             <ArrowLeft className="w-4 h-4" />
             プラン登録に戻る
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-base font-bold text-gray-900 mb-2">
             さいたま市みんなのアプリ 使い方ガイド
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm text-gray-600">
             アプリのダウンロードからユーザーID取得まで、詳しい手順をご説明します。
           </p>
         </div>
 
-        {/* ダウンロード手順 */}
+        {/* Step 1: アプリのダウンロード */}
         <div className="bg-white rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">📱 アプリのダウンロード</h2>
+          <h2 className="text-sm font-bold text-gray-900 mb-4">Step 1: アプリのダウンロード</h2>
           <div className="flex justify-center gap-4 mb-4">
             <a
               href="https://apps.apple.com/jp/app/%E3%81%95%E3%81%84%E3%81%9F%E3%81%BE%E5%B8%82%E3%81%BF%E3%82%93%E3%81%AA%E3%81%AE%E3%82%A2%E3%83%97%E3%83%AA/id6502677802"
@@ -50,50 +50,69 @@ export default function SaitamaAppGuidePage() {
           </p>
         </div>
 
-        {/* ユーザーID取得手順 */}
+        {/* Step 2: IDの確認 */}
         <div className="bg-white rounded-lg p-6 mb-6">
-          <div className="flex items-start gap-3">
-            <Copy className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">🔑 ユーザーIDの確認方法</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-bold text-gray-900 mb-2">1. アプリを開く</h3>
-                  <p className="text-gray-700 text-sm">
-                    ダウンロードした「さいたま市みんなのアプリ」を開いてください。
-                  </p>
-                </div>
-                
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-bold text-gray-900 mb-2">2. マイページにアクセス</h3>
-                  <p className="text-gray-700 text-sm">
-                    画面下部のメニューバーから「マイページ」をタップしてください。
-                  </p>
-                </div>
-                
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-bold text-gray-900 mb-2">3. ユーザーIDを確認</h3>
-                  <p className="text-gray-700 text-sm">
-                    マイページ内に「ユーザーID」が表示されます。
-                  </p>
-                </div>
-                
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-bold text-gray-900 mb-2">4. IDをコピー</h3>
-                  <p className="text-gray-700 text-sm">
-                    ユーザーIDをタップしてコピーし、プラン登録画面で入力してください。
-                  </p>
-                </div>
-              </div>
+          <h2 className="text-sm font-bold text-gray-900 mb-4">Step 2: IDの確認</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-bold text-gray-900 mb-2 text-sm">1. アプリを開く</h3>
+              <p className="text-gray-700 text-xs">
+                ダウンロードした「さいたま市みんなのアプリ」を開いてください。
+              </p>
             </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-bold text-gray-900 mb-2 text-sm">2. マイページにアクセス</h3>
+              <p className="text-gray-700 text-xs">
+                画面下部のメニューバーから「マイページ」をタップしてください。
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-bold text-gray-900 mb-2 text-sm">3. ユーザーIDを確認</h3>
+              <p className="text-gray-700 text-xs">
+                マイページ内に「ユーザーID」が表示されます。
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-bold text-gray-900 mb-2 text-sm">4. IDをコピー</h3>
+              <p className="text-gray-700 text-xs">
+                ユーザーIDをタップしてコピーしてください。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 3: IDの登録 */}
+        <div className="bg-white rounded-lg p-6 mb-6">
+          <h2 className="text-sm font-bold text-gray-900 mb-4">Step 3: IDの登録</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                さいたま市みんなのアプリ ユーザーID
+              </label>
+              <input
+                type="text"
+                placeholder="ユーザーIDを入力してください"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-lg">
+              <span>🔗</span>
+              アプリと連携して500円OFFで利用する
+            </button>
+            <p className="text-xs text-center text-gray-600">
+              ※ 連携後、すぐに割引価格が適用されます
+            </p>
           </div>
         </div>
 
         {/* 注意事項とサポート */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-            <h2 className="text-lg font-bold text-yellow-900 mb-3">⚠️ 注意事項</h2>
-            <ul className="space-y-2 text-yellow-800 text-sm">
+            <h2 className="text-sm font-bold text-yellow-900 mb-3">⚠️ 注意事項</h2>
+            <ul className="space-y-2 text-yellow-800 text-xs">
               <li>• ユーザーIDは個人情報です。他人に教えないでください。</li>
               <li>• アプリのバージョンによって画面レイアウトが異なる場合があります。</li>
               <li>• ユーザーIDが見つからない場合は、アプリを最新版に更新してください。</li>
@@ -102,11 +121,11 @@ export default function SaitamaAppGuidePage() {
           </div>
 
           <div className="bg-white rounded-lg p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-3">🆘 サポート</h2>
-            <p className="text-gray-700 text-sm mb-3">
+            <h2 className="text-sm font-bold text-gray-900 mb-3">🆘 サポート</h2>
+            <p className="text-gray-700 text-xs mb-3">
               アプリの使い方やユーザーIDの取得でお困りの場合は、以下までお問い合わせください。
             </p>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-xs">
               <p><strong>さいたま市みんなのアプリサポート:</strong> 048-829-1111</p>
               <p><strong>受付時間:</strong> 平日 9:00-17:00</p>
             </div>
