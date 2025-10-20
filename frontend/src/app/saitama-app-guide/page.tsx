@@ -20,7 +20,7 @@ export default function SaitamaAppGuidePage() {
             さいたま市みんなのアプリ 使い方ガイド
           </h1>
           <p className="text-sm text-gray-600">
-            アプリのダウンロードからユーザーID取得まで、詳しい手順をご説明します。
+            アプリのダウンロードからユーザーID取得まで、詳しくご説明します。
           </p>
         </div>
 
