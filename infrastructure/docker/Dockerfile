@@ -6,7 +6,8 @@ ARG GITHUB_TOKEN
 
 WORKDIR /app
 
-# pnpmのインストール
+# pnpmとWatchman（ファイル監視の最適化）をインストール
+RUN apk add --no-cache watchman
 RUN npm install -g pnpm
 
 # 依存関係ファイルのコピー
