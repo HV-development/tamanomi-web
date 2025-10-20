@@ -135,6 +135,27 @@ export function PlanRegistrationForm({
             const displayPrice = plan.discount_price ? plan.discount_price : plan.price;
             const hasDiscount = plan.discount_price && plan.discount_price < plan.price;
             
+            // さいたま市アプリ連携済みの場合の価格表示
+            const isSaitamaLinked = saitamaAppLinked || linkedSaitamaAppId;
+            const saitamaDiscountPrice = 480; // さいたま市アプリ連携時の価格
+            
+            // さいたま市アプリ連携済みで、通常価格が980円の場合
+            if (isSaitamaLinked && plan.price === 980) {
+              return (
+                <PlanCard
+                  key={plan.id}
+                  title={plan.name}
+                  description={plan.description || ''}
+                  features={plan.plan_content?.features || []}
+                  price={`¥${saitamaDiscountPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
+                  originalPrice={`¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
+                  badge={plan.status === 'active' ? 'さいたま市アプリ連携でお得' : undefined}
+                  isSelected={selectedPlan === plan.id}
+                  onSelect={() => handlePlanSelect(plan.id)}
+                />
+              );
+            }
+            
             return (
               <PlanCard
                 key={plan.id}
@@ -167,103 +188,93 @@ export function PlanRegistrationForm({
 
       {/* さいたま市みんなのアプリ連携フォーム（未連携の場合のみ表示） */}
       {!saitamaAppLinked && !linkedSaitamaAppId && (
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-xl p-6 space-y-6">
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-5 space-y-4">
           {/* 割引強調セクション */}
-          <div className="text-center bg-white/80 rounded-lg p-6 shadow-sm">
-            <div className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-full mb-4">
+          <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+            <div className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-full mb-3">
               <p className="text-sm font-bold">さらにお得に！</p>
             </div>
-            <div className="mb-4">
-              <p className="text-5xl font-black text-amber-600 mb-2">
+            <div className="mb-3">
+              <p className="text-4xl font-black text-amber-600 mb-1">
                 ¥480
-                <span className="text-2xl ml-2">OFF</span>
+                <span className="text-xl ml-1">OFF</span>
               </p>
-              <p className="text-gray-700 font-medium">
+              <p className="text-gray-700 text-sm font-medium">
                 さいたま市みんなのアプリ連携で
               </p>
-              <p className="text-2xl font-bold text-amber-700 mt-1">
+              <p className="text-lg font-bold text-amber-700">
                 月額480円でご利用いただけます
               </p>
             </div>
           </div>
 
-          {/* アプリ説明セクション */}
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <Smartphone className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
+          {/* アプリ説明とダウンロードリンク */}
+          <div className="bg-white rounded-lg p-4 space-y-3">
+            <div className="flex items-start gap-2">
+              <Smartphone className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-gray-900 mb-2">さいたま市みんなのアプリについて</h4>
-                <p className="text-sm text-gray-700 leading-relaxed">
+                <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリについて</h4>
+                <p className="text-xs text-gray-700 leading-relaxed">
                   さいたま市が提供する公式アプリです。アプリと連携することで、特別な割引価格でご利用いただけます。
                 </p>
               </div>
             </div>
 
-            {/* アプリダウンロードリンク */}
-            <div className="bg-white/60 rounded-lg p-4 space-y-3">
-              <p className="text-sm font-medium text-gray-900 text-center mb-3">
+            {/* ダウンロードリンク */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-gray-900 text-center">
                 まだアプリをお持ちでない方はこちらからダウンロード
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <div className="flex flex-col gap-2">
                 <a
                   href="https://apps.apple.com/jp/app/%E3%81%95%E3%81%84%E3%81%9F%E3%81%BE%E5%B8%82%E3%81%BF%E3%82%93%E3%81%AA%E3%81%AE%E3%82%A2%E3%83%97%E3%83%AA/id6502677802"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:opacity-80 transition-opacity"
+                  className="inline-flex items-center justify-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
                 >
-                  <Image
-                    src="/app-store-badge.svg"
-                    alt="App Storeからダウンロード"
-                    width={140}
-                    height={47}
-                    className="h-[47px] w-auto"
-                  />
+                  <span>📱</span>
+                  App Storeからダウンロード
                 </a>
                 <a
                   href="http://play.google.com/store/apps/details?id=jp.saitamacity.rsa&hl=ja&pli=1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:opacity-80 transition-opacity"
+                  className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
                 >
-                  <Image
-                    src="/google-play-badge.png"
-                    alt="Google Playで手に入れよう"
-                    width={157}
-                    height={47}
-                    className="h-[47px] w-auto"
-                  />
+                  <span>🤖</span>
+                  Google Playで手に入れよう
                 </a>
               </div>
             </div>
+          </div>
 
-            {/* ID取得手順 */}
-            <div className="bg-white/60 rounded-lg p-4 space-y-3">
-              <div className="flex items-start gap-2">
-                <Copy className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-2 text-sm">ユーザーIDの確認方法</h4>
-                  <ol className="text-sm text-gray-700 space-y-2 list-decimal list-inside">
-                    <li>さいたま市みんなのアプリを開く</li>
-                    <li>画面下部のメニューから「マイページ」をタップ</li>
-                    <li>「ユーザーID」が表示されます</li>
-                    <li>IDをタップしてコピー</li>
-                    <li>下記の入力欄に貼り付けてください</li>
-                  </ol>
-                </div>
+          {/* ID取得手順 */}
+          <div className="bg-white rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <Copy className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-bold text-gray-900 text-sm mb-2">ユーザーIDの確認方法</h4>
+                <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside">
+                  <li>さいたま市みんなのアプリを開く</li>
+                  <li>画面下部のメニューから「マイページ」をタップ</li>
+                  <li>「ユーザーID」が表示されます</li>
+                  <li>IDをタップしてコピー</li>
+                  <li>下記の入力欄に貼り付けてください</li>
+                </ol>
               </div>
             </div>
           </div>
 
           {/* エラー表示 */}
           {linkError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-500" />
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-500" />
               <p className="text-red-700 text-sm">{linkError}</p>
             </div>
           )}
 
           {/* 入力フォーム */}
-          <div className="space-y-3 bg-white/60 rounded-lg p-4">
+          <div className="space-y-3 bg-white rounded-lg p-4">
             <Input
               label="さいたま市みんなのアプリ ユーザーID"
               value={saitamaAppId}
@@ -277,9 +288,9 @@ export function PlanRegistrationForm({
             <Button
               onClick={handleLinkSaitamaApp}
               disabled={isLinking || !saitamaAppId}
-              className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white py-4 text-base font-bold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md"
+              className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              <LinkIcon className="w-5 h-5" />
+              <LinkIcon className="w-4 h-4" />
               {isLinking ? "連携処理中..." : "アプリと連携して480円OFFで利用する"}
             </Button>
             <p className="text-xs text-center text-gray-600">
