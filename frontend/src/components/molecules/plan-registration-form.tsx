@@ -8,6 +8,7 @@ import { Button } from "../atoms/button"
 import { Input } from "../atoms/input"
 import { Modal } from "../atoms/modal"
 import { PlanListResponse } from '@hv-development/schemas'
+import { ApiClient } from '../../lib/api-client';
 
 interface PlanRegistrationFormProps {
   onPaymentMethodRegister: (planId: string) => void
@@ -55,30 +56,17 @@ export function PlanRegistrationForm({
     setLinkError("")
 
     try {
-      const accessToken = localStorage.getItem('accessToken')
-      
-      if (!accessToken) {
-        setLinkError("認証情報が見つかりません。再度ログインしてください。")
-        setIsLinking(false)
-        return
-      }
-
-      const response = await fetch('/api/user/link-saitama-app', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ saitamaAppId }),
+      const result = await ApiClient.post('/api/user/link-saitama-app', {
+        saitamaAppId: saitamaAppId.trim()
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setLinkError(data.error || 'さいたま市アプリ連携に失敗しました')
+      if (result.error) {
+        setLinkError(result.error.message || "連携に失敗しました")
         setIsLinking(false)
         return
       }
+
+      const data = result.data
       
       // 連携したIDを保存
       setLinkedSaitamaAppId(saitamaAppId)
@@ -224,9 +212,6 @@ export function PlanRegistrationForm({
 
             {/* ダウンロードリンク */}
             <div className="space-y-3">
-              <p className="text-xs font-medium text-gray-900 text-center">
-                まだアプリをお持ちでない方はこちらからダウンロード
-              </p>
               <div className="flex justify-center gap-3">
                 <a
                   href="https://apps.apple.com/jp/app/%E3%81%95%E3%81%84%E3%81%9F%E3%81%BE%E5%B8%82%E3%81%BF%E3%82%93%E3%81%AA%E3%81%AE%E3%82%A2%E3%83%97%E3%83%AA/id6502677802"
