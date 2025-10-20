@@ -88,23 +88,24 @@ export default function HomePage() {
             const hasPlan = userData.plan !== null && userData.plan !== undefined
             console.log('🔍 [home] hasPlan:', hasPlan, 'view:', view)
 
-            // ビューパラメータがない場合のみプラン登録チェックを行う
-            if (!view) {
+            // ビューパラメータに応じて遷移
+            if (view === 'mypage') {
+              // マイページに遷移
+              navigation.navigateToView("mypage", "mypage")
+              navigation.navigateToMyPage("main")
+            } else if (!view) {
+              // ビューパラメータがない場合（リロード時など）
               if (!hasPlan) {
                 // プラン未登録の場合はプラン登録画面へ
                 console.log('🔍 [home] No plan, redirecting to plan registration page')
                 router.push('/plan-registration')
                 return
               } else {
-                // プラン登録済みの場合はマイページへ
-                console.log('🔍 [home] Has plan, showing mypage')
+                // プラン登録済みの場合はマイページへ（一時的な対応）
+                console.log('🔍 [home] Has plan, showing mypage (reload or direct access)')
                 navigation.navigateToView("mypage", "mypage")
                 navigation.navigateToMyPage("main")
               }
-            } else if (view === 'mypage') {
-              // マイページに遷移
-              navigation.navigateToView("mypage", "mypage")
-              navigation.navigateToMyPage("main")
             }
           })
           .catch(error => {
@@ -115,6 +116,19 @@ export default function HomePage() {
             // ログインページにリダイレクト
             router.push('/')
           })
+      } else if (accessToken && auth.isAuthenticated) {
+        // 既に認証済みの場合（リロード時など）
+        console.log('🔍 [home] Already authenticated')
+        
+        // ビューパラメータがない場合はマイページへ遷移（一時的な対応）
+        if (!view) {
+          console.log('🔍 [home] No view param, showing mypage (authenticated)')
+          navigation.navigateToView("mypage", "mypage")
+          navigation.navigateToMyPage("main")
+        } else if (view === 'mypage') {
+          navigation.navigateToView("mypage", "mypage")
+          navigation.navigateToMyPage("main")
+        }
       } else if (!accessToken && view !== 'map') {
         // トークンがない場合でviewパラメータがある場合の処理
         if (view === 'mypage') {
