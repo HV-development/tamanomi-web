@@ -32,10 +32,9 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
         return newErrors
       })
     } catch (error) {
-      // ZodErrorかどうかをより確実にチェック
-      if (error && typeof error === 'object' && 'errors' in error) {
-        const zodError = error as { errors: Array<{ message: string }> };
-        const errorMessage = zodError.errors[0]?.message || "入力エラーです"
+
+      if (error instanceof ZodError) {
+        const errorMessage = error.errors[0]?.message || "入力エラーです"
         setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
       }
     }
@@ -48,10 +47,9 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
       return true
     } catch (error) {
       // ZodErrorかどうかをより確実にチェック
-      if (error && typeof error === 'object' && 'errors' in error) {
-        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> };
+      if (error instanceof ZodError) {
         const newErrors: Partial<Record<keyof AdminLoginInput, string>> = {}
-        zodError.errors.forEach((err) => {
+        error.errors.forEach((err) => {
           const fieldName = err.path?.[0] as keyof AdminLoginInput
           if (fieldName === 'email' || fieldName === 'password') {
             newErrors[fieldName] = err.message

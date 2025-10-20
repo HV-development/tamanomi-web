@@ -3,11 +3,11 @@
 import { HeaderLogo } from "../atoms/header-logo"
 import { LoginForm } from "../molecules/login-form"
 import { OtpInputForm } from "../molecules/otp-input-form"
-import { type AdminLoginInput } from "@hv-development/schemas"
+import { type AdminLoginInput, type OtpVerifyCallback, type LoginStep } from "@hv-development/schemas"
 
 interface LoginContainerProps {
   onLogin: (loginData: AdminLoginInput) => void
-  onVerifyOtp: (otp: string) => void
+  onVerifyOtp: OtpVerifyCallback
   onSignup: () => void
   onForgotPassword: () => void
   onResendOtp: () => void
@@ -15,7 +15,7 @@ interface LoginContainerProps {
   onLogoClick: () => void
   isLoading?: boolean
   error?: string
-  loginStep?: "password" | "otp"
+  loginStep?: LoginStep
   email?: string
   backgroundColorClass?: string
 }
@@ -70,7 +70,6 @@ export function LoginContainer({
                 onVerifyOtp={onVerifyOtp}
                 onResendOtp={onResendOtp}
                 onBack={onBack}
-                isLoading={isLoading}
                 error={error}
               />
             )}
