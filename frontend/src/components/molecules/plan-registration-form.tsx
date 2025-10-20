@@ -119,9 +119,9 @@ export function PlanRegistrationForm({
           </div>
         ) : (
           plans.map((plan) => {
-            // 割引価格がある場合は割引価格を表示、ない場合は通常価格を表示
-            const displayPrice = plan.options?.discount_price ? plan.options.discount_price : plan.price;
-            const hasDiscount = plan.options?.discount_price && plan.options.discount_price < plan.price;
+            // 割引価格は現在のスキーマでは未対応のため、通常価格のみ表示
+            const displayPrice = plan.price;
+            const hasDiscount = false;
             
             // さいたま市アプリ連携済みの場合の価格表示
             const isSaitamaLinked = saitamaAppLinked || linkedSaitamaAppId;
