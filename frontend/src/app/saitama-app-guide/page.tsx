@@ -16,32 +16,12 @@ export default function SaitamaAppGuidePage() {
             <ArrowLeft className="w-4 h-4" />
             プラン登録に戻る
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
             さいたま市みんなのアプリ 使い方ガイド
           </h1>
           <p className="text-gray-600">
             アプリのダウンロードからユーザーID取得まで、詳しい手順をご説明します。
           </p>
-        </div>
-
-        {/* アプリについて */}
-        <div className="bg-white rounded-lg p-6 mb-6">
-          <div className="flex items-start gap-3">
-            <Smartphone className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-3">さいたま市みんなのアプリについて</h2>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                さいたま市が提供する公式アプリです。市民向けの各種サービスや情報を一元的に提供し、
-                アプリと連携することで特別な割引価格でご利用いただけます。
-              </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-bold text-blue-900 mb-2">🎉 連携特典</h3>
-                <p className="text-blue-800 text-sm">
-                  アプリと連携することで、月額料金が<strong>¥980 → ¥480</strong>に割引されます！
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* ダウンロード手順 */}
