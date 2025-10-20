@@ -8,9 +8,7 @@
     "lint": "next lint",
     "start": "next start",
     "setup:env": "bash ../scripts/setup-env.sh",
-    "secret:generate": "tsx ../scripts/generate-secret.ts",
-    "start:all": "concurrently \"pnpm dev\" \"cd ../../tamanomi-api && pnpm dev\" \"cd ../tamanomi-admin/frontend && pnpm dev\"",
-    "stop:all": "pkill -f 'concurrently' || true && pkill -f 'tsx watch' || true && pkill -f 'next dev' || true && echo 'All services stopped'"
+    "secret:generate": "tsx ../scripts/generate-secret.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
