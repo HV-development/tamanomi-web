@@ -42,7 +42,7 @@ export function PlanCard({
       {badge && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <span
-            className={`px-4 py-1 rounded-full text-sm font-medium ${
+            className={`px-4 py-1 rounded-full text-sm font-medium whitespace-nowrap ${
               disabled
                 ? "bg-gray-400 text-gray-600" // グレーアウト時のバッジ
                 : "bg-green-600 text-white"
@@ -76,7 +76,7 @@ export function PlanCard({
               <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-green-600"}`}>{price}</span>
             </div>
           ) : (
-            <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-blue-600"}`}>{price}</span>
+            <span className={`text-2xl font-bold ${disabled ? "text-gray-500" : "text-green-600"}`}>{price}</span>
           )}
         </div>
       )}
