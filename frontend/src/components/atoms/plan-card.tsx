@@ -63,13 +63,13 @@ export function PlanCard({
       )}
 
       {/* プラン名 */}
-      <h3 className={`text-xl font-bold mb-2 ${disabled ? "text-gray-500" : "text-gray-900"}`}>{title}</h3>
+      <h3 className={`text-xl font-bold mb-2 text-center ${disabled ? "text-gray-500" : "text-gray-900"}`}>{title}</h3>
 
       {/* 価格 */}
       {price && (
-        <div className="mb-4">
+        <div className="mb-4 text-center">
           {originalPrice ? (
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-center">
               <span className={`text-sm line-through ${disabled ? "text-gray-400" : "text-gray-500"}`}>
                 {originalPrice}
               </span>
