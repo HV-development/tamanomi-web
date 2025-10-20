@@ -66,7 +66,7 @@ export function PlanRegistrationForm({
         return
       }
 
-      const data = result.data
+      const data = result.data as { pointsGranted?: number }
       
       // 連携したIDを保存
       setLinkedSaitamaAppId(saitamaAppId)
