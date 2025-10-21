@@ -6,7 +6,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ApiClient } from "../../lib/api-client"
-import { Modal } from "../../components/atoms/modal"
+import { Modal } from "../../components/atoms/Modal"
 
 export default function SaitamaAppGuidePage() {
   const router = useRouter()
@@ -42,7 +42,6 @@ export default function SaitamaAppGuidePage() {
         setLinkError(result.data?.message || "連携に失敗しました")
       }
     } catch (error: unknown) {
-      console.error('Link error:', error)
       if (error instanceof Error) {
         setLinkError(error.message || "連携中にエラーが発生しました")
       } else {

@@ -1,14 +1,11 @@
 'use client';
 
-import DrinkAnimation from '@/components/molecules/drink-animation';
-import AdvancedDrinkAnimation from '@/components/molecules/advanced-drink-animation';
-import SimpleDrinkTest from '@/components/molecules/simple-drink-test';
-import SimpleDrinkTest2 from '@/components/molecules/simple-drink-test2';
-import BasicTest from '@/components/molecules/basic-test';
+import DrinkAnimation from '@/components/molecules/DrinkAnimation';
+import AdvancedDrinkAnimation from '@/components/molecules/AdvancedDrinkAnimation';
 
 export default function DrinkAnimationDemo() {
   const handleAnimationComplete = () => {
-    console.log('Animation completed')
+    // アニメーション完了
   }
 
   return (
@@ -19,48 +16,6 @@ export default function DrinkAnimationDemo() {
         </h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* 基本テスト */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              基本テスト
-            </h2>
-            <div className="flex justify-center">
-              <BasicTest />
-            </div>
-            <div className="mt-4 text-sm text-gray-600">
-              <p>• 最も基本的な画像切り替え</p>
-              <p>• 即座に切り替わる</p>
-            </div>
-          </div>
-
-          {/* 超シンプルテスト */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              超シンプルテスト
-            </h2>
-            <div className="flex justify-center">
-              <SimpleDrinkTest2 />
-            </div>
-            <div className="mt-4 text-sm text-gray-600">
-              <p>• 最もシンプルな実装</p>
-              <p>• コンソールログで動作確認</p>
-            </div>
-          </div>
-
-          {/* シンプルテスト */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              シンプルテスト
-            </h2>
-            <div className="flex justify-center">
-              <SimpleDrinkTest />
-            </div>
-            <div className="mt-4 text-sm text-gray-600">
-              <p>• ボタンクリックで画像切り替え</p>
-              <p>• デバッグ情報表示</p>
-            </div>
-          </div>
-
           {/* 基本的なアニメーション */}
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-semibold mb-4 text-center">
@@ -152,13 +107,13 @@ export default function DrinkAnimationDemo() {
             <div>
               <h3 className="text-lg font-medium mb-2">基本コンポーネント</h3>
               <pre className="bg-gray-100 p-4 rounded text-sm overflow-x-auto">
-{`import DrinkAnimation from '@/components/molecules/drink-animation';
+{`import DrinkAnimation from '@/components/molecules/DrinkAnimation';
 
 <DrinkAnimation
   width={200}
   height={200}
   duration={2000}
-  onAnimationComplete={() => console.log('完了！')}
+  onAnimationComplete={() => {}}
 />`}
               </pre>
             </div>
@@ -166,7 +121,7 @@ export default function DrinkAnimationDemo() {
             <div>
               <h3 className="text-lg font-medium mb-2">高度なコンポーネント</h3>
               <pre className="bg-gray-100 p-4 rounded text-sm overflow-x-auto">
-{`import AdvancedDrinkAnimation from '@/components/molecules/advanced-drink-animation';
+{`import AdvancedDrinkAnimation from '@/components/molecules/AdvancedDrinkAnimation';
 
 <AdvancedDrinkAnimation
   width={200}
@@ -174,7 +129,7 @@ export default function DrinkAnimationDemo() {
   duration={3000}
   autoStart={false}
   showButton={true}
-  onAnimationComplete={() => console.log('完了！')}
+  onAnimationComplete={() => {}}
 />`}
               </pre>
             </div>

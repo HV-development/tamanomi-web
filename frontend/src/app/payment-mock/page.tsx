@@ -24,22 +24,7 @@ function PaymentMockContent() {
       return
     }
 
-    // POSTリクエストのボディから取得を試行（フォーム送信時）
-    const handleFormData = () => {
-      // フォームデータが送信された場合の処理
-      const formData = new FormData()
-      // 実際のフォームデータは送信時に処理される
-    }
-
-    // ページロード時にフォームデータをチェック
-    if (typeof window !== 'undefined') {
-      // URLにcustomer_idが含まれていない場合、POSTデータから取得を試行
-      const url = new URL(window.location.href)
-      if (!url.searchParams.has('customer_id')) {
-        // POSTリクエストの場合、フォームデータから取得
-        // これは実際のフォーム送信時に処理される
-      }
-    }
+    // POSTリクエストのボディから取得は handleSubmit 内で処理
   }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,16 +47,10 @@ function PaymentMockContent() {
       }
       
       if (!currentCustomerId) {
-        console.error('❌ [PaymentMock] customer_id parameter is missing')
         alert('エラー: customer_idパラメータが見つかりません')
         setIsProcessing(false)
         return
       }
-      
-      console.log('🔍 [PaymentMock] Calling webhook with:', {
-        customerId: currentCustomerId,
-        customerCardId: mockCustomerCardId
-      })
       
       // WebhookをAPIに送信（実際のPaygentと同じフロー）
       // ハッシュは64文字必要（SHA-256ハッシュの16進数表現）
@@ -92,13 +71,10 @@ function PaymentMockContent() {
       })
       
       if (!webhookResponse.ok) {
-        console.error('❌ [PaymentMock] Webhook call failed:', await webhookResponse.text())
         alert('エラー: Webhook処理に失敗しました')
         setIsProcessing(false)
         return
       }
-      
-      console.log('✅ [PaymentMock] Webhook call successful')
       
       // 少し待ってから戻りURLへリダイレクト
       setTimeout(() => {
@@ -106,8 +82,7 @@ function PaymentMockContent() {
         router.push(returnUrl)
       }, 1000)
       
-    } catch (error) {
-      console.error('❌ [PaymentMock] Error:', error)
+    } catch {
       alert('エラーが発生しました')
       setIsProcessing(false)
     }

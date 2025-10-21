@@ -1,0 +1,74 @@
+"use client"
+
+import { HeaderLogo } from "../atoms/HeaderLogo"
+import { EmailChangeForm } from "./EmailChangeForm"
+import { EmailChangeComplete } from "@/components/molecules/EmailChangeComplete"
+
+interface EmailChangeContainerProps {
+  currentStep: "form" | "complete"
+  currentEmail: string
+  newEmail?: string
+  initialNewEmail?: string
+  onSubmit: (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => void
+  onCancel: () => void
+  onBackToMyPage: () => void
+  onResend: () => void
+  onLogoClick: () => void
+  isLoading?: boolean
+  backgroundColorClass?: string
+}
+
+export function EmailChangeContainer({
+  currentStep,
+  currentEmail,
+  newEmail = "",
+  initialNewEmail = "",
+  onSubmit,
+  onCancel,
+  onBackToMyPage,
+  onResend = () => {},
+  onLogoClick,
+  isLoading,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
+}: EmailChangeContainerProps) {
+  return (
+    <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
+      {/* ヘッダー */}
+      <HeaderLogo
+        onLogoClick={onLogoClick}
+        showBackButton={true}
+        onBackClick={currentStep === "form" ? onCancel : undefined}
+      />
+
+      {/* メインコンテンツ */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            {currentStep === "form" ? (
+              <>
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">メールアドレス変更</h2>
+                  <p className="text-gray-600">新しいメールアドレスを設定してください</p>
+                </div>
+                <EmailChangeForm
+                  currentEmail={currentEmail}
+                  initialNewEmail={initialNewEmail}
+                  onSubmit={onSubmit}
+                  onCancel={onCancel}
+                  isLoading={isLoading}
+                />
+              </>
+            ) : (
+              <EmailChangeComplete
+                currentEmail={currentEmail}
+                newEmail={newEmail}
+                onBackToMyPage={onBackToMyPage}
+                onResend={onResend}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

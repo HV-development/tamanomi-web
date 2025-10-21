@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { CircleCheck as CheckCircle, User, Hop as Home } from 'lucide-react'
-import { Logo } from '@/components/atoms/logo'
+import { Logo } from '@/components/atoms/Logo'
 
 export default function RegisterCompletePage() {
   const [isClient, setIsClient] = useState(false)

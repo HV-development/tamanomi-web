@@ -52,8 +52,6 @@ export class ApiClient {
 
       // トークン期限切れの場合
       if (response.status === 403 && requireAuth && autoRefresh) {
-        console.log('🔄 Token expired, attempting refresh...');
-        
         const refreshResult = await this.refreshToken();
         if (refreshResult.success) {
           // リフレッシュ成功時、元のリクエストを再実行
@@ -75,7 +73,6 @@ export class ApiClient {
         }
         
         // リフレッシュ失敗時、ログイン画面に遷移
-        console.log('❌ Token refresh failed, redirecting to login');
         this.redirectToLogin();
         return { error: { code: 'AUTHENTICATION_FAILED', message: '認証に失敗しました' } };
       }
@@ -86,8 +83,7 @@ export class ApiClient {
       }
 
       return { data: await response.json() };
-    } catch (error) {
-      console.error('API request error:', error);
+    } catch {
       return { error: { code: 'NETWORK_ERROR', message: 'ネットワークエラーが発生しました' } };
     }
   }
@@ -114,13 +110,11 @@ export class ApiClient {
         const data = await response.json();
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
-        console.log('✅ Token refreshed successfully');
         return { success: true };
       }
 
       return { success: false };
-    } catch (error) {
-      console.error('Token refresh error:', error);
+    } catch {
       return { success: false };
     }
   }
@@ -173,5 +167,55 @@ export class ApiClient {
    */
   static async delete<T = unknown>(endpoint: string, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+  }
+}
+
+/**
+ * 認証関連のAPI関数
+ */
+
+export interface PreRegisterRequest {
+  email: string
+  campaignCode?: string
+}
+
+export interface PreRegisterResponse {
+  success: boolean
+  message: string
+}
+
+/**
+ * メールアドレスの事前登録APIを呼び出す
+ * 登録確認メールが送信される
+ */
+export async function preRegister(
+  email: string,
+  campaignCode?: string
+): Promise<PreRegisterResponse> {
+  try {
+    const response = await fetch('/api/auth/pre-register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        campaignCode,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      const message = errorData.error?.message || errorData.message || '認証メールの送信に失敗しました'
+      throw new Error(message)
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('認証メールの送信中にエラーが発生しました')
   }
 }

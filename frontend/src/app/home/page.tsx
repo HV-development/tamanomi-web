@@ -18,7 +18,20 @@ import { initialState, appReducer } from "@/hooks/useAppReducer"
 import { useDataLoader } from "@/hooks/useDataLoader"
 import { useComputedValues } from "@/hooks/useComputedValues"
 import { useAppHandlers } from "@/hooks/useAppHandlers"
-import { HomeLayout } from "@/components/layouts/HomeLayout"
+import dynamic from "next/dynamic"
+
+// HomeLayoutを動的インポート（遅延読み込み）
+const HomeLayout = dynamic(() => import("@/components/templates/HomeLayout").then(mod => ({ default: mod.HomeLayout })), {
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+        <p className="text-green-600 font-medium">読み込み中...</p>
+      </div>
+    </div>
+  ),
+  ssr: false,
+})
 
 // メインコンポーネント
 export default function HomePage() {
@@ -61,7 +74,6 @@ export default function HomePage() {
       
       // 自動ログイン処理（トークンがあり、まだ認証されていない場合）
       if (accessToken && !auth.isAuthenticated) {
-        
         // トークンがある場合、ユーザー情報を取得
         fetch('/api/user/me', {
           headers: {
@@ -99,8 +111,7 @@ export default function HomePage() {
               }
             }
           })
-          .catch(error => {
-            console.error('❌ [home] Auto-login failed:', error)
+          .catch(() => {
             // トークンが無効な場合はクリア
             localStorage.removeItem('accessToken')
             localStorage.removeItem('refreshToken')
