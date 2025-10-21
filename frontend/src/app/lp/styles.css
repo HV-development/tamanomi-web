@@ -1,0 +1,172 @@
+:root {
+  --main: #6FC8E5;
+}
+
+/* Hide scrollbar for infinite carousel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* グローバルなbodyとhtmlの制限を完全に無効化 */
+html, body {
+  max-width: none !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: visible !important;
+}
+
+/* LP専用レイアウト - 完全に独立したスタイル */
+.lp-layout {
+  max-width: none !important;
+  width: 100vw !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 1 !important;
+}
+
+/* body要素の制限を完全に無効化 */
+.lp-layout body,
+body.lp-layout {
+  max-width: none !important;
+  width: 100vw !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+/* html要素も制限を無効化 */
+html.lp-layout {
+  max-width: none !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* すべてのmax-widthクラスを無効化 */
+.lp-layout .container,
+.lp-layout .max-w-7xl,
+.lp-layout .max-w-6xl,
+.lp-layout .max-w-5xl,
+.lp-layout .max-w-4xl,
+.lp-layout .max-w-3xl,
+.lp-layout .max-w-2xl,
+.lp-layout .max-w-xl,
+.lp-layout .max-w-lg,
+.lp-layout .max-w-md,
+.lp-layout .max-w-sm,
+.lp-layout .max-w-xs {
+  max-width: none !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.lp-layout .mx-auto {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* すべてのメディアクエリを無効化 */
+@media (min-width: 640px) {
+  .lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  .lp-layout body,
+  body.lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  html.lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    margin: 0 !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  .lp-layout body,
+  body.lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  html.lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    margin: 0 !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  .lp-layout body,
+  body.lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  html.lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    margin: 0 !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  .lp-layout body,
+  body.lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  
+  html.lp-layout {
+    max-width: none !important;
+    width: 100vw !important;
+    margin: 0 !important;
+  }
+}
