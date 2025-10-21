@@ -338,7 +338,7 @@ import { initialState, appReducer } from "@/hooks/useAppReducer"
 import { useDataLoader } from "@/hooks/useDataLoader"
 import { useComputedValues } from "@/hooks/useComputedValues"
 import { useAppHandlers } from "@/hooks/useAppHandlers"
-import { HomeLayout } from "@/components/layouts/HomeLayout"
+import { HomeLayout } from "@/components/templates/home-layout"
 
 // メインコンポーネント
 export default function HomePage() {

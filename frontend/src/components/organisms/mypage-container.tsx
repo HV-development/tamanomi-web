@@ -508,6 +508,7 @@ const MyPageSubView = React.memo(({
             onCancel={() => onViewChange("main")}
             onWithdraw={onWithdraw}
             onLogoClick={onLogoClick}
+            backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
           />
         </LazyFallback>
       )
@@ -524,6 +525,7 @@ const MyPageSubView = React.memo(({
             onResend={onEmailChangeResend}
             onLogoClick={onLogoClick}
             isLoading={false}
+            backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
           />
         </LazyFallback>
       )
@@ -539,6 +541,7 @@ const MyPageSubView = React.memo(({
             isLoading={false}
             errorMessage={passwordChangeError}
             currentUserRank={currentUserRank}
+            backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
           />
         </LazyFallback>
       )
@@ -571,6 +574,7 @@ const MyPageSubView = React.memo(({
             onWithdrawCancel={onWithdrawCancel}
             onLogoClick={onLogoClick}
             isLoading={false}
+            backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
           />
         </LazyFallback>
       )

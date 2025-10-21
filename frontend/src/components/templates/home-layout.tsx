@@ -4,21 +4,22 @@ import { useState } from "react"
 import Image from "next/image"
 import { HomeContainer } from "../organisms/home-container"
 import { LoginLayout } from "./login-layout"
-import { EmailRegistrationLayout } from "./email-registration-layout"
-import { RegisterLayout } from "./register-layout"
-import { ConfirmationLayout } from "./confirmation-layout"
-import { SubscriptionLayout } from "./subscription-layout"
-import { PasswordResetLayout } from "./password-reset-layout"
+import { EmailRegistrationContainer } from "../organisms/email-registration-container"
+import { RegisterContainer } from "../organisms/register-container"
+import { ConfirmationContainer } from "../organisms/confirmation-container"
+import { SubscriptionContainer } from "../organisms/subscription-container"
+import { PasswordResetContainer } from "../organisms/password-reset-container"
 
 import { HistoryPopup } from "../molecules/history-popup"
 import { MyPageLayout } from "./mypage-layout"
-import { PlanManagementLayout } from "./plan-management-layout"
-import { PlanChangeLayout } from "./plan-change-layout"
+import { PlanManagementContainer } from "../organisms/plan-management-container"
+import { PlanChangeContainer } from "../organisms/plan-change-container"
 import { CouponListPopup } from "../molecules/coupon-list-popup"
 import { CouponUsedSuccessModal } from "../molecules/coupon-used-success-modal"
 import { LoginRequiredModal } from "../molecules/login-required-modal"
 import { StoreDetailPopup } from "../molecules/store-detail-popup"
-import { EmailConfirmationLayout } from "./email-confirmation-layout"
+import { Logo } from "../atoms/logo"
+import { EmailConfirmationComplete } from "../molecules/email-confirmation-complete"
 import CouponConfirmationPage from "../molecules/coupon-confirmation-page"
 import { UsageGuidePage } from "../molecules/usage-guide-page"
 import { FooterNavigation } from "../molecules/footer-navigation"
@@ -26,7 +27,6 @@ import { BannerCarousel } from "../molecules/banner-carousel"
 import { AreaPopup } from "../molecules/area-popup"
 import { GenrePopup } from "../molecules/genre-popup"
 import { HamburgerMenu } from "../molecules/hamburger-menu"
-import { Logo } from "../atoms/logo"
 import { UsageGuideModal } from "../molecules/usage-guide-modal"
 import { useAppContext } from "../../contexts/AppContext"
 import type { Store } from "../../types/store"
@@ -187,16 +187,24 @@ export function HomeLayout() {
 
   if (currentView === "email-confirmation") {
     return (
-      <EmailConfirmationLayout
-        email={emailConfirmationEmail}
-        onLogoClick={onLogoClick}
-      />
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex flex-col">
+        <div className="bg-white border-b border-gray-200 px-4 py-4">
+          <div className="flex items-center justify-center">
+            <Logo size="lg" onClick={onLogoClick} />
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-md">
+            <EmailConfirmationComplete email={emailConfirmationEmail} />
+          </div>
+        </div>
+      </div>
     )
   }
 
   if (currentView === "password-reset") {
     return (
-      <PasswordResetLayout
+      <PasswordResetContainer
         currentStep={passwordResetStep}
         email={passwordResetEmail}
         onSubmit={onPasswordResetSubmit}
@@ -205,6 +213,7 @@ export function HomeLayout() {
         onResend={onPasswordResetResend}
         onLogoClick={onLogoClick}
         isLoading={isLoading}
+        backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       />
     )
   }
@@ -226,12 +235,13 @@ export function HomeLayout() {
     // プラン変更画面の場合
     if (myPageView === "plan-change") {
       return (
-        <PlanChangeLayout
+        <PlanChangeContainer
           currentPlan={plan}
           onPlanChange={onPlanChangeSubmit}
           onBack={onPlanChangeBack}
           onLogoClick={onLogoClick}
           isLoading={isLoading}
+          backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
         />
       )
     }
@@ -247,7 +257,7 @@ export function HomeLayout() {
       )
       
       return (
-        <PlanManagementLayout
+        <PlanManagementContainer
           plan={plan}
           onChangePlan={() => onMyPageViewChange("plan-change")}
           onCancelSubscription={onCancelSubscription}
@@ -258,6 +268,7 @@ export function HomeLayout() {
           hasPaymentMethod={hasPaymentMethod}
           onBack={() => onMyPageViewChange("main")}
           onLogoClick={onLogoClick}
+          backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
         />
       )
     }
@@ -301,18 +312,19 @@ export function HomeLayout() {
   }
 
   if (currentView === "subscription") {
-    return <SubscriptionLayout onSubscribe={onSubscribe} onLogoClick={onLogoClick} isLoading={isLoading} />
+    return <SubscriptionContainer onSubscribe={onSubscribe} onLogoClick={onLogoClick} isLoading={isLoading} backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100" />
   }
 
 
   if (currentView === "confirmation") {
     return (
-      <ConfirmationLayout
+      <ConfirmationContainer
         data={signupData}
         onRegister={onConfirmRegister}
         onEdit={onConfirmEdit}
         onLogoClick={onLogoClick}
         isLoading={isLoading}
+        backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       />
     )
   }
@@ -336,7 +348,7 @@ export function HomeLayout() {
 
   if (currentView === "email-registration") {
     return (
-      <EmailRegistrationLayout
+      <EmailRegistrationContainer
         currentStep={emailRegistrationStep ?? "form"}
         email={emailRegistrationEmail}
         onSubmit={onEmailSubmit}
@@ -345,13 +357,14 @@ export function HomeLayout() {
         onResend={onEmailRegistrationResend}
         onLogoClick={onLogoClick}
         isLoading={isLoading}
+        backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       />
     )
   }
 
   if (currentView === "signup") {
     return (
-      <RegisterLayout
+      <RegisterContainer
         email={signupData?.email}
         initialFormData={signupData ? {
           email: signupData.email || "",
@@ -367,6 +380,7 @@ export function HomeLayout() {
         onCancel={onSignupCancel}
         onLogoClick={onLogoClick}
         isLoading={isLoading}
+        backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       />
     )
   }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RegisterLayout } from '@/components/templates/register-layout'
+import { RegisterContainer } from '@/components/organisms/register-container'
 import { UserRegistrationComplete } from "@hv-development/schemas"
 
 export default function RegisterPage() {
@@ -76,13 +76,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <RegisterLayout
+    <RegisterContainer
       email={searchParams.email}
       initialFormData={initialFormData}
       onSubmit={handleRegisterSubmit}
       onCancel={handleCancel}
       onLogoClick={handleLogoClick}
       isLoading={isLoading}
+      backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
     />
   )
 }

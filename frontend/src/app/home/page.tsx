@@ -18,7 +18,20 @@ import { initialState, appReducer } from "@/hooks/useAppReducer"
 import { useDataLoader } from "@/hooks/useDataLoader"
 import { useComputedValues } from "@/hooks/useComputedValues"
 import { useAppHandlers } from "@/hooks/useAppHandlers"
-import { HomeLayout } from "@/components/layouts/HomeLayout"
+import dynamic from "next/dynamic"
+
+// HomeLayoutを動的インポート（遅延読み込み）
+const HomeLayout = dynamic(() => import("@/components/templates/home-layout").then(mod => ({ default: mod.HomeLayout })), {
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+        <p className="text-green-600 font-medium">読み込み中...</p>
+      </div>
+    </div>
+  ),
+  ssr: false,
+})
 
 // メインコンポーネント
 export default function HomePage() {

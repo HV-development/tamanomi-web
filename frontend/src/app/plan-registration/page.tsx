@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { PlanRegistrationLayout } from '@/components/templates/plan-registration-layout'
+import { PlanRegistrationContainer } from '@/components/organisms/plan-registration-container'
 import { 
   PlanListResponse
 } from '@hv-development/schemas'
@@ -293,7 +293,8 @@ export default function PlanRegistrationPage() {
   }
 
   return (
-    <PlanRegistrationLayout
+    <PlanRegistrationContainer
+      backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       onPaymentMethodRegister={handlePaymentMethodRegister}
       onLogoClick={handleLogoClick}
       onCancel={handleCancel}

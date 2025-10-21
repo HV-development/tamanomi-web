@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RegisterConfirmationLayout } from '@/components/templates/register-confirmation-layout'
+import { RegisterConfirmationContainer } from '@/components/organisms/register-confirmation-container'
 import { UserRegistrationComplete } from "@hv-development/schemas"
 import { Modal } from '@/components/atoms/modal'
 import { Button } from '@/components/atoms/button'
@@ -188,13 +188,14 @@ export default function RegisterConfirmationPage() {
 
   return (
     <>
-      <RegisterConfirmationLayout
+      <RegisterConfirmationContainer
         data={formData}
         email={email}
         onRegister={handleRegister}
         onEdit={handleEdit}
         onLogoClick={handleLogoClick}
         isLoading={isLoading}
+        backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       />
       
       {/* ポイント付与成功モーダル */}

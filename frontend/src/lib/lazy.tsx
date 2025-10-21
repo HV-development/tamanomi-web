@@ -16,26 +16,26 @@ export const LazyPaymentHistoryList = lazy(() =>
 )
 
 export const LazyProfileEditLayout = lazy(() =>
-    import("@/components/templates/profile-edit-layout").then(module => ({
-        default: module.ProfileEditLayout
+    import("@/components/organisms/profile-edit-container").then(module => ({
+        default: module.ProfileEditContainer
     }))
 )
 
 export const LazyEmailChangeLayout = lazy(() =>
-    import("@/components/templates/email-change-layout").then(module => ({
-        default: module.EmailChangeLayout
+    import("@/components/organisms/email-change-container").then(module => ({
+        default: module.EmailChangeContainer
     }))
 )
 
 export const LazyPasswordChangeLayout = lazy(() =>
-    import("@/components/templates/password-change-layout").then(module => ({
-        default: module.PasswordChangeLayout
+    import("@/components/organisms/password-change-container").then(module => ({
+        default: module.PasswordChangeContainer
     }))
 )
 
 export const LazyWithdrawalLayout = lazy(() =>
-    import("@/components/templates/withdrawal-layout").then(module => ({
-        default: module.WithdrawalLayout
+    import("@/components/organisms/withdrawal-container").then(module => ({
+        default: module.WithdrawalContainer
     }))
 )
 

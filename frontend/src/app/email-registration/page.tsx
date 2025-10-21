@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 import { useRouter } from 'next/navigation'
-import { EmailRegistrationLayout } from '@/components/templates/email-registration-layout'
+import { EmailRegistrationContainer } from '@/components/organisms/email-registration-container'
 import { useEmailRegistration } from '@/hooks/useEmailRegistration'
 
 function EmailRegistrationContent() {
@@ -26,7 +26,7 @@ function EmailRegistrationContent() {
   }
 
   return (
-    <EmailRegistrationLayout
+    <EmailRegistrationContainer
       currentStep={currentStep}
       email={email}
       onSubmit={handleSubmit}
@@ -35,6 +35,7 @@ function EmailRegistrationContent() {
       onResend={handleResend}
       onLogoClick={handleLogoClick}
       isLoading={isLoading}
+      backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       errorMessage={errorMessage}
       successMessage={successMessage}
     />
