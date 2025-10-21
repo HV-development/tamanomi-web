@@ -4,37 +4,37 @@ import { lazy, Suspense } from "react"
 
 // 重いコンポーネントを遅延読み込み
 export const LazyUsageHistoryList = lazy(() =>
-    import("../molecules/usage-history-list").then(module => ({
+    import("@/components/molecules/usage-history-list").then(module => ({
         default: module.UsageHistoryList
     }))
 )
 
 export const LazyPaymentHistoryList = lazy(() =>
-    import("../molecules/payment-history-list").then(module => ({
+    import("@/components/molecules/payment-history-list").then(module => ({
         default: module.PaymentHistoryList
     }))
 )
 
 export const LazyProfileEditLayout = lazy(() =>
-    import("../templates/profile-edit-layout").then(module => ({
+    import("@/components/templates/profile-edit-layout").then(module => ({
         default: module.ProfileEditLayout
     }))
 )
 
 export const LazyEmailChangeLayout = lazy(() =>
-    import("../templates/email-change-layout").then(module => ({
+    import("@/components/templates/email-change-layout").then(module => ({
         default: module.EmailChangeLayout
     }))
 )
 
 export const LazyPasswordChangeLayout = lazy(() =>
-    import("../templates/password-change-layout").then(module => ({
+    import("@/components/templates/password-change-layout").then(module => ({
         default: module.PasswordChangeLayout
     }))
 )
 
 export const LazyWithdrawalLayout = lazy(() =>
-    import("../templates/withdrawal-layout").then(module => ({
+    import("@/components/templates/withdrawal-layout").then(module => ({
         default: module.WithdrawalLayout
     }))
 )

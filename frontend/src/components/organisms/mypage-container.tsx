@@ -11,7 +11,7 @@ import type { User as UserType, Plan, UsageHistory, PaymentHistory } from "../..
 import { appConfig } from '@/config/appConfig'
 import { useDataPreloader } from "../../hooks/useDataPreloader"
 import { SkeletonMyPage, SkeletonCard, SkeletonRankCard, SkeletonMenuButton } from "../skeletons/mypage-skeleton"
-import { StaggeredContainer, FadeInComponent } from "../animations/progressive-loader"
+import { StaggeredContainer, FadeInComponent } from "../atoms/progressive-loader"
 import {
   LazyUsageHistoryList,
   LazyPaymentHistoryList,
@@ -20,7 +20,7 @@ import {
   LazyPasswordChangeLayout,
   LazyWithdrawalLayout,
   LazyFallback
-} from "../lazy/lazy-components"
+} from "@/lib/lazy"
 
 interface ProfileEditFormData {
   nickname: string
