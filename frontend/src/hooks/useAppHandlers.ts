@@ -1,8 +1,7 @@
 "use client"
 
 import React, { useCallback, useState } from "react"
-import type { AppAction, AppState, AppHandlers } from '@hv-development/schemas'
-import type { Store } from "@/types/store"
+import type { AppAction, AppState, AppHandlers, Store } from '@hv-development/schemas'
 import { appConfig } from '@/config/appConfig'
 import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
@@ -88,8 +87,7 @@ export const useAppHandlers = (
             dispatch({ type: 'SET_LOGIN_EMAIL', payload: loginData.email })
             setOtpRequestId(otpData.requestId)
             dispatch({ type: 'SET_LOGIN_STEP', payload: "otp" })
-        } catch (err) {
-            console.error('Login error:', err)
+        } catch {
             // エラーはステート管理システムで処理する必要があります
             // TODO: エラーステートの追加
         } finally {
@@ -129,7 +127,7 @@ export const useAppHandlers = (
                 localStorage.setItem('refreshToken', data.refreshToken)
             }
 
-            // プラン登録状況を確認
+            // プラン登録状況を確認してauth状態を更新
             let hasPlan = false
             try {
                 const userResponse = await fetch('/api/user/me', {
@@ -140,35 +138,40 @@ export const useAppHandlers = (
 
                 if (userResponse.ok) {
                     const userData = await userResponse.json()
-                    console.log('🔍 [OTP] User data:', userData)
-                    console.log('🔍 [OTP] User plan:', userData.plan)
                     hasPlan = userData.plan !== null && userData.plan !== undefined
-                    console.log('🔍 [OTP] hasPlan:', hasPlan)
+                    
+                    // auth状態を更新
+                    auth.login(userData, userData.plan, [], [])
                 }
-            } catch (error) {
-                console.error('❌ [OTP] Failed to fetch user data:', error)
+            } catch {
+                // エラー処理
             }
+
+        // メールアドレス変更成功モーダルが表示されている場合は遷移を停止
+        // @ts-expect-error - isEmailChangeSuccessModalOpen is not yet in the type definition
+        if (state.isEmailChangeSuccessModalOpen) {
+            dispatch({ type: 'RESET_LOGIN_STATE' })
+            return
+        }
 
             // プラン登録状況によって遷移先を変更
             if (!hasPlan) {
                 // プラン未登録の場合はプラン登録画面へ（独立したページ）
-                console.log('🔍 [OTP] Redirecting to plan registration')
                 router.push('/plan-registration')
             } else {
-                // プラン登録済みの場合はマイページへ
-                console.log('🔍 [OTP] Redirecting to mypage')
-                router.push('/home?view=mypage&auto-login=true')
+                // プラン登録済みの場合はマイページへ直接遷移
+                navigation.navigateToView("mypage", "mypage")
+                navigation.navigateToMyPage("main")
             }
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
-        } catch (err) {
-            console.error('OTP verification error:', err)
+        } catch {
             // エラーはステート管理システムで処理する必要があります
             // TODO: エラーステートの追加
         } finally {
             auth.setIsLoading(false)
         }
-    }, [auth, state.loginEmail, otpRequestId, router, dispatch])
+    }, [auth, otpRequestId, router, dispatch, navigation, state])
 
     const handleSignup = useCallback(() => {
         router.push('/email-registration')
@@ -194,7 +197,8 @@ export const useAppHandlers = (
     }, [navigation, dispatch])
 
     const handleBackToEmailLogin = useCallback(() => {
-        dispatch({ type: 'RESET_LOGIN_STATE' })
+        // OTP画面からパスワード入力画面に戻る
+        dispatch({ type: 'SET_LOGIN_STEP', payload: 'password' })
     }, [dispatch])
 
     const handleResendOtp = useCallback(async () => {
@@ -215,8 +219,7 @@ export const useAppHandlers = (
 
             const otpData = await response.json()
             setOtpRequestId(otpData.requestId)
-        } catch (err) {
-            console.error('Resend OTP error:', err)
+        } catch {
             // TODO: エラーステートの追加
         } finally {
             auth.setIsLoading(false)
@@ -408,35 +411,69 @@ export const useAppHandlers = (
         navigation.navigateToMyPage("plan-change")
     }, [navigation])
 
-    const handlePlanChangeSubmit = useCallback(async (planId: string) => {
-        auth.setIsLoading(true)
-        setTimeout(() => {
-            const planMap: Record<string, { name: string; price: number; description: string }> = {
-                "3days": {
-                    name: "3daysプラン",
-                    price: 300,
-                    description: "短期間でTAMAYOIを体験できるお試しプラン",
-                },
-                monthly: {
-                    name: "マンスリープラン",
-                    price: 980,
-                    description: "毎日お得にお酒を楽しめる定番プラン",
-                },
-                premium: {
-                    name: "プレミアムプラン",
-                    price: 1980,
-                    description: "より充実したサービスを楽しめる上位プラン",
-                },
+    const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
+        try {
+            auth.setIsLoading(true)
+            
+            // アクセストークンを取得
+            const accessToken = localStorage.getItem('accessToken')
+            if (!accessToken) {
+                throw new Error('認証情報が見つかりません。ログインしてください。')
             }
 
-            const newPlanData = planMap[planId]
-            if (newPlanData && auth.plan) {
-                // プラン変更処理
+            // プラン変更APIを呼び出し
+            const response = await fetch('/api/user-plans/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    planId: planId,
+                }),
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.message || 'プラン変更に失敗しました')
             }
 
+            await response.json()
+
+            // プラン変更後、新しいユーザー情報を取得してauth状態を更新
+            try {
+                const userResponse = await fetch('/api/user/me', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
+                })
+
+                if (userResponse.ok) {
+                    const updatedUserData = await userResponse.json()
+                    
+                    // auth状態を更新
+                    auth.login(updatedUserData, updatedUserData.plan, updatedUserData.usageHistory || [], updatedUserData.paymentHistory || [])
+                }
+            } catch {
+                // プラン変更は成功しているので、エラーでも続行
+            }
+
+            // 支払い方法も変更する場合は、支払い方法変更画面へ遷移
+            if (alsoChangePaymentMethod) {
+                if (typeof window !== 'undefined') {
+                    window.location.href = '/payment-method-change?from=plan-change'
+                }
+            } else {
+                // 成功時はマイページに戻る
+                navigation.navigateToMyPage("main")
+            }
+            
+        } catch {
+            // エラー時もマイページに戻る（エラーメッセージは別途表示）
             navigation.navigateToMyPage("main")
+        } finally {
             auth.setIsLoading(false)
-        }, 1500)
+        }
     }, [auth, navigation])
 
     const handlePlanChangeBack = useCallback(() => {
@@ -468,16 +505,26 @@ export const useAppHandlers = (
     }, [navigation])
 
     const handleWithdrawComplete = useCallback(() => {
+        // まず認証状態をクリア
         auth.logout()
         navigation.resetNavigation()
-        router.push('/')
-    }, [auth, navigation, router])
+        
+        // 即座にログイン画面に遷移（home画面を表示しない）
+        if (typeof window !== 'undefined') {
+            window.location.href = '/'
+        }
+    }, [auth, navigation])
 
     const handleLogout = useCallback(() => {
+        // まず認証状態をクリア
         auth.logout()
         navigation.resetNavigation()
-        router.push('/')
-    }, [auth, navigation, router])
+        
+        // 即座にログイン画面に遷移（home画面を表示しない）
+        if (typeof window !== 'undefined') {
+            window.location.href = '/'
+        }
+    }, [auth, navigation])
 
     const handleShowStoreOnHome = useCallback(() => {
         navigation.navigateToView("home", "home")
@@ -568,15 +615,88 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_SELECTED_STORE', payload: null })
     }, [dispatch])
 
-    const handleProfileEditSubmit = useCallback(async (data: Record<string, string>, updatedFields: string[]) => {
+    const handleProfileEditSubmit = useCallback(async (data: Record<string, string>) => {
         auth.setIsLoading(true)
-        console.log('Profile update data:', data, 'Updated fields:', updatedFields)
-        setTimeout(() => {
-            // プロフィール更新処理
-            // TODO: 実際のAPI呼び出しを実装
+        
+        try {
+            // 開発環境での認証バイパス機能
+            const isDevelopment = process.env.NODE_ENV === 'development'
+            const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true'
+
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            }
+
+            if (isDevelopment && bypassAuth) {
+                headers['Authorization'] = 'Bearer dev-bypass-token'
+            } else {
+                const token = localStorage.getItem('accessToken')
+                if (!token) {
+                    throw new Error('認証トークンが見つかりません。再度ログインしてください。')
+                }
+                headers['Authorization'] = `Bearer ${token}`
+            }
+
+            // saitamaAppIdは別テーブル管理のため、更新データから除外
+            // 日付フォーマットをISO形式に変換 (yyyy/MM/dd → yyyy-MM-dd)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { saitamaAppId, ...restData } = data
+            const updateData = {
+                ...restData,
+                birthDate: restData.birthDate ? restData.birthDate.replace(/\//g, '-') : restData.birthDate
+            }
+            
+            const response = await fetch('/api/user/update', {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify(updateData),
+            })
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                // トークン期限切れの場合（401エラー）
+                if (response.status === 401 || response.status === 403) {
+                    dispatch({ type: 'SET_LOGIN_REQUIRED_MODAL_OPEN', payload: true })
+                    auth.setIsLoading(false)
+                    return
+                }
+
+                throw new Error(result.message || 'プロフィールの更新に失敗しました')
+            }
+            
+            // 成功時はユーザー情報を再取得
+            try {
+                const token = localStorage.getItem('accessToken')
+                if (token) {
+                    const userResponse = await fetch('/api/user/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        cache: 'no-store',
+                    })
+                    
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json()
+                        // authの状態を更新
+                        auth.login(userData, userData.plan, [], [])
+                    }
+                }
+            } catch {
+                // エラー処理
+            }
+            
+            // マイページに戻る
+            navigation.navigateToView("mypage", "mypage")
+            navigation.navigateToMyPage("main")
+            
             auth.setIsLoading(false)
-        }, 1500)
-    }, [auth])
+        } catch (error) {
+            auth.setIsLoading(false)
+            // エラー表示（必要に応じてトーストやモーダルで通知）
+            alert(error instanceof Error ? error.message : 'プロフィールの更新に失敗しました')
+        }
+    }, [auth, dispatch, navigation])
 
     const handleEmailChangeSubmit = useCallback(async (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => {
         auth.setIsLoading(true)
@@ -630,13 +750,20 @@ export const useAppHandlers = (
             }
 
             // 成功時
+            // まず成功状態を設定（モーダル表示用）
             dispatch({ type: 'SET_NEW_EMAIL', payload: data.newEmail })
             dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "complete" })
+            // @ts-expect-error - SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN is not yet in the type definition
+            dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: true })
+            
+            // 少し待ってからログアウト処理を実行（モーダルが表示されるまで待つ）
+            setTimeout(() => {
+                auth.logout()
+            }, 100)
         } catch (error) {
             // エラーを表示するための状態管理が必要
             // TODO: エラー状態を管理する仕組みを追加
             const errorMessage = error instanceof Error ? error.message : 'メールアドレス変更に失敗しました'
-            console.error('Email change error:', errorMessage)
             // エラーメッセージをユーザーに表示する（TODO: UI実装）
             alert(errorMessage)
         } finally {
@@ -647,6 +774,31 @@ export const useAppHandlers = (
     const handleEmailChangeResend = useCallback(() => {
         dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "form" })
     }, [dispatch])
+
+    const handleEmailChangeSuccessModalClose = useCallback(() => {
+        // @ts-expect-error - SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN is not yet in the type definition
+        dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: false })
+        
+        // 確実にトークンを削除
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+        sessionStorage.clear()
+        
+        // ログイン状態をリセット
+        dispatch({ type: 'RESET_LOGIN_STATE' })
+        
+        // authのログアウトも実行
+        auth.logout()
+        
+        // ブラウザのタブを閉じる
+        window.close()
+        
+        // window.close()が失敗する場合（ユーザーが開いたタブでない場合）は、ログイン画面に遷移
+        // タブが閉じられた場合、以下のコードは実行されない
+        setTimeout(() => {
+            router.push('/?skip-auth-check=true')
+        }, 100)
+    }, [dispatch, router, auth])
 
     const handlePasswordChangeSubmit = useCallback(async (currentPassword: string, newPassword: string) => {
         auth.setIsLoading(true)
@@ -709,25 +861,17 @@ export const useAppHandlers = (
     }, [auth, dispatch, router])
 
     const handlePasswordChangeComplete = useCallback(() => {
-        console.log("🔧 handlePasswordChangeComplete: 開始")
-
         // ログアウト処理
-        console.log("🔧 handlePasswordChangeComplete: ログアウト処理実行")
         auth.logout()
 
         // パスワード変更ステップをリセット
-        console.log("🔧 handlePasswordChangeComplete: パスワード変更ステップをリセット")
         dispatch({ type: 'SET_PASSWORD_CHANGE_STEP', payload: "form" })
 
         // ログイン状態をリセット（パスワード入力画面に戻す）
-        console.log("🔧 handlePasswordChangeComplete: ログイン状態をリセット")
         dispatch({ type: 'RESET_LOGIN_STATE' })
 
         // ルートURL（ログイン画面）に遷移
-        console.log("🔧 handlePasswordChangeComplete: ルートURLに遷移")
         router.push('/')
-
-        console.log("🔧 handlePasswordChangeComplete: 完了")
     }, [auth, dispatch, router])
 
     return {
@@ -793,10 +937,11 @@ export const useAppHandlers = (
         handleUsageGuideBack,
         handleStoreClick,
         handleStoreDetailPopupClose,
-        handleProfileEditSubmit,
+        handleProfileEditSubmit: handleProfileEditSubmit as AppHandlers['handleProfileEditSubmit'],
         handleEmailChangeSubmit,
         handleEmailChangeResend,
+        handleEmailChangeSuccessModalClose,
         handlePasswordChangeSubmit,
         handlePasswordChangeComplete,
-    }
+    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void }
 }
