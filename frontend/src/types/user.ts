@@ -1,5 +1,9 @@
 import type { LucideIcon } from "lucide-react"
 
+/**
+ * フロントエンド用のUser型
+ * APIレスポンス（/api/user/me）の型定義
+ */
 export interface User {
   id: string
   email: string
@@ -9,18 +13,35 @@ export interface User {
   birthDate: string
   gender: string
   createdAt: Date
-  contractStartDate?: Date
-  registeredStore?: string
+  contractStartDate?: Date // フロントエンド固有のプロパティ
+  registeredStore?: string // フロントエンド固有のプロパティ
+  status?: string
+  phone?: string
+  lastLoginAt?: Date
+  updatedAt?: Date
+  saitamaAppLinked?: boolean
+  paymentCard?: {
+    paygentCustomerId: string
+    paygentCustomerCardId: string
+  } | null
 }
 
+/**
+ * フロントエンド用のPlan型
+ * APIレスポンスのplan部分の型定義
+ */
 export interface Plan {
   id: string
   name: string
   price: number
-  description: string
-  isActive: boolean
-  nextBillingDate?: Date
+  description?: string // フロントエンド固有
+  isActive?: boolean // フロントエンド固有
+  discountPrice?: number | null
+  isSubscription?: boolean
+  status?: string
   startDate: Date
+  endDate?: Date | null
+  nextBillingDate?: Date // フロントエンド固有
 }
 
 export interface UsageHistory {
