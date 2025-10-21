@@ -189,6 +189,10 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
   const handleFinalConfirm = () => {
     if (selectedPlan) {
       onPlanChange(selectedPlan, alsoChangePaymentMethod)
+      // プラン変更処理を実行したら、チェックボックスの状態をリセット
+      setAlsoChangePaymentMethod(false)
+      setShowConfirmation(false)
+      setSelectedPlan("")
     }
   }
 
