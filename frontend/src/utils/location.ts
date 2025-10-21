@@ -1,5 +1,14 @@
 // 位置情報関連のユーティリティ関数
-import type { Coordinates, LocationError } from '@/types/ui'
+
+export interface Coordinates {
+  latitude: number
+  longitude: number
+}
+
+export interface LocationError {
+  code: number
+  message: string
+}
 
 /**
  * 現在位置を取得する
