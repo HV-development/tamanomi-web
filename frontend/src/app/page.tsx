@@ -8,223 +8,36 @@
  * トップ画面を掲載店の一覧画面に変更する予定
  */
 
-import { useRouter, useSearchParams } from "next/navigation"
-import { LoginLayout } from "@/components/templates/login-layout"
-import { Suspense, useState, useEffect, useCallback, useMemo } from "react"
+import { LoginLayout } from "@/components/templates/LoginLayout"
+import { Suspense } from "react"
+import { useLoginPage } from "@/hooks/useLoginPage"
 
 function LoginPageContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string>("")
-  const [loginStep, setLoginStep] = useState<"password" | "otp">("password")
-  const [email, setEmail] = useState<string>("")
-  const [requestId, setRequestId] = useState<string>("")
+  const {
+    isLoading,
+    error,
+    loginStep,
+    email,
+    isCheckingAuth,
+    handlePasswordLogin,
+    handleOtpVerify,
+    handleResendOtp,
+    handleBackToPassword,
+    handleSignup,
+    handleForgotPassword,
+  } = useLoginPage()
 
-  // URLパラメータをメモ化して不要な再レンダリングを防ぐ
-  const urlParams = useMemo(() => ({
-    paymentSuccess: searchParams.get('payment-success'),
-    view: searchParams.get('view'),
-    error: searchParams.get('error'),
-    email: searchParams.get('email')
-  }), [searchParams])
-
-  // URLパラメータの処理をuseEffectに移動
-  useEffect(() => {
-    const { paymentSuccess, view } = urlParams
-
-    // payment-success パラメータがある場合、またはviewがmypageの場合は元のページに遷移
-    if (paymentSuccess === 'true' || view === 'mypage') {
-      // 現時点ではログイン画面にリダイレクト
-      // ログイン後にマイページに遷移するようにする
-      if (typeof window !== 'undefined' && view === 'mypage') {
-        sessionStorage.setItem('redirectAfterLogin', `/home?view=mypage${paymentSuccess ? '&payment-success=true' : ''}`)
-      }
-    }
-  }, [urlParams])
-
-  // URLパラメータからエラーメッセージを取得
-  useEffect(() => {
-    const { error: errorParam, email: emailParam } = urlParams
-
-    if (errorParam === 'already_registered') {
-      setError(`このメールアドレス（${emailParam}）は既に登録されています。ログイン画面からログインしてください。`)
-    }
-  }, [urlParams])
-
-  // ステップ1: パスワード認証 + OTP送信（useCallbackでメモ化）
-  const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {
-    setIsLoading(true)
-    setError("")
-
-    try {
-      // パスワード認証を実行
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: loginData.email, password: loginData.password }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'パスワード認証に失敗しました')
-      }
-
-      console.log('Password authentication successful:', data)
-
-      // OTP送信
-      const otpResponse = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: loginData.email }),
-      })
-
-      if (!otpResponse.ok) {
-        throw new Error('ワンタイムパスワードの送信に失敗しました')
-      }
-
-      const otpData = await otpResponse.json()
-      console.log('OTP sent successfully:', otpData)
-
-      // パスワード認証成功 → OTP入力画面へ
-      setEmail(loginData.email)
-      setRequestId(otpData.requestId) // requestIdを保存
-      setLoginStep("otp")
-    } catch (err) {
-      console.error('Login error:', err)
-      setError(err instanceof Error ? err.message : 'ログインに失敗しました')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  // ステップ2: OTP認証（useCallbackでメモ化）
-  const handleOtpVerify = useCallback(async (otp: string) => {
-    setIsLoading(true)
-    setError("")
-
-    try {
-      const response = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, otp, requestId }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'ワンタイムパスワードの認証に失敗しました')
-      }
-
-      // ログイン成功
-      console.log('OTP verification successful:', data)
-
-      // トークンをlocalStorageに保存
-      if (data.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken)
-      }
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken)
-      }
-
-      // プラン登録状況を確認
-      let hasPlan = false
-      try {
-        const userResponse = await fetch('/api/user/me', {
-          headers: {
-            'Authorization': `Bearer ${data.accessToken}`,
-          },
-        })
-        
-        if (userResponse.ok) {
-          const userData = await userResponse.json()
-          console.log('🔍 [OTP] User data:', userData)
-          console.log('🔍 [OTP] User plan:', userData.plan)
-          hasPlan = userData.plan !== null && userData.plan !== undefined
-          console.log('🔍 [OTP] hasPlan:', hasPlan)
-        }
-      } catch (error) {
-        console.error('❌ [OTP] Failed to fetch user data:', error)
-      }
-
-      // リダイレクト先を確認
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin')
-      console.log('🔍 [OTP] redirectPath:', redirectPath)
-      console.log('🔍 [OTP] hasPlan:', hasPlan)
-      
-      if (redirectPath) {
-        sessionStorage.removeItem('redirectAfterLogin')
-        console.log('🔍 [OTP] Redirecting to:', redirectPath)
-        router.push(redirectPath)
-      } else {
-        // プラン登録状況によって遷移先を変更
-        if (!hasPlan) {
-          // プラン未登録の場合はプラン登録画面へ（独立したページ）
-          console.log('🔍 [OTP] Redirecting to plan registration')
-          router.push('/plan-registration')
-        } else {
-          // プラン登録済みの場合はマイページへ
-          console.log('🔍 [OTP] Redirecting to mypage')
-          router.push('/home?view=mypage&auto-login=true')
-        }
-      }
-    } catch (err) {
-      console.error('OTP verification error:', err)
-      setError(err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [email, requestId, router])
-
-  // OTP再送信（useCallbackでメモ化）
-  const handleResendOtp = useCallback(async () => {
-    setIsLoading(true)
-    setError("")
-
-    try {
-      const response = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      })
-
-      if (!response.ok) {
-        throw new Error('ワンタイムパスワードの再送信に失敗しました')
-      }
-
-      const otpData = await response.json()
-      setRequestId(otpData.requestId) // 新しいrequestIdを保存
-      console.log('OTP resent successfully:', otpData)
-    } catch (err) {
-      console.error('OTP resend error:', err)
-      setError(err instanceof Error ? err.message : 'ワンタイムパスワードの再送信に失敗しました')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [email])
-
-  // パスワード入力画面に戻る（useCallbackでメモ化）
-  const handleBackToPassword = useCallback(() => {
-    setLoginStep("password")
-    setError("")
-  }, [])
-
-  const handleSignup = useCallback(() => {
-    router.push('/email-registration')
-  }, [router])
-
-  const handleForgotPassword = useCallback(() => {
-    router.push('/password-reset')
-  }, [router])
+  // 認証チェック中はローディング表示
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-green-600 font-medium">認証状態を確認中...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
@@ -281,7 +94,7 @@ import { initialState, appReducer } from "@/hooks/useAppReducer"
 import { useDataLoader } from "@/hooks/useDataLoader"
 import { useComputedValues } from "@/hooks/useComputedValues"
 import { useAppHandlers } from "@/hooks/useAppHandlers"
-import { HomeLayout } from "@/components/layouts/HomeLayout"
+import { HomeLayout } from "@/components/templates/HomeLayout"
 
 // メインコンポーネント
 export default function HomePage() {

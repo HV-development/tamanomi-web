@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext } from "react"
-import type { AppContextType } from '@hv-development/schemas'
+import type { AppContextType } from '@/types/app-context'
 
 // Context APIで状態管理を最適化
 export const AppContext = createContext<AppContextType | null>(null)

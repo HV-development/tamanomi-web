@@ -12,7 +12,7 @@ const API_VERSION = '/api/v1';
 
 // ランタイムで環境変数が未設定の場合のみ警告
 if (typeof window !== 'undefined' && !process.env.API_BASE_URL) {
-  console.warn('API_BASE_URL environment variable is not set, using default: http://localhost:3002');
+  // API_BASE_URL環境変数が未設定の場合、デフォルト値を使用
 }
 
 /**

@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RegisterConfirmationLayout } from '@/components/templates/register-confirmation-layout'
+import { RegisterConfirmationContainer } from '@/components/organisms/RegisterConfirmationContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
-import { Modal } from '@/components/atoms/modal'
-import { Button } from '@/components/atoms/button'
+import { Modal } from '@/components/atoms/Modal'
+import { Button } from '@/components/atoms/Button'
 
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -27,7 +27,6 @@ export default function RegisterConfirmationPage() {
 
       // フォームデータを取得（通常はlocalStorageやsessionStorageから）
       const storedData = sessionStorage.getItem('registerFormData')
-      console.log('🔍 [register-confirmation] SessionStorage raw data:', storedData)
 
       if (!storedData || !tokenParam) {
         // データがない場合は登録画面にリダイレクト
@@ -37,18 +36,10 @@ export default function RegisterConfirmationPage() {
 
       try {
         const parsedData = JSON.parse(storedData) as UserRegistrationComplete
-        console.log('🔍 [register-confirmation] Parsed session data:', {
-          nickname: parsedData.nickname,
-          saitamaAppId: parsedData.saitamaAppId,
-          saitamaAppIdType: typeof parsedData.saitamaAppId,
-          saitamaAppIdLength: parsedData.saitamaAppId?.length,
-          saitamaAppIdValue: `"${parsedData.saitamaAppId}"`,
-        })
         setFormData(parsedData)
         setEmail(emailParam)
         setToken(tokenParam)
-      } catch (error) {
-        console.error('Failed to parse form data:', error)
+      } catch {
         router.push('/email-registration')
       }
     }
@@ -61,14 +52,6 @@ export default function RegisterConfirmationPage() {
 
     try {
       const saitamaAppIdValue = formData.saitamaAppId && formData.saitamaAppId.trim() !== '' ? formData.saitamaAppId.trim() : undefined;
-      
-      console.log('🔍 [register-confirmation] Form data:', {
-        email: email,
-        nickname: formData.nickname,
-        saitamaAppId: formData.saitamaAppId,
-        saitamaAppIdTrimmed: saitamaAppIdValue,
-        saitamaAppIdWillSend: saitamaAppIdValue !== undefined,
-      })
 
       // バックエンドAPIに登録リクエストを送信
       const response = await fetch('/api/auth/register', {
@@ -93,45 +76,19 @@ export default function RegisterConfirmationPage() {
 
       const result = await response.json()
 
-      // デバッグログ
-      console.log('🔍 [register-confirmation] Register response:', {
-        status: response.status,
-        ok: response.ok,
-        hasPointsGranted: 'pointsGranted' in result,
-        pointsGranted: result.pointsGranted,
-        pointsGrantedType: typeof result.pointsGranted,
-        resultKeys: Object.keys(result),
-        result: result
-      })
-
       if (response.ok) {
         // トークンをlocalStorageに保存
         if (result.accessToken) {
           localStorage.setItem('accessToken', result.accessToken)
-          console.log('✅ [register-confirmation] Access token saved to localStorage:', {
-            tokenLength: result.accessToken.length,
-            tokenPreview: result.accessToken.substring(0, 20) + '...'
-          })
-          // 保存後、すぐに読み取って確認
-          const savedToken = localStorage.getItem('accessToken')
-          console.log('✅ [register-confirmation] Verification - token retrieved from localStorage:', {
-            hasToken: !!savedToken,
-            matches: savedToken === result.accessToken
-          })
         }
         if (result.refreshToken) {
           localStorage.setItem('refreshToken', result.refreshToken)
-          console.log('✅ [register-confirmation] Refresh token saved to localStorage')
         }
 
         // 登録成功後はセッションストレージをクリア
         sessionStorage.removeItem('registerFormData')
 
         // さいたま市アプリ連携でポイント付与があった場合はモーダルを表示
-        console.log('🔍 [register-confirmation] Checking pointsGranted:', {
-          pointsGranted: result.pointsGranted,
-          willShowModal: !!result.pointsGranted,
-        });
         if (result.pointsGranted) {
           setPointsGranted(result.pointsGranted)
           setShowSuccessModal(true)
@@ -188,13 +145,14 @@ export default function RegisterConfirmationPage() {
 
   return (
     <>
-      <RegisterConfirmationLayout
+      <RegisterConfirmationContainer
         data={formData}
         email={email}
         onRegister={handleRegister}
         onEdit={handleEdit}
         onLogoClick={handleLogoClick}
         isLoading={isLoading}
+        backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       />
       
       {/* ポイント付与成功モーダル */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { preRegister } from '@/services/auth'
+import { preRegister } from '@/lib/api-client'
 import type { UserRegistrationRequest } from "@hv-development/schemas"
 
 type Step = 'form' | 'complete'
@@ -87,7 +87,6 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       await preRegister(lastEmail)
       // 成功メッセージを表示（画面は complete のまま）
       setSuccessMessage('認証メールを再送信しました')
-      console.log('認証メールを再送信しました')
       
       // 5秒後に成功メッセージを消す
       setTimeout(() => {

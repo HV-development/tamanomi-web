@@ -6,7 +6,7 @@ ARG GITHUB_TOKEN
 
 WORKDIR /app
 
-# pnpmのインストール
+# pnpmをインストール
 RUN npm install -g pnpm
 
 # 依存関係ファイルのコピー

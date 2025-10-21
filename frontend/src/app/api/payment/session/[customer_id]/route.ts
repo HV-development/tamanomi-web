@@ -42,7 +42,14 @@ export async function GET(
     }
     
     const data = await response.json()
-    console.log('Payment session API data:', data)
+    console.log('🔍 [payment-session] Payment session API data:', {
+      customerId: data.customerId,
+      userEmail: data.userEmail,
+      planId: data.planId,
+      hasPlanId: !!data.planId,
+      planIdType: typeof data.planId,
+      applicationId: data.applicationId
+    })
     
     return NextResponse.json(data)
   } catch (error) {
