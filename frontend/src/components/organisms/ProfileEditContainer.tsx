@@ -3,8 +3,6 @@
 import { UserX, ChevronRight } from "lucide-react"
 import { HeaderLogo } from "../atoms/HeaderLogo"
 import { ProfileEditForm } from "./ProfileEditForm"
-import { ProfileUpdateSuccessModal } from "./ProfileUpdateSuccessModal"
-import { useState } from "react"
 import type { User } from "@/types/user"
 import type { ProfileEditFormData } from "@/types/forms"
 
@@ -19,18 +17,8 @@ interface ProfileEditContainerProps {
 }
 
 export function ProfileEditContainer({ user, onSubmit, onCancel, onWithdraw, onLogoClick, isLoading, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: ProfileEditContainerProps) {
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
-  const [updatedFields, setUpdatedFields] = useState<string[]>([])
-
-  const handleSubmit = (data: ProfileEditFormData, updatedFieldsList: string[]) => {
-    setUpdatedFields(updatedFieldsList)
+  const handleSubmit = (data: ProfileEditFormData) => {
     onSubmit(data)
-    setIsSuccessModalOpen(true)
-  }
-
-  const handleSuccessModalClose = () => {
-    setIsSuccessModalOpen(false)
-    onCancel() // マイページに戻る
   }
 
   return (
@@ -73,13 +61,6 @@ export function ProfileEditContainer({ user, onSubmit, onCancel, onWithdraw, onL
           </div>
         </div>
       </div>
-
-      {/* 成功モーダル */}
-      <ProfileUpdateSuccessModal
-        isOpen={isSuccessModalOpen}
-        onClose={handleSuccessModalClose}
-        updatedFields={updatedFields}
-      />
     </>
   )
 }

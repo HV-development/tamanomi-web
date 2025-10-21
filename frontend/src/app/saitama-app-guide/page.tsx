@@ -42,7 +42,6 @@ export default function SaitamaAppGuidePage() {
         setLinkError(result.data?.message || "連携に失敗しました")
       }
     } catch (error: unknown) {
-      console.error('Link error:', error)
       if (error instanceof Error) {
         setLinkError(error.message || "連携中にエラーが発生しました")
       } else {

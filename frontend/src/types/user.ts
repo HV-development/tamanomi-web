@@ -14,7 +14,6 @@ export interface User {
   gender: string
   createdAt: Date
   contractStartDate?: Date // フロントエンド固有のプロパティ
-  registeredStore?: string // フロントエンド固有のプロパティ
   status?: string
   phone?: string
   lastLoginAt?: Date

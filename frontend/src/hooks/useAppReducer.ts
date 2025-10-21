@@ -17,6 +17,7 @@ export const initialState: AppState = {
     signupData: null,
     emailChangeStep: "form",
     newEmail: "",
+    isEmailChangeSuccessModalOpen: false,
     passwordChangeStep: "form",
     passwordChangeError: null,
     passwordResetStep: "form",
@@ -74,7 +75,6 @@ export function appReducer(state: AppState, action: AppAction): AppState {
                 notifications: state.notifications.map(n => ({ ...n, isRead: true }))
             }
         case 'RESET_LOGIN_STATE':
-            console.log("🔧 RESET_LOGIN_STATE: loginStepを'password'にリセット")
             return { ...state, loginStep: "password", loginEmail: "" }
         case 'RESET_SIGNUP_STATE':
             return { ...state, signupData: null }
@@ -88,7 +88,6 @@ export function appReducer(state: AppState, action: AppAction): AppState {
                 isLoginRequiredModalOpen: false
             }
         case 'SET_LOGIN_STEP':
-            console.log("🔧 SET_LOGIN_STEP: loginStepを変更", { from: state.loginStep, to: action.payload })
             return { ...state, loginStep: action.payload }
         case 'SET_LOGIN_EMAIL':
             return { ...state, loginEmail: action.payload }
@@ -98,6 +97,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, emailChangeStep: action.payload }
         case 'SET_NEW_EMAIL':
             return { ...state, newEmail: action.payload }
+        case 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN':
+            return { ...state, isEmailChangeSuccessModalOpen: action.payload }
         case 'SET_PASSWORD_CHANGE_STEP':
             return { ...state, passwordChangeStep: action.payload }
         case 'SET_PASSWORD_CHANGE_ERROR':

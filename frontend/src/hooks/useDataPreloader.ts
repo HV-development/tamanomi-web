@@ -58,8 +58,7 @@ export const useDataPreloader = () => {
             setPreloadProgress(100)
 
             return data
-        } catch (error) {
-            console.error('データプリロードエラー:', error)
+        } catch {
             return null
         } finally {
             setIsPreloading(false)

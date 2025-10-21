@@ -91,8 +91,7 @@ export function PlanRegistrationForm({
       if (onSaitamaAppLinked) {
         await onSaitamaAppLinked()
       }
-    } catch (err) {
-      console.error('Link saitama app error:', err)
+    } catch {
       setLinkError('さいたま市アプリ連携中にエラーが発生しました')
     } finally {
       setIsLinking(false)

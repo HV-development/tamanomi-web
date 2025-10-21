@@ -74,7 +74,6 @@ export default function HomePage() {
       
       // 自動ログイン処理（トークンがあり、まだ認証されていない場合）
       if (accessToken && !auth.isAuthenticated) {
-        
         // トークンがある場合、ユーザー情報を取得
         fetch('/api/user/me', {
           headers: {
@@ -112,8 +111,7 @@ export default function HomePage() {
               }
             }
           })
-          .catch(error => {
-            console.error('❌ [home] Auto-login failed:', error)
+          .catch(() => {
             // トークンが無効な場合はクリア
             localStorage.removeItem('accessToken')
             localStorage.removeItem('refreshToken')

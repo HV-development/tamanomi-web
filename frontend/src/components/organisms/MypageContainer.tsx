@@ -23,8 +23,8 @@ import {
 } from "@/lib/lazy"
 import type { ProfileEditFormData } from "@/types/forms"
 interface MyPageContainerProps {
-  user: UserType
-  plan: Plan
+  user?: UserType
+  plan?: Plan
   usageHistory: UsageHistory[]
   paymentHistory: PaymentHistory[]
   currentView:
@@ -64,11 +64,20 @@ interface MyPageContainerProps {
   passwordChangeError?: string | null
   newEmail?: string
   currentUserRank?: string | null
+  isEmailChangeSuccessModalOpen?: boolean
 }
 
 // ランク計算用のカスタムフック
-const useRankCalculations = (user: UserType, currentUserRank: string | null | undefined) => {
+const useRankCalculations = (user: UserType | undefined, currentUserRank: string | null | undefined) => {
   return useMemo(() => {
+    if (!user) {
+      return {
+        currentRankInfo: null,
+        nextRankInfo: null,
+        monthsToNextRank: 0,
+        progressToNextRank: 0
+      }
+    }
     if (!currentUserRank || !(currentUserRank in RANK_INFO)) {
       return { nextRank: null, monthsToNext: null, currentRankInfo: null }
     }
@@ -79,39 +88,57 @@ const useRankCalculations = (user: UserType, currentUserRank: string | null | un
     const currentRankInfo = RANK_INFO[currentUserRank as keyof typeof RANK_INFO]
 
     return { nextRank, monthsToNext, currentRankInfo }
-  }, [user.contractStartDate, user.createdAt, currentUserRank])
+  }, [user, currentUserRank])
 }
 
 // プロフィールカードコンポーネント
-const ProfileCard = React.memo(({ user, onEditProfile }: { user: UserType, onEditProfile: () => void }) => (
-  <div className="bg-white rounded-2xl border border-green-200 p-6">
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-          <User className="w-5 h-5 text-green-600" />
+const ProfileCard = React.memo(({ user, onEditProfile }: { user?: UserType, onEditProfile: () => void }) => {
+  if (!user) {
+    return (
+      <div className="bg-white rounded-2xl border border-green-200 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <User className="w-5 h-5 text-green-600" />
+            </div>
+            <span className="text-lg font-bold text-gray-500">プロフィール</span>
+          </div>
         </div>
-        <span className="text-lg font-bold text-gray-500">プロフィール</span>
+        <div className="text-center text-gray-500">ユーザー情報を読み込み中...</div>
       </div>
-      <button
-        onClick={onEditProfile}
-        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-      >
-        <SquarePen className="w-5 h-5 text-gray-600" />
-      </button>
-    </div>
+    )
+  }
+  
+  return (
+    <div className="bg-white rounded-2xl border border-green-200 p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <User className="w-5 h-5 text-green-600" />
+          </div>
+          <span className="text-lg font-bold text-gray-500">プロフィール</span>
+        </div>
+        <button
+          onClick={onEditProfile}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <SquarePen className="w-5 h-5 text-gray-600" />
+        </button>
+      </div>
 
-    <div className="space-y-3">
-      <div className="flex justify-between items-center">
-        <span className="text-sm text-gray-600">ニックネーム</span>
-        <span className="text-sm font-medium text-gray-900">{user.nickname}</span>
-      </div>
-      <div className="flex justify-between items-center">
-        <span className="text-sm text-gray-600">メールアドレス</span>
-        <span className="text-sm font-medium text-gray-900">{user.email}</span>
+      <div className="space-y-3">
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-gray-600">ニックネーム</span>
+          <span className="text-sm font-medium text-gray-900">{user.nickname}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-gray-600">メールアドレス</span>
+          <span className="text-sm font-medium text-gray-900">{user.email}</span>
+        </div>
       </div>
     </div>
-  </div>
-))
+  );
+})
 ProfileCard.displayName = 'ProfileCard'
 
 // ランク画像コンポーネント
@@ -287,6 +314,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   passwordChangeError = null,
   newEmail = "",
   currentUserRank,
+  isEmailChangeSuccessModalOpen = false,
 }: MyPageContainerProps) {
   // データプリローダーを使用
   const { isPreloading, preloadProgress } = useDataPreloader()
@@ -300,7 +328,8 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   const rankCalculations = useRankCalculations(user, currentUserRank)
 
   // 防御的チェック：userとplanが存在しない場合はスケルトンを表示
-  if (!user || !plan) {
+  // ただし、メールアドレス変更成功モーダルが表示されている場合は無視
+  if ((!user || !plan) && !isEmailChangeSuccessModalOpen) {
     return <SkeletonMyPage />
   }
 
@@ -509,7 +538,7 @@ const MyPageSubView = React.memo(({
         <LazyFallback>
           <LazyEmailChangeLayout
             currentStep={emailChangeStep}
-            currentEmail={user.email}
+            currentEmail={user?.email || ''}
             newEmail={newEmail}
             onSubmit={onEmailChangeSubmit}
             onCancel={() => onViewChange("main")}

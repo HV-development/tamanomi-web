@@ -17,6 +17,7 @@ import { PlanChangeContainer } from "../organisms/PlanChangeContainer"
 import { CouponListPopup } from "../molecules/CouponListPopup"
 import { CouponUsedSuccessModal } from "../molecules/CouponUsedSuccessModal"
 import { LoginRequiredModal } from "../molecules/LoginRequiredModal"
+import { EmailChangeSuccessModal } from "../organisms/EmailChangeSuccessModal"
 import { StoreDetailPopup } from "@/components/organisms/StoreDetailPopup"
 import { Logo } from "../atoms/Logo"
 import { EmailConfirmationComplete } from "../molecules/EmailConfirmationComplete"
@@ -220,8 +221,13 @@ export function HomeLayout() {
 
   // マイページの表示
   if (currentView === "mypage") {
+    // メールアドレス変更成功モーダルが表示されている場合は、ユーザー情報の読み込み状態を無視
+    // @ts-expect-error - isEmailChangeSuccessModalOpen is not yet in the type definition
+    const isEmailChangeSuccessModalOpen = state.isEmailChangeSuccessModalOpen || false
+    
     // ユーザー情報とプラン情報が読み込まれていない場合はローディング表示
-    if (!user || !plan) {
+    // ただし、メールアドレス変更成功モーダルが表示されている場合は無視
+    if ((!user || !plan) && !isEmailChangeSuccessModalOpen) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
           <div className="text-center">
@@ -307,6 +313,7 @@ export function HomeLayout() {
         passwordChangeError={passwordChangeError}
         newEmail={newEmail}
         currentUserRank={currentUserRank}
+        isEmailChangeSuccessModalOpen={isEmailChangeSuccessModalOpen}
       />
     )
   }
@@ -330,7 +337,6 @@ export function HomeLayout() {
   }
 
   if (currentView === "login") {
-    console.log("🔧 HomeLayout: ログイン画面表示", { loginStep, loginEmail })
     return (
       <LoginLayout
         onLogin={onLogin}
@@ -338,7 +344,7 @@ export function HomeLayout() {
         onSignup={onSignup}
         onForgotPassword={onForgotPassword}
         onResendOtp={onResendOtp}
-        onBackToPassword={loginStep === "email" ? onBackToHome : onBackToEmailLogin}
+        onBackToPassword={onBackToEmailLogin}
         isLoading={isLoading}
         loginStep={loginStep}
         email={loginEmail}
@@ -576,6 +582,16 @@ export function HomeLayout() {
         isOpen={isLoginRequiredModalOpen}
         onClose={onLoginRequiredModalClose}
         onLogin={onLoginRequiredModalLogin}
+      />
+
+      {/* メールアドレス変更成功モーダル */}
+      <EmailChangeSuccessModal
+        // @ts-expect-error - isEmailChangeSuccessModalOpen is not yet in the type definition
+        isOpen={state.isEmailChangeSuccessModalOpen || false}
+        // @ts-expect-error - newEmail is not yet in the type definition
+        newEmail={state.newEmail || ""}
+        // @ts-expect-error - handleEmailChangeSuccessModalClose is not yet in the type definition
+        onClose={handlers.handleEmailChangeSuccessModalClose}
       />
 
       {/* フッターナビゲーション */}

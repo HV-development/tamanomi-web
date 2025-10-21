@@ -24,6 +24,19 @@ export const useLoginPage = () => {
   // 認証状態チェック
   useEffect(() => {
     const checkAuth = async () => {
+      // skip-auth-check パラメータがある場合は認証チェックをスキップ
+      const urlParams = new URLSearchParams(window.location.search)
+      const skipAuthCheck = urlParams.get('skip-auth-check')
+      
+      if (skipAuthCheck === 'true') {
+        // URLパラメータをクリア
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.delete('skip-auth-check')
+        window.history.replaceState({}, '', newUrl.toString())
+        setIsCheckingAuth(false)
+        return
+      }
+      
       const accessToken = localStorage.getItem('accessToken')
       
       if (!accessToken) {
@@ -42,8 +55,6 @@ export const useLoginPage = () => {
           const userData = await response.json()
           const hasPlan = userData.plan !== null && userData.plan !== undefined
           
-          console.log('🔍 [Login] Already authenticated, redirecting...')
-          
           if (!hasPlan) {
             router.push('/plan-registration')
           } else {
@@ -54,8 +65,7 @@ export const useLoginPage = () => {
           localStorage.removeItem('refreshToken')
           setIsCheckingAuth(false)
         }
-      } catch (error) {
-        console.error('Auth check error:', error)
+      } catch {
         setIsCheckingAuth(false)
       }
     }
@@ -103,8 +113,6 @@ export const useLoginPage = () => {
         throw new Error(data.error || 'パスワード認証に失敗しました')
       }
 
-      console.log('Password authentication successful:', data)
-
       // OTP送信
       const otpResponse = await fetch('/api/auth/send-otp', {
         method: 'POST',
@@ -119,13 +127,11 @@ export const useLoginPage = () => {
       }
 
       const otpData = await otpResponse.json()
-      console.log('OTP sent successfully:', otpData)
 
       setEmail(loginData.email)
       setRequestId(otpData.requestId)
       setLoginStep("otp")
     } catch (err) {
-      console.error('Login error:', err)
       setError(err instanceof Error ? err.message : 'ログインに失敗しました')
     } finally {
       setIsLoading(false)
@@ -152,14 +158,18 @@ export const useLoginPage = () => {
         throw new Error(data.error || 'ワンタイムパスワードの認証に失敗しました')
       }
 
-      console.log('OTP verification successful:', data)
-
       // トークンを保存
       if (data.accessToken) {
         localStorage.setItem('accessToken', data.accessToken)
       }
       if (data.refreshToken) {
         localStorage.setItem('refreshToken', data.refreshToken)
+      }
+
+      // トークンが存在しない場合は遷移を停止（メールアドレス変更成功時のログアウト処理のため）
+      const currentToken = localStorage.getItem('accessToken')
+      if (!currentToken) {
+        return
       }
 
       // プラン登録状況を確認
@@ -173,35 +183,26 @@ export const useLoginPage = () => {
         
         if (userResponse.ok) {
           const userData = await userResponse.json()
-          console.log('🔍 [OTP] User data:', userData)
-          console.log('🔍 [OTP] User plan:', userData.plan)
           hasPlan = userData.plan !== null && userData.plan !== undefined
-          console.log('🔍 [OTP] hasPlan:', hasPlan)
         }
-      } catch (error) {
-        console.error('❌ [OTP] Failed to fetch user data:', error)
+      } catch {
+        // エラー処理
       }
 
       // リダイレクト
       const redirectPath = sessionStorage.getItem('redirectAfterLogin')
-      console.log('🔍 [OTP] redirectPath:', redirectPath)
-      console.log('🔍 [OTP] hasPlan:', hasPlan)
       
       if (redirectPath) {
         sessionStorage.removeItem('redirectAfterLogin')
-        console.log('🔍 [OTP] Redirecting to:', redirectPath)
         router.push(redirectPath)
       } else {
         if (!hasPlan) {
-          console.log('🔍 [OTP] Redirecting to plan registration')
           router.push('/plan-registration')
         } else {
-          console.log('🔍 [OTP] Redirecting to mypage')
           router.push('/home?view=mypage&auto-login=true')
         }
       }
     } catch (err) {
-      console.error('OTP verification error:', err)
       setError(err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました')
     } finally {
       setIsLoading(false)
@@ -228,9 +229,7 @@ export const useLoginPage = () => {
 
       const otpData = await response.json()
       setRequestId(otpData.requestId)
-      console.log('OTP resent successfully:', otpData)
     } catch (err) {
-      console.error('OTP resend error:', err)
       setError(err instanceof Error ? err.message : 'ワンタイムパスワードの再送信に失敗しました')
     } finally {
       setIsLoading(false)

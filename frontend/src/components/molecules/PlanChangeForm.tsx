@@ -48,7 +48,6 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       const accessToken = localStorage.getItem('accessToken')
       
       if (!accessToken) {
-        console.log('🔍 [plan-change] No access token, setting saitamaAppLinked to false')
         setSaitamaAppLinked(false)
         return
       }
@@ -63,14 +62,11 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       if (response.ok) {
         const userData = await response.json()
         const newLinkedState = userData.saitamaAppLinked === true
-        console.log('🔍 [plan-change] User saitamaAppLinked:', newLinkedState)
         setSaitamaAppLinked(newLinkedState)
       } else {
-        console.log('🔍 [plan-change] Response not ok, setting saitamaAppLinked to false')
         setSaitamaAppLinked(false)
       }
-    } catch (error) {
-      console.error('❌ [plan-change] Failed to fetch user info:', error)
+    } catch {
       setSaitamaAppLinked(false)
     }
   }, [])
@@ -88,7 +84,6 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       }
       
       const apiUrl = `/api/plans?${queryParams.toString()}`
-      console.log('🔍 [plan-change] Fetching plans from:', apiUrl)
       const response = await fetch(apiUrl)
       
       if (!response.ok) {
@@ -97,11 +92,6 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       }
       
       const data = await response.json()
-      
-      console.log('🔍 [plan-change] Plans fetched:', {
-        planCount: data.plans?.length,
-        plans: data.plans?.map((p: { id: string; name: string; price: number }) => ({ id: p.id, name: p.name, price: p.price })),
-      })
       
       // APIから取得したプランをPlanOption形式に変換
       const formattedPlans: PlanOption[] = data.plans.map((plan: { 
@@ -125,8 +115,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       }))
       
       setAvailablePlans(formattedPlans)
-    } catch (err) {
-      console.error('プラン取得エラー:', err)
+    } catch {
       setFetchError('プランの取得に失敗しました')
     }
   }, [saitamaAppLinked])
@@ -236,8 +225,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       // 連携成功後、プランを再取得
       await fetchUserInfo()
       await fetchPlans()
-    } catch (err) {
-      console.error('Link saitama app error:', err)
+    } catch {
       setLinkError('さいたま市アプリ連携中にエラーが発生しました')
     } finally {
       setIsLinking(false)

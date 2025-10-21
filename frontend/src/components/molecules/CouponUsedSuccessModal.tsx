@@ -61,7 +61,7 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
                 autoStart={true}
                 showButton={false}
                 onAnimationComplete={() => {
-                  console.log('クーポン使用アニメーション完了！');
+                  // アニメーション完了
                 }}
               />
             </div>

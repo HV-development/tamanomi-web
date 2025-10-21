@@ -2,8 +2,8 @@ import { MyPageContainer } from "../organisms/MypageContainer"
 import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 
 interface MyPageLayoutProps {
-  user: User
-  plan: Plan
+  user?: User
+  plan?: Plan
   usageHistory: UsageHistory[]
   paymentHistory: PaymentHistory[]
   currentView:
@@ -43,6 +43,7 @@ interface MyPageLayoutProps {
   passwordChangeError?: string | null
   newEmail?: string
   currentUserRank?: string | null
+  isEmailChangeSuccessModalOpen?: boolean
 }
 
 export function MyPageLayout({
@@ -78,6 +79,7 @@ export function MyPageLayout({
   passwordChangeError,
   newEmail,
   currentUserRank,
+  isEmailChangeSuccessModalOpen,
 }: MyPageLayoutProps) {
   return (
     <MyPageContainer
@@ -113,6 +115,7 @@ export function MyPageLayout({
       passwordChangeError={passwordChangeError}
       newEmail={newEmail}
       currentUserRank={currentUserRank}
+      isEmailChangeSuccessModalOpen={isEmailChangeSuccessModalOpen}
     />
   )
 }

@@ -15,7 +15,6 @@ export const usePaymentReturn = () => {
   useEffect(() => {
     // 既に処理済み、または処理中の場合はスキップ
     if (hasProcessedRef.current || isProcessingRef.current) {
-      console.log('🔍 [payment-return] Already processed or processing, skipping')
       return
     }
 
@@ -28,14 +27,6 @@ export const usePaymentReturn = () => {
         const customerCardId = searchParams.get('customer_card_id')
         const errorCode = searchParams.get('error_code')
         const responseCode = searchParams.get('response_code')
-        
-        console.log('🔍 [payment-return] Payment return parameters:', {
-          customerId,
-          customerCardId,
-          errorCode,
-          responseCode,
-          allParams: Object.fromEntries(searchParams.entries())
-        })
 
         // エラーチェック
         const finalErrorCode = errorCode || responseCode
@@ -65,43 +56,24 @@ export const usePaymentReturn = () => {
           sessionStorage.setItem('paygentCustomerCardId', customerCardId)
         }
 
-        console.log('Card registration successful:', { customerId, customerCardId })
-
         // PaymentSessionから情報を取得
         let selectedPlanId: string | null = null
         let userEmail: string | null = null
 
         try {
-          console.log('🔍 [payment-return] Fetching PaymentSession for customerId:', customerId)
           const sessionResponse = await fetch(`/api/payment/session/${customerId}`)
-          
-          console.log('🔍 [payment-return] PaymentSession response:', {
-            status: sessionResponse.status,
-            ok: sessionResponse.ok
-          })
           
           if (sessionResponse.ok) {
             const sessionData = await sessionResponse.json()
             selectedPlanId = sessionData.planId || null
             userEmail = sessionData.userEmail
-            console.log('✅ [payment-return] Retrieved from PaymentSession:', { 
-              selectedPlanId, 
-              userEmail,
-              hasplanId: !!selectedPlanId,
-              planIdType: typeof selectedPlanId
-            })
           } else {
-            const errorText = await sessionResponse.text()
-            console.log('⚠️ [payment-return] PaymentSession not found, falling back to sessionStorage:', errorText)
             selectedPlanId = sessionStorage.getItem('selectedPlanId')
             userEmail = sessionStorage.getItem('userEmail')
-            console.log('📦 [payment-return] Retrieved from sessionStorage:', { selectedPlanId, userEmail })
           }
-        } catch (error) {
-          console.error('❌ [payment-return] Failed to retrieve PaymentSession, using sessionStorage:', error)
+        } catch {
           selectedPlanId = sessionStorage.getItem('selectedPlanId')
           userEmail = sessionStorage.getItem('userEmail')
-          console.log('📦 [payment-return] Retrieved from sessionStorage (error fallback):', { selectedPlanId, userEmail })
         }
 
         if (!userEmail) {
@@ -111,14 +83,6 @@ export const usePaymentReturn = () => {
         // ユーザープラン作成（プランIDがある場合のみ）
         const isPaymentMethodChange = !selectedPlanId
         setIsPaymentMethodChangeOnly(isPaymentMethodChange)
-        
-        if (selectedPlanId) {
-          console.log('🔍 [payment-return] Creating user plan with planId:', selectedPlanId)
-          console.log('🔍 [payment-return] planId type:', typeof selectedPlanId)
-          console.log('🔍 [payment-return] planId length:', selectedPlanId.length)
-        } else {
-          console.log('🔍 [payment-return] No planId, this is a payment method change only')
-        }
         
         if (selectedPlanId) {
           const accessToken = localStorage.getItem('accessToken')
@@ -143,8 +107,7 @@ export const usePaymentReturn = () => {
             throw new Error(errorData.message || 'プラン登録に失敗しました')
           }
 
-          const planData = await createPlanResponse.json()
-          console.log('User plan created successfully:', planData)
+          await createPlanResponse.json()
         }
 
         // PaymentSessionをクリーンアップ（成功時のみ）
@@ -152,9 +115,8 @@ export const usePaymentReturn = () => {
           await fetch(`/api/payment/session/${customerId}`, {
             method: 'DELETE',
           })
-          console.log('PaymentSession cleaned up successfully')
-        } catch (cleanupError) {
-          console.warn('Failed to cleanup PaymentSession:', cleanupError)
+        } catch {
+          // クリーンアップ失敗
         }
 
         // sessionStorageをクリア
@@ -169,16 +131,13 @@ export const usePaymentReturn = () => {
         // 2秒後にリダイレクト
         setTimeout(() => {
           if (isPaymentMethodChangeOnly) {
-            console.log('🔍 [payment-return] Payment method change completed, redirecting to mypage')
             router.push('/home?view=mypage&payment-method-change-success=true')
           } else {
-            console.log('🔍 [payment-return] Plan registration completed, redirecting to mypage')
             router.push('/home?view=mypage&payment-success=true')
           }
         }, 2000)
 
       } catch (err) {
-        console.error('Payment return processing error:', err)
         setError(err instanceof Error ? err.message : 'カード登録処理中にエラーが発生しました')
         setIsProcessing(false)
         hasProcessedRef.current = true

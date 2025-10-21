@@ -117,8 +117,7 @@ export default function PlanRegistrationPage() {
       // const validatedData = PlanListResponseSchema.parse(data)
       // setPlans(validatedData.plans)
       setPlans(data.plans)
-    } catch (err) {
-      console.error('プラン取得エラー:', err)
+    } catch {
       setError('プランの取得に失敗しました')
     } finally {
       setIsLoading(false)
@@ -182,13 +181,6 @@ export default function PlanRegistrationPage() {
         requestBody.planId = planId // セッション管理用（これがPaymentSessionに保存される）
       }
       
-      console.log('🔍 [plan-registration] Payment register request:', {
-        isPaymentMethodChangeOnly,
-        planId,
-        hasPlanIdInBody: 'planId' in requestBody,
-        requestBody
-      })
-      
       const response = await fetch('/api/payment/register', {
         method: 'POST',
         headers: {
@@ -237,8 +229,7 @@ export default function PlanRegistrationPage() {
         document.body.appendChild(form)
         form.submit()
       }
-    } catch (err) {
-      console.error('プラン登録エラー:', err)
+    } catch {
       setError('プランの登録に失敗しました')
     } finally {
       setIsLoading(false)
@@ -270,8 +261,8 @@ export default function PlanRegistrationPage() {
         // 状態更新を待たずに、明示的に新しい状態でプランを再取得
         await fetchPlans(newLinkedState)
       }
-    } catch (error) {
-      console.error('Failed to refresh user data:', error)
+    } catch {
+      // エラー処理
     }
   }
 

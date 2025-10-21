@@ -52,8 +52,6 @@ export class ApiClient {
 
       // トークン期限切れの場合
       if (response.status === 403 && requireAuth && autoRefresh) {
-        console.log('🔄 Token expired, attempting refresh...');
-        
         const refreshResult = await this.refreshToken();
         if (refreshResult.success) {
           // リフレッシュ成功時、元のリクエストを再実行
@@ -75,7 +73,6 @@ export class ApiClient {
         }
         
         // リフレッシュ失敗時、ログイン画面に遷移
-        console.log('❌ Token refresh failed, redirecting to login');
         this.redirectToLogin();
         return { error: { code: 'AUTHENTICATION_FAILED', message: '認証に失敗しました' } };
       }
@@ -86,8 +83,7 @@ export class ApiClient {
       }
 
       return { data: await response.json() };
-    } catch (error) {
-      console.error('API request error:', error);
+    } catch {
       return { error: { code: 'NETWORK_ERROR', message: 'ネットワークエラーが発生しました' } };
     }
   }
@@ -114,13 +110,11 @@ export class ApiClient {
         const data = await response.json();
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
-        console.log('✅ Token refreshed successfully');
         return { success: true };
       }
 
       return { success: false };
-    } catch (error) {
-      console.error('Token refresh error:', error);
+    } catch {
       return { success: false };
     }
   }
@@ -210,12 +204,6 @@ export async function preRegister(
       }),
     })
 
-    console.log('preRegister response:', {
-      status: response.status,
-      ok: response.ok,
-      statusText: response.statusText
-    })
-
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       const message = errorData.error?.message || errorData.message || '認証メールの送信に失敗しました'
@@ -223,10 +211,8 @@ export async function preRegister(
     }
 
     const data = await response.json()
-    console.log('preRegister success data:', data)
     return data
   } catch (error) {
-    console.error('preRegister error:', error)
     if (error instanceof Error) {
       throw error
     }

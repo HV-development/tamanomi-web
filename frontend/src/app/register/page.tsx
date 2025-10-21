@@ -23,7 +23,6 @@ export default function RegisterPage() {
 
       // トークンが存在しない場合はメール登録画面にリダイレクト
       if (!token || token.trim() === '') {
-        console.log('❌ Token is missing or empty, redirecting to email registration')
         router.push('/email-registration')
         return
       }

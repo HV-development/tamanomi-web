@@ -46,8 +46,7 @@ export const usePaymentMethodChange = () => {
         } else {
           setError('ユーザー情報の取得に失敗しました。')
         }
-      } catch (error) {
-        console.error('Failed to fetch user info:', error)
+      } catch {
         setError('ユーザー情報の取得中にエラーが発生しました。')
       }
     }
@@ -71,12 +70,9 @@ export const usePaymentMethodChange = () => {
                         !paymentCard
       
       if (isMockMode) {
-        console.log('🔧 [payment-method-change] Mock mode detected')
-        
         const mockCustomerId = paymentCard?.paygentCustomerId || `cust_${Date.now()}`
         const mockCustomerCardId = paymentCard?.paygentCustomerCardId || 'mock_initial'
         
-        console.log('🔧 [payment-method-change] Creating PaymentSession via update API')
         const response = await fetch('/api/payment/update', {
           method: 'POST',
           headers: {
@@ -95,10 +91,8 @@ export const usePaymentMethodChange = () => {
         }
         
         await response.json()
-        console.log('🔧 [payment-method-change] PaymentSession created, redirecting to mock payment')
         
         const mockUrl = `/payment-mock?customer_id=${mockCustomerId}&operation_type=02`
-        console.log('🔧 [payment-method-change] Redirecting to:', mockUrl)
         window.location.href = mockUrl
         return
       }
@@ -127,7 +121,6 @@ export const usePaymentMethodChange = () => {
       }
       
       const data = await response.json()
-      console.log('Payment update response:', data)
       
       if (data.redirectUrl && data.params) {
         const form = document.createElement('form')
@@ -147,7 +140,6 @@ export const usePaymentMethodChange = () => {
       }
       
     } catch (error: unknown) {
-      console.error('Payment method change error:', error)
       setError(error instanceof Error ? error.message : 'カード変更の準備中にエラーが発生しました')
       setIsLoading(false)
     }

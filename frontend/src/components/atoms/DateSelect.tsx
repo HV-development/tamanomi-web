@@ -5,12 +5,13 @@ import { useState, useEffect, useRef } from "react"
 interface DateSelectProps {
   value: string // yyyy/MM/dd形式
   onChange: (value: string) => void
+  onBlur?: () => void
   label?: string
   error?: string
   className?: string
 }
 
-export function DateSelect({ value, onChange, label, error, className = "" }: DateSelectProps) {
+export function DateSelect({ value, onChange, onBlur, label, error, className = "" }: DateSelectProps) {
   // valueを年・月・日に分割
   const parseDate = (dateStr: string) => {
     if (!dateStr) return { year: "", month: "", day: "" }
@@ -105,6 +106,7 @@ export function DateSelect({ value, onChange, label, error, className = "" }: Da
         <select
           value={selectedDate.year}
           onChange={(e) => handleDateChange("year", e.target.value)}
+          onBlur={onBlur}
           className={`flex-1 ${selectClassName}`}
         >
           <option value="">年</option>
@@ -119,6 +121,7 @@ export function DateSelect({ value, onChange, label, error, className = "" }: Da
         <select
           value={selectedDate.month}
           onChange={(e) => handleDateChange("month", e.target.value)}
+          onBlur={onBlur}
           className={`flex-1 ${selectClassName}`}
         >
           <option value="">月</option>
@@ -133,6 +136,7 @@ export function DateSelect({ value, onChange, label, error, className = "" }: Da
         <select
           value={selectedDate.day}
           onChange={(e) => handleDateChange("day", e.target.value)}
+          onBlur={onBlur}
           className={`flex-1 ${selectClassName}`}
         >
           <option value="">日</option>

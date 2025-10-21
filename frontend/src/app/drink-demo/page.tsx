@@ -5,7 +5,7 @@ import AdvancedDrinkAnimation from '@/components/molecules/AdvancedDrinkAnimatio
 
 export default function DrinkAnimationDemo() {
   const handleAnimationComplete = () => {
-    console.log('Animation completed')
+    // アニメーション完了
   }
 
   return (
@@ -113,7 +113,7 @@ export default function DrinkAnimationDemo() {
   width={200}
   height={200}
   duration={2000}
-  onAnimationComplete={() => console.log('完了！')}
+  onAnimationComplete={() => {}}
 />`}
               </pre>
             </div>
@@ -129,7 +129,7 @@ export default function DrinkAnimationDemo() {
   duration={3000}
   autoStart={false}
   showButton={true}
-  onAnimationComplete={() => console.log('完了！')}
+  onAnimationComplete={() => {}}
 />`}
               </pre>
             </div>

@@ -49,8 +49,7 @@ function VerifyEmailChangeContent() {
               setMessage(errorMessage)
           }
         }
-      } catch (error) {
-        console.error('Email change verification error:', error)
+      } catch {
         setStatus('error')
         setMessage('メールアドレス変更の確認中にエラーが発生しました')
       }

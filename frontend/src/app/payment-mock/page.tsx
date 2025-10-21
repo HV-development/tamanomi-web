@@ -47,16 +47,10 @@ function PaymentMockContent() {
       }
       
       if (!currentCustomerId) {
-        console.error('❌ [PaymentMock] customer_id parameter is missing')
         alert('エラー: customer_idパラメータが見つかりません')
         setIsProcessing(false)
         return
       }
-      
-      console.log('🔍 [PaymentMock] Calling webhook with:', {
-        customerId: currentCustomerId,
-        customerCardId: mockCustomerCardId
-      })
       
       // WebhookをAPIに送信（実際のPaygentと同じフロー）
       // ハッシュは64文字必要（SHA-256ハッシュの16進数表現）
@@ -77,13 +71,10 @@ function PaymentMockContent() {
       })
       
       if (!webhookResponse.ok) {
-        console.error('❌ [PaymentMock] Webhook call failed:', await webhookResponse.text())
         alert('エラー: Webhook処理に失敗しました')
         setIsProcessing(false)
         return
       }
-      
-      console.log('✅ [PaymentMock] Webhook call successful')
       
       // 少し待ってから戻りURLへリダイレクト
       setTimeout(() => {
@@ -91,8 +82,7 @@ function PaymentMockContent() {
         router.push(returnUrl)
       }, 1000)
       
-    } catch (error) {
-      console.error('❌ [PaymentMock] Error:', error)
+    } catch {
       alert('エラーが発生しました')
       setIsProcessing(false)
     }
