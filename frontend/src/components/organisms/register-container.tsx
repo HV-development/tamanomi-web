@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { RegisterForm } from "../molecules/register-form"
+import { RegisterForm } from "./register-form"
 import { UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterContainerProps {

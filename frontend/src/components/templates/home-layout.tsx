@@ -27,7 +27,7 @@ import { BannerCarousel } from "../molecules/banner-carousel"
 import { AreaPopup } from "../molecules/area-popup"
 import { GenrePopup } from "../molecules/genre-popup"
 import { HamburgerMenu } from "../molecules/hamburger-menu"
-import { UsageGuideModal } from "../molecules/usage-guide-modal"
+import { UsageGuideModal } from "@/components/organisms/usage-guide-modal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
 

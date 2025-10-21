@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { EmailChangeForm } from "../molecules/email-change-form"
+import { EmailChangeForm } from "./email-change-form"
 import { EmailChangeComplete } from "../molecules/email-change-complete"
 
 interface EmailChangeContainerProps {

@@ -2,8 +2,8 @@
 
 import { UserX, ChevronRight } from "lucide-react"
 import { HeaderLogo } from "../atoms/header-logo"
-import { ProfileEditForm } from "../molecules/profile-edit-form"
-import { ProfileUpdateSuccessModal } from "../molecules/profile-update-success-modal"
+import { ProfileEditForm } from "./profile-edit-form"
+import { ProfileUpdateSuccessModal } from "./profile-update-success-modal"
 import { useState } from "react"
 import type { User } from "@/types/user"
 

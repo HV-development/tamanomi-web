@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { PlanChangeForm } from "../molecules/plan-change-form"
+import { PlanChangeForm } from "./plan-change-form"
 import type { Plan } from "@/types/user"
 
 interface PlanChangeContainerProps {

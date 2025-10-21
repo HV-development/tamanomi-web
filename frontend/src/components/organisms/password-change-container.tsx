@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { PasswordChangeForm } from "../molecules/password-change-form"
+import { PasswordChangeForm } from "./password-change-form"
 import { PasswordChangeComplete } from "../molecules/password-change-complete"
 
 interface PasswordChangeContainerProps {

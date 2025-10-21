@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { PlanRegistrationForm } from "../molecules/plan-registration-form"
+import { PlanRegistrationForm } from "./plan-registration-form"
 import { PlanListResponse } from '@hv-development/schemas'
 
 interface PlanRegistrationContainerProps {

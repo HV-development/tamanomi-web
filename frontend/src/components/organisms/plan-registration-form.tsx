@@ -3,7 +3,7 @@
 import { CreditCard, AlertCircle, Link as LinkIcon, CheckCircle } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
-import { PlanCard } from "./plan-card"
+import { PlanCard } from "@/components/molecules/plan-card"
 import { Button } from "@/components/atoms/button"
 import { Input } from "@/components/atoms/input"
 import { Modal } from "@/components/atoms/modal"
