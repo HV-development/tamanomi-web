@@ -52,7 +52,7 @@ export default function PlanRegistrationPage() {
       } else {
         setSaitamaAppLinked(false)
       }
-    } catch (error) {
+    } catch {
       setSaitamaAppLinked(false)
     }
   }, [email])
@@ -147,8 +147,6 @@ export default function PlanRegistrationPage() {
       
       const isPaymentMethodChangeOnly = !planId || planId === ""
       
-      // トークンの確認（デバッグ用）
-      const accessToken = localStorage.getItem('accessToken')
       // メールアドレスの検証
       if (!email || email.trim() === '') {
         setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')

@@ -8,15 +8,14 @@ import type { UsageHistory } from "@/types/user"
 
 interface UsageHistoryListProps {
   history: UsageHistory[]
-  onBackToMyPage: () => void
-  onBackToTop: () => void
+  onBackToMyPage?: () => void // 無料キャンペーン中は未使用
+  onBackToTop?: () => void // 無料キャンペーン中は未使用
   className?: string
 }
 
 export function UsageHistoryList({
   history,
-  onBackToMyPage,
-  onBackToTop,
+  // onBackToMyPage, onBackToTop は無料キャンペーン中は未使用（将来のために型定義のみ保持）
   className = ""
 }: UsageHistoryListProps) {
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"

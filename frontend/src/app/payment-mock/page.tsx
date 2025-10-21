@@ -24,22 +24,7 @@ function PaymentMockContent() {
       return
     }
 
-    // POSTリクエストのボディから取得を試行（フォーム送信時）
-    const handleFormData = () => {
-      // フォームデータが送信された場合の処理
-      const formData = new FormData()
-      // 実際のフォームデータは送信時に処理される
-    }
-
-    // ページロード時にフォームデータをチェック
-    if (typeof window !== 'undefined') {
-      // URLにcustomer_idが含まれていない場合、POSTデータから取得を試行
-      const url = new URL(window.location.href)
-      if (!url.searchParams.has('customer_id')) {
-        // POSTリクエストの場合、フォームデータから取得
-        // これは実際のフォーム送信時に処理される
-      }
-    }
+    // POSTリクエストのボディから取得は handleSubmit 内で処理
   }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {

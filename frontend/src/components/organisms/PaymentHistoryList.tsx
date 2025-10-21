@@ -8,16 +8,15 @@ import type { PaymentHistory } from "@/types/user"
 
 interface PaymentHistoryListProps {
   history: PaymentHistory[]
-  onBackToMyPage: () => void
-  onBackToTop: () => void
+  onBackToMyPage?: () => void // 無料キャンペーン中は未使用
+  onBackToTop?: () => void // 無料キャンペーン中は未使用
   className?: string
   currentUserRank?: string | null
 }
 
 export function PaymentHistoryList({
   history,
-  onBackToMyPage,
-  onBackToTop,
+  // onBackToMyPage, onBackToTop は無料キャンペーン中は未使用（将来のために型定義のみ保持）
   className = ""
 }: PaymentHistoryListProps) {
   // 全ての背景色をブロンズ・非会員色に統一
