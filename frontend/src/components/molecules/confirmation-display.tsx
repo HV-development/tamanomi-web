@@ -3,17 +3,7 @@
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import { Button } from "@/components/atoms/button"
-
-interface SignupFormData {
-  nickname: string
-  password: string
-  passwordConfirm: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  saitamaAppId: string
-}
+import type { SignupFormData } from "@/types/forms"
 
 interface ConfirmationDisplayProps {
   data: SignupFormData

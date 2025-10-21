@@ -3,15 +3,7 @@
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-
-interface Banner {
-  id: string
-  title: string
-  subtitle: string
-  imageUrl: string
-  backgroundColor: string
-  textColor: string
-}
+import type { Banner } from "@/types/ui"
 
 interface BannerCarouselProps {
   className?: string

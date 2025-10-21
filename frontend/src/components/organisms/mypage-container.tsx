@@ -21,15 +21,7 @@ import {
   LazyWithdrawalLayout,
   LazyFallback
 } from "@/lib/lazy"
-
-interface ProfileEditFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  saitamaAppId: string
-}
+import type { ProfileEditFormData } from "@/types/forms"
 interface MyPageContainerProps {
   user: UserType
   plan: Plan

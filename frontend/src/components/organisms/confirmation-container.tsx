@@ -2,17 +2,7 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { ConfirmationDisplay } from "@/components/molecules/confirmation-display"
-
-interface SignupFormData {
-  nickname: string
-  password: string
-  passwordConfirm: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  saitamaAppId: string
-}
+import type { SignupFormData } from "@/types/forms"
 
 interface ConfirmationContainerProps {
   data: SignupFormData

@@ -2,14 +2,7 @@
 
 import Image from "next/image"
 import React from 'react'
-
-
-interface Coupon {
-  id: string
-  name: string
-  description: string
-  imageUrl?: string
-}
+import type { Coupon } from '@hv-development/schemas'
 
 interface CouponConfirmationPageProps {
   coupon: Coupon | null

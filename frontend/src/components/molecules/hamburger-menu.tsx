@@ -2,12 +2,7 @@
 
 import { useState } from "react"
 import { Menu, X, ChevronRight } from "lucide-react"
-
-interface MenuItem {
-  id: string
-  label: string
-  onClick: () => void
-}
+import type { MenuItem } from "@/types/ui"
 
 interface HamburgerMenuProps {
   onMenuItemClick: (itemId: string) => void

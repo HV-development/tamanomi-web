@@ -6,15 +6,7 @@ import { ProfileEditForm } from "./profile-edit-form"
 import { ProfileUpdateSuccessModal } from "./profile-update-success-modal"
 import { useState } from "react"
 import type { User } from "@/types/user"
-
-interface ProfileEditFormData {
-  nickname: string
-  postalCode: string
-  address: string
-  birthDate: string
-  gender: string
-  saitamaAppId: string
-}
+import type { ProfileEditFormData } from "@/types/forms"
 
 interface ProfileEditContainerProps {
   user: User

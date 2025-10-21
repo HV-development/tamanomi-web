@@ -1,29 +1,5 @@
 import { useState } from 'react';
-
-export type ViewType =
-    | "home"
-    | "login"
-    | "email-registration"
-    | "signup"
-    | "confirmation"
-    | "subscription"
-    | "mypage"
-    | "password-reset"
-    | "email-confirmation"
-    | "coupon-confirmation"
-    | "usage-guide";
-
-export type MyPageViewType =
-    | "main"
-    | "profile-edit"
-    | "email-change"
-    | "password-change"
-    | "usage-history"
-    | "payment-history"
-    | "plan-management"
-    | "plan-change"
-    | "withdrawal"
-    | "withdrawal-complete";
+import type { ViewType, MyPageViewType } from '@/types/navigation';
 
 export function useNavigation() {
     const [activeTab, setActiveTab] = useState("home");

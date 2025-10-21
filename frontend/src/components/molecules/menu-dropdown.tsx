@@ -1,12 +1,7 @@
 "use client"
 
 import { ChevronRight } from "lucide-react"
-
-interface MenuItem {
-  id: string
-  label: string
-  onClick: () => void
-}
+import type { MenuItem } from "@/types/ui"
 
 interface MenuDropdownProps {
   isOpen: boolean
