@@ -1,0 +1,270 @@
+"use client"
+
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+
+export const useLoginPage = () => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string>("")
+  const [loginStep, setLoginStep] = useState<"password" | "otp">("password")
+  const [email, setEmail] = useState<string>("")
+  const [requestId, setRequestId] = useState<string>("")
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+
+  // URLパラメータをメモ化
+  const urlParams = useMemo(() => ({
+    paymentSuccess: searchParams.get('payment-success'),
+    view: searchParams.get('view'),
+    error: searchParams.get('error'),
+    email: searchParams.get('email')
+  }), [searchParams])
+
+  // 認証状態チェック
+  useEffect(() => {
+    const checkAuth = async () => {
+      const accessToken = localStorage.getItem('accessToken')
+      
+      if (!accessToken) {
+        setIsCheckingAuth(false)
+        return
+      }
+
+      try {
+        const response = await fetch('/api/user/me', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        })
+
+        if (response.ok) {
+          const userData = await response.json()
+          const hasPlan = userData.plan !== null && userData.plan !== undefined
+          
+          console.log('🔍 [Login] Already authenticated, redirecting...')
+          
+          if (!hasPlan) {
+            router.push('/plan-registration')
+          } else {
+            router.push('/home?view=mypage')
+          }
+        } else {
+          localStorage.removeItem('accessToken')
+          localStorage.removeItem('refreshToken')
+          setIsCheckingAuth(false)
+        }
+      } catch (error) {
+        console.error('Auth check error:', error)
+        setIsCheckingAuth(false)
+      }
+    }
+
+    checkAuth()
+  }, [router])
+
+  // URLパラメータ処理
+  useEffect(() => {
+    const { paymentSuccess, view } = urlParams
+
+    if (paymentSuccess === 'true' || view === 'mypage') {
+      if (typeof window !== 'undefined' && view === 'mypage') {
+        sessionStorage.setItem('redirectAfterLogin', `/home?view=mypage${paymentSuccess ? '&payment-success=true' : ''}`)
+      }
+    }
+  }, [urlParams])
+
+  // エラーメッセージ取得
+  useEffect(() => {
+    const { error: errorParam, email: emailParam } = urlParams
+
+    if (errorParam === 'already_registered') {
+      setError(`このメールアドレス（${emailParam}）は既に登録されています。ログイン画面からログインしてください。`)
+    }
+  }, [urlParams])
+
+  // パスワード認証
+  const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: loginData.email, password: loginData.password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'パスワード認証に失敗しました')
+      }
+
+      console.log('Password authentication successful:', data)
+
+      // OTP送信
+      const otpResponse = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: loginData.email }),
+      })
+
+      if (!otpResponse.ok) {
+        throw new Error('ワンタイムパスワードの送信に失敗しました')
+      }
+
+      const otpData = await otpResponse.json()
+      console.log('OTP sent successfully:', otpData)
+
+      setEmail(loginData.email)
+      setRequestId(otpData.requestId)
+      setLoginStep("otp")
+    } catch (err) {
+      console.error('Login error:', err)
+      setError(err instanceof Error ? err.message : 'ログインに失敗しました')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  // OTP認証
+  const handleOtpVerify = useCallback(async (otp: string) => {
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otp, requestId }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'ワンタイムパスワードの認証に失敗しました')
+      }
+
+      console.log('OTP verification successful:', data)
+
+      // トークンを保存
+      if (data.accessToken) {
+        localStorage.setItem('accessToken', data.accessToken)
+      }
+      if (data.refreshToken) {
+        localStorage.setItem('refreshToken', data.refreshToken)
+      }
+
+      // プラン登録状況を確認
+      let hasPlan = false
+      try {
+        const userResponse = await fetch('/api/user/me', {
+          headers: {
+            'Authorization': `Bearer ${data.accessToken}`,
+          },
+        })
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json()
+          console.log('🔍 [OTP] User data:', userData)
+          console.log('🔍 [OTP] User plan:', userData.plan)
+          hasPlan = userData.plan !== null && userData.plan !== undefined
+          console.log('🔍 [OTP] hasPlan:', hasPlan)
+        }
+      } catch (error) {
+        console.error('❌ [OTP] Failed to fetch user data:', error)
+      }
+
+      // リダイレクト
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin')
+      console.log('🔍 [OTP] redirectPath:', redirectPath)
+      console.log('🔍 [OTP] hasPlan:', hasPlan)
+      
+      if (redirectPath) {
+        sessionStorage.removeItem('redirectAfterLogin')
+        console.log('🔍 [OTP] Redirecting to:', redirectPath)
+        router.push(redirectPath)
+      } else {
+        if (!hasPlan) {
+          console.log('🔍 [OTP] Redirecting to plan registration')
+          router.push('/plan-registration')
+        } else {
+          console.log('🔍 [OTP] Redirecting to mypage')
+          router.push('/home?view=mypage&auto-login=true')
+        }
+      }
+    } catch (err) {
+      console.error('OTP verification error:', err)
+      setError(err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [email, requestId, router])
+
+  // OTP再送信
+  const handleResendOtp = useCallback(async () => {
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      if (!response.ok) {
+        throw new Error('ワンタイムパスワードの再送信に失敗しました')
+      }
+
+      const otpData = await response.json()
+      setRequestId(otpData.requestId)
+      console.log('OTP resent successfully:', otpData)
+    } catch (err) {
+      console.error('OTP resend error:', err)
+      setError(err instanceof Error ? err.message : 'ワンタイムパスワードの再送信に失敗しました')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [email])
+
+  // パスワード入力画面に戻る
+  const handleBackToPassword = useCallback(() => {
+    setLoginStep("password")
+    setError("")
+  }, [])
+
+  // 新規登録画面へ
+  const handleSignup = useCallback(() => {
+    router.push('/email-registration')
+  }, [router])
+
+  // パスワードリセット画面へ
+  const handleForgotPassword = useCallback(() => {
+    router.push('/password-reset')
+  }, [router])
+
+  return {
+    isLoading,
+    error,
+    loginStep,
+    email,
+    isCheckingAuth,
+    handlePasswordLogin,
+    handleOtpVerify,
+    handleResendOtp,
+    handleBackToPassword,
+    handleSignup,
+    handleForgotPassword,
+  }
+}
+
