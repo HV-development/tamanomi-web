@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 const images = [
   "/lp/images/banner-placeholder.png",
@@ -10,6 +11,7 @@ const images = [
 ];
 
 export default function LPPage() {
+  const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(3) // 2回目のセットの先頭から開始
 
@@ -101,9 +103,8 @@ export default function LPPage() {
                   alt="たまのみ"
                   width={328}
                   height={80}
+                  className="w-48 h-12 md:w-82 md:h-20"
                   style={{
-                    width: '328px',
-                    height: '80px',
                     flexShrink: 0
                   }}
                 />
@@ -141,10 +142,10 @@ export default function LPPage() {
             {/* Main Title */}
             <div className="mb-10 md:mb-6" style={{ position: 'relative' }}>
               <h1 
+                className="text-4xl md:text-8xl"
                 style={{
                   color: '#FFF',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '80px',
                   fontWeight: '700',
                   lineHeight: '100%'
                 }}
@@ -156,21 +157,17 @@ export default function LPPage() {
                 alt="1軒"
                 width={156}
                 height={128}
-                style={{
-                  position: 'absolute',
-                  left: '60px',
-                  top: '-120px'
-                }}
+                className="absolute left-8 top-[-80px] md:left-16 md:top-[-120px] w-20 h-16 md:w-40 md:h-32"
               />
             </div>
 
             {/* Sub Title */}
             <div className="mb-16 md:mb-10">
               <h2 
+                className="text-xl md:text-4xl"
                 style={{
                   color: '#FFF',
                   fontFamily: '"Shippori Antique"',
-                  fontSize: '34px',
                   fontWeight: '400',
                   lineHeight: '100%',
                   letterSpacing: '-2.38px'
@@ -183,10 +180,9 @@ export default function LPPage() {
             {/* CTA Button */}
             <div className="flex justify-center">
               <button
+                className="w-80 md:w-80 px-4 py-3 md:px-6 md:py-4"
                 style={{
                   display: 'flex',
-                  width: '320px',
-                  padding: '16px 24px',
                   justifyContent: 'center',
                   alignItems: 'center',
                   gap: '8px',
@@ -197,13 +193,14 @@ export default function LPPage() {
                   flexDirection: 'row',
                   position: 'relative'
                 }}
+                onClick={() => router.push('/email-registration')}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                   <span 
+                    className="text-sm md:text-lg"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -212,10 +209,10 @@ export default function LPPage() {
                     今すぐ始める
                   </span>
                   <span 
+                    className="text-lg md:text-2xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '26px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -229,14 +226,7 @@ export default function LPPage() {
                   alt="Arrow right"
                   width={40}
                   height={40}
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    aspectRatio: '1/1',
-                    position: 'absolute',
-                    right: '8px',
-                    top: '22px'
-                  }}
+                  className="w-6 h-6 md:w-10 md:h-10 absolute right-2 top-4 md:right-2 md:top-6"
                 />
               </button>
             </div>
@@ -295,14 +285,12 @@ export default function LPPage() {
                 {extendedImages.map((src, i) => (
                   <div
                     key={i}
-                    className="relative flex-shrink-0 overflow-hidden rounded-lg"
+                    className="relative flex-shrink-0 overflow-hidden rounded-lg w-80 h-44 md:w-96 md:h-52"
                     style={{
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      width: '375px',
-                      height: '210px',
-                      transform: `translateX(-${currentSlide * (375 + 24)}px)`,
+                      transform: `translateX(-${currentSlide * (320 + 24)}px)`,
                       transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
                     }}
                   >
@@ -363,9 +351,9 @@ export default function LPPage() {
         </div>
         
         {/* Content */}
-        <div className="relative z-10 flex items-center justify-center min-h-screen px-8 py-16">
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-center min-h-screen px-4 md:px-8 py-16">
           {/* Central Image */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 z-20">
+          <div className="absolute left-1/2 transform -translate-x-1/2 z-20 w-64 md:w-96">
             <Image
               src="/lp/images/about-section-image.png"
               alt="About Section"
@@ -376,19 +364,19 @@ export default function LPPage() {
           </div>
           
           {/* Left Content */}
-          <div className="w-1/2 flex justify-center items-center pr-8">
+          <div className="w-full md:w-1/2 flex justify-center items-center pr-0 md:pr-8 mb-8 md:mb-0">
             <Image
               src="/lp/images/about-left-text.png"
               alt="たまのみ片手に街を歩こう"
               width={300}
               height={200}
-              className="max-w-full h-auto"
+              className="max-w-full h-auto w-64 md:w-80"
             />
           </div>
           
           {/* Right Content */}
-          <div className="w-1/2 flex flex-col justify-center items-center pl-8">
-            <div className="w-[350px] flex flex-col justify-center items-center">
+          <div className="w-full md:w-1/2 flex flex-col justify-center items-center pl-0 md:pl-8">
+            <div className="w-full max-w-sm md:w-[350px] flex flex-col justify-center items-center">
               {/* Heading */}
               <div className="mb-6">
                 <Image
@@ -441,7 +429,7 @@ export default function LPPage() {
                   alt="1店舗につき1杯無料!"
                   width={300}
                   height={300}
-                  className="max-w-full h-auto"
+                  className="max-w-full h-auto w-64 md:w-80"
                 />
               </div>
               <div className="text-gray-700 text-sm leading-relaxed max-w-md">
@@ -462,7 +450,7 @@ export default function LPPage() {
                   alt="1日で複数店舗をはしごできる!"
                   width={300}
                   height={300}
-                  className="max-w-full h-auto"
+                  className="max-w-full h-auto w-64 md:w-80"
                 />
               </div>
               <div className="text-gray-700 text-sm leading-relaxed max-w-md">
@@ -483,7 +471,7 @@ export default function LPPage() {
                   alt="お酒が苦手でも楽しめる!"
                   width={300}
                   height={300}
-                  className="max-w-full h-auto"
+                  className="max-w-full h-auto w-64 md:w-80"
                 />
               </div>
               <div className="text-gray-700 text-sm leading-relaxed max-w-md">
@@ -504,7 +492,7 @@ export default function LPPage() {
                   alt="新しいお店との出会い!"
                   width={300}
                   height={300}
-                  className="max-w-full h-auto"
+                  className="max-w-full h-auto w-64 md:w-80"
                 />
               </div>
               <div className="text-gray-700 text-sm leading-relaxed max-w-md">
@@ -906,7 +894,7 @@ export default function LPPage() {
 
       {/* Store Recruitment Section */}
       <div 
-        className="w-full py-16 md:py-24 -mt-24"
+        className="w-full py-16 md:py-24 -mt-32"
         style={{ backgroundColor: '#6FC8E5' }}
       >
         <div className="max-w-6xl mx-auto px-8 text-center">
