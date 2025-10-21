@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { PlanCard } from "../atoms/plan-card"
-import { Button } from "../atoms/button"
+import { PlanCard } from "./plan-card"
+import { Button } from "@/components/atoms/button"
 
 interface SubscriptionPlansProps {
   onSubscribe: (planId: string) => void

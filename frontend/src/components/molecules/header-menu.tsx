@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { NotificationIcon } from "../atoms/notification-icon"
-import { HamburgerIcon } from "../atoms/hamburger-icon"
+import { NotificationIcon } from "@/components/atoms/notification-icon"
+import { HamburgerIcon } from "@/components/atoms/hamburger-icon"
 import { MenuDropdown } from "./menu-dropdown"
 
 interface HeaderMenuProps {

@@ -1,7 +1,7 @@
 "use client"
 
 import { StoreList } from "../molecules/store-list";
-import type { Store } from "../../types/store";
+import type { Store } from "@/types/store";
 
 interface HomeContainerProps {
   selectedGenres: string[] | undefined

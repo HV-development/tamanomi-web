@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import type { UserRank } from "../../types/user"
+import type { UserRank } from "@/types/user"
 
 interface RankBadgeProps {
   rank: UserRank

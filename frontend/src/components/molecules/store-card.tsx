@@ -2,9 +2,9 @@
 
 import Image from "next/image"
 import { Navigation, Phone } from "lucide-react"
-import { FavoriteButton } from "./favorite-button"
-import type { Store } from "../../types/store"
-import { getGenreColor } from "../../utils/genre-colors"
+import { FavoriteButton } from "@/components/atoms/favorite-button"
+import type { Store } from "@/types/store"
+import { getGenreColor } from "@/utils/genre-colors"
 import { useState, useRef } from "react"
 
 interface StoreCardProps {

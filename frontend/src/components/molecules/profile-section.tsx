@@ -1,9 +1,9 @@
 "use client"
 
 import { User, CreditCard as Edit, Settings } from "lucide-react"
-import { RankBadge } from "../atoms/rank-badge"
-import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "../../utils/rank-calculator"
-import type { User as UserType, UserRank } from "../../types/user"
+import { RankBadge } from "@/components/atoms/rank-badge"
+import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
+import type { User as UserType, UserRank } from "@/types/user"
 
 interface ProfileSectionProps {
   user: UserType

@@ -2,7 +2,7 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { PlanChangeForm } from "../molecules/plan-change-form"
-import type { Plan } from "../../types/user"
+import type { Plan } from "@/types/user"
 
 interface PlanChangeContainerProps {
   currentPlan: Plan

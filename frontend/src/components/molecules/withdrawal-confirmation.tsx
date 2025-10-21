@@ -1,7 +1,7 @@
 "use client"
 
 import { AlertTriangle } from "lucide-react"
-import { Button } from "../atoms/button"
+import { Button } from "@/components/atoms/button"
 
 interface WithdrawalConfirmationProps {
   onConfirm: () => void

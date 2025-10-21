@@ -3,12 +3,12 @@
 import { CreditCard, AlertCircle, Link as LinkIcon, CheckCircle } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
-import { PlanCard } from "../atoms/plan-card"
-import { Button } from "../atoms/button"
-import { Input } from "../atoms/input"
-import { Modal } from "../atoms/modal"
+import { PlanCard } from "./plan-card"
+import { Button } from "@/components/atoms/button"
+import { Input } from "@/components/atoms/input"
+import { Modal } from "@/components/atoms/modal"
 import { PlanListResponse } from '@hv-development/schemas'
-import { ApiClient } from '../../lib/api-client';
+import { ApiClient } from '@/lib/api-client';
 
 interface PlanRegistrationFormProps {
   onPaymentMethodRegister: (planId: string) => void

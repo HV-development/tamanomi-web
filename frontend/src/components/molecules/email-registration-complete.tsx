@@ -1,7 +1,7 @@
 "use client"
 
 import { Mail, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react"
-import { Button } from "../atoms/button"
+import { Button } from "@/components/atoms/button"
 
 interface EmailRegistrationCompleteProps {
   email: string

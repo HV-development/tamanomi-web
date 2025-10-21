@@ -1,7 +1,7 @@
 "use client"
 
 import { CheckCircle, AlertTriangle, Info } from 'lucide-react'
-import { HeaderLogo } from '../atoms/header-logo'
+import { HeaderLogo } from '@/components/atoms/header-logo'
 
 interface UsageGuidePageProps {
   onBack: () => void

@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "../atoms/button"
+import { Button } from "@/components/atoms/button"
 
 interface EmailChangeCompleteProps {
   currentEmail: string

@@ -1,8 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import { useCouponAudio } from "../../hooks/use-audio"
-import type { Coupon } from "../../types/coupon"
+import { useCouponAudio } from "@/hooks/use-audio"
+import type { Coupon } from "@/types/coupon"
 
 interface CouponConfirmationPopupProps {
   isOpen: boolean

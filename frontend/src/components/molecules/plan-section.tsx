@@ -3,8 +3,8 @@
 import { Crown, Calendar } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import { StatusBadge } from "../atoms/status-badge"
-import type { Plan } from "../../types/user"
+import { StatusBadge } from "@/components/atoms/status-badge"
+import type { Plan } from "@/types/user"
 
 interface PlanSectionProps {
   plan: Plan

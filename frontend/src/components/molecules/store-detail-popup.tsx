@@ -1,7 +1,7 @@
 "use client"
 
 import { X } from "lucide-react"
-import type { Store } from "../../types/store"
+import type { Store } from "@/types/store"
 
 interface StoreDetailPopupProps {
   isOpen: boolean

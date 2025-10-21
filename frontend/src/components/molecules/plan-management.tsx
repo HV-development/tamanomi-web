@@ -3,7 +3,7 @@
 import { Crown, Settings, CreditCard } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import type { Plan } from "../../types/user"
+import type { Plan } from "@/types/user"
 
 interface PlanManagementProps {
   plan: Plan

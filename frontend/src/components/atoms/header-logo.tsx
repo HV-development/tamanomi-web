@@ -1,6 +1,6 @@
 "use client"
 
-import { Logo } from "./logo"
+import { Logo } from "@/components/atoms/logo"
 
 interface HeaderLogoProps {
   onLogoClick: () => void

@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Button } from "../atoms/button"
+import { Button } from "@/components/atoms/button"
 
 interface PasswordResetFormProps {
   onSubmit: (email: string) => void

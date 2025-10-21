@@ -1,9 +1,9 @@
 "use client"
 
 import { useCallback } from "react"
-import { Button } from "../atoms/button"
-import { getGenreColor } from "../../utils/genre-colors"
-import { cn } from "../../lib/utils"
+import { Button } from "@/components/atoms/button"
+import { getGenreColor } from "@/utils/genre-colors"
+import { cn } from "@/lib/utils"
 
 interface GenrePopupProps {
   isOpen: boolean

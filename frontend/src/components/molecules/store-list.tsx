@@ -1,7 +1,7 @@
 "use client"
 
-import { StoreCard } from "../atoms/store-card"
-import type { Store } from "../../types/store"
+import { StoreCard } from "./store-card"
+import type { Store } from "@/types/store"
 
 interface StoreListProps {
   stores: Store[]

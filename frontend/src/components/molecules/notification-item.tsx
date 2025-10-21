@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Bell, AlertTriangle, CheckCircle, Gift, Info } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import type { Notification } from "../../types/notification"
+import type { Notification } from "@/types/notification"
 
 interface NotificationItemProps {
   notification: Notification

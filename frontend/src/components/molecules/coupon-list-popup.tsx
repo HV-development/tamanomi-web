@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { Ticket, X } from "lucide-react"
-import type { Coupon } from "../../types/coupon"
+import type { Coupon } from "@/types/coupon"
 
 interface CouponListPopupProps {
   isOpen: boolean

@@ -2,7 +2,7 @@
 
 import { StoreList } from "./store-list"
 import { X } from "lucide-react"
-import type { Store } from "../../types/store"
+import type { Store } from "@/types/store"
 
 interface HistoryPopupProps {
   isOpen: boolean

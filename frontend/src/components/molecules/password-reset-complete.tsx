@@ -1,7 +1,7 @@
 "use client"
 
 import { Mail, AlertCircle, RefreshCw } from "lucide-react"
-import { Button } from "../atoms/button"
+import { Button } from "@/components/atoms/button"
 
 interface PasswordResetCompleteProps {
   email: string

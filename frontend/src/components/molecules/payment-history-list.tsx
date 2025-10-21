@@ -4,7 +4,7 @@ import Image from "next/image"
 import { CreditCard } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import type { PaymentHistory } from "../../types/user"
+import type { PaymentHistory } from "@/types/user"
 
 interface PaymentHistoryListProps {
   history: PaymentHistory[]

@@ -3,7 +3,7 @@
 import { MapPin, Calendar, Ticket, RotateCcw } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import type { UsageHistory } from "../../types/user"
+import type { UsageHistory } from "@/types/user"
 
 interface UsageHistoryCardProps {
   usage: UsageHistory

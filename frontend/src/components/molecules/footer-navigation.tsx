@@ -1,7 +1,7 @@
 "use client"
 
 import { Home, Heart, User, LogIn } from "lucide-react"
-import { useAppContext } from "../../contexts/AppContext"
+import { useAppContext } from "@/contexts/AppContext"
 
 interface FooterNavigationProps {
   className?: string

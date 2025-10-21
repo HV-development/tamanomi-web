@@ -1,7 +1,7 @@
 "use client"
 
-import { AreaButton } from "../atoms/area-button"
-import { Button } from "../atoms/button"
+import { AreaButton } from "@/components/atoms/area-button"
+import { Button } from "@/components/atoms/button"
 
 interface AreaPopupProps {
   isOpen: boolean

@@ -1,7 +1,7 @@
 "use client"
 
 import { Check } from "lucide-react"
-import { getGenreColor } from "../../utils/genre-colors"
+import { getGenreColor } from "@/utils/genre-colors"
 
 interface GenreButtonProps {
   label: string

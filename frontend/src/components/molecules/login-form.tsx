@@ -2,8 +2,8 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Input } from "../atoms/input"
-import { Button } from "../atoms/button"
+import { Input } from "@/components/atoms/input"
+import { Button } from "@/components/atoms/button"
 import { adminLoginSchema, type AdminLoginInput } from "@hv-development/schemas"
 
 interface LoginFormProps {

@@ -28,8 +28,8 @@ import { AreaPopup } from "../molecules/area-popup"
 import { GenrePopup } from "../molecules/genre-popup"
 import { HamburgerMenu } from "../molecules/hamburger-menu"
 import { UsageGuideModal } from "../molecules/usage-guide-modal"
-import { useAppContext } from "../../contexts/AppContext"
-import type { Store } from "../../types/store"
+import { useAppContext } from "@/contexts/AppContext"
+import type { Store } from "@/types/store"
 
 
 export function HomeLayout() {

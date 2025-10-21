@@ -3,8 +3,8 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Button } from "../atoms/button"
-import { Input } from "../atoms/input"
+import { Button } from "@/components/atoms/button"
+import { Input } from "@/components/atoms/input"
 import { UserRegistrationRequestSchema, type UserRegistrationRequest } from "@hv-development/schemas"
 import { ZodError } from "zod"
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { CheckCircle, Lock, LogIn } from "lucide-react"
-import { Button } from "../atoms/button"
+import { Button } from "@/components/atoms/button"
 
 interface PasswordChangeCompleteProps {
   onBackToLogin: () => void

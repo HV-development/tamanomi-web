@@ -2,7 +2,7 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { PlanManagement } from "../molecules/plan-management"
-import type { Plan } from "../../types/user"
+import type { Plan } from "@/types/user"
 
 interface PlanManagementContainerProps {
   plan: Plan

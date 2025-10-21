@@ -2,10 +2,10 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { Input } from "../atoms/input"
-import { Button } from "../atoms/button"
-import { RadioButton } from "../atoms/radio-button"
-import { DateSelect } from "../atoms/date-select"
+import { Input } from "@/components/atoms/input"
+import { Button } from "@/components/atoms/button"
+import { RadioButton } from "@/components/atoms/radio-button"
+import { DateSelect } from "@/components/atoms/date-select"
 import { UseRregistrationCompleteSchema, type UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterFormProps {

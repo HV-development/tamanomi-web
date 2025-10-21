@@ -3,13 +3,13 @@
 import { useState, useEffect, useCallback } from "react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import { PlanCard } from "../atoms/plan-card"
-import { Button } from "../atoms/button"
+import { PlanCard } from "./plan-card"
+import { Button } from "@/components/atoms/button"
 import { Calendar, CheckCircle, AlertCircle, Link as LinkIcon } from "lucide-react"
 import Image from "next/image"
-import { Modal } from "../atoms/modal"
-import type { Plan } from "../../types/user"
-import { ApiClient } from '../../lib/api-client'
+import { Modal } from "@/components/atoms/modal"
+import type { Plan } from "@/types/user"
+import { ApiClient } from '@/lib/api-client'
 
 interface PlanOption {
   id: string

@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Clock } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import type { Coupon } from "../../types/coupon"
+import type { Coupon } from "@/types/coupon"
 
 interface CouponCardProps {
   coupon: Coupon

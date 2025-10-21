@@ -2,12 +2,12 @@
 
 import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
-import { Logo } from "../atoms/logo"
+import { Logo } from "@/components/atoms/logo"
 import { HamburgerMenu } from "./hamburger-menu"
 import { GenrePopup } from "./genre-popup"
 import { AreaPopup } from "./area-popup"
-import { calculateUserRank } from "../../utils/rank-calculator"
-import type { User as UserType } from "../../types/user"
+import { calculateUserRank } from "@/utils/rank-calculator"
+import type { User as UserType } from "@/types/user"
 
 // ユーザーランク計算のヘルパー関数
 function getUserRankValue(user?: UserType): string | null {

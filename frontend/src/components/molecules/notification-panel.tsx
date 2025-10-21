@@ -1,8 +1,8 @@
 "use client"
 
 import { X, Bell, CheckCheck } from "lucide-react"
-import { NotificationItem } from "../atoms/notification-item"
-import type { Notification } from "../../types/notification"
+import { NotificationItem } from "./notification-item"
+import type { Notification } from "@/types/notification"
 
 interface NotificationPanelProps {
   isOpen: boolean

@@ -1,5 +1,5 @@
 import { MyPageContainer } from "../organisms/mypage-container"
-import type { User, Plan, UsageHistory, PaymentHistory } from "../../types/user"
+import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 
 interface MyPageLayoutProps {
   user: User

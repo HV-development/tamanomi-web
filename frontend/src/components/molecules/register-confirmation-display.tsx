@@ -2,7 +2,7 @@
 
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import { Button } from "../atoms/button"
+import { Button } from "@/components/atoms/button"
 import { UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterConfirmationDisplayProps {
