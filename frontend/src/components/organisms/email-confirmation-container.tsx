@@ -1,7 +1,7 @@
 "use client"
 
 import { Logo } from "../atoms/logo"
-import { EmailConfirmationComplete } from "../molecules/email-confirmation-complete"
+import { EmailConfirmationComplete } from "@/components/molecules/email-confirmation-complete"
 
 interface EmailConfirmationContainerProps {
   email: string

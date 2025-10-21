@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { PlanManagement } from "../molecules/plan-management"
+import { PlanManagement } from "@/components/molecules/plan-management"
 import type { Plan } from "@/types/user"
 
 interface PlanManagementContainerProps {

@@ -2,9 +2,6 @@
 
 import DrinkAnimation from '@/components/molecules/drink-animation';
 import AdvancedDrinkAnimation from '@/components/molecules/advanced-drink-animation';
-import SimpleDrinkTest from '@/components/molecules/simple-drink-test';
-import SimpleDrinkTest2 from '@/components/molecules/simple-drink-test2';
-import BasicTest from '@/components/molecules/basic-test';
 
 export default function DrinkAnimationDemo() {
   const handleAnimationComplete = () => {
@@ -19,48 +16,6 @@ export default function DrinkAnimationDemo() {
         </h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* 基本テスト */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              基本テスト
-            </h2>
-            <div className="flex justify-center">
-              <BasicTest />
-            </div>
-            <div className="mt-4 text-sm text-gray-600">
-              <p>• 最も基本的な画像切り替え</p>
-              <p>• 即座に切り替わる</p>
-            </div>
-          </div>
-
-          {/* 超シンプルテスト */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              超シンプルテスト
-            </h2>
-            <div className="flex justify-center">
-              <SimpleDrinkTest2 />
-            </div>
-            <div className="mt-4 text-sm text-gray-600">
-              <p>• 最もシンプルな実装</p>
-              <p>• コンソールログで動作確認</p>
-            </div>
-          </div>
-
-          {/* シンプルテスト */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              シンプルテスト
-            </h2>
-            <div className="flex justify-center">
-              <SimpleDrinkTest />
-            </div>
-            <div className="mt-4 text-sm text-gray-600">
-              <p>• ボタンクリックで画像切り替え</p>
-              <p>• デバッグ情報表示</p>
-            </div>
-          </div>
-
           {/* 基本的なアニメーション */}
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-semibold mb-4 text-center">

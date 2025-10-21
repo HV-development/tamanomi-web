@@ -1,8 +1,8 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { LoginForm } from "../molecules/login-form"
-import { OtpInputForm } from "../molecules/otp-input-form"
+import { LoginForm } from "@/components/organisms/login-form"
+import { OtpInputForm } from "@/components/organisms/otp-input-form"
 import { type AdminLoginInput } from "@hv-development/schemas"
 
 interface LoginContainerProps {

@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { ConfirmationDisplay } from "../molecules/confirmation-display"
+import { ConfirmationDisplay } from "@/components/molecules/confirmation-display"
 
 interface SignupFormData {
   nickname: string

@@ -2,7 +2,7 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { PasswordChangeForm } from "./password-change-form"
-import { PasswordChangeComplete } from "../molecules/password-change-complete"
+import { PasswordChangeComplete } from "@/components/molecules/password-change-complete"
 
 interface PasswordChangeContainerProps {
   currentStep: "form" | "complete"

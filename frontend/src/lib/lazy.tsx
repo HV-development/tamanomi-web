@@ -4,13 +4,13 @@ import { lazy, Suspense } from "react"
 
 // 重いコンポーネントを遅延読み込み
 export const LazyUsageHistoryList = lazy(() =>
-    import("@/components/molecules/usage-history-list").then(module => ({
+    import("@/components/organisms/usage-history-list").then(module => ({
         default: module.UsageHistoryList
     }))
 )
 
 export const LazyPaymentHistoryList = lazy(() =>
-    import("@/components/molecules/payment-history-list").then(module => ({
+    import("@/components/organisms/payment-history-list").then(module => ({
         default: module.PaymentHistoryList
     }))
 )

@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { RegisterConfirmationDisplay } from "../molecules/register-confirmation-display"
+import { RegisterConfirmationDisplay } from "@/components/molecules/register-confirmation-display"
 import { UserRegistrationComplete } from "@hv-development/schemas"
 
 interface RegisterConfirmationContainerProps {

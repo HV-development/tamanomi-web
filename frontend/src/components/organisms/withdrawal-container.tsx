@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { WithdrawalConfirmation } from "../molecules/withdrawal-confirmation"
+import { WithdrawalConfirmation } from "@/components/molecules/withdrawal-confirmation"
 
 interface WithdrawalContainerProps {
   onWithdraw: () => void

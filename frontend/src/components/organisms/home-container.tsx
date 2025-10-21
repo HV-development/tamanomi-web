@@ -1,6 +1,6 @@
 "use client"
 
-import { StoreList } from "../molecules/store-list";
+import { StoreList } from "@/components/molecules/store-list";
 import type { Store } from "@/types/store";
 
 interface HomeContainerProps {

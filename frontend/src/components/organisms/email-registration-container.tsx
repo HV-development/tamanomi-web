@@ -1,8 +1,8 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { EmailRegistrationForm } from "../molecules/email-registration-form"
-import { EmailRegistrationComplete } from "../molecules/email-registration-complete"
+import { EmailRegistrationForm } from "@/components/organisms/email-registration-form"
+import { EmailRegistrationComplete } from "@/components/molecules/email-registration-complete"
 import { type UserRegistrationRequest } from "@hv-development/schemas"
 
 interface EmailRegistrationContainerProps {

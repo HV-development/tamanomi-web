@@ -2,7 +2,7 @@
 
 import { HeaderLogo } from "../atoms/header-logo"
 import { EmailChangeForm } from "./email-change-form"
-import { EmailChangeComplete } from "../molecules/email-change-complete"
+import { EmailChangeComplete } from "@/components/molecules/email-change-complete"
 
 interface EmailChangeContainerProps {
   currentStep: "form" | "complete"

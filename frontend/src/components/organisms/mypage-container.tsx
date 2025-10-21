@@ -6,7 +6,7 @@ import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
-import { WithdrawalComplete } from "../molecules/withdrawal-complete"
+import { WithdrawalComplete } from "@/components/molecules/withdrawal-complete"
 import type { User as UserType, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 import { appConfig } from '@/config/appConfig'
 import { useDataPreloader } from "@/hooks/useDataPreloader"

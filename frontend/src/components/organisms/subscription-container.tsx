@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { SubscriptionPlans } from "../molecules/subscription-plans"
+import { SubscriptionPlans } from "@/components/molecules/subscription-plans"
 
 interface SubscriptionContainerProps {
   onSubscribe: (planId: string) => void

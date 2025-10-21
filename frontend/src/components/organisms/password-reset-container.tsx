@@ -1,8 +1,8 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/header-logo"
-import { PasswordResetForm } from "../molecules/password-reset-form"
-import { PasswordResetComplete } from "../molecules/password-reset-complete"
+import { PasswordResetForm } from "@/components/molecules/password-reset-form"
+import { PasswordResetComplete } from "@/components/molecules/password-reset-complete"
 
 interface PasswordResetContainerProps {
   currentStep: "form" | "complete"
