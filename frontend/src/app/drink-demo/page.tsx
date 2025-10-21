@@ -7,6 +7,9 @@ import SimpleDrinkTest2 from '@/components/molecules/simple-drink-test2';
 import BasicTest from '@/components/molecules/basic-test';
 
 export default function DrinkAnimationDemo() {
+  const handleAnimationComplete = () => {
+    console.log('Animation completed')
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
