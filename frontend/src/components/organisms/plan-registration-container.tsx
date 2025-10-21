@@ -14,6 +14,8 @@ interface PlanRegistrationContainerProps {
   error?: string
   saitamaAppLinked?: boolean
   onSaitamaAppLinked?: () => void
+  hasPaymentMethod?: boolean
+  isPaymentMethodChangeOnly?: boolean
 }
 
 export function PlanRegistrationContainer({
@@ -26,6 +28,8 @@ export function PlanRegistrationContainer({
   error,
   saitamaAppLinked,
   onSaitamaAppLinked,
+  hasPaymentMethod,
+  isPaymentMethodChangeOnly,
 }: PlanRegistrationContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
@@ -44,6 +48,8 @@ export function PlanRegistrationContainer({
               error={error}
               saitamaAppLinked={saitamaAppLinked}
               onSaitamaAppLinked={onSaitamaAppLinked}
+              hasPaymentMethod={hasPaymentMethod}
+              isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
             />
           </div>
         </div>

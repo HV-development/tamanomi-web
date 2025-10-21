@@ -5,8 +5,11 @@ import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import { PlanCard } from "../atoms/plan-card"
 import { Button } from "../atoms/button"
-import { Calendar } from "lucide-react"
+import { Calendar, CheckCircle, AlertCircle, Link as LinkIcon } from "lucide-react"
+import Image from "next/image"
+import { Modal } from "../atoms/modal"
 import type { Plan } from "../../types/user"
+import { ApiClient } from '../../lib/api-client'
 
 interface PlanOption {
   id: string
@@ -21,7 +24,7 @@ interface PlanOption {
 
 interface PlanChangeFormProps {
   currentPlan: Plan
-  onPlanChange: (planId: string) => void
+  onPlanChange: (planId: string, alsoChangePaymentMethod?: boolean) => void
   onCancel: () => void
   isLoading?: boolean
 }
@@ -32,6 +35,13 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
   const [availablePlans, setAvailablePlans] = useState<PlanOption[]>([])
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const [fetchError, setFetchError] = useState<string>("")
+  const [saitamaAppId, setSaitamaAppId] = useState<string>("")
+  const [linkedSaitamaAppId, setLinkedSaitamaAppId] = useState<string>("")
+  const [linkError, setLinkError] = useState<string>("")
+  const [isLinking, setIsLinking] = useState<boolean>(false)
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
+  const [modalMessage, setModalMessage] = useState<string>("")
+  const [alsoChangePaymentMethod, setAlsoChangePaymentMethod] = useState<boolean>(false)
 
   const fetchUserInfo = useCallback(async () => {
     try {
@@ -178,7 +188,55 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
 
   const handleFinalConfirm = () => {
     if (selectedPlan) {
-      onPlanChange(selectedPlan)
+      onPlanChange(selectedPlan, alsoChangePaymentMethod)
+    }
+  }
+
+  const handleLinkSaitamaApp = async () => {
+    if (!saitamaAppId || saitamaAppId.trim() === "") {
+      setLinkError("さいたま市アプリIDを入力してください")
+      return
+    }
+
+    setIsLinking(true)
+    setLinkError("")
+
+    try {
+      const result = await ApiClient.post('/api/user/link-saitama-app', {
+        saitamaAppId: saitamaAppId.trim()
+      })
+
+      if (result.error) {
+        setLinkError(result.error.message || "連携に失敗しました")
+        setIsLinking(false)
+        return
+      }
+
+      const data = result.data as { pointsGranted?: number }
+      
+      // 連携したIDを保存
+      setLinkedSaitamaAppId(saitamaAppId)
+      
+      // モーダル用のメッセージを作成
+      const pointsMessage = typeof data.pointsGranted === 'number' && data.pointsGranted > 0
+        ? `${data.pointsGranted}ポイントを付与しました！` 
+        : 'ポイントが付与されました！'
+      setModalMessage(`さいたま市みんなのアプリとの連携が完了しました。\n\n${pointsMessage}\n\nお得なプランが表示されます。`)
+      
+      // モーダルを表示
+      setShowSuccessModal(true)
+      
+      // 入力フィールドをクリア
+      setSaitamaAppId("")
+      
+      // 連携成功後、プランを再取得
+      await fetchUserInfo()
+      await fetchPlans()
+    } catch (err) {
+      console.error('Link saitama app error:', err)
+      setLinkError('さいたま市アプリ連携中にエラーが発生しました')
+    } finally {
+      setIsLinking(false)
     }
   }
 
@@ -254,6 +312,16 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
           </ul>
         </div>
 
+        {/* 支払い方法変更の確認 */}
+        {alsoChangePaymentMethod && (
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
+            <div className="text-sm text-purple-900 font-bold mb-2">支払い方法の変更</div>
+            <p className="text-sm text-purple-800">
+              プラン変更後、自動的に支払い方法変更画面へ移動します
+            </p>
+          </div>
+        )}
+
         {/* ボタン */}
         <div className="space-y-3">
           <Button
@@ -321,6 +389,36 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
         {sortedPlans.map((plan) => {
           const isCurrentPlan = plan.id === currentPlan.id
           const isSelected = selectedPlan === plan.id
+          
+          // さいたま市アプリ連携済みの場合の価格表示
+          const isSaitamaLinked = saitamaAppLinked || linkedSaitamaAppId;
+          const saitamaDiscountPrice = 480; // さいたま市アプリ連携時の価格
+          
+          // さいたま市アプリ連携済みで、通常価格が980円の場合
+          if (isSaitamaLinked && plan.price === 980) {
+            return (
+              <div key={plan.id} className="relative">
+                <PlanCard
+                  title={plan.name}
+                  description={plan.description}
+                  features={plan.features}
+                  price={`¥${saitamaDiscountPrice.toLocaleString()}/月`}
+                  originalPrice={`¥${plan.price.toLocaleString()}/月`}
+                  badge="さいたま市アプリ連携でお得"
+                  isSelected={isSelected}
+                  onSelect={() => handlePlanSelect(plan.id)}
+                  disabled={isCurrentPlan}
+                />
+
+                {/* 現在のプランオーバーレイ */}
+                {isCurrentPlan && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none">
+                    <div className="bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-bold">現在ご利用中</div>
+                  </div>
+                )}
+              </div>
+            );
+          }
 
           return (
             <div key={plan.id} className="relative">
@@ -346,6 +444,163 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
           )
         })}
       </div>
+
+      {/* 連携完了表示（連携済みまたは連携したIDがある場合） */}
+      {(saitamaAppLinked || linkedSaitamaAppId) && (
+        <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm text-gray-900">
+                <span className="font-medium">さいたま市みんなのアプリ連携:</span>
+              </p>
+              <p className="text-xs text-gray-600 font-mono break-all mt-1">
+                {linkedSaitamaAppId || '連携済み'}
+              </p>
+              <p className="text-xs text-green-600 font-medium mt-1">✓ 連携完了</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* さいたま市みんなのアプリ連携フォーム（未連携の場合のみ表示） */}
+      {!saitamaAppLinked && !linkedSaitamaAppId && (
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5 space-y-4">
+          {/* 割引強調セクション */}
+          <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+            <div className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full mb-3">
+              <p className="text-sm font-bold">さらにお得に！</p>
+            </div>
+            <div className="mb-3">
+              <div className="flex flex-col items-center">
+                <span className="text-sm line-through text-gray-500 mb-1">
+                  ¥980/月
+                </span>
+                <p className="text-3xl font-bold text-blue-600 mb-1">
+                  ¥480/月
+                </p>
+                <p className="text-gray-700 text-sm font-medium">
+                  さいたま市みんなのアプリ連携で
+                </p>
+                <p className="text-sm font-bold text-indigo-700">
+                  月額480円でご利用いただけます
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* アプリ説明とダウンロードリンク */}
+          <div className="bg-white rounded-lg p-4 space-y-3">
+            <div>
+              <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリについて</h4>
+              <p className="text-xs text-gray-700 leading-relaxed">
+                さいたま市が提供する公式アプリです。<br />
+                アプリと連携することで、特別な割引価格でご利用いただけます。
+              </p>
+            </div>
+
+            {/* ダウンロードリンク */}
+            <div className="space-y-3">
+              <div className="flex justify-center gap-3">
+                <a
+                  href="https://apps.apple.com/jp/app/%E3%81%95%E3%81%84%E3%81%9F%E3%81%BE%E5%B8%82%E3%81%BF%E3%82%93%E3%81%AA%E3%81%AE%E3%82%A2%E3%83%97%E3%83%AA/id6502677802"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:opacity-80 transition-opacity"
+                >
+                  <Image src="/app-store.svg" alt="App Storeからダウンロード" width={100} height={48} className="h-12" />
+                </a>
+                <a
+                  href="http://play.google.com/store/apps/details?id=jp.saitamacity.rsa&hl=ja&pli=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:opacity-80 transition-opacity"
+                >
+                  <Image src="/google-play.svg" alt="Google Playで手に入れよう" width={120} height={48} className="h-12" />
+                </a>
+              </div>
+              <div className="text-center">
+                <a
+                  href="/saitama-app-guide"
+                  className="text-xs text-blue-600 hover:text-blue-800 underline"
+                >
+                  アプリの使い方とユーザーID取得手順はこちら
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* エラー表示 */}
+          {linkError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+              <p className="text-red-700 text-sm">{linkError}</p>
+            </div>
+          )}
+
+          {/* ID入力フォーム */}
+          <div className="bg-white rounded-lg p-4 space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                さいたま市みんなのアプリ ユーザーID
+              </label>
+              <input
+                type="text"
+                value={saitamaAppId}
+                onChange={(e) => {
+                  setSaitamaAppId(e.target.value)
+                  setLinkError("")
+                }}
+                placeholder="ユーザーIDを入力してください"
+                disabled={isLinking}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+            </div>
+            <button 
+              onClick={handleLinkSaitamaApp}
+              disabled={isLinking || !saitamaAppId}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              {isLinking ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  連携中...
+                </>
+              ) : (
+                <>
+                  <LinkIcon className="w-4 h-4" />
+                  アプリと連携して500円OFFで利用する
+                </>
+              )}
+            </button>
+            <p className="text-xs text-center text-gray-600">
+              ※ 連携後、すぐに割引価格が適用されます
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 支払い方法も変更するチェックボックス */}
+      {selectedPlan && (
+        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={alsoChangePaymentMethod}
+              onChange={(e) => setAlsoChangePaymentMethod(e.target.checked)}
+              className="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+            />
+            <div className="flex-1">
+              <div className="text-sm font-bold text-purple-900 mb-1">
+                支払い方法も変更する
+              </div>
+              <p className="text-xs text-purple-700">
+                プラン変更後、自動的にカード情報の変更画面に移動します
+              </p>
+            </div>
+          </label>
+        </div>
+      )}
 
       {/* 注意事項 */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -377,6 +632,31 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
           キャンセル
         </Button>
       </div>
+
+      {/* 成功モーダル */}
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="🎉 連携完了"
+      >
+        <div className="text-center py-4">
+          <div className="mb-4">
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            さいたま市みんなのアプリとの連携が完了しました！
+          </h3>
+          <p className="text-gray-600 mb-4 whitespace-pre-line">
+            {modalMessage}
+          </p>
+          <button
+            onClick={() => setShowSuccessModal(false)}
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 rounded-lg font-bold transition-colors"
+          >
+            プラン変更画面に戻る
+          </button>
+        </div>
+      </Modal>
     </div>
   )
 }

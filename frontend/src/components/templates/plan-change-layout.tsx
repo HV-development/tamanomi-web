@@ -3,7 +3,7 @@ import type { Plan } from "../../types/user"
 
 interface PlanChangeLayoutProps {
   currentPlan: Plan
-  onPlanChange: (planId: string) => void
+  onPlanChange: (planId: string, alsoChangePaymentMethod?: boolean) => void
   onBack: () => void
   onLogoClick: () => void
   isLoading?: boolean

@@ -35,12 +35,14 @@ export function UsageHistoryList({
         {/* ヘッダー */}
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="flex items-center justify-between">
-            <button
+            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
+            {/* <button
               onClick={onBackToMyPage}
               className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
             >
               ← 戻る
-            </button>
+            </button> */}
+            <div className="w-12"></div>
             <Image
               src="/logo.svg"
               alt="TAMAYOI"
@@ -74,12 +76,14 @@ export function UsageHistoryList({
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-between">
-          <button
+          {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
+          {/* <button
             onClick={onBackToMyPage}
             className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
           >
             ← 戻る
-          </button>
+          </button> */}
+          <div className="w-12"></div>
           <Image
             src="/logo.svg"
             alt="TAMAYOI"
@@ -133,8 +137,8 @@ export function UsageHistoryList({
         </div>
       </div>
 
-      {/* 下部ボタン */}
-      <div className="p-6 border-t border-green-200">
+      {/* 下部ボタン - 無料キャンペーン中は一時的に無効化 */}
+      {/* <div className="p-6 border-t border-green-200">
         <div className="space-y-3 max-w-md mx-auto">
           <button
             onClick={onBackToMyPage}
@@ -149,7 +153,7 @@ export function UsageHistoryList({
             トップページに戻る
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

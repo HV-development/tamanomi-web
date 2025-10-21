@@ -5,6 +5,8 @@ interface PlanManagementLayoutProps {
   plan: Plan
   onChangePlan: () => void
   onCancelSubscription: () => void
+  onChangePaymentMethod?: () => void
+  hasPaymentMethod?: boolean
   onBack: () => void
   onLogoClick: () => void
 }
@@ -13,6 +15,8 @@ export function PlanManagementLayout({
   plan,
   onChangePlan,
   onCancelSubscription,
+  onChangePaymentMethod,
+  hasPaymentMethod,
   onBack,
   onLogoClick,
 }: PlanManagementLayoutProps) {
@@ -24,6 +28,8 @@ export function PlanManagementLayout({
       plan={plan}
       onChangePlan={onChangePlan}
       onCancelSubscription={onCancelSubscription}
+      onChangePaymentMethod={onChangePaymentMethod}
+      hasPaymentMethod={hasPaymentMethod}
       onBack={onBack}
       onLogoClick={onLogoClick}
       backgroundColorClass={backgroundColorClass}

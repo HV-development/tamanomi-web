@@ -238,11 +238,24 @@ export function HomeLayout() {
 
     // プラン管理画面の場合
     if (myPageView === "plan-management") {
+      // カード登録状態を確認（sessionStorageとlocalStorageの両方をチェック）
+      const hasPaymentMethod = typeof window !== 'undefined' && (
+        !!sessionStorage.getItem('paygentCustomerCardId') || 
+        !!localStorage.getItem('paygentCustomerCardId') ||
+        !!sessionStorage.getItem('paygentCustomerId') ||
+        !!localStorage.getItem('paygentCustomerId')
+      )
+      
       return (
         <PlanManagementLayout
           plan={plan}
           onChangePlan={() => onMyPageViewChange("plan-change")}
           onCancelSubscription={onCancelSubscription}
+          onChangePaymentMethod={() => {
+            // 支払い方法変更の専用画面に遷移
+            window.location.href = '/payment-method-change'
+          }}
+          hasPaymentMethod={hasPaymentMethod}
           onBack={() => onMyPageViewChange("main")}
           onLogoClick={onLogoClick}
         />

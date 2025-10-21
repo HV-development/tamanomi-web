@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 function PaymentReturnContent() {
@@ -8,8 +8,20 @@ function PaymentReturnContent() {
   const searchParams = useSearchParams()
   const [isProcessing, setIsProcessing] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isPaymentMethodChangeOnly, setIsPaymentMethodChangeOnly] = useState(false)
+  const hasProcessedRef = useRef(false)
+  const isProcessingRef = useRef(false)
 
   useEffect(() => {
+    // 既に処理済み、または処理中の場合はスキップ
+    if (hasProcessedRef.current || isProcessingRef.current) {
+      console.log('🔍 [payment-return] Already processed or processing, skipping')
+      return
+    }
+
+    // 処理開始フラグを立てる
+    isProcessingRef.current = true
+
     const processPaymentReturn = async () => {
       try {
         const customerId = searchParams.get('customer_id')
@@ -62,36 +74,57 @@ function PaymentReturnContent() {
 
         try {
           // まずバックエンドのPaymentSessionから取得を試みる
+          console.log('🔍 [payment-return] Fetching PaymentSession for customerId:', customerId)
           const sessionResponse = await fetch(`/api/payment/session/${customerId}`)
+          
+          console.log('🔍 [payment-return] PaymentSession response:', {
+            status: sessionResponse.status,
+            ok: sessionResponse.ok
+          })
           
           if (sessionResponse.ok) {
             const sessionData = await sessionResponse.json()
             selectedPlanId = sessionData.planId || null
             userEmail = sessionData.userEmail
-            console.log('Retrieved from PaymentSession:', { selectedPlanId, userEmail })
+            console.log('✅ [payment-return] Retrieved from PaymentSession:', { 
+              selectedPlanId, 
+              userEmail,
+              hasplanId: !!selectedPlanId,
+              planIdType: typeof selectedPlanId
+            })
           } else {
-            console.log('PaymentSession not found, falling back to sessionStorage')
+            const errorText = await sessionResponse.text()
+            console.log('⚠️ [payment-return] PaymentSession not found, falling back to sessionStorage:', errorText)
             // フォールバック: sessionStorageから取得
             selectedPlanId = sessionStorage.getItem('selectedPlanId')
             userEmail = sessionStorage.getItem('userEmail')
-            console.log('Retrieved from sessionStorage:', { selectedPlanId, userEmail })
+            console.log('📦 [payment-return] Retrieved from sessionStorage:', { selectedPlanId, userEmail })
           }
         } catch (error) {
-          console.error('Failed to retrieve PaymentSession, using sessionStorage:', error)
+          console.error('❌ [payment-return] Failed to retrieve PaymentSession, using sessionStorage:', error)
           // エラー時もsessionStorageにフォールバック
           selectedPlanId = sessionStorage.getItem('selectedPlanId')
           userEmail = sessionStorage.getItem('userEmail')
+          console.log('📦 [payment-return] Retrieved from sessionStorage (error fallback):', { selectedPlanId, userEmail })
         }
 
         if (!userEmail) {
           throw new Error('ユーザー情報が見つかりません')
         }
 
-        // ユーザープラン作成APIを呼び出す（プランIDがある場合）
+        // ユーザープラン作成APIを呼び出す（プランIDがある場合のみ）
+        const isPaymentMethodChange = !selectedPlanId
+        setIsPaymentMethodChangeOnly(isPaymentMethodChange)
+        
         if (selectedPlanId) {
           console.log('🔍 [payment-return] Creating user plan with planId:', selectedPlanId)
           console.log('🔍 [payment-return] planId type:', typeof selectedPlanId)
           console.log('🔍 [payment-return] planId length:', selectedPlanId.length)
+        } else {
+          console.log('🔍 [payment-return] No planId, this is a payment method change only')
+        }
+        
+        if (selectedPlanId) {
           
           // プランIDの形式をチェック（UUID形式であることを確認）
           const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -148,6 +181,7 @@ function PaymentReturnContent() {
         }
         
         // 処理完了
+        hasProcessedRef.current = true
         setIsProcessing(false)
 
         // sessionStorageをクリア
@@ -156,15 +190,24 @@ function PaymentReturnContent() {
         sessionStorage.removeItem('paygentCustomerId')
         sessionStorage.removeItem('paygentCustomerCardId')
 
-        // ★一時的な対応：決済完了後はマイページに遷移
-        // 正式リリース時には店舗一覧画面（/home）に遷移する予定
+        // 支払い方法変更のみの場合とプラン登録の場合で遷移先を分ける
         setTimeout(() => {
-          router.push('/home?view=mypage&payment-success=true')
+          if (isPaymentMethodChangeOnly) {
+            // 支払い方法変更のみの場合はマイページに遷移
+            console.log('🔍 [payment-return] Payment method change completed, redirecting to mypage')
+            router.push('/home?view=mypage&payment-method-change-success=true')
+          } else {
+            // プラン登録の場合はマイページに遷移（従来通り）
+            console.log('🔍 [payment-return] Plan registration completed, redirecting to mypage')
+            router.push('/home?view=mypage&payment-success=true')
+          }
         }, 2000)
 
       } catch (err) {
         console.error('Payment return error:', err)
         setError(err instanceof Error ? err.message : 'カード登録の処理に失敗しました')
+        hasProcessedRef.current = true
+        isProcessingRef.current = false
         setIsProcessing(false)
       }
     }
@@ -173,6 +216,9 @@ function PaymentReturnContent() {
   }, [searchParams, router])
 
   if (error) {
+    // ユーザーが存在しない場合の特別な処理
+    const isUserNotFoundError = error.includes('アカウント登録が完了していない可能性があります')
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
@@ -196,12 +242,33 @@ function PaymentReturnContent() {
               エラーが発生しました
             </h2>
             <p className="text-gray-600 mb-6">{error}</p>
-            <button
-              onClick={() => router.push('/')}
-              className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700"
-            >
-              トップページに戻る
-            </button>
+            
+            {isUserNotFoundError ? (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-500">
+                  アカウント登録を完了してからカード登録を行ってください。
+                </p>
+                <button
+                  onClick={() => router.push('/register')}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  アカウント登録を完了する
+                </button>
+                <button
+                  onClick={() => router.push('/plan-registration')}
+                  className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  プラン登録画面に戻る
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => router.push('/plan-registration')}
+                className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700"
+              >
+                プラン登録画面に戻る
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -232,12 +299,15 @@ function PaymentReturnContent() {
             )}
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {isProcessing ? 'カード登録を処理中...' : 'カード登録完了'}
+            {isProcessing 
+              ? (isPaymentMethodChangeOnly ? '支払い方法変更を処理中...' : 'カード登録を処理中...') 
+              : (isPaymentMethodChangeOnly ? '支払い方法変更完了' : 'カード登録完了')
+            }
           </h2>
           <p className="text-gray-600">
             {isProcessing
               ? 'しばらくお待ちください'
-              : 'トップページに移動します...'}
+              : 'マイページに移動します...'}
           </p>
         </div>
       </div>

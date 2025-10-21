@@ -43,6 +43,14 @@ export function useAuth() {
     };
 
     const logout = () => {
+        // localStorageからトークンをクリア
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            // その他のセッション関連データもクリア
+            sessionStorage.clear();
+        }
+        
         setIsAuthenticated(false);
         setUser(undefined);
         setPlan(undefined);

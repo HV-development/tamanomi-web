@@ -408,35 +408,82 @@ export const useAppHandlers = (
         navigation.navigateToMyPage("plan-change")
     }, [navigation])
 
-    const handlePlanChangeSubmit = useCallback(async (planId: string) => {
-        auth.setIsLoading(true)
-        setTimeout(() => {
-            const planMap: Record<string, { name: string; price: number; description: string }> = {
-                "3days": {
-                    name: "3daysプラン",
-                    price: 300,
-                    description: "短期間でTAMAYOIを体験できるお試しプラン",
-                },
-                monthly: {
-                    name: "マンスリープラン",
-                    price: 980,
-                    description: "毎日お得にお酒を楽しめる定番プラン",
-                },
-                premium: {
-                    name: "プレミアムプラン",
-                    price: 1980,
-                    description: "より充実したサービスを楽しめる上位プラン",
-                },
+    const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
+        try {
+            auth.setIsLoading(true)
+            
+            // アクセストークンを取得
+            const accessToken = localStorage.getItem('accessToken')
+            if (!accessToken) {
+                throw new Error('認証情報が見つかりません。ログインしてください。')
             }
 
-            const newPlanData = planMap[planId]
-            if (newPlanData && auth.plan) {
-                // プラン変更処理
+            console.log('🔍 [plan-change] Changing plan:', { newPlanId: planId, alsoChangePaymentMethod })
+
+            // プラン変更APIを呼び出し
+            const response = await fetch('/api/user-plans/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    planId: planId,
+                }),
+            })
+
+            console.log('🔍 [plan-change] Response status:', response.status)
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.message || 'プラン変更に失敗しました')
             }
 
+            const data = await response.json()
+            console.log('✅ [plan-change] Plan changed successfully:', data)
+
+            // プラン変更後、新しいユーザー情報を取得してauth状態を更新
+            try {
+                console.log('🔍 [plan-change] Fetching updated user data...')
+                const userResponse = await fetch('/api/user/me', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
+                })
+
+                if (userResponse.ok) {
+                    const updatedUserData = await userResponse.json()
+                    console.log('✅ [plan-change] Updated user data:', updatedUserData)
+                    
+                    // auth状態を更新
+                    auth.login(updatedUserData, updatedUserData.plan, updatedUserData.usageHistory || [], updatedUserData.paymentHistory || [])
+                    console.log('✅ [plan-change] Auth state updated with new plan')
+                } else {
+                    console.warn('⚠️ [plan-change] Failed to fetch updated user data, but plan change was successful')
+                }
+            } catch (fetchError) {
+                console.warn('⚠️ [plan-change] Error fetching updated user data:', fetchError)
+                // プラン変更は成功しているので、エラーでも続行
+            }
+
+            // 支払い方法も変更する場合は、支払い方法変更画面へ遷移
+            if (alsoChangePaymentMethod) {
+                console.log('🔍 [plan-change] Navigating to payment method change page')
+                if (typeof window !== 'undefined') {
+                    window.location.href = '/payment-method-change?from=plan-change'
+                }
+            } else {
+                // 成功時はマイページに戻る
+                navigation.navigateToMyPage("main")
+            }
+            
+        } catch (error) {
+            console.error('❌ [plan-change] Error:', error)
+            // エラー時もマイページに戻る（エラーメッセージは別途表示）
             navigation.navigateToMyPage("main")
+        } finally {
             auth.setIsLoading(false)
-        }, 1500)
+        }
     }, [auth, navigation])
 
     const handlePlanChangeBack = useCallback(() => {
@@ -468,16 +515,26 @@ export const useAppHandlers = (
     }, [navigation])
 
     const handleWithdrawComplete = useCallback(() => {
+        // まず認証状態をクリア
         auth.logout()
         navigation.resetNavigation()
-        router.push('/')
-    }, [auth, navigation, router])
+        
+        // 即座にログイン画面に遷移（home画面を表示しない）
+        if (typeof window !== 'undefined') {
+            window.location.href = '/'
+        }
+    }, [auth, navigation])
 
     const handleLogout = useCallback(() => {
+        // まず認証状態をクリア
         auth.logout()
         navigation.resetNavigation()
-        router.push('/')
-    }, [auth, navigation, router])
+        
+        // 即座にログイン画面に遷移（home画面を表示しない）
+        if (typeof window !== 'undefined') {
+            window.location.href = '/'
+        }
+    }, [auth, navigation])
 
     const handleShowStoreOnHome = useCallback(() => {
         navigation.navigateToView("home", "home")

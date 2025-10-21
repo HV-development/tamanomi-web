@@ -391,9 +391,11 @@ export const MyPageContainer = React.memo(function MyPageContainer({
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="flex items-center justify-between">
-            <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
+            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
+            {/* <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
               ← 戻る
-            </button>
+            </button> */}
+            <div className="w-12"></div>
             <Logo size="lg" onClick={onLogoClick} />
             <div className="w-12"></div>
           </div>
@@ -411,9 +413,11 @@ export const MyPageContainer = React.memo(function MyPageContainer({
       <FadeInComponent delay={0}>
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="flex items-center justify-between">
-            <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
+            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
+            {/* <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
               ← 戻る
-            </button>
+            </button> */}
+            <div className="w-12"></div>
             <Logo size="lg" onClick={onLogoClick} />
             <div className="w-12"></div>
           </div>

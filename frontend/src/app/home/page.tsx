@@ -44,10 +44,6 @@ export default function HomePage() {
       const view = urlParams.get('view')
       const token = urlParams.get('token')
       
-      console.log('🔍 [home] URL params:', { autoLogin, view, token: !!token, url: window.location.href })
-      console.log('🔍 [home] Auth state:', { isAuthenticated: auth.isAuthenticated })
-      console.log('🔍 [home] localStorage accessToken:', !!localStorage.getItem('accessToken'))
-
       // ★URLパラメータからトークンを取得してlocalStorageに保存（auto-loginの場合）
       if (autoLogin === 'true' && token) {
         localStorage.setItem('accessToken', token)
@@ -59,14 +55,12 @@ export default function HomePage() {
       // ログインしているかチェック（auto-loginパラメータがない場合のみ）
       if (!accessToken && view !== 'map' && autoLogin !== 'true') {
         // ログインしていない場合はログインページにリダイレクト（マップビュー以外）
-        console.log('🔍 [home] No access token, redirecting to login')
         router.push('/')
         return
       }
       
       // 自動ログイン処理（トークンがあり、まだ認証されていない場合）
       if (accessToken && !auth.isAuthenticated) {
-        console.log('🔍 [home] Auto-login: fetching user data...')
         
         // トークンがある場合、ユーザー情報を取得
         fetch('/api/user/me', {
@@ -81,13 +75,11 @@ export default function HomePage() {
             return response.json()
           })
           .then(userData => {
-            console.log('✅ [home] User data fetched:', userData)
             // ユーザーデータでauth.loginを呼び出す
             auth.login(userData, userData.plan, [], [])
 
             // プラン登録状況を確認して適切な画面に遷移
             const hasPlan = userData.plan !== null && userData.plan !== undefined
-            console.log('🔍 [home] hasPlan:', hasPlan, 'view:', view)
 
             // ビューパラメータに応じて遷移
             if (view === 'mypage') {
@@ -98,12 +90,10 @@ export default function HomePage() {
               // ビューパラメータがない場合（リロード時など）
               if (!hasPlan) {
                 // プラン未登録の場合はプラン登録画面へ
-                console.log('🔍 [home] No plan, redirecting to plan registration page')
                 router.push('/plan-registration')
                 return
               } else {
                 // プラン登録済みの場合はマイページへ（一時的な対応）
-                console.log('🔍 [home] Has plan, showing mypage (reload or direct access)')
                 navigation.navigateToView("mypage", "mypage")
                 navigation.navigateToMyPage("main")
               }
@@ -119,11 +109,9 @@ export default function HomePage() {
           })
       } else if (accessToken && auth.isAuthenticated) {
         // 既に認証済みの場合（リロード時など）
-        console.log('🔍 [home] Already authenticated')
         
         // ビューパラメータがない場合はマイページへ遷移（一時的な対応）
         if (!view) {
-          console.log('🔍 [home] No view param, showing mypage (authenticated)')
           navigation.navigateToView("mypage", "mypage")
           navigation.navigateToMyPage("main")
         } else if (view === 'mypage') {

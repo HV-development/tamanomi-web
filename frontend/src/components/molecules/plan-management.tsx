@@ -1,6 +1,6 @@
 "use client"
 
-import { Crown, Settings } from "lucide-react"
+import { Crown, Settings, CreditCard } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import type { Plan } from "../../types/user"
@@ -9,10 +9,18 @@ interface PlanManagementProps {
   plan: Plan
   onChangePlan: () => void
   onCancelSubscription: () => void
+  onChangePaymentMethod?: () => void
+  hasPaymentMethod?: boolean
   className?: string
 }
 
-export function PlanManagement({ plan, onChangePlan, className = "" }: PlanManagementProps) {
+export function PlanManagement({ 
+  plan, 
+  onChangePlan, 
+  onChangePaymentMethod,
+  hasPaymentMethod = false,
+  className = "" 
+}: PlanManagementProps) {
   const formatDate = (date: Date) => {
     return format(date, "yyyy年M月d日", { locale: ja })
   }
@@ -77,6 +85,29 @@ export function PlanManagement({ plan, onChangePlan, className = "" }: PlanManag
             変更する
           </button>
         </div>
+
+        {/* 支払い方法変更セクション（カード登録済みの場合のみ表示） */}
+        {hasPaymentMethod && onChangePaymentMethod && (
+          <div className="bg-white rounded-2xl border-2 border-blue-300 p-4 mt-4">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">支払い方法の変更</h3>
+            </div>
+
+            <div className="text-sm text-gray-700 mb-4">
+              登録済みのクレジットカードを変更できます
+            </div>
+
+            <button
+              onClick={onChangePaymentMethod}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-medium transition-colors"
+            >
+              支払い方法を変更する
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

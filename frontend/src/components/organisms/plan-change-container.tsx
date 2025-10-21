@@ -6,7 +6,7 @@ import type { Plan } from "../../types/user"
 
 interface PlanChangeContainerProps {
   currentPlan: Plan
-  onPlanChange: (planId: string) => void
+  onPlanChange: (planId: string, alsoChangePaymentMethod?: boolean) => void
   onBack: () => void
   onLogoClick: () => void
   isLoading?: boolean
@@ -21,8 +21,8 @@ export function PlanChangeContainer({
   isLoading,
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: PlanChangeContainerProps) {
-  const handlePlanChange = (planId: string) => {
-    onPlanChange(planId)
+  const handlePlanChange = (planId: string, alsoChangePaymentMethod?: boolean) => {
+    onPlanChange(planId, alsoChangePaymentMethod)
   }
 
   return (

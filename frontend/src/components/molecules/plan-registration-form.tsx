@@ -18,6 +18,8 @@ interface PlanRegistrationFormProps {
   error?: string
   saitamaAppLinked?: boolean
   onSaitamaAppLinked?: () => void
+  hasPaymentMethod?: boolean
+  isPaymentMethodChangeOnly?: boolean
 }
 
 export function PlanRegistrationForm({ 
@@ -27,6 +29,8 @@ export function PlanRegistrationForm({
   error,
   saitamaAppLinked = false,
   onSaitamaAppLinked,
+  hasPaymentMethod = false,
+  isPaymentMethodChangeOnly = false,
 }: PlanRegistrationFormProps) {
   const [selectedPlan, setSelectedPlan] = useState<string>(plans.length > 0 ? plans[0].id : "")
   const [saitamaAppId, setSaitamaAppId] = useState<string>("")
@@ -99,8 +103,12 @@ export function PlanRegistrationForm({
     <div className="space-y-6">
       {/* ページタイトル */}
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">プラン登録</h2>
-        <p className="text-gray-600">ご希望のプランを選択してください</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          {isPaymentMethodChangeOnly ? '支払い方法の変更' : 'プラン登録'}
+        </h2>
+        <p className="text-gray-600">
+          {isPaymentMethodChangeOnly ? 'クレジットカード情報を変更してください' : 'ご希望のプランを選択してください'}
+        </p>
       </div>
 
       {/* エラー表示 */}
@@ -111,13 +119,14 @@ export function PlanRegistrationForm({
         </div>
       )}
 
-      {/* プラン選択 */}
-      <div className="space-y-4">
-        {plans.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">利用可能なプランがありません</p>
-          </div>
-        ) : (
+      {/* プラン選択（支払い方法変更のみの場合は非表示） */}
+      {!isPaymentMethodChangeOnly && (
+        <div className="space-y-4">
+          {plans.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">利用可能なプランがありません</p>
+            </div>
+          ) : (
           plans.map((plan) => {
             // 割引価格は現在のスキーマでは未対応のため、通常価格のみ表示
             const displayPrice = plan.price;
@@ -159,10 +168,11 @@ export function PlanRegistrationForm({
             );
           })
         )}
-      </div>
+        </div>
+      )}
 
-      {/* 連携完了表示（連携済みまたは連携したIDがある場合） */}
-      {(saitamaAppLinked || linkedSaitamaAppId) && (
+      {/* 連携完了表示（連携済みまたは連携したIDがある場合、支払い方法変更のみの場合は非表示） */}
+      {!isPaymentMethodChangeOnly && (saitamaAppLinked || linkedSaitamaAppId) && (
         <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -179,8 +189,8 @@ export function PlanRegistrationForm({
         </div>
       )}
 
-      {/* さいたま市みんなのアプリ連携フォーム（未連携の場合のみ表示） */}
-      {!saitamaAppLinked && !linkedSaitamaAppId && (
+      {/* さいたま市みんなのアプリ連携フォーム（未連携の場合のみ表示、支払い方法変更のみの場合は非表示） */}
+      {!isPaymentMethodChangeOnly && !saitamaAppLinked && !linkedSaitamaAppId && (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5 space-y-4">
           {/* 割引強調セクション */}
           <div className="text-center bg-white rounded-lg p-4 shadow-sm">
@@ -224,7 +234,7 @@ export function PlanRegistrationForm({
                   rel="noopener noreferrer"
                   className="hover:opacity-80 transition-opacity"
                 >
-                  <Image src="/app-store.svg" alt="App Storeからダウンロード" width={48} height={48} className="h-12" />
+                  <Image src="/app-store.svg" alt="App Storeからダウンロード" width={100} height={48} className="h-12" />
                 </a>
                 <a
                   href="http://play.google.com/store/apps/details?id=jp.saitamacity.rsa&hl=ja&pli=1"
@@ -232,16 +242,16 @@ export function PlanRegistrationForm({
                   rel="noopener noreferrer"
                   className="hover:opacity-80 transition-opacity"
                 >
-                  <Image src="/google-play.svg" alt="Google Playで手に入れよう" width={48} height={48} className="h-12" />
+                  <Image src="/google-play.svg" alt="Google Playで手に入れよう" width={120} height={48} className="h-12" />
                 </a>
               </div>
               <div className="text-center">
-                <button
-                  onClick={() => window.open('/saitama-app-guide', '_blank')}
+                <a
+                  href="/saitama-app-guide"
                   className="text-xs text-blue-600 hover:text-blue-800 underline"
                 >
                   アプリの使い方とユーザーID取得手順はこちら
-                </button>
+                </a>
               </div>
             </div>
           </div>
@@ -281,16 +291,31 @@ export function PlanRegistrationForm({
         </div>
       )}
 
-      {/* 支払い方法登録ボタン */}
-      <div>
+      {/* 支払い方法登録・変更ボタン */}
+      <div className="space-y-3">
         <Button
           onClick={handlePaymentRegister}
-          disabled={isLoading || plans.length === 0 || !selectedPlan}
+          disabled={isLoading || (!isPaymentMethodChangeOnly && (plans.length === 0 || !selectedPlan))}
           className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-medium flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           <CreditCard className="w-5 h-5" />
-          {isLoading ? "処理中..." : "支払い方法を登録する"}
+          {isLoading ? "処理中..." : isPaymentMethodChangeOnly ? "支払い方法を変更する" : (hasPaymentMethod ? "プランに登録する" : "支払い方法を登録する")}
         </Button>
+        
+        {/* 支払い方法変更ボタン（カード登録済みの場合のみ表示、支払い方法変更のみの場合は非表示） */}
+        {hasPaymentMethod && !isPaymentMethodChangeOnly && (
+          <Button
+            onClick={() => {
+              // 既存プランを選択せず、支払い方法のみ変更
+              onPaymentMethodRegister("")
+            }}
+            disabled={isLoading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            <CreditCard className="w-4 h-4" />
+            {isLoading ? "処理中..." : "支払い方法を変更する"}
+          </Button>
+        )}
       </div>
 
       {/* カードブランドロゴ */}

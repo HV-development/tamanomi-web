@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 function PaymentMockContent() {
@@ -13,21 +13,104 @@ function PaymentMockContent() {
     cvv: '',
     cardHolderName: ''
   })
+  const [customerId, setCustomerId] = useState<string>('')
+
+  // POSTリクエストからcustomer_idを取得
+  useEffect(() => {
+    // URLパラメータから取得を試行
+    const urlCustomerId = searchParams.get('customer_id')
+    if (urlCustomerId) {
+      setCustomerId(urlCustomerId)
+      return
+    }
+
+    // POSTリクエストのボディから取得を試行（フォーム送信時）
+    const handleFormData = () => {
+      // フォームデータが送信された場合の処理
+      const formData = new FormData()
+      // 実際のフォームデータは送信時に処理される
+    }
+
+    // ページロード時にフォームデータをチェック
+    if (typeof window !== 'undefined') {
+      // URLにcustomer_idが含まれていない場合、POSTデータから取得を試行
+      const url = new URL(window.location.href)
+      if (!url.searchParams.has('customer_id')) {
+        // POSTリクエストの場合、フォームデータから取得
+        // これは実際のフォーム送信時に処理される
+      }
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsProcessing(true)
     
-    // モック処理：2秒後に完了
-    setTimeout(() => {
+    try {
       const mockCustomerCardId = 'mock_' + Date.now()
       
-      // 戻りURLにリダイレクト
-      const customerId = searchParams.get('customer_id') || 'mock_customer'
-      const returnUrl = `/payment-return?customer_id=${customerId}&customer_card_id=${mockCustomerCardId}`
+      // customer_idを取得（URLパラメータまたはフォームデータから）
+      let currentCustomerId = customerId
       
-      router.push(returnUrl)
-    }, 2000)
+      // フォームデータからcustomer_idを取得
+      const formData = new FormData(e.target as HTMLFormElement)
+      const formCustomerId = formData.get('customer_id') as string
+      
+      if (formCustomerId) {
+        currentCustomerId = formCustomerId
+        setCustomerId(formCustomerId)
+      }
+      
+      if (!currentCustomerId) {
+        console.error('❌ [PaymentMock] customer_id parameter is missing')
+        alert('エラー: customer_idパラメータが見つかりません')
+        setIsProcessing(false)
+        return
+      }
+      
+      console.log('🔍 [PaymentMock] Calling webhook with:', {
+        customerId: currentCustomerId,
+        customerCardId: mockCustomerCardId
+      })
+      
+      // WebhookをAPIに送信（実際のPaygentと同じフロー）
+      // ハッシュは64文字必要（SHA-256ハッシュの16進数表現）
+      const mockHash = 'mock_hash_' + Date.now().toString().padEnd(54, '0') // 64文字にパディング
+      
+      const webhookResponse = await fetch('/api/payment/webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customer_id: currentCustomerId,
+          customer_card_id: mockCustomerCardId,
+          operation_type: '01', // 登録
+          update_date: new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 14),
+          hc: mockHash
+        })
+      })
+      
+      if (!webhookResponse.ok) {
+        console.error('❌ [PaymentMock] Webhook call failed:', await webhookResponse.text())
+        alert('エラー: Webhook処理に失敗しました')
+        setIsProcessing(false)
+        return
+      }
+      
+      console.log('✅ [PaymentMock] Webhook call successful')
+      
+      // 少し待ってから戻りURLへリダイレクト
+      setTimeout(() => {
+        const returnUrl = `/payment-return?customer_id=${currentCustomerId}&customer_card_id=${mockCustomerCardId}`
+        router.push(returnUrl)
+      }, 1000)
+      
+    } catch (error) {
+      console.error('❌ [PaymentMock] Error:', error)
+      alert('エラーが発生しました')
+      setIsProcessing(false)
+    }
   }
 
   return (
@@ -40,6 +123,13 @@ function PaymentMockContent() {
           <p className="mt-2 text-center text-sm text-gray-600">
             これはテスト環境のモック画面です
           </p>
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p className="text-xs text-blue-800">
+              <strong>Debug Info:</strong><br/>
+              customer_id: {customerId || searchParams.get('customer_id') || 'なし'}<br/>
+              return_url: {searchParams.get('return_url') || 'なし'}
+            </p>
+          </div>
         </div>
         
         <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
@@ -62,6 +152,10 @@ function PaymentMockContent() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Hidden input for customer_id from POST data */}
+          {customerId && (
+            <input type="hidden" name="customer_id" value={customerId} />
+          )}
           <div className="space-y-4">
             <div>
               <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">

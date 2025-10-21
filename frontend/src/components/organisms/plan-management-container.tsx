@@ -8,6 +8,8 @@ interface PlanManagementContainerProps {
   plan: Plan
   onChangePlan: () => void
   onCancelSubscription: () => void
+  onChangePaymentMethod?: () => void
+  hasPaymentMethod?: boolean
   onBack: () => void
   onLogoClick: () => void
   backgroundColorClass?: string
@@ -17,6 +19,8 @@ export function PlanManagementContainer({
   plan,
   onChangePlan,
   onCancelSubscription,
+  onChangePaymentMethod,
+  hasPaymentMethod,
   onBack,
   onLogoClick,
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
@@ -27,7 +31,13 @@ export function PlanManagementContainer({
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onBack} />
 
       <div className="p-4 max-w-md mx-auto">
-        <PlanManagement plan={plan} onChangePlan={onChangePlan} onCancelSubscription={onCancelSubscription} />
+        <PlanManagement 
+          plan={plan} 
+          onChangePlan={onChangePlan} 
+          onCancelSubscription={onCancelSubscription}
+          onChangePaymentMethod={onChangePaymentMethod}
+          hasPaymentMethod={hasPaymentMethod}
+        />
       </div>
     </div>
   )

@@ -12,6 +12,8 @@ interface PlanRegistrationLayoutProps {
   error?: string
   saitamaAppLinked?: boolean
   onSaitamaAppLinked?: () => void
+  hasPaymentMethod?: boolean
+  isPaymentMethodChangeOnly?: boolean
 }
 
 export function PlanRegistrationLayout({ 
@@ -23,6 +25,8 @@ export function PlanRegistrationLayout({
   error,
   saitamaAppLinked,
   onSaitamaAppLinked,
+  hasPaymentMethod,
+  isPaymentMethodChangeOnly,
 }: PlanRegistrationLayoutProps) {
   // ランクに基づく背景色を取得
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
@@ -38,6 +42,8 @@ export function PlanRegistrationLayout({
       error={error}
       saitamaAppLinked={saitamaAppLinked}
       onSaitamaAppLinked={onSaitamaAppLinked}
+      hasPaymentMethod={hasPaymentMethod}
+      isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
     />
   )
 }

@@ -20,6 +20,7 @@ function LoginPageContent() {
   const [loginStep, setLoginStep] = useState<"password" | "otp">("password")
   const [email, setEmail] = useState<string>("")
   const [requestId, setRequestId] = useState<string>("")
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
   // URLパラメータをメモ化して不要な再レンダリングを防ぐ
   const urlParams = useMemo(() => ({
@@ -28,6 +29,50 @@ function LoginPageContent() {
     error: searchParams.get('error'),
     email: searchParams.get('email')
   }), [searchParams])
+
+  // 認証状態をチェックして、既にログイン済みの場合はマイページにリダイレクト
+  useEffect(() => {
+    const checkAuth = async () => {
+      const accessToken = localStorage.getItem('accessToken')
+      
+      if (!accessToken) {
+        setIsCheckingAuth(false)
+        return
+      }
+
+      try {
+        const response = await fetch('/api/user/me', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        })
+
+        if (response.ok) {
+          const userData = await response.json()
+          const hasPlan = userData.plan !== null && userData.plan !== undefined
+          
+          console.log('🔍 [Login] Already authenticated, redirecting...')
+          
+          // プラン登録状況によって遷移先を変更
+          if (!hasPlan) {
+            router.push('/plan-registration')
+          } else {
+            router.push('/home?view=mypage')
+          }
+        } else {
+          // トークンが無効な場合はクリア
+          localStorage.removeItem('accessToken')
+          localStorage.removeItem('refreshToken')
+          setIsCheckingAuth(false)
+        }
+      } catch (error) {
+        console.error('Auth check error:', error)
+        setIsCheckingAuth(false)
+      }
+    }
+
+    checkAuth()
+  }, [router])
 
   // URLパラメータの処理をuseEffectに移動
   useEffect(() => {
@@ -225,6 +270,18 @@ function LoginPageContent() {
   const handleForgotPassword = useCallback(() => {
     router.push('/password-reset')
   }, [router])
+
+  // 認証チェック中はローディング表示
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-green-600 font-medium">認証状態を確認中...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
