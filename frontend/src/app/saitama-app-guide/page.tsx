@@ -6,7 +6,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ApiClient } from "../../lib/api-client"
-import { Modal } from "../../components/atoms/modal"
+import { Modal } from "../../components/atoms/Modal"
 
 export default function SaitamaAppGuidePage() {
   const router = useRouter()

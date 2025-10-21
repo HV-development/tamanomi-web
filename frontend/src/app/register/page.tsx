@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RegisterContainer } from '@/components/organisms/register-container'
+import { RegisterContainer } from '@/components/organisms/RegisterContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
 
 export default function RegisterPage() {

@@ -21,7 +21,7 @@ import { useAppHandlers } from "@/hooks/useAppHandlers"
 import dynamic from "next/dynamic"
 
 // HomeLayoutを動的インポート（遅延読み込み）
-const HomeLayout = dynamic(() => import("@/components/templates/home-layout").then(mod => ({ default: mod.HomeLayout })), {
+const HomeLayout = dynamic(() => import("@/components/templates/HomeLayout").then(mod => ({ default: mod.HomeLayout })), {
   loading: () => (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
       <div className="text-center">

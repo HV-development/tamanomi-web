@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { RegisterConfirmationContainer } from '@/components/organisms/register-confirmation-container'
+import { RegisterConfirmationContainer } from '@/components/organisms/RegisterConfirmationContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
-import { Modal } from '@/components/atoms/modal'
-import { Button } from '@/components/atoms/button'
+import { Modal } from '@/components/atoms/Modal'
+import { Button } from '@/components/atoms/Button'
 
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)

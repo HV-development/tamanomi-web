@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 import { usePaymentMethodChange } from '@/hooks/usePaymentMethodChange'
-import { PaymentMethodChangeContainer } from '@/components/organisms/payment-method-change-container'
+import { PaymentMethodChangeContainer } from '@/components/organisms/PaymentMethodChangeContainer'
 
 function PaymentMethodChangeContent() {
   const {

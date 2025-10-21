@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { PlanRegistrationContainer } from '@/components/organisms/plan-registration-container'
+import { PlanRegistrationContainer } from '@/components/organisms/PlanRegistrationContainer'
 import { 
   PlanListResponse
 } from '@hv-development/schemas'

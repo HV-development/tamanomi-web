@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 import { useRouter } from 'next/navigation'
-import { EmailRegistrationContainer } from '@/components/organisms/email-registration-container'
+import { EmailRegistrationContainer } from '@/components/organisms/EmailRegistrationContainer'
 import { useEmailRegistration } from '@/hooks/useEmailRegistration'
 
 function EmailRegistrationContent() {

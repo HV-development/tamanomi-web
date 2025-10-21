@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 import { usePaymentReturn } from '@/hooks/usePaymentReturn'
-import { PaymentReturnContainer } from '@/components/organisms/payment-return-container'
+import { PaymentReturnContainer } from '@/components/organisms/PaymentReturnContainer'
 
 function PaymentReturnContent() {
   const { isProcessing, error, isPaymentMethodChangeOnly } = usePaymentReturn()

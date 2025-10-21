@@ -1,7 +1,7 @@
 'use client';
 
-import DrinkAnimation from '@/components/molecules/drink-animation';
-import AdvancedDrinkAnimation from '@/components/molecules/advanced-drink-animation';
+import DrinkAnimation from '@/components/molecules/DrinkAnimation';
+import AdvancedDrinkAnimation from '@/components/molecules/AdvancedDrinkAnimation';
 
 export default function DrinkAnimationDemo() {
   const handleAnimationComplete = () => {
@@ -107,7 +107,7 @@ export default function DrinkAnimationDemo() {
             <div>
               <h3 className="text-lg font-medium mb-2">基本コンポーネント</h3>
               <pre className="bg-gray-100 p-4 rounded text-sm overflow-x-auto">
-{`import DrinkAnimation from '@/components/molecules/drink-animation';
+{`import DrinkAnimation from '@/components/molecules/DrinkAnimation';
 
 <DrinkAnimation
   width={200}
@@ -121,7 +121,7 @@ export default function DrinkAnimationDemo() {
             <div>
               <h3 className="text-lg font-medium mb-2">高度なコンポーネント</h3>
               <pre className="bg-gray-100 p-4 rounded text-sm overflow-x-auto">
-{`import AdvancedDrinkAnimation from '@/components/molecules/advanced-drink-animation';
+{`import AdvancedDrinkAnimation from '@/components/molecules/AdvancedDrinkAnimation';
 
 <AdvancedDrinkAnimation
   width={200}

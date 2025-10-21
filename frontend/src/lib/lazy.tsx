@@ -4,37 +4,37 @@ import { lazy, Suspense } from "react"
 
 // 重いコンポーネントを遅延読み込み
 export const LazyUsageHistoryList = lazy(() =>
-    import("@/components/organisms/usage-history-list").then(module => ({
+    import("@/components/organisms/UsageHistoryList").then(module => ({
         default: module.UsageHistoryList
     }))
 )
 
 export const LazyPaymentHistoryList = lazy(() =>
-    import("@/components/organisms/payment-history-list").then(module => ({
+    import("@/components/organisms/PaymentHistoryList").then(module => ({
         default: module.PaymentHistoryList
     }))
 )
 
 export const LazyProfileEditLayout = lazy(() =>
-    import("@/components/organisms/profile-edit-container").then(module => ({
+    import("@/components/organisms/ProfileEditContainer").then(module => ({
         default: module.ProfileEditContainer
     }))
 )
 
 export const LazyEmailChangeLayout = lazy(() =>
-    import("@/components/organisms/email-change-container").then(module => ({
+    import("@/components/organisms/EmailChangeContainer").then(module => ({
         default: module.EmailChangeContainer
     }))
 )
 
 export const LazyPasswordChangeLayout = lazy(() =>
-    import("@/components/organisms/password-change-container").then(module => ({
+    import("@/components/organisms/PasswordChangeContainer").then(module => ({
         default: module.PasswordChangeContainer
     }))
 )
 
 export const LazyWithdrawalLayout = lazy(() =>
-    import("@/components/organisms/withdrawal-container").then(module => ({
+    import("@/components/organisms/WithdrawalContainer").then(module => ({
         default: module.WithdrawalContainer
     }))
 )

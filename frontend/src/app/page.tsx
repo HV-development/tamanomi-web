@@ -8,7 +8,7 @@
  * トップ画面を掲載店の一覧画面に変更する予定
  */
 
-import { LoginLayout } from "@/components/templates/login-layout"
+import { LoginLayout } from "@/components/templates/LoginLayout"
 import { Suspense } from "react"
 import { useLoginPage } from "@/hooks/useLoginPage"
 
@@ -94,7 +94,7 @@ import { initialState, appReducer } from "@/hooks/useAppReducer"
 import { useDataLoader } from "@/hooks/useDataLoader"
 import { useComputedValues } from "@/hooks/useComputedValues"
 import { useAppHandlers } from "@/hooks/useAppHandlers"
-import { HomeLayout } from "@/components/templates/home-layout"
+import { HomeLayout } from "@/components/templates/HomeLayout"
 
 // メインコンポーネント
 export default function HomePage() {
