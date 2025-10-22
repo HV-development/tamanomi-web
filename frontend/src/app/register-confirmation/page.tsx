@@ -25,21 +25,64 @@ export default function RegisterConfirmationPage() {
       const emailParam = urlParams.get('email') || ''
       const tokenParam = urlParams.get('token') || ''
 
-      // フォームデータを取得（通常はlocalStorageやsessionStorageから）
-      const storedData = sessionStorage.getItem('registerFormData')
-
-      if (!storedData || !tokenParam) {
-        // データがない場合は登録画面にリダイレクト
+      // トークンがない場合は登録画面にリダイレクト
+      if (!tokenParam) {
         router.push('/email-registration')
         return
       }
 
+      // まずsessionStorageから取得を試みる
+      const storedData = sessionStorage.getItem('registerFormData')
+
+      if (storedData) {
+        // sessionStorageにデータがある場合（通常フロー）
+        try {
+          const parsedData = JSON.parse(storedData) as UserRegistrationComplete
+          setFormData(parsedData)
+          setEmail(emailParam)
+          setToken(tokenParam)
+          return
+        } catch (error) {
+          console.error('sessionStorage parse error:', error)
+          // パースエラーの場合は次の処理へ
+        }
+      }
+
+      // sessionStorageがない場合、トークンからemailを復元
       try {
-        const parsedData = JSON.parse(storedData) as UserRegistrationComplete
-        setFormData(parsedData)
-        setEmail(emailParam)
-        setToken(tokenParam)
-      } catch {
+        console.log('🔄 sessionStorageが空のため、トークンからemailを復元します')
+        
+        // Base64URLデコード（ブラウザ環境用）
+        const paddedToken = tokenParam + '='.repeat((4 - tokenParam.length % 4) % 4)
+        const base64 = paddedToken.replace(/-/g, '+').replace(/_/g, '/')
+        
+        // ブラウザ環境でのデコード
+        const decodedString = atob(base64)
+        const tokenData = JSON.parse(decodedString)
+        
+        console.log('✅ トークンからemailを復元:', tokenData.email)
+        
+        // 有効期限チェック
+        if (tokenData.expiresAt && Date.now() > tokenData.expiresAt) {
+          alert('トークンの有効期限が切れています。再度メール登録からやり直してください。')
+          router.push('/email-registration')
+          return
+        }
+        
+        // tokenDataから取得したemailまたはURLパラメータのemailを使用
+        const recoveredEmail = tokenData.email || emailParam
+        
+        if (!recoveredEmail) {
+          throw new Error('メールアドレスを取得できませんでした')
+        }
+        
+        // ユーザーに情報を再入力してもらうため、登録画面に戻す
+        alert('セッションが切れました。お手数ですが、再度情報を入力してください。')
+        router.push(`/register?email=${encodeURIComponent(recoveredEmail)}&token=${encodeURIComponent(tokenParam)}`)
+        
+      } catch (error) {
+        console.error('トークンデコードエラー:', error)
+        alert('トークンの検証に失敗しました。再度メール登録からやり直してください。')
         router.push('/email-registration')
       }
     }
