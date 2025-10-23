@@ -206,6 +206,13 @@ export async function preRegister(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
+      
+      // 409エラー（メールアドレス重複）の場合は特別なメッセージ
+      if (response.status === 409) {
+        const message = errorData.message || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
+        throw new Error(message)
+      }
+      
       const message = errorData.error?.message || errorData.message || '認証メールの送信に失敗しました'
       throw new Error(message)
     }

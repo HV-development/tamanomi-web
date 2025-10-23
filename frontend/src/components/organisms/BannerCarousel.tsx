@@ -139,7 +139,7 @@ export function BannerCarousel({ className = "" }: BannerCarouselProps) {
                   ? "bg-white scale-125"
                   : "bg-white/50 hover:bg-white/70"
               }`}
-              aria-label={`バナー ${index + 1} に移動`}
+              aria-label={`バナー  ${index + 1} に移動`}
             />
           ))}
         </div>
