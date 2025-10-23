@@ -13,6 +13,7 @@ interface LoginContainerProps {
   onResendOtp: () => void
   onBack: () => void
   onLogoClick: () => void
+  onHomeClick?: () => void
   isLoading?: boolean
   error?: string
   loginStep?: "password" | "otp"
@@ -28,12 +29,14 @@ export function LoginContainer({
   onResendOtp,
   onBack,
   onLogoClick,
+  onHomeClick,
   isLoading,
   error,
   loginStep = "password",
   email = "",
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
 }: LoginContainerProps) {
+
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
@@ -41,6 +44,8 @@ export function LoginContainer({
         onLogoClick={onLogoClick}
         showBackButton={loginStep === "otp"} // OTP画面のみ戻るボタンを表示
         onBackClick={onBack}
+        showHomeButton={true} // homeボタンを常に表示
+        onHomeClick={onHomeClick}
       />
 
       {/* メインコンテンツ */}

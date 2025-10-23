@@ -14,6 +14,14 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
   const [isOpen, setIsOpen] = useState(false)
 
   const menuItems: MenuItem[] = [
+    ...(isAuthenticated ? [] : [{
+      id: "login",
+      label: "ログイン",
+      onClick: () => {
+        window.location.href = "/login"
+        onMenuItemClick("login")
+      },
+    }]),
     {
       id: "terms",
       label: "利用規約",
