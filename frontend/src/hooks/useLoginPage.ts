@@ -56,7 +56,8 @@ export const useLoginPage = () => {
           const hasPlan = userData.plan !== null && userData.plan !== undefined
           
           if (!hasPlan) {
-            router.push('/plan-registration')
+            // プラン未登録の場合はプラン登録画面へ（メールアドレスをURLパラメータとして渡す）
+            router.push(`/plan-registration?email=${encodeURIComponent(userData.email)}`)
           } else {
             router.push('/home?view=mypage')
           }

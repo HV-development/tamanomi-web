@@ -101,8 +101,9 @@ export default function PlanRegistrationPage() {
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
       
-      // URLパラメータにメールアドレスがある場合のみ設定
+      // URLパラメータにメールアドレスがある場合は設定
       if (emailParam) {
+        console.log('🔍 [useEffect] Setting email from URL parameter:', emailParam)
         setEmail(emailParam)
       }
       
@@ -118,11 +119,15 @@ export default function PlanRegistrationPage() {
       
       // refreshパラメータがある場合、ユーザー情報を再取得（ガイドページからの戻り）
       if (refreshParam) {
+        console.log('🔍 [useEffect] Refresh parameter found, fetching user info')
         fetchUserInfo()
       } else {
         // refreshパラメータがない場合も、メールアドレスが設定されていない場合はユーザー情報を取得
         if (!emailParam) {
+          console.log('🔍 [useEffect] No email parameter, fetching user info')
           fetchUserInfo()
+        } else {
+          console.log('🔍 [useEffect] Email parameter found, skipping user info fetch')
         }
       }
     }
