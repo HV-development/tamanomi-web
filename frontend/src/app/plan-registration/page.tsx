@@ -43,11 +43,11 @@ export default function PlanRegistrationPage() {
         const userData = await response.json()
         console.log('🔍 [fetchUserInfo] User data received:', userData)
         
-        // メールアドレスがURLパラメータにない場合は、ユーザーデータから取得
-        if (!email && userData.email) {
+        // メールアドレスをユーザーデータから取得（常に更新）
+        if (userData.email) {
           console.log('🔍 [fetchUserInfo] Setting email from user data:', userData.email)
           setEmail(userData.email)
-        } else if (!email && !userData.email) {
+        } else {
           console.error('❌ [fetchUserInfo] No email found in user data')
           
           // JWTトークンから直接メールアドレスを取得するフォールバック処理
@@ -89,7 +89,7 @@ export default function PlanRegistrationPage() {
       setSaitamaAppLinked(false)
       setError('ユーザー情報の取得中にエラーが発生しました。')
     }
-  }, [email])
+  }, [])
 
   // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
@@ -101,7 +101,10 @@ export default function PlanRegistrationPage() {
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
       
-      setEmail(emailParam)
+      // URLパラメータにメールアドレスがある場合のみ設定
+      if (emailParam) {
+        setEmail(emailParam)
+      }
       
       // 支払い方法変更のみの場合はフラグを設定
       if (paymentMethodChangeParam === 'true') {
@@ -116,9 +119,28 @@ export default function PlanRegistrationPage() {
       // refreshパラメータがある場合、ユーザー情報を再取得（ガイドページからの戻り）
       if (refreshParam) {
         fetchUserInfo()
+      } else {
+        // refreshパラメータがない場合も、メールアドレスが設定されていない場合はユーザー情報を取得
+        if (!emailParam) {
+          fetchUserInfo()
+        }
       }
     }
   }, [fetchUserInfo])
+
+  // ページがフォーカスされた時にユーザー情報を再取得（戻るボタンで戻ってきた時など）
+  useEffect(() => {
+    const handleFocus = () => {
+      // メールアドレスが設定されていない場合のみ再取得
+      if (!email) {
+        console.log('🔍 [handleFocus] Page focused, refetching user info')
+        fetchUserInfo()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [email, fetchUserInfo])
 
   const fetchPlans = useCallback(async (explicitLinkedState?: boolean | null) => {
     try {
@@ -307,7 +329,17 @@ export default function PlanRegistrationPage() {
     }
   }
 
-  const handleCancel = () => router.push('/')
+  const handleCancel = () => {
+    // 状態をリセット
+    setEmail('')
+    setError('')
+    setSaitamaAppLinked(null)
+    setHasPaymentMethod(false)
+    setIsPaymentMethodChangeOnly(false)
+    
+    // トップページに遷移
+    router.push('/')
+  }
   const handleLogoClick = () => router.push('/')
 
   // クライアントサイドでの初期化が完了するまでローディング表示
