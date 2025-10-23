@@ -206,7 +206,24 @@ export async function preRegister(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      const message = errorData.error?.message || errorData.message || '認証メールの送信に失敗しました'
+      
+      // エラーメッセージを適切に処理
+      let message = '認証メールの送信に失敗しました'
+      
+      if (errorData.message) {
+        message = errorData.message
+      } else if (errorData.error?.message) {
+        message = errorData.error.message
+      } else if (response.status === 409) {
+        message = 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
+      } else if (response.status === 400) {
+        message = '入力内容に誤りがあります。入力内容を確認してください。'
+      } else if (response.status === 503) {
+        message = 'サーバーに接続できません。ネットワーク接続を確認してください。'
+      } else if (response.status === 408) {
+        message = 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。'
+      }
+      
       throw new Error(message)
     }
 
@@ -217,5 +234,26 @@ export async function preRegister(
       throw error
     }
     throw new Error('認証メールの送信中にエラーが発生しました')
+  }
+}
+
+/**
+ * アカウント削除
+ */
+export async function deleteAccount(): Promise<void> {
+  try {
+    const response = await ApiClient.request('/api/user/delete-account', {
+      method: 'DELETE',
+      requireAuth: true,
+    })
+
+    if (response.error) {
+      throw new Error(response.error.message || 'アカウントの削除に失敗しました')
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('アカウントの削除中にエラーが発生しました')
   }
 }

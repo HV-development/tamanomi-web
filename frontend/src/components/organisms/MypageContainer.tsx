@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import Image from "next/image"
-import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut } from "lucide-react"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, Trash2 } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
@@ -279,7 +279,7 @@ const MenuButtons = React.memo(({
     {appConfig.myPageSettings.showPaymentHistory && (
       <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
     )} */}
-    <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
+    <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" />
   </div>
 ))
 MenuButtons.displayName = 'MenuButtons'
@@ -462,8 +462,6 @@ export const MyPageContainer = React.memo(function MyPageContainer({
               onViewPlan={onViewPlan}
               onChangeEmail={onChangeEmail}
               onChangePassword={onChangePassword}
-              onViewUsageHistory={onViewUsageHistory}
-              onViewPaymentHistory={onViewPaymentHistory}
               onLogout={onLogout}
             />
           </FadeInComponent>

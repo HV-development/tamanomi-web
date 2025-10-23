@@ -7,6 +7,7 @@ import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
 import type { useFilters } from './useFilters'
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import { deleteAccount } from '@/lib/api-client'
 
 // ハンドラー作成フック
 export const useAppHandlers = (
@@ -178,10 +179,8 @@ export const useAppHandlers = (
     }, [router])
 
     const handleForgotPassword = useCallback(() => {
-        dispatch({ type: 'SET_PASSWORD_RESET_STEP', payload: "form" })
-        dispatch({ type: 'SET_PASSWORD_RESET_EMAIL', payload: "" })
-        navigation.navigateToView("password-reset")
-    }, [navigation, dispatch])
+        router.push('/forgot-password')
+    }, [router])
 
     const handleBackToHome = useCallback(() => {
         navigation.navigateToView("home", "home")
@@ -496,8 +495,18 @@ export const useAppHandlers = (
         navigation.navigateToMyPage("withdrawal")
     }, [navigation])
 
-    const handleWithdrawConfirm = useCallback(() => {
-        navigation.navigateToMyPage("withdrawal-complete")
+    const handleWithdrawConfirm = useCallback(async () => {
+        try {
+            // 解約処理を実行
+            await deleteAccount()
+            
+            // 成功した場合は完了画面に遷移
+            navigation.navigateToMyPage("withdrawal-complete")
+        } catch (error) {
+            console.error('Account deletion error:', error)
+            // エラーハンドリング（必要に応じてエラーメッセージを表示）
+            alert('アカウントの削除に失敗しました。')
+        }
     }, [navigation])
 
     const handleWithdrawCancel = useCallback(() => {
@@ -873,6 +882,7 @@ export const useAppHandlers = (
         // ルートURL（ログイン画面）に遷移
         router.push('/')
     }, [auth, dispatch, router])
+
 
     return {
         handleCurrentLocationClick,

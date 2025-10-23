@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildApiUrl } from '@/lib/api-config';
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,9 +19,7 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
-    const fullUrl = buildApiUrl('/pre-register');
-    
-    console.log('🔍 [pre-register] Request:', { url: fullUrl, email: body.email, campaignCode: body.campaignCode });
+    const fullUrl = buildApiUrl('/auth/password/reset/request');
 
     try {
       const response = await fetch(fullUrl, {
@@ -31,45 +29,16 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           email: body.email,
-          campaignCode: body.campaignCode,
         }),
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
-      console.log('🔍 [pre-register] Response status:', response.status);
-      console.log('🔍 [pre-register] Response ok:', response.ok);
-
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.log('🔍 [pre-register] Error data:', errorData);
-
-        // 409エラー（既存アカウント）の場合は特別な処理
-        if (response.status === 409) {
-          return NextResponse.json(
-            {
-              success: false,
-              message: 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
-              errorCode: 'USER_ALREADY_EXISTS',
-              error: errorData
-            },
-            { status: 409 }
-          );
-        }
-
-        // 400エラー（バリデーションエラー）の場合は特別な処理
-        if (response.status === 400) {
-          return NextResponse.json(
-            {
-              success: false,
-              message: errorData.message || '入力内容に誤りがあります。入力内容を確認してください。',
-              error: errorData,
-            },
-            { status: 400 }
-          );
-        }
+        console.log('🔍 [forgot-password] Error data:', errorData);
 
         return NextResponse.json(
           {
@@ -88,7 +57,7 @@ export async function POST(request: NextRequest) {
       throw fetchError;
     }
   } catch (error) {
-    console.error('Pre-registration error:', error);
+    console.error('Forgot password error:', error);
     console.error('Error details:', {
       name: error instanceof Error ? error.name : 'Unknown',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -121,11 +90,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: 'リクエストの処理に失敗しました。しばらくしてから再度お試しください。',
+        message: 'パスワードリセットメールの送信に失敗しました。しばらくしてから再度お試しください。',
         error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
   }
 }
-

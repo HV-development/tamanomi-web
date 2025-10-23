@@ -59,9 +59,24 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       // 送信完了画面に遷移
       setCurrentStep('complete')
     } catch (error) {
-      const message = error instanceof Error 
-        ? error.message 
-        : '認証メールの送信に失敗しました'
+      // エラーメッセージを適切に処理
+      let message = '認証メールの送信に失敗しました'
+      
+      if (error instanceof Error) {
+        // 409エラー（既存アカウント）の場合は特別なメッセージ
+        if (error.message.includes('既に登録されています')) {
+          message = 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
+        } else if (error.message.includes('入力内容に誤りがあります')) {
+          message = '入力内容に誤りがあります。メールアドレスとキャンペーンコードを確認してください。'
+        } else if (error.message.includes('ネットワーク接続')) {
+          message = 'ネットワーク接続を確認してください。'
+        } else if (error.message.includes('タイムアウト')) {
+          message = 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。'
+        } else {
+          message = error.message
+        }
+      }
+      
       setErrorMessage(message)
       // エラー時はフォーム画面に留まる
       setCurrentStep('form')
@@ -93,9 +108,24 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
         setSuccessMessage('')
       }, 5000)
     } catch (error) {
-      const message = error instanceof Error 
-        ? error.message 
-        : '認証メールの再送信に失敗しました'
+      // エラーメッセージを適切に処理
+      let message = '認証メールの再送信に失敗しました'
+      
+      if (error instanceof Error) {
+        // 409エラー（既存アカウント）の場合は特別なメッセージ
+        if (error.message.includes('既に登録されています')) {
+          message = 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
+        } else if (error.message.includes('入力内容に誤りがあります')) {
+          message = '入力内容に誤りがあります。メールアドレスとキャンペーンコードを確認してください。'
+        } else if (error.message.includes('ネットワーク接続')) {
+          message = 'ネットワーク接続を確認してください。'
+        } else if (error.message.includes('タイムアウト')) {
+          message = 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。'
+        } else {
+          message = error.message
+        }
+      }
+      
       setErrorMessage(message)
     } finally {
       setIsLoading(false)

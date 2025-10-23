@@ -249,7 +249,7 @@ export const useLoginPage = () => {
 
   // パスワードリセット画面へ
   const handleForgotPassword = useCallback(() => {
-    router.push('/password-reset')
+    router.push('/forgot-password')
   }, [router])
 
   return {
