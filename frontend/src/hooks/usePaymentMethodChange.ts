@@ -11,6 +11,7 @@ export const usePaymentMethodChange = () => {
     paygentCustomerId: string
     paygentCustomerCardId: string
   } | null>(null)
+  const [useMockPayment, setUseMockPayment] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const fromPlanChange = searchParams.get('from') === 'plan-change'
@@ -25,6 +26,16 @@ export const usePaymentMethodChange = () => {
           return
         }
 
+        // モックモード状態を取得
+        const mockStatusResponse = await fetch('/api/payment/mock-status', {
+          cache: 'no-store',
+        })
+        
+        if (mockStatusResponse.ok) {
+          const mockStatus = await mockStatusResponse.json()
+          setUseMockPayment(mockStatus.useMockPayment)
+        }
+
         const response = await fetch('/api/user/me', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -37,10 +48,7 @@ export const usePaymentMethodChange = () => {
           setUserEmail(userData.email)
           setPaymentCard(userData.paymentCard)
           
-          const isMockMode = process.env.NODE_ENV === 'development' || 
-                            localStorage.getItem('USE_MOCK_PAYMENT') === 'true'
-          
-          if (!userData.paymentCard && !isMockMode) {
+          if (!userData.paymentCard && !useMockPayment) {
             setError('カード情報が登録されていません。')
           }
         } else {
@@ -65,9 +73,7 @@ export const usePaymentMethodChange = () => {
         return
       }
       
-      const isMockMode = process.env.NODE_ENV === 'development' || 
-                        localStorage.getItem('USE_MOCK_PAYMENT') === 'true' ||
-                        !paymentCard
+      const isMockMode = useMockPayment || !paymentCard
       
       if (isMockMode) {
         const mockCustomerId = paymentCard?.paygentCustomerId || `cust_${Date.now()}`

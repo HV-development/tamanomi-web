@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlanRegistrationContainer } from '@/components/organisms/PlanRegistrationContainer'
 import { 
-  PlanListResponse
+  PlanListResponse,
+  PlanListResponseSchema
 } from '@hv-development/schemas'
 
 export default function PlanRegistrationPage() {
@@ -113,10 +114,9 @@ export default function PlanRegistrationPage() {
       
       const data = await response.json()
       
-      // バリデーション（一時的に無効化）
-      // const validatedData = PlanListResponseSchema.parse(data)
-      // setPlans(validatedData.plans)
-      setPlans(data.plans)
+      // バリデーションを有効化
+      const validatedData = PlanListResponseSchema.parse(data)
+      setPlans(validatedData.plans)
     } catch {
       setError('プランの取得に失敗しました')
     } finally {
