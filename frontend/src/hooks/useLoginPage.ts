@@ -158,9 +158,13 @@ export const useLoginPage = () => {
       })
 
       const data = await response.json()
+      
+      console.log('🔍 [useLoginPage] OTP response data:', data)
+      console.log('🔍 [useLoginPage] Response ok:', response.ok)
 
       if (!response.ok) {
         const errorMessage = data.error || data.message || 'ワンタイムパスワードの認証に失敗しました'
+        console.log('🔍 [useLoginPage] Error message:', errorMessage)
         throw new Error(errorMessage)
       }
 
