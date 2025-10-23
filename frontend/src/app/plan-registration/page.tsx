@@ -96,15 +96,15 @@ export default function PlanRegistrationPage() {
     setIsClient(true)
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
-      const emailParam = urlParams.get('email') || ''
       const saitamaAppLinkedParam = urlParams.get('saitamaAppLinked')
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
       
-      // URLパラメータにメールアドレスがある場合は設定
-      if (emailParam) {
-        console.log('🔍 [useEffect] Setting email from URL parameter:', emailParam)
-        setEmail(emailParam)
+      // セッションストレージからメールアドレスを取得
+      const sessionEmail = sessionStorage.getItem('userEmail')
+      if (sessionEmail) {
+        console.log('🔍 [useEffect] Setting email from session storage:', sessionEmail)
+        setEmail(sessionEmail)
       }
       
       // 支払い方法変更のみの場合はフラグを設定
@@ -122,12 +122,12 @@ export default function PlanRegistrationPage() {
         console.log('🔍 [useEffect] Refresh parameter found, fetching user info')
         fetchUserInfo()
       } else {
-        // refreshパラメータがない場合も、メールアドレスが設定されていない場合はユーザー情報を取得
-        if (!emailParam) {
-          console.log('🔍 [useEffect] No email parameter, fetching user info')
+        // メールアドレスが取得できない場合はユーザー情報を取得
+        if (!sessionEmail) {
+          console.log('🔍 [useEffect] No email in session storage, fetching user info')
           fetchUserInfo()
         } else {
-          console.log('🔍 [useEffect] Email parameter found, skipping user info fetch')
+          console.log('🔍 [useEffect] Email found in session storage, skipping user info fetch')
         }
       }
     }
@@ -271,6 +271,9 @@ export default function PlanRegistrationPage() {
       // ペイジェントのカード登録画面にリダイレクト
       // リンクタイプ方式では、redirectUrlにGETパラメータを付与してリダイレクト
       const { redirectUrl, params } = data
+      
+      // プラン登録成功後、セッションストレージからメールアドレスをクリア
+      sessionStorage.removeItem('userEmail')
       
       // モック環境の場合はGETパラメータとしてリダイレクト
       if (redirectUrl.includes('/payment-mock')) {
