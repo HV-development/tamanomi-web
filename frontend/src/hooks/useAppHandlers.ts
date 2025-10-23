@@ -174,9 +174,10 @@ export const useAppHandlers = (
             }
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
-        } catch {
-            // エラーはステート管理システムで処理する必要があります
-            // TODO: エラーステートの追加
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'ワンタイムパスワードの認証に失敗しました'
+            console.error('OTP verification error:', errorMessage)
+            dispatch({ type: 'SET_LOGIN_ERROR', payload: errorMessage })
         } finally {
             auth.setIsLoading(false)
         }
