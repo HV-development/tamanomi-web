@@ -106,9 +106,8 @@ export default function HomePage() {
                 router.push('/plan-registration')
                 return
               } else {
-                // プラン登録済みの場合はマイページへ（一時的な対応）
-                navigation.navigateToView("mypage", "mypage")
-                navigation.navigateToMyPage("main")
+                // プラン登録済みの場合はhome画面を表示（一時的な対応）
+                // home画面をそのまま表示
               }
             }
           })
@@ -122,10 +121,9 @@ export default function HomePage() {
       } else if (accessToken && auth.isAuthenticated) {
         // 既に認証済みの場合（リロード時など）
         
-        // ビューパラメータがない場合はマイページへ遷移（一時的な対応）
+        // ビューパラメータがない場合はhome画面を表示（一時的な対応）
         if (!view) {
-          navigation.navigateToView("mypage", "mypage")
-          navigation.navigateToMyPage("main")
+          // home画面をそのまま表示
         } else if (view === 'mypage') {
           navigation.navigateToView("mypage", "mypage")
           navigation.navigateToMyPage("main")

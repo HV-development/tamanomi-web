@@ -60,7 +60,7 @@ export const useLoginPage = () => {
             sessionStorage.setItem('userEmail', userData.email)
             router.push('/plan-registration')
           } else {
-            router.push('/home?view=mypage')
+            router.push('/home')
           }
         } else {
           localStorage.removeItem('accessToken')
@@ -201,7 +201,7 @@ export const useLoginPage = () => {
         if (!hasPlan) {
           router.push('/plan-registration')
         } else {
-          router.push('/home?view=mypage&auto-login=true')
+          router.push('/home')
         }
       }
     } catch (err) {

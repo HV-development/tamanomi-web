@@ -158,9 +158,8 @@ export const useAppHandlers = (
                 // プラン未登録の場合はプラン登録画面へ（独立したページ）
                 router.push('/plan-registration')
             } else {
-                // プラン登録済みの場合はマイページへ直接遷移
-                navigation.navigateToView("mypage", "mypage")
-                navigation.navigateToMyPage("main")
+                // プラン登録済みの場合はhome画面へ遷移
+                router.push('/home')
             }
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
@@ -170,7 +169,7 @@ export const useAppHandlers = (
         } finally {
             auth.setIsLoading(false)
         }
-    }, [auth, otpRequestId, router, dispatch, navigation, state])
+    }, [auth, otpRequestId, router, dispatch, state])
 
     const handleSignup = useCallback(() => {
         router.push('/email-registration')
