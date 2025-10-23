@@ -8,13 +8,17 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
     
     if (!authHeader) {
+      console.log('❌ [user/me] No authorization header');
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
       )
     }
 
+    console.log('🔍 [user/me] Authorization header found, calling backend API');
+
     const fullUrl = buildApiUrl('/users/me')
+    console.log('🔍 [user/me] Backend URL:', fullUrl);
 
     const response = await fetch(fullUrl, {
       method: 'GET',
@@ -25,20 +29,23 @@ export async function GET(request: NextRequest) {
       cache: 'no-store',
     })
 
+    console.log('🔍 [user/me] Backend response status:', response.status);
+
     const data = await response.json()
 
     if (!response.ok) {
-      console.error('Backend API error:', data)
+      console.error('❌ [user/me] Backend API error:', data)
       return NextResponse.json(
         { error: data.message || 'ユーザー情報の取得に失敗しました' },
         { status: response.status }
       )
     }
     
+    console.log('🔍 [user/me] Backend response data:', data);
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('User me route error:', error)
+    console.error('❌ [user/me] Route error:', error)
     return NextResponse.json(
       { error: 'ユーザー情報の取得中にエラーが発生しました' },
       { status: 500 }
