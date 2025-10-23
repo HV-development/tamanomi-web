@@ -23,10 +23,12 @@ export default function PlanRegistrationPage() {
       const accessToken = localStorage.getItem('accessToken')
       
       if (!accessToken) {
-      
+        console.log('🔍 [fetchUserInfo] No access token found')
         setSaitamaAppLinked(false)
         return
       }
+
+      console.log('🔍 [fetchUserInfo] Access token found, calling /api/user/me')
 
       const response = await fetch('/api/user/me', {
         headers: {
@@ -35,12 +37,37 @@ export default function PlanRegistrationPage() {
         cache: 'no-store',
       })
 
+      console.log('🔍 [fetchUserInfo] Response status:', response.status)
+
       if (response.ok) {
         const userData = await response.json()
+        console.log('🔍 [fetchUserInfo] User data received:', userData)
         
         // メールアドレスがURLパラメータにない場合は、ユーザーデータから取得
         if (!email && userData.email) {
+          console.log('🔍 [fetchUserInfo] Setting email from user data:', userData.email)
           setEmail(userData.email)
+        } else if (!email && !userData.email) {
+          console.error('❌ [fetchUserInfo] No email found in user data')
+          
+          // JWTトークンから直接メールアドレスを取得するフォールバック処理
+          try {
+            const token = localStorage.getItem('accessToken')
+            if (token) {
+              const payload = JSON.parse(atob(token.split('.')[1]))
+              if (payload.email) {
+                console.log('🔍 [fetchUserInfo] Fallback: Setting email from JWT token:', payload.email)
+                setEmail(payload.email)
+              } else {
+                setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+              }
+            } else {
+              setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+            }
+          } catch (error) {
+            console.error('❌ [fetchUserInfo] Failed to parse JWT token:', error)
+            setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+          }
         }
         
         const newLinkedState = userData.saitamaAppLinked === true
@@ -50,10 +77,17 @@ export default function PlanRegistrationPage() {
         const hasCard = !!sessionStorage.getItem('paygentCustomerCardId')
         setHasPaymentMethod(hasCard)
       } else {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('❌ [fetchUserInfo] API error:', response.status, errorData)
         setSaitamaAppLinked(false)
+        if (response.status === 404) {
+          setError('ユーザー情報が見つかりません。新規登録画面からやり直してください。')
+        }
       }
-    } catch {
+    } catch (error) {
+      console.error('❌ [fetchUserInfo] Error:', error)
       setSaitamaAppLinked(false)
+      setError('ユーザー情報の取得中にエラーが発生しました。')
     }
   }, [email])
 
@@ -148,9 +182,16 @@ export default function PlanRegistrationPage() {
       
       // メールアドレスの検証
       if (!email || email.trim() === '') {
-        setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
-        setIsLoading(false)
-        return
+        // メールアドレスが取得できていない場合、再度ユーザー情報を取得を試行
+        console.log('🔍 [handlePaymentMethodRegister] Email not found, retrying fetchUserInfo');
+        await fetchUserInfo();
+        
+        // 再試行後もメールアドレスが取得できない場合はエラー
+        if (!email || email.trim() === '') {
+          setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+          setIsLoading(false)
+          return
+        }
       }
       
       // カード登録APIを呼び出し
