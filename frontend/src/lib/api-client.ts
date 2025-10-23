@@ -209,7 +209,19 @@ export async function preRegister(
       
       // 409エラー（メールアドレス重複）の場合は特別なメッセージ
       if (response.status === 409) {
-        const message = errorData.message || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
+        const message = errorData.error?.message || errorData.message || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
+        throw new Error(message)
+      }
+      
+      // 400エラー（バリデーションエラー）の場合は詳細なメッセージを表示
+      if (response.status === 400) {
+        const message = errorData.error?.message || errorData.message || '入力内容に問題があります。確認してから再度お試しください。'
+        throw new Error(message)
+      }
+      
+      // 500エラー（サーバーエラー）の場合は一般的なメッセージを表示
+      if (response.status === 500) {
+        const message = errorData.error?.message || errorData.message || 'システムエラーが発生しました。しばらく時間をおいてから再度お試しください。'
         throw new Error(message)
       }
       
