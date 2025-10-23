@@ -56,6 +56,8 @@ export const useLoginPage = () => {
           const hasPlan = userData.plan !== null && userData.plan !== undefined
           
           if (!hasPlan) {
+            // プラン未登録の場合はプラン登録画面へ（セッションストレージにメールアドレスを保存）
+            sessionStorage.setItem('userEmail', userData.email)
             router.push('/plan-registration')
           } else {
             router.push('/home?view=mypage')

@@ -24,10 +24,12 @@ export default function PlanRegistrationPage() {
       const accessToken = localStorage.getItem('accessToken')
       
       if (!accessToken) {
-      
+        console.log('🔍 [fetchUserInfo] No access token found')
         setSaitamaAppLinked(false)
         return
       }
+
+      console.log('🔍 [fetchUserInfo] Access token found, calling /api/user/me')
 
       const response = await fetch('/api/user/me', {
         headers: {
@@ -36,12 +38,37 @@ export default function PlanRegistrationPage() {
         cache: 'no-store',
       })
 
+      console.log('🔍 [fetchUserInfo] Response status:', response.status)
+
       if (response.ok) {
         const userData = await response.json()
+        console.log('🔍 [fetchUserInfo] User data received:', userData)
         
-        // メールアドレスがURLパラメータにない場合は、ユーザーデータから取得
-        if (!email && userData.email) {
+        // メールアドレスをユーザーデータから取得（常に更新）
+        if (userData.email) {
+          console.log('🔍 [fetchUserInfo] Setting email from user data:', userData.email)
           setEmail(userData.email)
+        } else {
+          console.error('❌ [fetchUserInfo] No email found in user data')
+          
+          // JWTトークンから直接メールアドレスを取得するフォールバック処理
+          try {
+            const token = localStorage.getItem('accessToken')
+            if (token) {
+              const payload = JSON.parse(atob(token.split('.')[1]))
+              if (payload.email) {
+                console.log('🔍 [fetchUserInfo] Fallback: Setting email from JWT token:', payload.email)
+                setEmail(payload.email)
+              } else {
+                setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+              }
+            } else {
+              setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+            }
+          } catch (error) {
+            console.error('❌ [fetchUserInfo] Failed to parse JWT token:', error)
+            setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+          }
         }
         
         const newLinkedState = userData.saitamaAppLinked === true
@@ -51,24 +78,35 @@ export default function PlanRegistrationPage() {
         const hasCard = !!sessionStorage.getItem('paygentCustomerCardId')
         setHasPaymentMethod(hasCard)
       } else {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('❌ [fetchUserInfo] API error:', response.status, errorData)
         setSaitamaAppLinked(false)
+        if (response.status === 404) {
+          setError('ユーザー情報が見つかりません。新規登録画面からやり直してください。')
+        }
       }
-    } catch {
+    } catch (error) {
+      console.error('❌ [fetchUserInfo] Error:', error)
       setSaitamaAppLinked(false)
+      setError('ユーザー情報の取得中にエラーが発生しました。')
     }
-  }, [email])
+  }, [])
 
   // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
     setIsClient(true)
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
-      const emailParam = urlParams.get('email') || ''
       const saitamaAppLinkedParam = urlParams.get('saitamaAppLinked')
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
       
-      setEmail(emailParam)
+      // セッションストレージからメールアドレスを取得
+      const sessionEmail = sessionStorage.getItem('userEmail')
+      if (sessionEmail) {
+        console.log('🔍 [useEffect] Setting email from session storage:', sessionEmail)
+        setEmail(sessionEmail)
+      }
       
       // 支払い方法変更のみの場合はフラグを設定
       if (paymentMethodChangeParam === 'true') {
@@ -82,10 +120,33 @@ export default function PlanRegistrationPage() {
       
       // refreshパラメータがある場合、ユーザー情報を再取得（ガイドページからの戻り）
       if (refreshParam) {
+        console.log('🔍 [useEffect] Refresh parameter found, fetching user info')
         fetchUserInfo()
+      } else {
+        // メールアドレスが取得できない場合はユーザー情報を取得
+        if (!sessionEmail) {
+          console.log('🔍 [useEffect] No email in session storage, fetching user info')
+          fetchUserInfo()
+        } else {
+          console.log('🔍 [useEffect] Email found in session storage, skipping user info fetch')
+        }
       }
     }
   }, [fetchUserInfo])
+
+  // ページがフォーカスされた時にユーザー情報を再取得（戻るボタンで戻ってきた時など）
+  useEffect(() => {
+    const handleFocus = () => {
+      // メールアドレスが設定されていない場合のみ再取得
+      if (!email) {
+        console.log('🔍 [handleFocus] Page focused, refetching user info')
+        fetchUserInfo()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [email, fetchUserInfo])
 
   const fetchPlans = useCallback(async (explicitLinkedState?: boolean | null) => {
     try {
@@ -148,9 +209,16 @@ export default function PlanRegistrationPage() {
       
       // メールアドレスの検証
       if (!email || email.trim() === '') {
-        setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
-        setIsLoading(false)
-        return
+        // メールアドレスが取得できていない場合、再度ユーザー情報を取得を試行
+        console.log('🔍 [handlePaymentMethodRegister] Email not found, retrying fetchUserInfo');
+        await fetchUserInfo();
+        
+        // 再試行後もメールアドレスが取得できない場合はエラー
+        if (!email || email.trim() === '') {
+          setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+          setIsLoading(false)
+          return
+        }
       }
       
       // カード登録APIを呼び出し
@@ -203,6 +271,9 @@ export default function PlanRegistrationPage() {
       // ペイジェントのカード登録画面にリダイレクト
       // リンクタイプ方式では、redirectUrlにGETパラメータを付与してリダイレクト
       const { redirectUrl, params } = data
+      
+      // プラン登録成功後、セッションストレージからメールアドレスをクリア
+      sessionStorage.removeItem('userEmail')
       
       // モック環境の場合はGETパラメータとしてリダイレクト
       if (redirectUrl.includes('/payment-mock')) {
@@ -266,7 +337,17 @@ export default function PlanRegistrationPage() {
     }
   }
 
-  const handleCancel = () => router.push('/')
+  const handleCancel = () => {
+    // 状態をリセット
+    setEmail('')
+    setError('')
+    setSaitamaAppLinked(null)
+    setHasPaymentMethod(false)
+    setIsPaymentMethodChangeOnly(false)
+    
+    // トップページに遷移
+    router.push('/')
+  }
   const handleLogoClick = () => router.push('/')
 
   // クライアントサイドでの初期化が完了するまでローディング表示

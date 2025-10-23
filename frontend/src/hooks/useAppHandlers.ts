@@ -148,7 +148,6 @@ export const useAppHandlers = (
             }
 
         // メールアドレス変更成功モーダルが表示されている場合は遷移を停止
-        // @ts-expect-error - isEmailChangeSuccessModalOpen is not yet in the type definition
         if (state.isEmailChangeSuccessModalOpen) {
             dispatch({ type: 'RESET_LOGIN_STATE' })
             return
@@ -753,7 +752,6 @@ export const useAppHandlers = (
             // まず成功状態を設定（モーダル表示用）
             dispatch({ type: 'SET_NEW_EMAIL', payload: data.newEmail })
             dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "complete" })
-            // @ts-expect-error - SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN is not yet in the type definition
             dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: true })
             
             // 少し待ってからログアウト処理を実行（モーダルが表示されるまで待つ）
@@ -776,7 +774,6 @@ export const useAppHandlers = (
     }, [dispatch])
 
     const handleEmailChangeSuccessModalClose = useCallback(() => {
-        // @ts-expect-error - SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN is not yet in the type definition
         dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: false })
         
         // 確実にトークンを削除

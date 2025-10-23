@@ -136,8 +136,9 @@ export default function RegisterConfirmationPage() {
           setPointsGranted(result.pointsGranted)
           setShowSuccessModal(true)
         } else {
-          // ポイント付与がない場合は直接プラン登録画面に遷移
-          router.push('/plan-registration?email=' + encodeURIComponent(email))
+          // ポイント付与がない場合は直接プラン登録画面に遷移（セッションストレージにメールアドレスを保存）
+          sessionStorage.setItem('userEmail', email)
+          router.push('/plan-registration')
         }
       } else {
         // エラーハンドリング
@@ -146,7 +147,7 @@ export default function RegisterConfirmationPage() {
         // 409エラー（既存アカウント）の場合は特別な処理
         if (response.status === 409 && result.errorCode === 'USER_ALREADY_EXISTS') {
           // ログイン画面にリダイレクト
-          router.push(`/?error=already_registered&email=${encodeURIComponent(email)}`)
+          router.push(`/?error=already_registered`)
         } else {
           alert(errorMessage)
         }
@@ -163,15 +164,16 @@ export default function RegisterConfirmationPage() {
     if (formData) {
       sessionStorage.setItem('editFormData', JSON.stringify(formData))
     }
-    router.push(`/register?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}&edit=true`)
+    router.push(`/register?token=${encodeURIComponent(token)}&edit=true`)
   }
 
   const handleLogoClick = () => router.push('/')
 
   const handleModalClose = () => {
     setShowSuccessModal(false)
-    // モーダルを閉じた後、プラン登録画面に遷移（連携済みフラグを追加）
-    router.push('/plan-registration?email=' + encodeURIComponent(email) + '&saitamaAppLinked=true')
+    // モーダルを閉じた後、プラン登録画面に遷移（セッションストレージにメールアドレスを保存）
+    sessionStorage.setItem('userEmail', email)
+    router.push('/plan-registration?saitamaAppLinked=true')
   }
 
   // クライアントサイドでの初期化が完了するまでローディング表示

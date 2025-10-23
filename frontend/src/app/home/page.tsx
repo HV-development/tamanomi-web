@@ -101,7 +101,8 @@ export default function HomePage() {
             } else if (!view) {
               // ビューパラメータがない場合（リロード時など）
               if (!hasPlan) {
-                // プラン未登録の場合はプラン登録画面へ
+                // プラン未登録の場合はプラン登録画面へ（セッションストレージにメールアドレスを保存）
+                sessionStorage.setItem('userEmail', userData.email)
                 router.push('/plan-registration')
                 return
               } else {
