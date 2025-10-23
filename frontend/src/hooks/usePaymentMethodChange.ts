@@ -60,7 +60,7 @@ export const usePaymentMethodChange = () => {
     }
 
     fetchUserInfo()
-  }, [])
+  }, [useMockPayment])
 
   const handleChangePaymentMethod = async () => {
     try {

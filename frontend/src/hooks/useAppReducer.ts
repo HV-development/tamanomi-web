@@ -1,4 +1,4 @@
-import type { AppState, AppAction } from '@hv-development/schemas'
+import type { AppState, AppAction } from '../../tamanomi-schemas/src/frontend/types'
 
 // 初期状態
 export const initialState: AppState = {
@@ -14,6 +14,7 @@ export const initialState: AppState = {
     isFavoritesOpen: false,
     loginStep: "password",
     loginEmail: "",
+    loginError: "",
     signupData: null,
     emailChangeStep: "form",
     newEmail: "",
@@ -75,7 +76,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
                 notifications: state.notifications.map(n => ({ ...n, isRead: true }))
             }
         case 'RESET_LOGIN_STATE':
-            return { ...state, loginStep: "password", loginEmail: "" }
+            return { ...state, loginStep: "password", loginEmail: "", loginError: "" }
         case 'RESET_SIGNUP_STATE':
             return { ...state, signupData: null }
         case 'RESET_COUPON_STATE':
@@ -91,6 +92,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, loginStep: action.payload }
         case 'SET_LOGIN_EMAIL':
             return { ...state, loginEmail: action.payload }
+        case 'SET_LOGIN_ERROR':
+            return { ...state, loginError: action.payload }
         case 'SET_SIGNUP_DATA':
             return { ...state, signupData: action.payload }
         case 'SET_EMAIL_CHANGE_STEP':

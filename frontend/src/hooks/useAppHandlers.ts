@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useCallback, useState } from "react"
-import type { AppAction, AppState, AppHandlers, Store } from '@hv-development/schemas'
+import React, { useCallback, useState, useRef, useEffect } from "react"
+import type { AppAction, AppState, AppHandlers, Store } from '../../tamanomi-schemas/src/frontend/types'
 import { appConfig } from '@/config/appConfig'
 import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
@@ -17,6 +17,14 @@ export const useAppHandlers = (
     router: AppRouterInstance,
     state: AppState
 ): AppHandlers => {
+    // useRefを使用して最新のstateを保持
+    const latestState = useRef(state)
+
+    // stateが変更されるたびにrefを更新
+    useEffect(() => {
+        latestState.current = state
+    }, [state])
+
     // OTP requestIdを管理するローカルstate
     const [otpRequestId, setOtpRequestId] = useState<string>("")
 
@@ -51,6 +59,8 @@ export const useAppHandlers = (
     // ステップ1: パスワード認証 + OTP送信
     const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {
         auth.setIsLoading(true)
+        // エラーメッセージをクリア（空文字列に設定）
+        dispatch({ type: 'SET_LOGIN_ERROR', payload: "" })
 
         try {
             // パスワード認証を実行
@@ -87,9 +97,10 @@ export const useAppHandlers = (
             dispatch({ type: 'SET_LOGIN_EMAIL', payload: loginData.email })
             setOtpRequestId(otpData.requestId)
             dispatch({ type: 'SET_LOGIN_STEP', payload: "otp" })
-        } catch {
-            // エラーはステート管理システムで処理する必要があります
-            // TODO: エラーステートの追加
+        } catch (error) {
+            // エラーメッセージをステートに設定
+            const errorMessage = error instanceof Error ? error.message : 'ログインに失敗しました'
+            dispatch({ type: 'SET_LOGIN_ERROR', payload: errorMessage })
         } finally {
             auth.setIsLoading(false)
         }

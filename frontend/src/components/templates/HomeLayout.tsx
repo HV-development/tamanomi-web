@@ -346,6 +346,7 @@ export function HomeLayout() {
         onResendOtp={onResendOtp}
         onBackToPassword={onBackToEmailLogin}
         isLoading={isLoading}
+        error={state.loginError}
         loginStep={loginStep}
         email={loginEmail}
       />

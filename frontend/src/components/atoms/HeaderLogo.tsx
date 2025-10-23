@@ -6,6 +6,8 @@ interface HeaderLogoProps {
   onLogoClick: () => void
   showBackButton?: boolean
   onBackClick?: () => void
+  showHomeButton?: boolean
+  onHomeClick?: () => void
   title?: string
   className?: string
 }
@@ -14,6 +16,8 @@ export function HeaderLogo({
   onLogoClick,
   showBackButton = false,
   onBackClick,
+  showHomeButton = false,
+  onHomeClick,
   title,
   className = "",
 }: HeaderLogoProps) {
@@ -33,10 +37,17 @@ export function HeaderLogo({
         {/* 中央のロゴ */}
         <Logo size="lg" onClick={onLogoClick} />
         
-        {/* 右側のタイトル（必要に応じて） */}
-        {title && (
+        {/* 右側のhomeボタンまたはタイトル */}
+        {showHomeButton && onHomeClick ? (
+          <button 
+            onClick={onHomeClick} 
+            className="absolute right-0 text-green-600 hover:text-green-700 transition-colors text-sm font-medium"
+          >
+            Home
+          </button>
+        ) : title ? (
           <h1 className="absolute right-0 text-lg font-bold text-gray-900">{title}</h1>
-        )}
+        ) : null}
       </div>
     </div>
   )

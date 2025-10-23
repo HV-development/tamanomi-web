@@ -5,6 +5,8 @@ import { useAuth } from "@/hooks/useAuth"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useFilters } from "@/hooks/useFilters"
 import { useRouter } from "next/navigation"
+import type { Store } from "@/types/store"
+import type { Notification } from "@/types/notification"
 
 // 分離したコンポーネントとフックをインポート
 import { AppContext } from "@/contexts/AppContext"
@@ -26,14 +28,14 @@ export default function HomePage() {
   const [state, dispatch] = useReducer(appReducer, initialState)
 
   // データ読み込みの最適化
-  const { loadData, isLoading: dataLoading, error: dataError } = useDataLoader()
+  const { loadData } = useDataLoader()
 
   // データの遅延読み込み
   useEffect(() => {
     const initializeData = async () => {
       const data = await loadData()
-      dispatch({ type: 'SET_STORES', payload: data.stores as any })
-      dispatch({ type: 'SET_NOTIFICATIONS', payload: data.notifications as any })
+      dispatch({ type: 'SET_STORES', payload: data.stores as Store[] })
+      dispatch({ type: 'SET_NOTIFICATIONS', payload: data.notifications as Notification[] })
       dispatch({ type: 'SET_DATA_LOADED', payload: true })
     }
 
@@ -48,8 +50,8 @@ export default function HomePage() {
 
   // 計算値をカスタムフックで分離
   const computedValues = useComputedValues(
-    state.stores as any[] || [],
-    state.notifications as any[] || [],
+    state.stores as Store[] || [],
+    state.notifications as Notification[] || [],
     auth || { isAuthenticated: false, user: undefined },
     filters || { isFavoritesFilter: false }
   )
