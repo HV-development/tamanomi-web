@@ -35,8 +35,17 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       console.error('❌ [user/me] Backend API error:', data)
+      
+      // 403エラーの場合（アカウントタイプ不一致）は特別に処理
+      if (response.status === 403) {
+        return NextResponse.json(
+          { error: 'この機能はユーザーアカウント専用です' },
+          { status: 403 }
+        )
+      }
+      
       return NextResponse.json(
-        { error: data.message || 'ユーザー情報の取得に失敗しました' },
+        { error: data.message || data.error?.message || 'ユーザー情報の取得に失敗しました' },
         { status: response.status }
       )
     }
