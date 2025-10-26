@@ -7,6 +7,7 @@ interface LoginLayoutProps {
   onForgotPassword: () => void
   onResendOtp: () => void
   onBackToPassword: () => void
+  onHomeClick?: () => void
   isLoading?: boolean
   error?: string
   loginStep?: "password" | "otp"
@@ -20,11 +21,13 @@ export function LoginLayout({
   onForgotPassword,
   onResendOtp,
   onBackToPassword,
+  onHomeClick,
   isLoading,
   error,
   loginStep = "password",
   email = "",
 }: LoginLayoutProps) {
+
   // ランクに基づく背景色を取得
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
@@ -42,6 +45,15 @@ export function LoginLayout({
     // ロゴクリックも何もしない（すでにトップページにいるため）
   }
 
+  const handleHomeClick = () => {
+    if (onHomeClick) {
+      onHomeClick()
+    } else {
+      // デフォルトの動作：home画面に遷移
+      window.location.href = "/"
+    }
+  }
+
   return (
     <LoginContainer
       onLogin={onLogin}
@@ -51,6 +63,7 @@ export function LoginLayout({
       onResendOtp={onResendOtp}
       onBack={handleBack}
       onLogoClick={handleLogoClick}
+      onHomeClick={handleHomeClick}
       isLoading={isLoading}
       error={error}
       loginStep={loginStep}
