@@ -17,8 +17,6 @@ services:
       - ../../frontend/tailwind.config.ts:/app/tailwind.config.ts
       - ../../frontend/tsconfig.json:/app/tsconfig.json
       - ../../frontend/postcss.config.mjs:/app/postcss.config.mjs
-    environment:
-      - NODE_ENV=development
     command: pnpm dev 
 
 networks:

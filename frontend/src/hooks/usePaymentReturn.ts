@@ -131,9 +131,9 @@ export const usePaymentReturn = () => {
         // 2秒後にリダイレクト
         setTimeout(() => {
           if (isPaymentMethodChangeOnly) {
-            router.push('/home?view=mypage&payment-method-change-success=true')
+            router.push('/home?payment-method-change-success=true')
           } else {
-            router.push('/home?view=mypage&payment-success=true')
+            router.push('/home?payment-success=true')
           }
         }, 2000)
 

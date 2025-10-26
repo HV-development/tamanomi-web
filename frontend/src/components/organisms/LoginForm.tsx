@@ -96,7 +96,7 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {externalError && (
+      {externalError && externalError.trim() !== "" && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
           <p className="text-sm text-red-800">{externalError}</p>
         </div>

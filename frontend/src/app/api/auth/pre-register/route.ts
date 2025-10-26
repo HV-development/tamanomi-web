@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            message: errorData.message || `サーバーエラーが発生しました (${response.status})`,
+            message: errorData.error?.message || errorData.message || `サーバーエラーが発生しました (${response.status})`,
             error: errorData,
           },
           { status: response.status }

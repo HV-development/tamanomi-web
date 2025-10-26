@@ -8,6 +8,7 @@ export const useLoginPage = () => {
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>("")
+  
   const [loginStep, setLoginStep] = useState<"password" | "otp">("password")
   const [email, setEmail] = useState<string>("")
   const [requestId, setRequestId] = useState<string>("")
@@ -60,7 +61,7 @@ export const useLoginPage = () => {
             sessionStorage.setItem('userEmail', userData.email)
             router.push('/plan-registration')
           } else {
-            router.push('/home?view=mypage')
+            router.push('/home')
           }
         } else {
           localStorage.removeItem('accessToken')
@@ -112,7 +113,8 @@ export const useLoginPage = () => {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'パスワード認証に失敗しました')
+        const errorMessage = data.error || data.message || 'パスワード認証に失敗しました'
+        throw new Error(errorMessage)
       }
 
       // OTP送信
@@ -133,11 +135,12 @@ export const useLoginPage = () => {
       setEmail(loginData.email)
       setRequestId(otpData.requestId)
       setLoginStep("otp")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'ログインに失敗しました')
-    } finally {
-      setIsLoading(false)
-    }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'ログインに失敗しました'
+        setError(errorMessage)
+      } finally {
+        setIsLoading(false)
+      }
   }, [])
 
   // OTP認証
@@ -155,9 +158,14 @@ export const useLoginPage = () => {
       })
 
       const data = await response.json()
+      
+      console.log('🔍 [useLoginPage] OTP response data:', data)
+      console.log('🔍 [useLoginPage] Response ok:', response.ok)
 
       if (!response.ok) {
-        throw new Error(data.error || 'ワンタイムパスワードの認証に失敗しました')
+        const errorMessage = data.error || data.message || 'ワンタイムパスワードの認証に失敗しました'
+        console.log('🔍 [useLoginPage] Error message:', errorMessage)
+        throw new Error(errorMessage)
       }
 
       // トークンを保存
@@ -201,11 +209,13 @@ export const useLoginPage = () => {
         if (!hasPlan) {
           router.push('/plan-registration')
         } else {
-          router.push('/home?view=mypage&auto-login=true')
+          router.push('/home')
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました')
+      const errorMessage = err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました'
+      console.error('OTP verification error:', errorMessage) // デバッグログ
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }

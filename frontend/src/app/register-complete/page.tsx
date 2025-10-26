@@ -15,8 +15,8 @@ export default function RegisterCompletePage() {
   }, [])
 
   const handleGoToHome = () => {
-    // 登録完了後はマイページに遷移
-    router.push('/?view=mypage&mypage=main')
+    // 登録完了後はhome画面に遷移
+    router.push('/home')
   }
 
   const handleGoToLogin = () => {
