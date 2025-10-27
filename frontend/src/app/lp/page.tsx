@@ -120,13 +120,14 @@ export default function LPPage() {
                 className="text-white font-bold hover:opacity-90 transition-opacity text-sm md:text-base"
                 style={{
                   display: 'flex',
-                  padding: '8px 12px',
+                  padding: '16px 24px',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '10px',
                   borderRadius: '9999px',
                   background: 'var(--main, #6FC8E5)'
                 }}
+                onClick={() => router.push('/lp/merchant')}
               >
                 <span className="hidden md:inline">お店の方はこちら</span>
                 <span className="md:hidden">お店の方</span>
@@ -918,6 +919,7 @@ export default function LPPage() {
           <div className="flex justify-center">
             <button
               style={{
+                position: 'relative',
                 display: 'flex',
                 padding: '24px 24px 24px 40px',
                 justifyContent: 'center',
@@ -928,27 +930,41 @@ export default function LPPage() {
                 border: 'none',
                 cursor: 'pointer'
               }}
+              onClick={() => router.push('/lp/merchant')}
             >
               <span 
                 style={{
                   color: '#000',
+                  textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '18px',
-                  fontWeight: '700'
+                  fontSize: '20px',
+                  fontStyle: 'normal',
+                  fontWeight: '700',
+                  lineHeight: '100%'
                 }}
               >
                 お店の方はこちら
               </span>
-              <Image
-                src="/lp/images/arrow-rigte-duotone.svg"
-                alt="Arrow right"
-                width={32}
-                height={32}
+              <svg 
+                width="14" 
+                height="7" 
+                viewBox="0 0 14 7" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
                 style={{
-                  width: '32px',
-                  height: '32px'
+                  position: 'absolute',
+                  right: '40px',
+                  flexShrink: 0
                 }}
-              />
+              >
+                <path 
+                  d="M1 3.5H13M13 3.5L10 1M13 3.5L10 6" 
+                  stroke="#000" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           </div>
         </div>
@@ -974,9 +990,13 @@ export default function LPPage() {
               <Image
                 src="/lp/images/logo.png"
                 alt="TAMANOMI"
-                width={200}
-                height={120}
-                className="max-w-full h-auto"
+                width={328}
+                height={329}
+                style={{
+                  width: '328px',
+                  height: '329px',
+                  aspectRatio: '328/329'
+                }}
               />
             </div>
 
