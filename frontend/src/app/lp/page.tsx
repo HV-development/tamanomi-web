@@ -1417,7 +1417,7 @@ export default function LPPage() {
             <div className="relative flex flex-col items-center w-full max-w-lg">
               {/* Top Section - White Background */}
               <div
-                className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg mx-[39px]"
+                className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg mx-[39px] md:mx-0"
               >
                 <div className="flex items-baseline gap-2">
                   <h3
@@ -1505,7 +1505,7 @@ export default function LPPage() {
 
               {/* Bottom Section - Yellow Background */}
               <div
-                className="flex flex-col md:flex-row items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12 relative mx-[39px]"
+                className="flex flex-col md:flex-row items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12 mx-[39px] md:mx-0 relative"
                 style={{
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
