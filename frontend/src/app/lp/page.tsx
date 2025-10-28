@@ -287,7 +287,7 @@ export default function LPPage() {
                   gap: '8px',
                   borderRadius: '9999px',
                   border: 'none',
-                  background: 'var(--accent, #FF6F61)',
+                  background: '#FF6F61',
                   cursor: 'pointer'
                 }}
                 onClick={() => router.push('/email-registration')}
