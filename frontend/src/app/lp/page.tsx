@@ -1180,7 +1180,7 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-sm md:text-base text-center w-full"
+                className="text-sm md:text-base text-left w-full"
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -1227,7 +1227,7 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-sm md:text-base text-center w-full"
+                className="text-sm md:text-base text-left w-full"
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -1274,7 +1274,7 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-sm md:text-base text-center w-full"
+                className="text-sm md:text-base text-left w-full"
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
