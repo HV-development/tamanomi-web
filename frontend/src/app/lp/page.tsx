@@ -509,10 +509,10 @@ export default function LPPage() {
 
       {/* About Section */}
       <div id="about" className="w-full relative min-h-screen">
-        {/* Background with split colors */}
-        <div className="absolute inset-0 flex">
-          <div className="w-1/2" style={{ backgroundColor: '#FFD93B' }}></div>
-          <div className="w-1/2" style={{ backgroundColor: '#6FC8E5' }}></div>
+        {/* Background with split colors - モバイル: 上下分割、PC: 左右分割 */}
+        <div className="absolute inset-0 flex flex-col lg:flex-row">
+          <div className="w-full h-1/2 lg:w-1/2 lg:h-full" style={{ backgroundColor: '#FFD93B' }}></div>
+          <div className="w-full h-1/2 lg:w-1/2 lg:h-full" style={{ backgroundColor: '#6FC8E5' }}></div>
         </div>
         
         {/* Content */}
