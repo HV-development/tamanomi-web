@@ -25,6 +25,14 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  
+  @media (min-width: 768px) {
+    .md\:w-365 {
+      width: 365px !important;
+      max-width: 365px !important;
+      min-width: 365px !important;
+    }
+  }
 }
 
 @layer base {

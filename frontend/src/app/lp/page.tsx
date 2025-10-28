@@ -18,6 +18,14 @@ export default function LPPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
 
+  // LPページ用：bodyの最大幅制限を解除
+  useEffect(() => {
+    document.body.style.maxWidth = '100vw'
+    return () => {
+      document.body.style.maxWidth = ''
+    }
+  }, [])
+
   // 無限ループ用：画像を15回複製（PCで3枚同時表示するため十分な余裕を持たせる）
   const extendedImages = [
     ...images,
@@ -707,7 +715,7 @@ export default function LPPage() {
           <div 
             className="w-full md:w-1/2 flex flex-col justify-center items-center pl-0 order-2 md:order-2"
           >
-            <div className="w-full max-w-sm px-4 md:px-0 md:max-w-none flex flex-col justify-center items-center md:gap-8 md:flex-1">
+            <div className="w-full max-w-sm px-4 md:px-0 flex flex-col justify-center items-center md:gap-8">
               {/* Heading */}
               <div className="mb-6 md:mb-0" style={{ position: 'relative', display: 'inline-block' }}>
                 <h2
@@ -744,13 +752,15 @@ export default function LPPage() {
               
               {/* Body Text */}
               <div
-                className="text-white w-full max-w-md text-center md:text-justify md:max-w-[365px]"
+                className="text-white w-full max-w-md text-center md:text-justify md:w-365"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
                   fontSize: '16px',
                   fontStyle: 'normal',
                   fontWeight: '400',
-                  lineHeight: '160%'
+                  lineHeight: '160%',
+                  wordBreak: 'break-word',
+                  overflowWrap: 'break-word'
                 }}
               >
                 <p className="mb-4" style={{ fontWeight: '500' }}>
