@@ -488,7 +488,7 @@ export default function LPPage() {
 
             {/* Left Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity left-[12px] top-[69px] md:left-[-50px] md:top-[89px]"
+              className="absolute z-10 hover:opacity-80 transition-opacity left-[12px] top-[69px] md:left-[50px] md:top-[89px]"
               onClick={() => handleScroll('left')}
               style={{
                 display: 'flex',
@@ -515,7 +515,7 @@ export default function LPPage() {
 
             {/* Right Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity right-[12px] top-[69px] md:right-[-50px] md:top-[89px]"
+              className="absolute z-10 hover:opacity-80 transition-opacity right-[12px] top-[69px] md:right-[50px] md:top-[89px]"
               onClick={() => handleScroll('right')}
               style={{
                 display: 'flex',
