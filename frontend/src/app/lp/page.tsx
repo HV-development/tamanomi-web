@@ -1621,7 +1621,7 @@ export default function LPPage() {
                   }}
                 />
                 
-                {/* Phone Image - スマホ用（absolute配置で左側） */}
+                {/* Phone Image - スマホ用（absolute配置で中央） */}
                 <Image
                   src="/lp/images/pricing-phone.png"
                   alt="Phone illustration"
@@ -1632,7 +1632,8 @@ export default function LPPage() {
                     width: '145.279px',
                     height: '171px',
                     aspectRatio: '145.28/171.00',
-                    left: '16px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
                     bottom: '-25px',
                     objectFit: 'cover'
                   }}
