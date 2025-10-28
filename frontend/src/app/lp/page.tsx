@@ -782,7 +782,7 @@ export default function LPPage() {
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-20 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-[80px] max-w-4xl mx-auto">
             {/* Feature 01 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
