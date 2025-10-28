@@ -1414,7 +1414,7 @@ export default function LPPage() {
 
           {/* Pricing Content */}
           <div className="flex justify-center mb-8">
-            <div className="relative flex flex-col items-center w-full max-w-lg">
+            <div className="relative flex flex-col items-center w-full max-w-[580px]">
               {/* Top Section - White Background */}
               <div
                 className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg"
