@@ -704,10 +704,10 @@ export default function LPPage() {
           </div>
 
           {/* Right Content */}
-          <div className="w-full md:w-1/2 flex flex-col justify-center items-center order-2 md:order-2">
-            <div className="w-full max-w-sm md:max-w-none px-4 md:px-0 flex flex-col justify-center items-center">
+          <div className="w-full md:w-1/2 flex flex-col justify-center items-center pl-0 md:pl-8 order-2 md:order-2">
+            <div className="w-full max-w-sm px-4 flex flex-col justify-center items-center">
               {/* Heading */}
-              <div className="mb-6 self-center" style={{ position: 'relative', display: 'inline-block' }}>
+              <div className="mb-6" style={{ position: 'relative', display: 'inline-block' }}>
                 <h2
                   className="md:text-5xl lg:text-6xl"
                   style={{
@@ -742,14 +742,14 @@ export default function LPPage() {
               </div>
               
               {/* Body Text */}
-              <div className="text-white leading-relaxed text-left w-full max-w-md md:w-auto" style={{ fontSize: '16px' }}>
-                <p className="mb-4 w-full md:w-[365px]">
+              <div className="text-white leading-relaxed text-left w-full max-w-md" style={{ fontSize: '16px' }}>
+                <p className="mb-4 md:w-[365px]">
                   「たまのみ」は、毎日1軒につきドリンクが1杯無料になる新しい&ldquo;Welcomeドリンク&rdquo;サービスです。
                 </p>
-                <p className="mb-4 w-full md:w-[365px]">
+                <p className="mb-4 md:w-[365px]">
                   お酒でもソフトドリンクでもOK。
                 </p>
-                <p className="w-full md:w-[365px]">
+                <p className="md:w-[365px]">
                   気になるお店をみつけたら、仲間と乾杯したり、自分だけの寄り道を楽しんだり。あなたの「今日はどこで飲もう？」をもっと自由に、もっとおトクにします。
                 </p>
               </div>
