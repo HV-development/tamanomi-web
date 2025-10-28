@@ -692,10 +692,11 @@ export default function LPPage() {
               {/* Heading */}
               <div className="mb-6" style={{ position: 'relative', display: 'inline-block' }}>
                 <h2
-                  className="text-4xl md:text-5xl lg:text-6xl"
+                  className="md:text-5xl lg:text-6xl"
                   style={{
                     color: 'var(--accent-yellow, #FFD93B)',
-                    fontFamily: 'var(--font-plaster)',
+                    fontFamily: 'Plaster',
+                    fontSize: '48px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%'
@@ -704,7 +705,7 @@ export default function LPPage() {
                   About
                 </h2>
                 <p
-                  className="text-base md:text-lg lg:text-xl"
+                  className="md:text-lg lg:text-xl"
                   style={{
                     position: 'absolute',
                     top: '85%',
@@ -712,6 +713,7 @@ export default function LPPage() {
                     transform: 'translate(-50%, -50%)',
                     color: '#000',
                     fontFamily: '"Zen Kaku Gothic New"',
+                    fontSize: '20px',
                     fontStyle: 'normal',
                     fontWeight: '700',
                     lineHeight: '100%',
