@@ -14,7 +14,7 @@ const images = [
 export default function LPPage() {
   const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [currentSlide, setCurrentSlide] = useState(0) // 0から開始
+  const [currentSlide, setCurrentSlide] = useState(images.length) // 中央のセット（2番目）の先頭から開始
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
 
@@ -30,25 +30,34 @@ export default function LPPage() {
     
     setIsTransitioning(true)
     
-    // 次のスライドインデックスを計算
-    let newSlide: number
-    if (direction === 'right') {
-      newSlide = (currentSlide + 1) % images.length
-    } else {
-      newSlide = (currentSlide - 1 + images.length) % images.length
-    }
-    
+    // スライドを増減（無限に）
+    const newSlide = direction === 'right' ? currentSlide + 1 : currentSlide - 1
     setCurrentSlide(newSlide)
     
-    // トランジション完了後にフラグをリセット
-    setTimeout(() => setIsTransitioning(false), 500)
+    // トランジション完了後に境界チェックと瞬間移動
+    setTimeout(() => {
+      setIsTransitioning(false)
+      
+      // 境界を超えたら瞬間移動（トランジションなし）
+      setCurrentSlide((prev) => {
+        // 右端を超えた場合（3回目のセットに入った）
+        if (prev >= images.length * 2) {
+          return prev - images.length
+        }
+        // 左端を超えた場合（1回目のセットに入った）
+        if (prev < images.length) {
+          return prev + images.length
+        }
+        return prev
+      })
+    }, 500)
   }
 
   const goToSlide = (index: number) => {
     if (isTransitioning) return
     
     setIsTransitioning(true)
-    setCurrentSlide(index)
+    setCurrentSlide(images.length + index) // 中央のセットの該当位置
     
     // トランジション完了後にフラグをリセット
     setTimeout(() => setIsTransitioning(false), 500)
@@ -441,7 +450,7 @@ export default function LPPage() {
                 className="flex absolute left-1/2"
                 style={{ 
                   gap: '16px',
-                  transform: `translateX(calc(-50% - ${(images.length + currentSlide) * (carouselImageWidth + 16)}px))`,
+                  transform: `translateX(calc(-50% - ${currentSlide * (carouselImageWidth + 16)}px))`,
                   transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
                 }}
               >
@@ -527,22 +536,26 @@ export default function LPPage() {
 
           {/* Pagination Dots */}
           <div className="flex justify-center space-x-2 md:space-x-3">
-            {images.map((_, index) => (
-              <button 
-                key={index} 
-                className="p-1 hover:opacity-80 transition-opacity"
-                onClick={() => goToSlide(index)}
-              >
-                <div
-                  className="w-3 h-3 md:w-4 md:h-4"
-                  style={{
-                    borderRadius: '50%',
-                    backgroundColor: currentSlide === index ? '#6FC8E5' : '#D9D9D9',
-                    transition: 'background-color 0.3s ease'
-                  }}
-                />
-              </button>
-            ))}
+            {images.map((_, index) => {
+              // 現在のスライドがどの画像を表示しているかを計算
+              const actualIndex = ((currentSlide - images.length) % images.length + images.length) % images.length
+              return (
+                <button 
+                  key={index} 
+                  className="p-1 hover:opacity-80 transition-opacity"
+                  onClick={() => goToSlide(index)}
+                >
+                  <div
+                    className="w-3 h-3 md:w-4 md:h-4"
+                    style={{
+                      borderRadius: '50%',
+                      backgroundColor: actualIndex === index ? '#6FC8E5' : '#D9D9D9',
+                      transition: 'background-color 0.3s ease'
+                    }}
+                  />
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
