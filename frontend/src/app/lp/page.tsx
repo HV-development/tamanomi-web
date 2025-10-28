@@ -277,27 +277,27 @@ export default function LPPage() {
             {/* CTA Button */}
             <div className="flex justify-center">
               <button
-                className="w-64 sm:w-72 md:w-80"
                 style={{
                   position: 'relative',
                   display: 'flex',
+                  width: '320px',
                   padding: '16px 24px',
                   justifyContent: 'center',
                   alignItems: 'center',
                   gap: '8px',
                   borderRadius: '9999px',
                   border: 'none',
-                  background: '#FF6F61',
+                  background: 'var(--accent, #FF6F61)',
                   cursor: 'pointer'
                 }}
                 onClick={() => router.push('/email-registration')}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                   <span 
-                    className="text-sm md:text-base"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -306,10 +306,10 @@ export default function LPPage() {
                     今すぐ始める
                   </span>
                   <span 
-                    className="text-xl md:text-2xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '26px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
