@@ -1144,7 +1144,7 @@ export default function LPPage() {
           </div>
 
           {/* Steps Grid */}
-          <div className="flex flex-col md:flex-row justify-center items-stretch gap-6 md:gap-8 max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-center items-stretch gap-6 md:gap-[48px] max-w-5xl mx-auto">
             {/* Step 01 */}
             <div 
               className="bg-white rounded-lg md:w-[368px]"
