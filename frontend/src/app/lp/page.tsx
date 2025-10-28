@@ -707,7 +707,7 @@ export default function LPPage() {
           <div className="w-full md:w-1/2 flex flex-col justify-center items-center md:items-start pl-0 md:pl-8 order-2 md:order-2">
             <div className="w-full max-w-sm md:max-w-none px-4 md:px-0 flex flex-col justify-center items-center md:items-start">
               {/* Heading */}
-              <div className="mb-6" style={{ position: 'relative', display: 'inline-block' }}>
+              <div className="mb-6 self-center" style={{ position: 'relative', display: 'inline-block' }}>
                 <h2
                   className="md:text-5xl lg:text-6xl"
                   style={{
