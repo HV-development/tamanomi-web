@@ -1417,7 +1417,7 @@ export default function LPPage() {
             <div className="relative flex flex-col items-center w-full max-w-[580px]">
               {/* Top Section - White Background */}
               <div
-                className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg"
+                className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg mx-[39px] md:mx-0"
               >
                 <div className="flex items-baseline gap-2">
                   <h3
@@ -1473,7 +1473,7 @@ export default function LPPage() {
 
               {/* Images Section - Absolute Positioning */}
               <div
-                className="absolute bottom-[280px] md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
+                className="absolute bottom-32 md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
               >
                 {/* Left illustration - スマホ用 */}
                 <Image
@@ -1531,7 +1531,7 @@ export default function LPPage() {
 
               {/* Bottom Section - Yellow Background */}
               <div
-                className="flex items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12 relative md:h-[160px]"
+                className="flex items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12 relative h-[317px] md:h-[160px] mx-[39px] md:mx-0"
                 style={{
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
@@ -1616,7 +1616,7 @@ export default function LPPage() {
                     flexShrink: 0,
                     aspectRatio: '152.50/179.50',
                     left: '16px',
-                    bottom: '-25px',
+                    bottom: '-10px',
                     objectFit: 'cover'
                   }}
                 />
