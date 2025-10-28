@@ -782,9 +782,9 @@ export default function LPPage() {
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-[80px] md:justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-y-[80px] md:gap-x-[80px]">
             {/* Feature 01 */}
-            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0">
+            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0 md:justify-self-end">
               <div className="relative w-full aspect-square md:max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
@@ -858,7 +858,7 @@ export default function LPPage() {
             </div>
 
             {/* Feature 02 */}
-            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0">
+            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0 md:justify-self-start">
               <div className="relative w-full aspect-square md:max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
@@ -932,7 +932,7 @@ export default function LPPage() {
             </div>
 
             {/* Feature 03 */}
-            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0">
+            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0 md:justify-self-end">
               <div className="relative w-full aspect-square md:max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
@@ -1006,7 +1006,7 @@ export default function LPPage() {
             </div>
 
             {/* Feature 04 */}
-            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0">
+            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0 md:justify-self-start">
               <div className="relative w-full aspect-square md:max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
