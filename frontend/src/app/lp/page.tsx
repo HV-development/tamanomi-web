@@ -1536,7 +1536,7 @@ export default function LPPage() {
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
               >
-                <div className="flex flex-col gap-2 flex-1 md:ml-12">
+                <div className="flex flex-col gap-2 flex-1 md:ml-40">
                   <p
                     className="text-sm md:text-base lg:text-lg text-center"
                     style={{
@@ -1611,8 +1611,9 @@ export default function LPPage() {
                   height={179.5}
                   className="hidden md:block absolute"
                   style={{
-                    width: '152px',
-                    height: 'auto',
+                    width: '152.5px',
+                    height: '179.5px',
+                    flexShrink: 0,
                     aspectRatio: '152.50/179.50',
                     left: '16px',
                     bottom: '-25px',
