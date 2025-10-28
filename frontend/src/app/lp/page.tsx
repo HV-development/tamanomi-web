@@ -487,7 +487,8 @@ export default function LPPage() {
                 position: 'absolute',
                 left: '28px',
                 top: '69px',
-                background: 'none',
+                borderRadius: '9999px',
+                background: 'var(--main, #6FC8E5)',
                 border: 'none',
                 cursor: 'pointer',
                 padding: 0
@@ -516,7 +517,8 @@ export default function LPPage() {
                 position: 'absolute',
                 right: '28px',
                 top: '69px',
-                background: 'none',
+                borderRadius: '9999px',
+                background: 'var(--main, #6FC8E5)',
                 border: 'none',
                 cursor: 'pointer',
                 padding: 0
