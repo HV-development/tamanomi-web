@@ -1,6 +1,6 @@
 # tamanomi-web
 
-埼玉県の飲食店マップアプリケーション - Next.js 14 + TypeScript
+埼玉県の飲食店マップアプリケーション - Next.js 15 + TypeScript
 
 > **統合管理**: セットアップとDocker管理は[tamanomi-root](https://github.com/HV-development/tamanomi-root)で行います
 
