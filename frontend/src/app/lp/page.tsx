@@ -14,15 +14,18 @@ const images = [
 export default function LPPage() {
   const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [currentSlide, setCurrentSlide] = useState(images.length) // 2回目のセットの先頭から開始
+  const [currentSlide, setCurrentSlide] = useState(images.length * 2) // 中央のセット（3回目）の先頭から開始
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
+  const [nextSlide, setNextSlide] = useState<number | null>(null)
 
-  // 無限ループのため、画像を複数回複製
+  // 無限ループのため、画像を5回複製して余裕を持たせる
   const extendedImages = [
-    ...images, // 元の画像
-    ...images, // 2回目
-    ...images, // 3回目
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
   ]
 
   const handleScroll = (direction: 'left' | 'right') => {
@@ -30,45 +33,44 @@ export default function LPPage() {
     
     setIsTransitioning(true)
     
-    if (direction === 'right') {
-      setCurrentSlide((prev) => {
-        const newIndex = prev + 1
-        return newIndex
-      })
-    } else {
-      setCurrentSlide((prev) => {
-        const newIndex = prev - 1
-        return newIndex
-      })
-    }
-    
-    // トランジション完了後にフラグをリセットし、必要なら瞬間移動
-    setTimeout(() => {
-      setIsTransitioning(false)
-      
-      setCurrentSlide((prev) => {
-        // 3回目のセットに入ったら、2回目のセットの同じ位置に瞬間移動
-        if (prev >= images.length * 2) {
-          return prev - images.length
-        }
-        // 1回目のセットに入ったら、2回目のセットの同じ位置に瞬間移動
-        if (prev < images.length) {
-          return prev + images.length
-        }
-        return prev
-      })
-    }, 500)
+    const newSlide = direction === 'right' ? currentSlide + 1 : currentSlide - 1
+    setNextSlide(newSlide)
+    setCurrentSlide(newSlide)
   }
 
   const goToSlide = (index: number) => {
     if (isTransitioning) return
     
     setIsTransitioning(true)
-    setCurrentSlide(images.length + index) // 2回目のセットの該当位置
-    
-    // トランジション完了後にフラグをリセット
-    setTimeout(() => setIsTransitioning(false), 500)
+    setNextSlide(images.length * 2 + index) // 中央のセットの該当位置
+    setCurrentSlide(images.length * 2 + index)
   }
+
+  // トランジション完了後の処理
+  useEffect(() => {
+    if (!isTransitioning || nextSlide === null) return
+
+    const timer = setTimeout(() => {
+      setIsTransitioning(false)
+      
+      // 境界チェックと瞬間移動
+      const imagesPerSet = images.length
+      const centerSetStart = imagesPerSet * 2 // 中央のセット（3回目）の開始位置
+      const centerSetEnd = centerSetStart + imagesPerSet - 1 // 中央のセット（3回目）の終了位置
+      
+      // 右端を超えた場合、または左端を超えた場合、中央のセットの対応位置に瞬間移動
+      if (nextSlide > centerSetEnd || nextSlide < centerSetStart) {
+        // 実際の画像インデックスを計算（0, 1, 2のいずれか）
+        const actualIndex = ((nextSlide % imagesPerSet) + imagesPerSet) % imagesPerSet
+        // 中央のセットの対応位置に戻す
+        setCurrentSlide(centerSetStart + actualIndex)
+      }
+      
+      setNextSlide(null)
+    }, 500) // トランジションの時間と合わせる
+
+    return () => clearTimeout(timer)
+  }, [isTransitioning, nextSlide])
 
   // メディアクエリでカルーセル画像サイズを動的に変更
   useEffect(() => {
@@ -543,22 +545,26 @@ export default function LPPage() {
 
           {/* Pagination Dots */}
           <div className="flex justify-center space-x-2 md:space-x-3">
-            {images.map((_, index) => (
-              <button 
-                key={index} 
-                className="p-1 hover:opacity-80 transition-opacity"
-                onClick={() => goToSlide(index)}
-              >
-                <div
-                  className="w-3 h-3 md:w-4 md:h-4"
-                  style={{
-                    borderRadius: '50%',
-                    backgroundColor: (currentSlide % images.length) === index ? '#6FC8E5' : '#D9D9D9',
-                    transition: 'background-color 0.3s ease'
-                  }}
-                />
-              </button>
-            ))}
+            {images.map((_, index) => {
+              // 現在のスライドがどの画像を表示しているかを計算
+              const actualIndex = ((currentSlide % images.length) + images.length) % images.length
+              return (
+                <button 
+                  key={index} 
+                  className="p-1 hover:opacity-80 transition-opacity"
+                  onClick={() => goToSlide(index)}
+                >
+                  <div
+                    className="w-3 h-3 md:w-4 md:h-4"
+                    style={{
+                      borderRadius: '50%',
+                      backgroundColor: actualIndex === index ? '#6FC8E5' : '#D9D9D9',
+                      transition: 'background-color 0.3s ease'
+                    }}
+                  />
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
