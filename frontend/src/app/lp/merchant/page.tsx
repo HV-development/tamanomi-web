@@ -963,7 +963,7 @@ export default function MerchantLPPage() {
             </div>
             <div>
               <Image
-                src="/lp/images/step-application.png"
+                src="/lp/images/merchant-step-application.png"
                 alt="お申し込み"
                 width={280}
                 height={200}
@@ -1036,7 +1036,7 @@ export default function MerchantLPPage() {
             </div>
             <div>
               <Image
-                src="/lp/images/step-confirmation.png"
+                src="/lp/images/merchant-step-confirmation.png"
                 alt="掲載内容確認"
                 width={280}
                 height={200}
@@ -1109,7 +1109,7 @@ export default function MerchantLPPage() {
             </div>
             <div>
               <Image
-                src="/lp/images/step-start.png"
+                src="/lp/images/merchant-step-start.png"
                 alt="ご利用開始"
                 width={280}
                 height={200}
