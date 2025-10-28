@@ -246,9 +246,14 @@ export default function LPPage() {
               <Image
                 src="/lp/images/fukidashi.svg"
                 alt="1軒"
-                width={156}
-                height={128}
-                className="absolute left-4 top-[-40px] w-12 h-10 sm:left-8 sm:top-[-60px] sm:w-16 sm:h-12 md:left-16 md:top-[-80px] md:w-32 md:h-24 lg:top-[-120px] lg:w-40 lg:h-32"
+                width={91}
+                height={74}
+                className="absolute left-4 top-[-40px] md:left-16 md:top-[-80px] lg:top-[-120px]"
+                style={{
+                  width: '91px',
+                  height: '74px',
+                  aspectRatio: '91/74'
+                }}
               />
             </div>
 
