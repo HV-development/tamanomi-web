@@ -156,7 +156,7 @@ export default function LPPage() {
           {/* モバイルメニュー */}
           {isMobileMenuOpen && (
             <div 
-              className="md:hidden fixed inset-0 w-full h-full z-50"
+              className="md:hidden fixed inset-0 w-full h-full"
               style={{
                 background: '#FFF',
                 display: 'flex',
@@ -166,7 +166,8 @@ export default function LPPage() {
                 alignItems: 'center',
                 gap: '32px',
                 flex: '1 0 0',
-                alignSelf: 'stretch'
+                alignSelf: 'stretch',
+                zIndex: 9999
               }}
             >
               {/* 閉じるボタン */}

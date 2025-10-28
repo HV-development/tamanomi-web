@@ -77,7 +77,7 @@ export default function MerchantLPPage() {
           {/* モバイルメニュー */}
           {isMobileMenuOpen && (
             <div 
-              className="lg:hidden fixed inset-0 w-full h-full z-50"
+              className="lg:hidden fixed inset-0 w-full h-full"
               style={{
                 background: '#FFF',
                 display: 'flex',
@@ -87,7 +87,8 @@ export default function MerchantLPPage() {
                 alignItems: 'center',
                 gap: '32px',
                 flex: '1 0 0',
-                alignSelf: 'stretch'
+                alignSelf: 'stretch',
+                zIndex: 9999
               }}
             >
               {/* 閉じるボタン */}
