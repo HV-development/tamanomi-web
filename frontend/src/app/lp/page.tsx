@@ -1473,7 +1473,7 @@ export default function LPPage() {
 
               {/* Images Section - Absolute Positioning */}
               <div
-                className="absolute bottom-32 md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
+                className="absolute bottom-12 md:bottom-24 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
               >
                 <Image
                   src="/lp/images/pricing-left.png"
@@ -1510,17 +1510,6 @@ export default function LPPage() {
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
               >
-                <Image
-                  src="/lp/images/pricing-phone.png"
-                  alt="Phone illustration"
-                  width={152.5}
-                  height={179.5}
-                  className="hidden md:block w-20 h-auto md:w-28 lg:w-[152px] flex-shrink-0 relative z-10"
-                  style={{
-                    aspectRatio: '152.50/179.50',
-                    objectFit: 'cover'
-                  }}
-                />
                 <div className="flex flex-col gap-2 flex-1 w-full">
                   <p
                     className="text-sm md:text-base lg:text-lg text-center"
@@ -1585,17 +1574,30 @@ export default function LPPage() {
                       利用可能！
                     </p>
                   </div>
+                  
+                  {/* Phone Image - 480円の下（スマホのみ） */}
+                  <div className="md:hidden flex justify-center mt-4">
+                    <Image
+                      src="/lp/images/pricing-phone.png"
+                      alt="Phone illustration"
+                      width={152.5}
+                      height={179.5}
+                      className="w-20 h-auto"
+                      style={{
+                        aspectRatio: '152.50/179.50',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              {/* Phone Image - スマホ専用（480円の下） */}
-              <div className="md:hidden flex justify-center mt-6">
+                
+                {/* Phone Image - PC用 */}
                 <Image
                   src="/lp/images/pricing-phone.png"
                   alt="Phone illustration"
                   width={152.5}
                   height={179.5}
-                  className="w-20 h-auto"
+                  className="hidden md:block w-20 h-auto md:w-28 lg:w-[152px] flex-shrink-0 relative z-10"
                   style={{
                     aspectRatio: '152.50/179.50',
                     objectFit: 'cover'
