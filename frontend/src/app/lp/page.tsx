@@ -1414,7 +1414,7 @@ export default function LPPage() {
 
           {/* Pricing Content */}
           <div className="flex justify-center mb-8">
-            <div className="relative flex flex-col items-center w-full max-w-lg">
+            <div className="relative flex flex-col items-center w-full max-w-lg mx-[39px]">
               {/* Top Section - White Background */}
               <div
                 className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg"
@@ -1473,7 +1473,7 @@ export default function LPPage() {
 
               {/* Images Section - Absolute Positioning */}
               <div
-                className="absolute bottom-12 md:bottom-24 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
+                className="absolute bottom-[245px] md:bottom-24 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
               >
                 <Image
                   src="/lp/images/pricing-left.png"
@@ -1505,7 +1505,7 @@ export default function LPPage() {
 
               {/* Bottom Section - Yellow Background */}
               <div
-                className="flex flex-col md:flex-row items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12"
+                className="flex flex-col md:flex-row items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12 relative"
                 style={{
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
@@ -1576,15 +1576,20 @@ export default function LPPage() {
                   </div>
                   
                   {/* Phone Image - 480円の下（スマホのみ） */}
-                  <div className="md:hidden flex justify-center mt-4">
+                  <div className="md:hidden">
                     <Image
                       src="/lp/images/pricing-phone.png"
                       alt="Phone illustration"
-                      width={152.5}
-                      height={179.5}
-                      className="w-20 h-auto"
+                      width={145.279}
+                      height={171}
+                      className="absolute"
                       style={{
-                        aspectRatio: '152.50/179.50',
+                        width: '145.279px',
+                        height: '171px',
+                        aspectRatio: '145.28/171.00',
+                        position: 'absolute',
+                        right: '83.221px',
+                        bottom: '-25px',
                         objectFit: 'cover'
                       }}
                     />
