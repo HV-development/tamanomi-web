@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 // カルーセル用のプレースホルダー（実際の画像がある場合は置き換えてください）
@@ -16,6 +16,7 @@ export default function LPPage() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(3) // 2回目のセットの先頭から開始
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [carouselImageWidth, setCarouselImageWidth] = useState(303)
 
   // 無限ループのため、画像を複数回複製
   const extendedImages = [
@@ -64,6 +65,21 @@ export default function LPPage() {
     // トランジション完了後にフラグをリセット
     setTimeout(() => setIsTransitioning(false), 500)
   }
+
+  // メディアクエリでカルーセル画像サイズを動的に変更
+  useEffect(() => {
+    const updateCarouselSize = () => {
+      if (window.matchMedia('(min-width: 768px)').matches) {
+        setCarouselImageWidth(375)
+      } else {
+        setCarouselImageWidth(303)
+      }
+    }
+
+    updateCarouselSize()
+    window.addEventListener('resize', updateCarouselSize)
+    return () => window.removeEventListener('resize', updateCarouselSize)
+  }, [])
 
   return (
     <div className="w-full">
@@ -432,25 +448,23 @@ export default function LPPage() {
           {/* Carousel Container */}
           <div className="relative w-full max-w-6xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* Banner Images Container */}
-            <div className="relative overflow-hidden" style={{ width: '100%', maxWidth: '375px', height: '170px' }}>
+            <div className="relative overflow-hidden w-full max-w-[375px] h-[170px] md:max-w-[1157px] md:h-[210px]">
               <div 
                 className="flex absolute left-1/2"
                 style={{ 
                   gap: '16px',
-                  transform: `translateX(calc(-50% - ${currentSlide * (303 + 16)}px))`,
+                  transform: `translateX(calc(-50% - ${currentSlide * (carouselImageWidth + 16)}px))`,
                   transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
                 }}
               >
                 {extendedImages.map((src, i) => (
                   <div
                     key={i}
-                    className="relative flex-shrink-0 overflow-hidden"
+                    className="relative flex-shrink-0 overflow-hidden w-[303px] h-[170px] md:w-[375px] md:h-[210px]"
                     style={{
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      width: '303px',
-                      height: '170px',
                       aspectRatio: '303/170',
                       borderRadius: '20px',
                       background: '#D9D9D9'
@@ -474,7 +488,7 @@ export default function LPPage() {
 
             {/* Left Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity"
+              className="absolute z-10 hover:opacity-80 transition-opacity left-[12px] top-[69px] md:left-[-50px] md:top-[89px]"
               onClick={() => handleScroll('left')}
               style={{
                 display: 'flex',
@@ -484,9 +498,6 @@ export default function LPPage() {
                 alignItems: 'center',
                 gap: '10px',
                 aspectRatio: '1/1',
-                position: 'absolute',
-                left: '12px',
-                top: '69px',
                 borderRadius: '9999px',
                 background: 'var(--main, #6FC8E5)',
                 border: 'none',
@@ -504,7 +515,7 @@ export default function LPPage() {
 
             {/* Right Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity"
+              className="absolute z-10 hover:opacity-80 transition-opacity right-[12px] top-[69px] md:right-[-50px] md:top-[89px]"
               onClick={() => handleScroll('right')}
               style={{
                 display: 'flex',
@@ -514,9 +525,6 @@ export default function LPPage() {
                 alignItems: 'center',
                 gap: '10px',
                 aspectRatio: '1/1',
-                position: 'absolute',
-                right: '12px',
-                top: '69px',
                 borderRadius: '9999px',
                 background: 'var(--main, #6FC8E5)',
                 border: 'none',
