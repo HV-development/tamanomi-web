@@ -526,7 +526,7 @@ export default function LPPage() {
                 alt="たまのみロゴ"
                 width={1305}
                 height={453}
-                className="w-48 h-auto md:w-60 lg:w-80"
+                className="w-64 h-auto md:w-80 lg:w-[400px]"
               />
             </div>
             
