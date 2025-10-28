@@ -1192,10 +1192,11 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-sm md:text-base text-left w-full"
+                className="text-left w-full"
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '16px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
@@ -1251,10 +1252,11 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-sm md:text-base text-left w-full"
+                className="text-left w-full"
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '16px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
@@ -1310,10 +1312,11 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-sm md:text-base text-left w-full"
+                className="text-left w-full"
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '16px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
