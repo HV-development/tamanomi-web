@@ -1536,7 +1536,7 @@ export default function LPPage() {
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
               >
-                <div className="flex flex-col gap-2 flex-1">
+                <div className="flex flex-col gap-2 flex-1 md:ml-12">
                   <p
                     className="text-sm md:text-base lg:text-lg text-center"
                     style={{
