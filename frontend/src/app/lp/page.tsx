@@ -14,16 +14,24 @@ const images = [
 export default function LPPage() {
   const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [currentSlide, setCurrentSlide] = useState(images.length * 3) // 中央のセット（4番目）の先頭から開始
+  const [currentSlide, setCurrentSlide] = useState(images.length * 7) // 中央のセット（8番目）の先頭から開始
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
 
-  // 無限ループ用：画像を7回複製（PCで3枚同時表示するため余裕を持たせる）
+  // 無限ループ用：画像を15回複製（PCで3枚同時表示するため十分な余裕を持たせる）
   const extendedImages = [
     ...images,
     ...images,
     ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
     ...images, // 中央のセット（表示用）
+    ...images,
+    ...images,
+    ...images,
+    ...images,
     ...images,
     ...images,
     ...images,
@@ -44,13 +52,13 @@ export default function LPPage() {
       
       // 境界を超えたら瞬間移動（トランジションなし）
       setCurrentSlide((prev) => {
-        // 右端を超えた場合（6番目のセット以降に入った）
-        if (prev >= images.length * 5) {
-          return prev - images.length * 3
+        // 右端を超えた場合（12番目のセット以降に入った）
+        if (prev >= images.length * 11) {
+          return prev - images.length * 5
         }
-        // 左端を超えた場合（2番目のセット以前に入った）
-        if (prev < images.length * 2) {
-          return prev + images.length * 3
+        // 左端を超えた場合（4番目のセット以前に入った）
+        if (prev < images.length * 3) {
+          return prev + images.length * 5
         }
         return prev
       })
@@ -61,7 +69,7 @@ export default function LPPage() {
     if (isTransitioning) return
     
     setIsTransitioning(true)
-    setCurrentSlide(images.length * 3 + index) // 中央のセット（4番目）の該当位置
+    setCurrentSlide(images.length * 7 + index) // 中央のセット（8番目）の該当位置
     
     // トランジション完了後にフラグをリセット
     setTimeout(() => setIsTransitioning(false), 500)
