@@ -111,7 +111,7 @@ export default function LPPage() {
                 />
               </div>
               <div style={{ flex: 1 }}></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', md: { gap: '44px' } }} className="gap-4 md:gap-11">
+              <div className="flex items-center gap-4 md:gap-11">
                 <nav className="hidden md:flex items-center space-x-6 lg:space-x-10">
                   <a href="#about" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">たまのみとは</a>
                   <a href="#features" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">魅力</a>
@@ -169,6 +169,17 @@ export default function LPPage() {
                 alignSelf: 'stretch'
               }}
             >
+              {/* 閉じるボタン */}
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+                aria-label="メニューを閉じる"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="#007D4F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
               <nav className="flex flex-col items-center gap-8 py-8">
                 <a 
                   href="#about" 
