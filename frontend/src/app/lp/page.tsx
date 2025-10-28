@@ -14,15 +14,19 @@ const images = [
 export default function LPPage() {
   const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [currentSlide, setCurrentSlide] = useState(images.length) // 中央のセット（2番目）の先頭から開始
+  const [currentSlide, setCurrentSlide] = useState(images.length * 3) // 中央のセット（4番目）の先頭から開始
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
 
-  // 無限ループ用：画像を3回複製（前、中央、後）
+  // 無限ループ用：画像を7回複製（PCで3枚同時表示するため余裕を持たせる）
   const extendedImages = [
-    ...images, // 前のセット
+    ...images,
+    ...images,
+    ...images,
     ...images, // 中央のセット（表示用）
-    ...images, // 後のセット
+    ...images,
+    ...images,
+    ...images,
   ]
 
   const handleScroll = (direction: 'left' | 'right') => {
@@ -40,13 +44,13 @@ export default function LPPage() {
       
       // 境界を超えたら瞬間移動（トランジションなし）
       setCurrentSlide((prev) => {
-        // 右端を超えた場合（3回目のセットに入った）
-        if (prev >= images.length * 2) {
-          return prev - images.length
+        // 右端を超えた場合（6番目のセット以降に入った）
+        if (prev >= images.length * 5) {
+          return prev - images.length * 3
         }
-        // 左端を超えた場合（1回目のセットに入った）
-        if (prev < images.length) {
-          return prev + images.length
+        // 左端を超えた場合（2番目のセット以前に入った）
+        if (prev < images.length * 2) {
+          return prev + images.length * 3
         }
         return prev
       })
@@ -57,7 +61,7 @@ export default function LPPage() {
     if (isTransitioning) return
     
     setIsTransitioning(true)
-    setCurrentSlide(images.length + index) // 中央のセットの該当位置
+    setCurrentSlide(images.length * 3 + index) // 中央のセット（4番目）の該当位置
     
     // トランジション完了後にフラグをリセット
     setTimeout(() => setIsTransitioning(false), 500)
@@ -538,7 +542,7 @@ export default function LPPage() {
           <div className="flex justify-center space-x-2 md:space-x-3">
             {images.map((_, index) => {
               // 現在のスライドがどの画像を表示しているかを計算
-              const actualIndex = ((currentSlide - images.length) % images.length + images.length) % images.length
+              const actualIndex = ((currentSlide % images.length) + images.length) % images.length
               return (
                 <button 
                   key={index} 
