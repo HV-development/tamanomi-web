@@ -519,14 +519,14 @@ export default function LPPage() {
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-center min-h-screen px-4 md:px-8 py-16 md:py-24">
           {/* Left Content */}
           <div className="w-full md:w-1/2 flex flex-col justify-center items-center pr-0 md:pr-8 mb-8 md:mb-0 order-1 md:order-1">
-            {/* Logo */}
-            <div className="mb-6 md:mb-8">
+            {/* Logo - モバイル・タブレットのみ表示 */}
+            <div className="mb-6 md:mb-8 lg:hidden">
               <Image
                 src="/lp/images/about-text-logo.png"
                 alt="たまのみロゴ"
                 width={1305}
                 height={453}
-                className="w-64 h-auto md:w-80 lg:w-[400px]"
+                className="w-64 h-auto md:w-80"
               />
             </div>
             
