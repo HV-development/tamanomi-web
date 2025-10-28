@@ -786,7 +786,7 @@ export default function LPPage() {
             {/* Feature 01 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
-                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
+                <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
                   <p 
                     style={{
                       color: 'var(--main, #6FC8E5)',
@@ -859,7 +859,7 @@ export default function LPPage() {
             {/* Feature 02 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
-                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
+                <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
                   <p 
                     style={{
                       color: 'var(--main, #6FC8E5)',
@@ -932,7 +932,7 @@ export default function LPPage() {
             {/* Feature 03 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
-                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
+                <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
                   <p
                     style={{
                       color: 'var(--main, #6FC8E5)',
@@ -1005,7 +1005,7 @@ export default function LPPage() {
             {/* Feature 04 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
-                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
+                <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
                   <p
                     style={{
                       color: 'var(--main, #6FC8E5)',
