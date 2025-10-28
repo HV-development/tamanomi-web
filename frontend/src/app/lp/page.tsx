@@ -95,7 +95,7 @@ export default function LPPage() {
         </div>
 
         {/* Header */}
-        <header className="relative z-10 w-full">
+        <header className="relative w-full" style={{ zIndex: 100 }}>
           <div className="w-full px-4 py-4 md:px-8 md:py-6" style={{ width: '100vw', margin: 0 }}>
             <div className="flex items-center w-full">
               <div className="flex items-center">
@@ -223,7 +223,7 @@ export default function LPPage() {
         </header>
 
         {/* Main Content */}
-        <div className="relative z-10 w-full h-full flex items-start justify-center pt-32 md:pt-40 pb-32 md:pb-40 px-4">
+        <div className="relative w-full h-full flex items-start justify-center pt-32 md:pt-40 pb-32 md:pb-40 px-4" style={{ zIndex: 1 }}>
           <div className="text-center">
 
             {/* Main Title */}
@@ -537,7 +537,7 @@ export default function LPPage() {
           </div>
 
           {/* Central Image - Phone, Text Logo, and Character */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 z-20 hidden md:flex">
+          <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:flex" style={{ zIndex: 20 }}>
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               {/* Text Logo - top center */}
               <div className="mb-4 md:mb-5" style={{ 
@@ -572,7 +572,7 @@ export default function LPPage() {
                   />
                 </div>
               {/* Character - overlapping bottom of phone */}
-              <div className="-mt-6 md:-mt-8 lg:-mt-10" style={{ zIndex: 25, position: 'relative' }}>
+              <div className="-mt-6 md:-mt-8 lg:-mt-10" style={{ zIndex: 21, position: 'relative' }}>
                 <Image
                   src="/lp/images/about-character.png"
                   alt="たまのみキャラクター"
