@@ -59,7 +59,7 @@ export default function MerchantLPPage() {
 
                 {/* ハンバーガーメニューアイコン（モバイル・タブレットのみ表示） */}
                 <button
-                  className="lg:hidden flex flex-col justify-center items-center cursor-pointer"
+                  className="lg:hidden flex flex-col justify-center items-center cursor-pointer mr-4"
                   style={{
                     gap: '6px'
                   }}
@@ -77,7 +77,7 @@ export default function MerchantLPPage() {
           {/* モバイルメニュー */}
           {isMobileMenuOpen && (
             <div 
-              className="lg:hidden absolute top-full left-0 w-full"
+              className="lg:hidden fixed inset-0 w-full h-full z-50"
               style={{
                 background: '#FFF',
                 display: 'flex',
@@ -87,8 +87,7 @@ export default function MerchantLPPage() {
                 alignItems: 'center',
                 gap: '32px',
                 flex: '1 0 0',
-                alignSelf: 'stretch',
-                zIndex: 9999
+                alignSelf: 'stretch'
               }}
             >
               <nav className="flex flex-col items-center gap-8 py-8">
