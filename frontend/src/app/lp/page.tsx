@@ -704,16 +704,17 @@ export default function LPPage() {
           </div>
 
           {/* Right Content */}
-          <div className="w-full md:w-1/2 flex flex-col justify-center items-center pl-0 md:pl-8 order-2 md:order-2">
-            <div className="w-full max-w-sm px-4 flex flex-col justify-center items-center">
+          <div 
+            className="w-full md:w-1/2 flex flex-col justify-center items-center pl-0 order-2 md:order-2"
+          >
+            <div className="w-full max-w-sm px-4 md:px-0 md:max-w-none flex flex-col justify-center items-center md:gap-8 md:flex-1">
               {/* Heading */}
-              <div className="mb-6" style={{ position: 'relative', display: 'inline-block' }}>
+              <div className="mb-6 md:mb-0" style={{ position: 'relative', display: 'inline-block' }}>
                 <h2
-                  className="md:text-5xl lg:text-6xl"
+                  className="text-[48px] md:text-[64px]"
                   style={{
                     color: 'var(--accent-yellow, #FFD93B)',
                     fontFamily: 'var(--font-plaster)',
-                    fontSize: '48px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%'
@@ -742,14 +743,23 @@ export default function LPPage() {
               </div>
               
               {/* Body Text */}
-              <div className="text-white leading-relaxed text-left w-full max-w-md" style={{ fontSize: '16px' }}>
-                <p className="mb-4 md:w-[365px]">
+              <div
+                className="text-white w-full max-w-md text-center md:text-justify md:flex-1"
+                style={{
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '16px',
+                  fontStyle: 'normal',
+                  fontWeight: '400',
+                  lineHeight: '160%'
+                }}
+              >
+                <p className="mb-4" style={{ fontWeight: '500' }}>
                   「たまのみ」は、毎日1軒につきドリンクが1杯無料になる新しい&ldquo;Welcomeドリンク&rdquo;サービスです。
                 </p>
-                <p className="mb-4 md:w-[365px]">
+                <p className="mb-4" style={{ fontWeight: '500' }}>
                   お酒でもソフトドリンクでもOK。
                 </p>
-                <p className="md:w-[365px]">
+                <p style={{ fontWeight: '500' }}>
                   気になるお店をみつけたら、仲間と乾杯したり、自分だけの寄り道を楽しんだり。あなたの「今日はどこで飲もう？」をもっと自由に、もっとおトクにします。
                 </p>
               </div>
