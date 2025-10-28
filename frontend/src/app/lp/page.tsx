@@ -744,7 +744,7 @@ export default function LPPage() {
               
               {/* Body Text */}
               <div
-                className="text-white w-full max-w-md text-center md:text-justify md:flex-1"
+                className="text-white w-full max-w-md text-center md:text-justify md:max-w-[365px]"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
                   fontSize: '16px',
