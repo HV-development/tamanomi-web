@@ -90,6 +90,17 @@ export default function MerchantLPPage() {
                 alignSelf: 'stretch'
               }}
             >
+              {/* 閉じるボタン */}
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+                aria-label="メニューを閉じる"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="#007D4F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
               <nav className="flex flex-col items-center gap-8 py-8">
                 <a 
                   href="#overview" 
