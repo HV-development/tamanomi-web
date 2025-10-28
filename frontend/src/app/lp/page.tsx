@@ -788,11 +788,11 @@ export default function LPPage() {
               <div className="relative w-full aspect-square max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
-                    className="text-xs md:text-sm"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
-                      fontFamily: 'var(--font-limelight)',
+                      fontFamily: 'Limelight',
+                      fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -801,11 +801,11 @@ export default function LPPage() {
                     feature
                   </p>
                   <h3 
-                    className="text-4xl md:text-5xl lg:text-6xl"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
-                      fontFamily: 'var(--font-limelight)',
+                      fontFamily: 'Limelight',
+                      fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -831,10 +831,10 @@ export default function LPPage() {
                   }}
                 >
                   <span 
-                    className="text-sm md:text-base lg:text-xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -859,11 +859,11 @@ export default function LPPage() {
               <div className="relative w-full aspect-square max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
-                    className="text-xs md:text-sm"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
-                      fontFamily: 'var(--font-limelight)',
+                      fontFamily: 'Limelight',
+                      fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -872,11 +872,11 @@ export default function LPPage() {
                     feature
                   </p>
                   <h3 
-                    className="text-4xl md:text-5xl lg:text-6xl"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
-                      fontFamily: 'var(--font-limelight)',
+                      fontFamily: 'Limelight',
+                      fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -902,10 +902,10 @@ export default function LPPage() {
                   }}
                 >
                   <span 
-                    className="text-sm md:text-base lg:text-xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -930,11 +930,11 @@ export default function LPPage() {
               <div className="relative w-full aspect-square max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
-                    className="text-xs md:text-sm"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
-                      fontFamily: 'var(--font-limelight)',
+                      fontFamily: 'Limelight',
+                      fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -943,11 +943,11 @@ export default function LPPage() {
                     feature
                   </p>
                   <h3
-                    className="text-4xl md:text-5xl lg:text-6xl"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
-                      fontFamily: 'var(--font-limelight)',
+                      fontFamily: 'Limelight',
+                      fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -973,10 +973,10 @@ export default function LPPage() {
                   }}
                 >
                   <span 
-                    className="text-sm md:text-base lg:text-xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -1001,11 +1001,11 @@ export default function LPPage() {
               <div className="relative w-full aspect-square max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
-                    className="text-xs md:text-sm"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
-                      fontFamily: 'var(--font-limelight)',
+                      fontFamily: 'Limelight',
+                      fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -1014,11 +1014,11 @@ export default function LPPage() {
                     feature
                   </p>
                   <h3
-                    className="text-4xl md:text-5xl lg:text-6xl"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
-                      fontFamily: 'var(--font-limelight)',
+                      fontFamily: 'Limelight',
+                      fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -1044,10 +1044,10 @@ export default function LPPage() {
                   }}
                 >
                   <span 
-                    className="text-sm md:text-base lg:text-xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
