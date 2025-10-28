@@ -1571,7 +1571,7 @@ export default function LPPage() {
                       </span>
                     </div>
                     <h4
-                      className="text-5xl md:text-7xl lg:text-8xl"
+                      className="text-7xl md:text-7xl lg:text-8xl"
                       style={{
                         color: '#000',
                         textAlign: 'center',
