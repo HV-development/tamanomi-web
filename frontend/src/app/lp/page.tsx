@@ -120,20 +120,6 @@ export default function LPPage() {
                   <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使えるお店</a>
                 </nav>
                 
-                {/* ハンバーガーメニューアイコン（モバイルのみ表示） */}
-                <button
-                  className="md:hidden flex flex-col justify-center items-center cursor-pointer"
-                  style={{
-                    gap: '6px'
-                  }}
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  aria-label="メニュー"
-                >
-                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
-                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
-                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
-                </button>
-
                 <button 
                   className="text-white font-bold hover:opacity-90 transition-opacity text-xs md:text-sm lg:text-base px-4 py-2 md:px-6 md:py-4"
                   style={{
@@ -149,6 +135,20 @@ export default function LPPage() {
                   <span className="hidden md:inline">お店の方はこちら</span>
                   <span className="md:hidden">お店の方</span>
                 </button>
+
+                {/* ハンバーガーメニューアイコン（モバイルのみ表示） */}
+                <button
+                  className="md:hidden flex flex-col justify-center items-center cursor-pointer"
+                  style={{
+                    gap: '6px'
+                  }}
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  aria-label="メニュー"
+                >
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                </button>
               </div>
             </div>
           </div>
@@ -158,7 +158,7 @@ export default function LPPage() {
             <div 
               className="md:hidden absolute top-full left-0 w-full"
               style={{
-                background: 'rgba(0, 0, 0, 0.95)',
+                background: '#FFF',
                 display: 'flex',
                 paddingBottom: '184px',
                 flexDirection: 'column',
@@ -166,41 +166,42 @@ export default function LPPage() {
                 alignItems: 'center',
                 gap: '32px',
                 flex: '1 0 0',
-                alignSelf: 'stretch'
+                alignSelf: 'stretch',
+                zIndex: 9999
               }}
             >
               <nav className="flex flex-col items-center gap-8 py-8">
                 <a 
                   href="#about" 
-                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   たまのみとは
                 </a>
                 <a 
                   href="#features" 
-                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   魅力
                 </a>
                 <a 
                   href="#howto" 
-                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   使い方
                 </a>
                 <a 
                   href="#pricing" 
-                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   利用料金
                 </a>
                 <a 
                   href="#stores" 
-                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   使えるお店
