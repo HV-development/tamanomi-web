@@ -15,6 +15,7 @@ export default function LPPage() {
   const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(3) // 2回目のセットの先頭から開始
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // 無限ループのため、画像を複数回複製
   const extendedImages = [
@@ -118,6 +119,21 @@ export default function LPPage() {
                   <a href="#pricing" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">利用料金</a>
                   <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使えるお店</a>
                 </nav>
+                
+                {/* ハンバーガーメニューアイコン（モバイルのみ表示） */}
+                <button
+                  className="md:hidden flex flex-col justify-center items-center cursor-pointer"
+                  style={{
+                    gap: '6px'
+                  }}
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  aria-label="メニュー"
+                >
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                </button>
+
                 <button 
                   className="text-white font-bold hover:opacity-90 transition-opacity text-xs md:text-sm lg:text-base px-4 py-2 md:px-6 md:py-4"
                   style={{
@@ -136,6 +152,62 @@ export default function LPPage() {
               </div>
             </div>
           </div>
+
+          {/* モバイルメニュー */}
+          {isMobileMenuOpen && (
+            <div 
+              className="md:hidden absolute top-full left-0 w-full"
+              style={{
+                background: 'rgba(0, 0, 0, 0.95)',
+                display: 'flex',
+                paddingBottom: '184px',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                gap: '32px',
+                flex: '1 0 0',
+                alignSelf: 'stretch'
+              }}
+            >
+              <nav className="flex flex-col items-center gap-8 py-8">
+                <a 
+                  href="#about" 
+                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  たまのみとは
+                </a>
+                <a 
+                  href="#features" 
+                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  魅力
+                </a>
+                <a 
+                  href="#howto" 
+                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  使い方
+                </a>
+                <a 
+                  href="#pricing" 
+                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  利用料金
+                </a>
+                <a 
+                  href="#stores" 
+                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  使えるお店
+                </a>
+              </nav>
+            </div>
+          )}
         </header>
 
         {/* Main Content */}

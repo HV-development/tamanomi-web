@@ -1,10 +1,12 @@
 'use client'
 
 import Image from 'next/image'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function MerchantLPPage() {
   const router = useRouter()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <div className="w-full">
@@ -43,6 +45,21 @@ export default function MerchantLPPage() {
                   <a href="#benefits" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">飲食店様のメリット</a>
                   <a href="#how-to-apply" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">お申し込み方法</a>
                 </nav>
+                
+                {/* ハンバーガーメニューアイコン（モバイル・タブレットのみ表示） */}
+                <button
+                  className="lg:hidden flex flex-col justify-center items-center cursor-pointer"
+                  style={{
+                    gap: '6px'
+                  }}
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  aria-label="メニュー"
+                >
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                  <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                </button>
+
                 <button 
                   className="text-white font-bold hover:opacity-90 transition-opacity text-xs md:text-sm lg:text-base px-4 py-3 md:px-6 md:py-4 rounded-full"
                   style={{
@@ -56,6 +73,48 @@ export default function MerchantLPPage() {
               </div>
             </div>
           </div>
+
+          {/* モバイルメニュー */}
+          {isMobileMenuOpen && (
+            <div 
+              className="lg:hidden absolute top-full left-0 w-full"
+              style={{
+                background: 'rgba(0, 0, 0, 0.95)',
+                display: 'flex',
+                paddingBottom: '184px',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                gap: '32px',
+                flex: '1 0 0',
+                alignSelf: 'stretch'
+              }}
+            >
+              <nav className="flex flex-col items-center gap-8 py-8">
+                <a 
+                  href="#overview" 
+                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  概要
+                </a>
+                <a 
+                  href="#benefits" 
+                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  飲食店様のメリット
+                </a>
+                <a 
+                  href="#how-to-apply" 
+                  className="text-white hover:text-blue-200 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  お申し込み方法
+                </a>
+              </nav>
+            </div>
+          )}
         </header>
 
         {/* Main Content */}
