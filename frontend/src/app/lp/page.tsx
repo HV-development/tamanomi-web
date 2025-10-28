@@ -782,10 +782,10 @@ export default function LPPage() {
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-[80px] max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-[80px] md:justify-items-center">
             {/* Feature 01 */}
-            <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto md:ml-auto md:mr-0">
-              <div className="relative w-full aspect-square max-w-[379px]">
+            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0">
+              <div className="relative w-full aspect-square md:max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
                     style={{
@@ -858,8 +858,8 @@ export default function LPPage() {
             </div>
 
             {/* Feature 02 */}
-            <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto md:mr-auto md:ml-0">
-              <div className="relative w-full aspect-square max-w-[379px]">
+            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0">
+              <div className="relative w-full aspect-square md:max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
                     style={{
@@ -932,8 +932,8 @@ export default function LPPage() {
             </div>
 
             {/* Feature 03 */}
-            <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto md:ml-auto md:mr-0">
-              <div className="relative w-full aspect-square max-w-[379px]">
+            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0">
+              <div className="relative w-full aspect-square md:max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
                     style={{
@@ -1006,8 +1006,8 @@ export default function LPPage() {
             </div>
 
             {/* Feature 04 */}
-            <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto md:mr-auto md:ml-0">
-              <div className="relative w-full aspect-square max-w-[379px]">
+            <div className="flex flex-col items-center text-center gap-6 w-full md:w-[379px] mx-auto md:mx-0">
+              <div className="relative w-full aspect-square md:max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
                     style={{
