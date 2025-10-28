@@ -1330,16 +1330,34 @@ export default function LPPage() {
 
       {/* Pricing Section */}
       <div id="pricing" className="w-full py-16 md:py-24 lg:py-32 relative overflow-hidden">
-        {/* Background with confetti */}
+        {/* Background with confetti - スマホ用 */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute md:hidden"
+          style={{
+            width: '875px',
+            height: '262px',
+            aspectRatio: '875/262',
+            position: 'absolute',
+            left: '-287px',
+            top: '-93px',
+            backgroundImage: 'url(/lp/images/pricing-confetti.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        {/* Background with confetti - PC用 */}
+        <div 
+          className="hidden md:block absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: 'url(/lp/images/pricing-confetti.png)',
             backgroundColor: '#6FC8E5'
           }}
         />
+        {/* 背景色 */}
+        <div className="absolute inset-0 -z-10" style={{ backgroundColor: '#6FC8E5' }} />
         
-        <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-8">
+        <div className="relative z-10 max-w-6xl md:px-8" style={{ marginLeft: '39px', marginRight: '39px' }}>
           {/* Pricing Title */}
           <div className="flex justify-center mb-8 md:mb-12">
             <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -1455,16 +1473,18 @@ export default function LPPage() {
 
               {/* Images Section - Absolute Positioning */}
               <div
-                className="absolute bottom-32 md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32 hidden md:flex"
+                className="absolute bottom-32 md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
               >
                 <Image
                   src="/lp/images/pricing-left.png"
                   alt="Left illustration"
                   width={597}
                   height={481}
-                  className="w-32 h-auto md:w-48 lg:w-[298px]"
+                  className="md:w-48 lg:w-[298px]"
                   style={{
-                    aspectRatio: '298.50/240.50',
+                    width: '179px',
+                    height: '144px',
+                    aspectRatio: '179/144',
                     objectFit: 'cover'
                   }}
                 />
@@ -1473,9 +1493,11 @@ export default function LPPage() {
                   alt="Right illustration"
                   width={614}
                   height={476}
-                  className="w-32 h-auto md:w-48 lg:w-[307px]"
+                  className="md:w-48 lg:w-[307px]"
                   style={{
-                    aspectRatio: '307/238',
+                    width: '184px',
+                    height: '142px',
+                    aspectRatio: '92/71',
                     objectFit: 'cover'
                   }}
                 />
@@ -1483,7 +1505,7 @@ export default function LPPage() {
 
               {/* Bottom Section - Yellow Background */}
               <div
-                className="flex items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12"
+                className="flex flex-col md:flex-row items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12"
                 style={{
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
@@ -1493,13 +1515,13 @@ export default function LPPage() {
                   alt="Phone illustration"
                   width={152.5}
                   height={179.5}
-                  className="w-20 h-auto md:w-28 lg:w-[152px] flex-shrink-0 relative z-10"
+                  className="hidden md:block w-20 h-auto md:w-28 lg:w-[152px] flex-shrink-0 relative z-10"
                   style={{
                     aspectRatio: '152.50/179.50',
                     objectFit: 'cover'
                   }}
                 />
-                <div className="flex flex-col gap-2 flex-1">
+                <div className="flex flex-col gap-2 flex-1 w-full">
                   <p
                     className="text-sm md:text-base lg:text-lg text-center"
                     style={{
@@ -1564,6 +1586,21 @@ export default function LPPage() {
                     </p>
                   </div>
                 </div>
+              </div>
+              
+              {/* Phone Image - スマホ専用（480円の下） */}
+              <div className="md:hidden flex justify-center mt-6">
+                <Image
+                  src="/lp/images/pricing-phone.png"
+                  alt="Phone illustration"
+                  width={152.5}
+                  height={179.5}
+                  className="w-20 h-auto"
+                  style={{
+                    aspectRatio: '152.50/179.50',
+                    objectFit: 'cover'
+                  }}
+                />
               </div>
             </div>
           </div>
