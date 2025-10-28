@@ -725,7 +725,7 @@ export default function LPPage() {
               </div>
               
               {/* Body Text */}
-              <div className="text-white text-sm md:text-base leading-relaxed text-center w-full max-w-md">
+              <div className="text-white leading-relaxed text-left w-full max-w-md" style={{ fontSize: '16px' }}>
                 <p className="mb-4">
                   「たまのみ」は、毎日1軒につきドリンクが1杯無料になる新しい&ldquo;Welcomeドリンク&rdquo;サービスです。
                 </p>
