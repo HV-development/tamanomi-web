@@ -223,7 +223,7 @@ export default function LPPage() {
         </header>
 
         {/* Main Content */}
-        <div className="relative w-full h-full flex items-start justify-center pt-48 md:pt-40 pb-32 md:pb-40 px-4" style={{ zIndex: 1 }}>
+        <div className="relative w-full h-full flex items-start justify-center pt-[300px] md:pt-40 pb-32 md:pb-40 px-4" style={{ zIndex: 1 }}>
           <div className="text-center">
 
             {/* Main Title */}
@@ -248,7 +248,7 @@ export default function LPPage() {
                 alt="1軒"
                 width={91}
                 height={74}
-                className="absolute left-4 top-[-40px] md:left-16 md:top-[-80px] lg:top-[-120px]"
+                className="absolute left-16z top-[-80px] md:left-16 md:top-[-80px] lg:top-[-120px]"
                 style={{
                   width: '91px',
                   height: '74px',
@@ -260,13 +260,14 @@ export default function LPPage() {
             {/* Sub Title */}
             <div className="mb-12 md:mb-10">
               <h2 
-                className="text-lg sm:text-xl md:text-3xl lg:text-4xl"
                 style={{
                   color: '#FFF',
                   fontFamily: '"Shippori Antique"',
+                  fontSize: '26px',
+                  fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%',
-                  letterSpacing: '-1px'
+                  letterSpacing: '-1.82px'
                 }}
               >
                 次のお店はどこに行く?
@@ -1347,7 +1348,7 @@ export default function LPPage() {
                       lineHeight: '100%'
                     }}
                   >
-                    1日1件1杯無料
+                    1日1軒1杯無料
                   </span>
                 </div>
               </div>
