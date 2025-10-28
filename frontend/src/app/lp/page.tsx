@@ -742,14 +742,14 @@ export default function LPPage() {
               </div>
               
               {/* Body Text */}
-              <div className="text-white leading-relaxed text-left w-full max-w-md" style={{ fontSize: '16px' }}>
-                <p className="mb-4 md:w-[365px]">
+              <div className="text-white leading-relaxed text-left w-full max-w-md md:max-w-none" style={{ fontSize: '16px' }}>
+                <p className="mb-4 w-full md:w-[365px]">
                   「たまのみ」は、毎日1軒につきドリンクが1杯無料になる新しい&ldquo;Welcomeドリンク&rdquo;サービスです。
                 </p>
-                <p className="mb-4">
+                <p className="mb-4 w-full md:w-[365px]">
                   お酒でもソフトドリンクでもOK。
                 </p>
-                <p>
+                <p className="w-full md:w-[365px]">
                   気になるお店をみつけたら、仲間と乾杯したり、自分だけの寄り道を楽しんだり。あなたの「今日はどこで飲もう？」をもっと自由に、もっとおトクにします。
                 </p>
               </div>
