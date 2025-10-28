@@ -1147,7 +1147,7 @@ export default function LPPage() {
           <div className="flex flex-col md:flex-row justify-center items-stretch gap-6 md:gap-[48px] max-w-5xl mx-auto">
             {/* Step 01 */}
             <div 
-              className="bg-white rounded-lg md:w-[368px]"
+              className="bg-white rounded-lg md:w-[368px] mx-[39px] md:mx-0"
               style={{
                 display: 'flex',
                 padding: '32px 24px',
@@ -1155,9 +1155,7 @@ export default function LPPage() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '32px',
-                alignSelf: 'stretch',
-                marginLeft: '39px',
-                marginRight: '39px'
+                alignSelf: 'stretch'
               }}
             >
               <div className="text-center">
@@ -1207,7 +1205,7 @@ export default function LPPage() {
 
             {/* Step 02 */}
             <div 
-              className="bg-white rounded-lg md:w-[368px]"
+              className="bg-white rounded-lg md:w-[368px] mx-[39px] md:mx-0"
               style={{
                 display: 'flex',
                 padding: '32px 24px',
@@ -1215,9 +1213,7 @@ export default function LPPage() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '32px',
-                alignSelf: 'stretch',
-                marginLeft: '39px',
-                marginRight: '39px'
+                alignSelf: 'stretch'
               }}
             >
               <div className="text-center">
@@ -1267,7 +1263,7 @@ export default function LPPage() {
 
             {/* Step 03 */}
             <div 
-              className="bg-white rounded-lg md:w-[368px]"
+              className="bg-white rounded-lg md:w-[368px] mx-[39px] md:mx-0"
               style={{
                 display: 'flex',
                 padding: '32px 24px',
@@ -1275,9 +1271,7 @@ export default function LPPage() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '32px',
-                alignSelf: 'stretch',
-                marginLeft: '39px',
-                marginRight: '39px'
+                alignSelf: 'stretch'
               }}
             >
               <div className="text-center">
