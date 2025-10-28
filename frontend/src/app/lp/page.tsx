@@ -1531,12 +1531,12 @@ export default function LPPage() {
 
               {/* Bottom Section - Yellow Background */}
               <div
-                className="flex flex-col md:flex-row items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12 relative"
+                className="flex items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12 relative"
                 style={{
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
               >
-                <div className="flex flex-col gap-2 flex-1 w-full">
+                <div className="flex flex-col gap-2 flex-1">
                   <p
                     className="text-sm md:text-base lg:text-lg text-center"
                     style={{
@@ -1603,15 +1603,19 @@ export default function LPPage() {
                   
                 </div>
                 
-                {/* Phone Image - PC用（左側に配置） */}
+                {/* Phone Image - PC用（absolute配置で左側） */}
                 <Image
                   src="/lp/images/pricing-phone.png"
                   alt="Phone illustration"
                   width={152.5}
                   height={179.5}
-                  className="hidden md:block w-20 h-auto md:w-28 lg:w-[152px] flex-shrink-0 relative z-10"
+                  className="hidden md:block absolute"
                   style={{
+                    width: '152px',
+                    height: 'auto',
                     aspectRatio: '152.50/179.50',
+                    left: '16px',
+                    bottom: '-25px',
                     objectFit: 'cover'
                   }}
                 />
