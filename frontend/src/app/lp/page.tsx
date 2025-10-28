@@ -1147,15 +1147,27 @@ export default function LPPage() {
           <div className="flex flex-col md:flex-row justify-center items-stretch gap-6 md:gap-8 max-w-5xl mx-auto">
             {/* Step 01 */}
             <div 
-              className="flex flex-col justify-center items-center gap-6 md:gap-8 w-full md:w-1/3 p-6 md:p-8 bg-white rounded-lg"
+              className="bg-white rounded-lg"
+              style={{
+                display: 'flex',
+                padding: '32px 24px',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '32px',
+                alignSelf: 'stretch',
+                marginLeft: '39px',
+                marginRight: '39px'
+              }}
             >
               <div className="text-center">
                 <p 
-                  className="text-base md:text-lg mb-4"
+                  className="mb-4"
                   style={{
                     color: '#000',
                     textAlign: 'center',
                     fontFamily: 'var(--font-limelight)',
+                    fontSize: '18px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%',
@@ -1194,15 +1206,27 @@ export default function LPPage() {
 
             {/* Step 02 */}
             <div 
-              className="flex flex-col justify-center items-center gap-6 md:gap-8 w-full md:w-1/3 p-6 md:p-8 bg-white rounded-lg"
+              className="bg-white rounded-lg"
+              style={{
+                display: 'flex',
+                padding: '32px 24px',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '32px',
+                alignSelf: 'stretch',
+                marginLeft: '39px',
+                marginRight: '39px'
+              }}
             >
               <div className="text-center">
                 <p 
-                  className="text-base md:text-lg mb-4"
+                  className="mb-4"
                   style={{
                     color: '#000',
                     textAlign: 'center',
                     fontFamily: 'var(--font-limelight)',
+                    fontSize: '18px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%',
@@ -1241,15 +1265,27 @@ export default function LPPage() {
 
             {/* Step 03 */}
             <div 
-              className="flex flex-col justify-center items-center gap-6 md:gap-8 w-full md:w-1/3 p-6 md:p-8 bg-white rounded-lg"
+              className="bg-white rounded-lg"
+              style={{
+                display: 'flex',
+                padding: '32px 24px',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '32px',
+                alignSelf: 'stretch',
+                marginLeft: '39px',
+                marginRight: '39px'
+              }}
             >
               <div className="text-center">
                 <p 
-                  className="text-base md:text-lg mb-4"
+                  className="mb-4"
                   style={{
                     color: '#000',
                     textAlign: 'center',
                     fontFamily: 'var(--font-limelight)',
+                    fontSize: '18px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%',
