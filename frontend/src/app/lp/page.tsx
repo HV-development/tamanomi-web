@@ -579,14 +579,15 @@ export default function LPPage() {
             </div>
             
             <p
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl"
+              className="md:text-4xl lg:text-5xl"
               style={{
                 color: '#000',
+                textAlign: 'center',
                 fontFamily: '"Zen Kaku Gothic New"',
+                fontSize: '30px',
                 fontStyle: 'normal',
                 fontWeight: '400',
-                lineHeight: '160%',
-                textAlign: 'center'
+                lineHeight: '160%'
               }}
             >
               たまのみ片手に
@@ -618,9 +619,11 @@ export default function LPPage() {
                     alt="たまのみキャラクター"
                     width={1520}
                     height={602}
-                    className="w-56 h-auto md:w-72"
+                    className="md:w-72"
                     style={{ 
-                      aspectRatio: '380.00/150.50',
+                      width: '344px',
+                      height: '136px',
+                      aspectRatio: '43/17',
                       objectFit: 'cover'
                     }}
                   />
