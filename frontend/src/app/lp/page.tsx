@@ -1473,7 +1473,7 @@ export default function LPPage() {
 
               {/* Images Section - Absolute Positioning */}
               <div
-                className="absolute bottom-[245px] md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
+                className="absolute bottom-[280px] md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
               >
                 {/* Left illustration - スマホ用 */}
                 <Image
@@ -1601,28 +1601,9 @@ export default function LPPage() {
                     </p>
                   </div>
                   
-                  {/* Phone Image - 480円の下（スマホのみ） */}
-                  <div className="md:hidden">
-                    <Image
-                      src="/lp/images/pricing-phone.png"
-                      alt="Phone illustration"
-                      width={145.279}
-                      height={171}
-                      className="absolute"
-                      style={{
-                        width: '145.279px',
-                        height: '171px',
-                        aspectRatio: '145.28/171.00',
-                        position: 'absolute',
-                        right: '83.221px',
-                        bottom: '-25px',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  </div>
                 </div>
                 
-                {/* Phone Image - PC用 */}
+                {/* Phone Image - PC用（左側に配置） */}
                 <Image
                   src="/lp/images/pricing-phone.png"
                   alt="Phone illustration"
@@ -1631,6 +1612,23 @@ export default function LPPage() {
                   className="hidden md:block w-20 h-auto md:w-28 lg:w-[152px] flex-shrink-0 relative z-10"
                   style={{
                     aspectRatio: '152.50/179.50',
+                    objectFit: 'cover'
+                  }}
+                />
+                
+                {/* Phone Image - スマホ用（absolute配置で左側） */}
+                <Image
+                  src="/lp/images/pricing-phone.png"
+                  alt="Phone illustration"
+                  width={145.279}
+                  height={171}
+                  className="md:hidden absolute"
+                  style={{
+                    width: '145.279px',
+                    height: '171px',
+                    aspectRatio: '145.28/171.00',
+                    left: '16px',
+                    bottom: '-25px',
                     objectFit: 'cover'
                   }}
                 />
