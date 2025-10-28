@@ -786,7 +786,7 @@ export default function LPPage() {
             {/* Feature 01 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
-                <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
+                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
                     style={{
                       color: 'var(--main, #6FC8E5)',
@@ -824,10 +824,10 @@ export default function LPPage() {
                   className="w-full h-full object-cover rounded-full"
                 />
                 <div 
-                  className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 px-3 md:px-4 py-1"
+                  className="absolute bottom-6 md:bottom-10 left-6 px-3 md:px-4 py-1"
                   style={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                     background: 'var(--main, #6FC8E5)'
                   }}
@@ -839,7 +839,8 @@ export default function LPPage() {
                       fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     1店舗につき1杯無料！
@@ -859,7 +860,7 @@ export default function LPPage() {
             {/* Feature 02 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
-                <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
+                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
                     style={{
                       color: 'var(--main, #6FC8E5)',
@@ -897,10 +898,10 @@ export default function LPPage() {
                   className="w-full h-full object-cover rounded-full"
                 />
                 <div 
-                  className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 px-3 md:px-4 py-1"
+                  className="absolute bottom-6 md:bottom-10 left-6 px-3 md:px-4 py-1"
                   style={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                     background: 'var(--main, #6FC8E5)'
                   }}
@@ -912,7 +913,8 @@ export default function LPPage() {
                       fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     1日で複数店舗をはしごできる！
@@ -932,7 +934,7 @@ export default function LPPage() {
             {/* Feature 03 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
-                <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
+                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
                     style={{
                       color: 'var(--main, #6FC8E5)',
@@ -970,10 +972,10 @@ export default function LPPage() {
                   className="w-full h-full object-cover rounded-full"
                 />
                 <div 
-                  className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 px-3 md:px-4 py-1"
+                  className="absolute bottom-6 md:bottom-10 left-6 px-3 md:px-4 py-1"
                   style={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                     background: 'var(--main, #6FC8E5)'
                   }}
@@ -985,7 +987,8 @@ export default function LPPage() {
                       fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     お酒が苦手でも楽しめる！
@@ -1005,7 +1008,7 @@ export default function LPPage() {
             {/* Feature 04 */}
             <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
               <div className="relative w-full aspect-square max-w-[379px]">
-                <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
+                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
                     style={{
                       color: 'var(--main, #6FC8E5)',
@@ -1043,10 +1046,10 @@ export default function LPPage() {
                   className="w-full h-full object-cover rounded-full"
                 />
                 <div 
-                  className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 px-3 md:px-4 py-1"
+                  className="absolute bottom-6 md:bottom-10 left-6 px-3 md:px-4 py-1"
                   style={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                     background: 'var(--main, #6FC8E5)'
                   }}
@@ -1058,7 +1061,8 @@ export default function LPPage() {
                       fontSize: '18px',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     新しいお店との出会い！
