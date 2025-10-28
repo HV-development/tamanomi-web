@@ -1196,7 +1196,7 @@ export default function LPPage() {
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
@@ -1256,7 +1256,7 @@ export default function LPPage() {
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
@@ -1316,7 +1316,7 @@ export default function LPPage() {
                 style={{
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
