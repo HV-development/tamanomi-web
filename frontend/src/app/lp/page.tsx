@@ -229,15 +229,19 @@ export default function LPPage() {
             {/* Main Title */}
             <div className="mb-8 md:mb-6 relative">
               <h1 
-                className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl"
+                className="md:text-6xl lg:text-8xl"
                 style={{
+                  alignSelf: 'stretch',
                   color: '#FFF',
                   fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '60px',
+                  fontStyle: 'normal',
                   fontWeight: '700',
-                  lineHeight: '100%'
+                  lineHeight: '120%'
                 }}
               >
-                毎日1杯、無料で乾杯
+                <span className="block md:inline">毎日1杯、</span>
+                <span className="block md:inline">無料で乾杯</span>
               </h1>
               <Image
                 src="/lp/images/fukidashi.svg"
