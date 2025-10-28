@@ -748,10 +748,11 @@ export default function LPPage() {
           <div className="flex justify-center mb-12 md:mb-16">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2 
-                className="text-4xl md:text-5xl lg:text-6xl"
+                className="md:text-5xl lg:text-6xl"
                 style={{
                   color: '#EFECE8',
                   fontFamily: 'var(--font-plaster)',
+                  fontSize: '48px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
@@ -760,7 +761,7 @@ export default function LPPage() {
                 Features
               </h2>
               <p 
-                className="text-base md:text-lg lg:text-xl"
+                className="md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -768,6 +769,7 @@ export default function LPPage() {
                   transform: 'translate(-50%, -50%)',
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%',
@@ -1080,10 +1082,11 @@ export default function LPPage() {
           <div className="flex justify-center mb-8 md:mb-12">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl"
+                className="md:text-5xl lg:text-6xl"
                 style={{
                   color: '#FFF',
                   fontFamily: 'var(--font-plaster)',
+                  fontSize: '48px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
@@ -1092,7 +1095,7 @@ export default function LPPage() {
                 How to Use
               </h2>
               <p
-                className="text-base md:text-lg lg:text-xl"
+                className="md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -1100,6 +1103,7 @@ export default function LPPage() {
                   transform: 'translate(-50%, -50%)',
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%',
@@ -1289,10 +1293,11 @@ export default function LPPage() {
           <div className="flex justify-center mb-8 md:mb-12">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl"
+                className="md:text-5xl lg:text-6xl"
                 style={{
                   color: '#FFF',
                   fontFamily: 'var(--font-plaster)',
+                  fontSize: '48px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
@@ -1301,7 +1306,7 @@ export default function LPPage() {
                 Pricing
               </h2>
               <p
-                className="text-base md:text-lg lg:text-xl"
+                className="md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -1309,6 +1314,7 @@ export default function LPPage() {
                   transform: 'translate(-50%, -50%)',
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%',
@@ -1550,10 +1556,11 @@ export default function LPPage() {
           <div className="flex justify-center mb-8 md:mb-12">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2
-                className="text-4xl md:text-5xl lg:text-6xl"
+                className="md:text-5xl lg:text-6xl"
                 style={{
                   color: '#FFF',
                   fontFamily: 'var(--font-plaster)',
+                  fontSize: '48px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
@@ -1562,7 +1569,7 @@ export default function LPPage() {
                 Stores
               </h2>
               <p
-                className="text-base md:text-lg lg:text-xl"
+                className="md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -1570,6 +1577,7 @@ export default function LPPage() {
                   transform: 'translate(-50%, -50%)',
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%',
@@ -1644,10 +1652,11 @@ export default function LPPage() {
             <div className="flex justify-center mb-8 md:mb-12">
               <div style={{ position: 'relative', display: 'inline-block' }}>
                 <h2
-                  className="text-4xl md:text-5xl lg:text-6xl"
+                  className="md:text-5xl lg:text-6xl"
                   style={{
                     color: 'var(--accent-yellow, #EFECE8)',
                     fontFamily: 'var(--font-plaster)',
+                    fontSize: '48px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%'
@@ -1656,7 +1665,7 @@ export default function LPPage() {
                   FAQ
                 </h2>
                 <p
-                  className="text-base md:text-lg lg:text-xl"
+                  className="md:text-lg lg:text-xl"
                   style={{
                     position: 'absolute',
                     top: '85%',
@@ -1664,6 +1673,7 @@ export default function LPPage() {
                     transform: 'translate(-50%, -50%)',
                     color: '#000',
                     fontFamily: '"Zen Kaku Gothic New"',
+                    fontSize: '20px',
                     fontStyle: 'normal',
                     fontWeight: '700',
                     lineHeight: '100%',
