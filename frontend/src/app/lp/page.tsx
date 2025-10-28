@@ -4,10 +4,11 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+// カルーセル用のプレースホルダー（実際の画像がある場合は置き換えてください）
 const images = [
-  "/lp/images/banner-placeholder.png",
-  "/lp/images/banner-placeholder.png", 
-  "/lp/images/banner-placeholder.png",
+  null, // プレースホルダー1
+  null, // プレースホルダー2
+  null, // プレースホルダー3
 ];
 
 export default function LPPage() {
@@ -358,13 +359,17 @@ export default function LPPage() {
                       transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
                     }}
                   >
-                    <Image
-                      src={src}
-                      alt={`banner-${i}`}
-                      fill
-                      className="object-cover"
-                      priority={i < 2}
-                    />
+                    {src ? (
+                      <Image
+                        src={src}
+                        alt={`banner-${i}`}
+                        fill
+                        className="object-cover"
+                        priority={i < 2}
+                      />
+                    ) : (
+                      <p style={{ color: '#999', fontSize: '16px', fontWeight: 400 }}>準備中</p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -409,12 +414,14 @@ export default function LPPage() {
                 className="p-1 hover:opacity-80 transition-opacity"
                 onClick={() => goToSlide(index - 1)}
               >
-                <Image
-                  src={currentSlide === (index - 1) ? "/lp/images/carousel-dot-active.png" : "/lp/images/carousel-dot-inactive.png"}
-                  alt={`ページ ${index}`}
-                  width={16}
-                  height={16}
-                  className="w-3 h-3 md:w-4 md:h-4"
+                <div
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    backgroundColor: currentSlide === (index - 1) ? '#6FC8E5' : '#D9D9D9',
+                    transition: 'background-color 0.3s ease'
+                  }}
                 />
               </button>
             ))}
