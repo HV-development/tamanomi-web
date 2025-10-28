@@ -223,7 +223,7 @@ export default function LPPage() {
         </header>
 
         {/* Main Content */}
-        <div className="relative w-full h-full flex items-start justify-center pt-32 md:pt-40 pb-32 md:pb-40 px-4" style={{ zIndex: 1 }}>
+        <div className="relative w-full h-full flex items-start justify-center pt-48 md:pt-40 pb-32 md:pb-40 px-4" style={{ zIndex: 1 }}>
           <div className="text-center">
 
             {/* Main Title */}
