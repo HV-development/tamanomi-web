@@ -68,11 +68,10 @@ export default function LPPage() {
     <div className="w-full">
       {/* First View */}
       <div 
-        className="relative w-full"
+        className="relative w-full min-h-screen"
         style={{
           maxWidth: 'none',
           width: '100vw',
-          height: '100vh',
           margin: 0,
           padding: 0,
           overflow: 'visible',
@@ -104,27 +103,25 @@ export default function LPPage() {
                   alt="たまのみ"
                   width={1312}
                   height={320}
+                  className="w-40 h-10 md:w-[328px] md:h-20"
                   style={{
-                    width: '328px',
-                    height: '80px',
                     flexShrink: 0
                   }}
                 />
               </div>
               <div style={{ flex: 1 }}></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '44px' }}>
-                <nav className="hidden md:flex items-center space-x-10">
-                  <a href="#about" className="text-white hover:text-blue-200 transition-colors text-lg">たまのみとは</a>
-                  <a href="#features" className="text-white hover:text-blue-200 transition-colors text-lg">魅力</a>
-                  <a href="#howto" className="text-white hover:text-blue-200 transition-colors text-lg">使い方</a>
-                  <a href="#pricing" className="text-white hover:text-blue-200 transition-colors text-lg">利用料金</a>
-                  <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-lg">使えるお店</a>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', md: { gap: '44px' } }} className="gap-4 md:gap-11">
+                <nav className="hidden md:flex items-center space-x-6 lg:space-x-10">
+                  <a href="#about" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">たまのみとは</a>
+                  <a href="#features" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">魅力</a>
+                  <a href="#howto" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使い方</a>
+                  <a href="#pricing" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">利用料金</a>
+                  <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使えるお店</a>
                 </nav>
                 <button 
-                  className="text-white font-bold hover:opacity-90 transition-opacity text-sm md:text-base"
+                  className="text-white font-bold hover:opacity-90 transition-opacity text-xs md:text-sm lg:text-base px-4 py-2 md:px-6 md:py-4"
                   style={{
                     display: 'flex',
-                    padding: '16px 24px',
                     justifyContent: 'center',
                     alignItems: 'center',
                     gap: '10px',
@@ -142,13 +139,13 @@ export default function LPPage() {
         </header>
 
         {/* Main Content */}
-        <div className="relative z-10 w-full h-full flex items-start justify-center pt-96 md:pt-40">
+        <div className="relative z-10 w-full h-full flex items-start justify-center pt-32 md:pt-40 pb-32 md:pb-40 px-4">
           <div className="text-center">
 
             {/* Main Title */}
-            <div className="mb-10 md:mb-6" style={{ position: 'relative' }}>
+            <div className="mb-8 md:mb-6 relative">
               <h1 
-                className="text-4xl md:text-8xl"
+                className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl"
                 style={{
                   color: '#FFF',
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -163,20 +160,20 @@ export default function LPPage() {
                 alt="1軒"
                 width={156}
                 height={128}
-                className="absolute left-8 top-[-80px] md:left-16 md:top-[-120px] w-20 h-16 md:w-40 md:h-32"
+                className="absolute left-4 top-[-40px] w-12 h-10 sm:left-8 sm:top-[-60px] sm:w-16 sm:h-12 md:left-16 md:top-[-80px] md:w-32 md:h-24 lg:top-[-120px] lg:w-40 lg:h-32"
               />
             </div>
 
             {/* Sub Title */}
-            <div className="mb-16 md:mb-10">
+            <div className="mb-12 md:mb-10">
               <h2 
-                className="text-xl md:text-4xl"
+                className="text-lg sm:text-xl md:text-3xl lg:text-4xl"
                 style={{
                   color: '#FFF',
                   fontFamily: '"Shippori Antique"',
                   fontWeight: '400',
                   lineHeight: '100%',
-                  letterSpacing: '-2.38px'
+                  letterSpacing: '-1px'
                 }}
               >
                 次のお店はどこに行く?
@@ -186,10 +183,10 @@ export default function LPPage() {
             {/* CTA Button */}
             <div className="flex justify-center">
               <button
+                className="w-64 sm:w-72 md:w-80"
                 style={{
                   position: 'relative',
                   display: 'flex',
-                  width: '320px',
                   padding: '16px 24px',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -203,25 +200,25 @@ export default function LPPage() {
               >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                   <span 
+                    className="text-sm md:text-base"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%',
-                      fontSize: '16px'
+                      lineHeight: '100%'
                     }}
                   >
                     今すぐ始める
                   </span>
                   <span 
+                    className="text-xl md:text-2xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%',
-                      fontSize: '24px'
+                      lineHeight: '100%'
                     }}
                   >
                     一杯無料
@@ -255,70 +252,71 @@ export default function LPPage() {
         {/* Decorative drink icons at bottom */}
         <div className="absolute bottom-2 md:bottom-4 left-0 w-full overflow-hidden">
           <div 
-            style={{
-              display: 'flex',
-              width: '1440px',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              gap: '64px',
-              margin: '0 auto'
-            }}
+            className="flex justify-center items-end gap-4 sm:gap-8 md:gap-12 lg:gap-16 max-w-7xl mx-auto px-4"
           >
             <Image
               src="/lp/images/fv-glass-01.svg"
               alt="ドリンク1"
               width={168.008}
               height={140}
-              style={{ width: '168.008px', height: '140px', flexShrink: 0 }}
+              className="w-12 h-10 sm:w-16 sm:h-12 md:w-24 md:h-20 lg:w-[168px] lg:h-[140px]"
+              style={{ flexShrink: 0 }}
             />
             <Image
               src="/lp/images/fv-glass-02.svg"
               alt="ドリンク2"
               width={158}
               height={181}
-              style={{ width: '158px', height: '181px', flexShrink: 0 }}
+              className="w-12 h-14 sm:w-16 sm:h-18 md:w-20 md:h-24 lg:w-[158px] lg:h-[181px]"
+              style={{ flexShrink: 0 }}
             />
             <Image
               src="/lp/images/fv-glass-03.svg"
               alt="ドリンク3"
               width={154}
               height={179}
-              style={{ width: '154px', height: '179px', flexShrink: 0 }}
+              className="w-12 h-14 sm:w-16 sm:h-18 md:w-20 md:h-24 lg:w-[154px] lg:h-[179px]"
+              style={{ flexShrink: 0 }}
             />
             <Image
               src="/lp/images/fv-glass-04.svg"
               alt="ドリンク4"
               width={185}
               height={164}
-              style={{ width: '185px', height: '164px', flexShrink: 0 }}
+              className="w-14 h-12 sm:w-18 sm:h-16 md:w-24 md:h-20 lg:w-[185px] lg:h-[164px]"
+              style={{ flexShrink: 0 }}
             />
             <Image
               src="/lp/images/fv-glass-05.svg"
               alt="ドリンク5"
               width={121}
               height={146}
-              style={{ width: '121px', height: '146px', flexShrink: 0 }}
+              className="hidden sm:block w-12 h-14 md:w-16 md:h-18 lg:w-[121px] lg:h-[146px]"
+              style={{ flexShrink: 0 }}
             />
             <Image
               src="/lp/images/fv-glass-06.svg"
               alt="ドリンク6"
               width={118}
               height={181}
-              style={{ width: '118px', height: '181px', flexShrink: 0 }}
+              className="hidden md:block w-16 h-20 lg:w-[118px] lg:h-[181px]"
+              style={{ flexShrink: 0 }}
             />
             <Image
               src="/lp/images/fv-glass-07.svg"
               alt="ドリンク7"
               width={113}
               height={203}
-              style={{ width: '113px', height: '203px', flexShrink: 0 }}
+              className="hidden lg:block w-[113px] h-[203px]"
+              style={{ flexShrink: 0 }}
             />
             <Image
               src="/lp/images/fv-glass-08.svg"
               alt="ドリンク8"
               width={124}
               height={165}
-              style={{ width: '124px', height: '165px', flexShrink: 0 }}
+              className="hidden lg:block w-[124px] h-[165px]"
+              style={{ flexShrink: 0 }}
             />
           </div>
         </div>
@@ -327,10 +325,9 @@ export default function LPPage() {
       {/* Banner Carousel Section (Second Layer) */}
       <div className="w-full bg-white py-10 md:py-20">
         <div 
-          className="w-full"
+          className="w-full px-4 md:px-8 lg:px-20"
           style={{
             display: 'flex',
-            padding: '40px 120px',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
@@ -339,20 +336,20 @@ export default function LPPage() {
           }}
         >
           {/* Carousel Container */}
-          <div className="relative w-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="relative w-full max-w-6xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* Banner Images Container */}
-            <div className="relative overflow-hidden" style={{ width: '1173px', height: '210px' }}>
+            <div className="relative overflow-hidden w-full" style={{ height: '210px', maxHeight: '40vw' }}>
               <div className="flex" style={{ gap: '24px' }}>
                 {extendedImages.map((src, i) => (
                   <div
                     key={i}
-                    className="relative flex-shrink-0 overflow-hidden"
+                    className="relative flex-shrink-0 overflow-hidden w-full md:w-[375px]"
                     style={{
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      width: '375px',
                       height: '210px',
+                      maxHeight: '40vw',
                       borderRadius: '20px',
                       background: '#D9D9D9',
                       transform: `translateX(-${currentSlide * (375 + 24)}px)`,
@@ -377,8 +374,7 @@ export default function LPPage() {
 
             {/* Left Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-2 shadow-lg"
-              style={{ left: '0' }}
+              className="absolute z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-1 md:p-2 shadow-lg left-0 md:-left-4"
               onClick={() => handleScroll('left')}
             >
               <Image
@@ -386,14 +382,13 @@ export default function LPPage() {
                 alt="前へ"
                 width={40}
                 height={40}
-                className="w-8 h-8 md:w-10 md:h-10"
+                className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10"
               />
             </button>
 
             {/* Right Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-2 shadow-lg"
-              style={{ right: '0' }}
+              className="absolute z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-1 md:p-2 shadow-lg right-0 md:-right-4"
               onClick={() => handleScroll('right')}
             >
               <Image
@@ -401,7 +396,7 @@ export default function LPPage() {
                 alt="次へ"
                 width={40}
                 height={40}
-                className="w-8 h-8 md:w-10 md:h-10"
+                className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10"
               />
             </button>
           </div>
@@ -415,9 +410,8 @@ export default function LPPage() {
                 onClick={() => goToSlide(index)}
               >
                 <div
+                  className="w-3 h-3 md:w-4 md:h-4"
                   style={{
-                    width: '16px',
-                    height: '16px',
                     borderRadius: '50%',
                     backgroundColor: (currentSlide % images.length) === index ? '#6FC8E5' : '#D9D9D9',
                     transition: 'background-color 0.3s ease'
@@ -430,7 +424,7 @@ export default function LPPage() {
       </div>
 
       {/* About Section */}
-      <div className="w-full relative min-h-screen">
+      <div id="about" className="w-full relative min-h-screen">
         {/* Background with split colors */}
         <div className="absolute inset-0 flex">
           <div className="w-1/2" style={{ backgroundColor: '#FFD93B' }}></div>
@@ -438,14 +432,14 @@ export default function LPPage() {
         </div>
         
         {/* Content */}
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-center min-h-screen px-4 md:px-8 py-16">
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-center min-h-screen px-4 md:px-8 py-16 md:py-24">
           {/* Left Content */}
-          <div className="w-full md:w-1/2 flex justify-center items-center pr-0 md:pr-8 mb-8 md:mb-0">
+          <div className="w-full md:w-1/2 flex justify-center items-center pr-0 md:pr-8 mb-8 md:mb-0 order-1 md:order-1">
             <p
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl"
               style={{
                 color: '#000',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '46px',
                 fontStyle: 'normal',
                 fontWeight: '400',
                 lineHeight: '160%',
@@ -459,25 +453,22 @@ export default function LPPage() {
           </div>
 
           {/* Central Image - Phone, Text Logo, and Character */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 z-20">
+          <div className="absolute left-1/2 transform -translate-x-1/2 z-20 hidden md:flex">
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               {/* Text Logo - top center */}
-              <div style={{ 
+              <div className="mb-4 md:mb-5" style={{ 
                 display: 'flex',
-                width: '326.16px',
-                height: '113.16px',
-                paddingRight: '0.01px',
                 justifyContent: 'center',
                 alignItems: 'center',
-                flexShrink: 0,
-                marginBottom: '20px'
+                flexShrink: 0
               }}>
                 <Image
                   src="/lp/images/about-text-logo.png"
                   alt="たまのみテキストロゴ"
                   width={1305}
                   height={453}
-                  style={{ width: '326.16px', height: '113.16px', objectFit: 'contain' }}
+                  className="w-48 h-auto md:w-60 lg:w-[326px]"
+                  style={{ objectFit: 'contain' }}
                 />
               </div>
               {/* Phone and Character container */}
@@ -489,24 +480,22 @@ export default function LPPage() {
                     alt="スマホ画面"
                     width={860}
                     height={1740}
+                    className="w-32 h-auto md:w-40 lg:w-[215px]"
                     style={{
-                      width: '215px',
-                      height: '435px',
                       aspectRatio: '43/87',
                       objectFit: 'cover'
                     }}
                   />
                 </div>
               {/* Character - overlapping bottom of phone */}
-              <div style={{ marginTop: '-40px', zIndex: 25, position: 'relative' }}>
+              <div className="-mt-6 md:-mt-8 lg:-mt-10" style={{ zIndex: 25, position: 'relative' }}>
                 <Image
                   src="/lp/images/about-character.png"
                   alt="たまのみキャラクター"
                   width={1520}
                   height={602}
+                  className="w-56 h-auto md:w-72 lg:w-[380px]"
                   style={{ 
-                    width: '380px', 
-                    height: '150.5px',
                     aspectRatio: '380.00/150.50',
                     objectFit: 'cover'
                   }}
@@ -517,15 +506,15 @@ export default function LPPage() {
           </div>
 
           {/* Right Content */}
-          <div className="w-full md:w-1/2 flex flex-col justify-center items-center pl-0 md:pl-8">
-            <div className="w-full max-w-sm md:w-[365px] flex flex-col justify-center items-center">
+          <div className="w-full md:w-1/2 flex flex-col justify-center items-center pl-0 md:pl-8 order-2 md:order-2">
+            <div className="w-full max-w-sm px-4 flex flex-col justify-center items-center">
               {/* Heading */}
               <div className="mb-6" style={{ position: 'relative', display: 'inline-block' }}>
                 <h2
+                  className="text-4xl md:text-5xl lg:text-6xl"
                   style={{
                     color: 'var(--accent-yellow, #FFD93B)',
                     fontFamily: 'var(--font-plaster)',
-                    fontSize: '64px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%'
@@ -534,6 +523,7 @@ export default function LPPage() {
                   About
                 </h2>
                 <p
+                  className="text-base md:text-lg lg:text-xl"
                   style={{
                     position: 'absolute',
                     top: '85%',
@@ -541,7 +531,6 @@ export default function LPPage() {
                     transform: 'translate(-50%, -50%)',
                     color: '#000',
                     fontFamily: '"Zen Kaku Gothic New"',
-                    fontSize: '20px',
                     fontStyle: 'normal',
                     fontWeight: '700',
                     lineHeight: '100%',
@@ -553,7 +542,7 @@ export default function LPPage() {
               </div>
               
               {/* Body Text */}
-              <div className="text-white text-sm leading-relaxed text-center" style={{ width: '365px' }}>
+              <div className="text-white text-sm md:text-base leading-relaxed text-center w-full max-w-md">
                 <p className="mb-4">
                   「たまのみ」は、毎日1軒につきドリンクが1杯無料になる新しい&ldquo;Welcomeドリンク&rdquo;サービスです。
                 </p>
@@ -570,16 +559,16 @@ export default function LPPage() {
       </div>
 
       {/* Features Section */}
-      <div className="w-full bg-white py-16 md:py-24">
-        <div className="max-w-6xl mx-auto px-8">
+      <div id="features" className="w-full bg-white py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-4 md:px-8">
           {/* Features Title */}
-          <div className="flex justify-center mb-16">
+          <div className="flex justify-center mb-12 md:mb-16">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2 
+                className="text-4xl md:text-5xl lg:text-6xl"
                 style={{
                   color: '#EFECE8',
                   fontFamily: 'var(--font-plaster)',
-                  fontSize: '64px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
@@ -588,6 +577,7 @@ export default function LPPage() {
                 Features
               </h2>
               <p 
+                className="text-base md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -595,7 +585,6 @@ export default function LPPage() {
                   transform: 'translate(-50%, -50%)',
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%',
@@ -608,17 +597,17 @@ export default function LPPage() {
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 mx-auto" style={{ rowGap: '80px', columnGap: '80px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-20 max-w-4xl mx-auto">
             {/* Feature 01 */}
-            <div className="flex flex-col items-center text-center gap-6" style={{ width: '379px', justifySelf: 'end' }}>
-              <div style={{ position: 'relative', width: '379px', height: '379px' }}>
+            <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
+              <div className="relative w-full aspect-square max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
+                    className="text-xs md:text-sm"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
                       fontFamily: 'var(--font-limelight)',
-                      fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -627,11 +616,11 @@ export default function LPPage() {
                     feature
                   </p>
                   <h3 
+                    className="text-4xl md:text-5xl lg:text-6xl"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
                       fontFamily: 'var(--font-limelight)',
-                      fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -645,29 +634,22 @@ export default function LPPage() {
                   alt="1店舗につき1杯無料!"
                   width={379}
                   height={379}
-                  style={{
-                    width: '379px',
-                    height: '379px',
-                    objectFit: 'cover',
-                    borderRadius: '50%'
-                  }}
+                  className="w-full h-full object-cover rounded-full"
                 />
                 <div 
+                  className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 px-3 md:px-4 py-1"
                   style={{
                     display: 'flex',
-                    padding: '3px 16px',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    position: 'absolute',
-                    bottom: '40px',
                     background: 'var(--main, #6FC8E5)'
                   }}
                 >
                   <span 
+                    className="text-sm md:text-base lg:text-xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '20px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -677,7 +659,7 @@ export default function LPPage() {
                   </span>
                 </div>
               </div>
-              <div className="text-gray-700 text-sm leading-relaxed max-w-md">
+              <div className="text-gray-700 text-sm md:text-base leading-relaxed w-full">
                 <p className="mb-2">お酒でもソフトドリンクでもOK。</p>
                 <p className="mb-2">「たまのみ」の掲載店なら、</p>
                 <p className="mb-2">どこでも1杯が無料に！</p>
@@ -688,15 +670,15 @@ export default function LPPage() {
             </div>
 
             {/* Feature 02 */}
-            <div className="flex flex-col items-center text-center gap-6" style={{ width: '379px', justifySelf: 'start' }}>
-              <div style={{ position: 'relative', width: '379px', height: '379px' }}>
+            <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
+              <div className="relative w-full aspect-square max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p 
+                    className="text-xs md:text-sm"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
                       fontFamily: 'var(--font-limelight)',
-                      fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -705,11 +687,11 @@ export default function LPPage() {
                     feature
                   </p>
                   <h3 
+                    className="text-4xl md:text-5xl lg:text-6xl"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
                       fontFamily: 'var(--font-limelight)',
-                      fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -723,29 +705,22 @@ export default function LPPage() {
                   alt="1日で複数店舗をはしごできる!"
                   width={379}
                   height={379}
-                  style={{
-                    width: '379px',
-                    height: '379px',
-                    objectFit: 'cover',
-                    borderRadius: '50%'
-                  }}
+                  className="w-full h-full object-cover rounded-full"
                 />
                 <div 
+                  className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 px-3 md:px-4 py-1"
                   style={{
                     display: 'flex',
-                    padding: '3px 16px',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    position: 'absolute',
-                    bottom: '40px',
                     background: 'var(--main, #6FC8E5)'
                   }}
                 >
                   <span 
+                    className="text-sm md:text-base lg:text-xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '20px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -755,7 +730,7 @@ export default function LPPage() {
                   </span>
                 </div>
               </div>
-              <div className="text-gray-700 text-sm leading-relaxed max-w-md">
+              <div className="text-gray-700 text-sm md:text-base leading-relaxed w-full">
                 <p className="mb-2">1店舗につき1杯無料だから、</p>
                 <p className="mb-2">1日で何軒もめぐれるのが「たまのみ」の魅力。</p>
                 <p className="mb-2">今日は気の合う仲間とカジュアルに、</p>
@@ -766,15 +741,15 @@ export default function LPPage() {
             </div>
 
             {/* Feature 03 */}
-            <div className="flex flex-col items-center text-center gap-6" style={{ width: '379px', justifySelf: 'end' }}>
-              <div style={{ position: 'relative', width: '379px', height: '379px' }}>
+            <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
+              <div className="relative w-full aspect-square max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
+                    className="text-xs md:text-sm"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
                       fontFamily: 'var(--font-limelight)',
-                      fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -783,11 +758,11 @@ export default function LPPage() {
                     feature
                   </p>
                   <h3
+                    className="text-4xl md:text-5xl lg:text-6xl"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
                       fontFamily: 'var(--font-limelight)',
-                      fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -801,29 +776,22 @@ export default function LPPage() {
                   alt="お酒が苦手でも楽しめる!"
                   width={379}
                   height={379}
-                  style={{
-                    width: '379px',
-                    height: '379px',
-                    objectFit: 'cover',
-                    borderRadius: '50%'
-                  }}
+                  className="w-full h-full object-cover rounded-full"
                 />
                 <div 
+                  className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 px-3 md:px-4 py-1"
                   style={{
                     display: 'flex',
-                    padding: '3px 16px',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    position: 'absolute',
-                    bottom: '40px',
                     background: 'var(--main, #6FC8E5)'
                   }}
                 >
                   <span 
+                    className="text-sm md:text-base lg:text-xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '20px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -833,7 +801,7 @@ export default function LPPage() {
                   </span>
                 </div>
               </div>
-              <div className="text-gray-700 text-sm leading-relaxed max-w-md">
+              <div className="text-gray-700 text-sm md:text-base leading-relaxed w-full">
                 <p className="mb-2">「たまのみ」は&ldquo;飲める人だけ&rdquo;の</p>
                 <p className="mb-2">サービスじゃありません。</p>
                 <p className="mb-2">ソフトドリンクも対象だから、</p>
@@ -844,15 +812,15 @@ export default function LPPage() {
             </div>
 
             {/* Feature 04 */}
-            <div className="flex flex-col items-center text-center gap-6" style={{ width: '379px', justifySelf: 'start' }}>
-              <div style={{ position: 'relative', width: '379px', height: '379px' }}>
+            <div className="flex flex-col items-center text-center gap-6 w-full max-w-sm mx-auto">
+              <div className="relative w-full aspect-square max-w-[379px]">
                 <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
                   <p
+                    className="text-xs md:text-sm"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
                       fontFamily: 'var(--font-limelight)',
-                      fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -861,11 +829,11 @@ export default function LPPage() {
                     feature
                   </p>
                   <h3
+                    className="text-4xl md:text-5xl lg:text-6xl"
                     style={{
                       color: 'var(--main, #6FC8E5)',
                       textAlign: 'justify',
                       fontFamily: 'var(--font-limelight)',
-                      fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
                       lineHeight: '100%'
@@ -879,29 +847,22 @@ export default function LPPage() {
                   alt="新しいお店との出会い!"
                   width={379}
                   height={379}
-                  style={{
-                    width: '379px',
-                    height: '379px',
-                    objectFit: 'cover',
-                    borderRadius: '50%'
-                  }}
+                  className="w-full h-full object-cover rounded-full"
                 />
                 <div 
+                  className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 px-3 md:px-4 py-1"
                   style={{
                     display: 'flex',
-                    padding: '3px 16px',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    position: 'absolute',
-                    bottom: '40px',
                     background: 'var(--main, #6FC8E5)'
                   }}
                 >
                   <span 
+                    className="text-sm md:text-base lg:text-xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '20px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -911,7 +872,7 @@ export default function LPPage() {
                   </span>
                 </div>
               </div>
-              <div className="text-gray-700 text-sm leading-relaxed max-w-md">
+              <div className="text-gray-700 text-sm md:text-base leading-relaxed w-full">
                 <p className="mb-2">普段は行かないお店でも、</p>
                 <p className="mb-2">1杯無料なら挑戦しやすい。</p>
                 <p className="mb-2">地元で愛される居酒屋から、</p>
@@ -927,18 +888,19 @@ export default function LPPage() {
 
       {/* How to Use Section */}
       <div 
-        className="w-full py-24 md:py-32"
+        id="howto"
+        className="w-full py-16 md:py-24 lg:py-32"
         style={{ backgroundColor: 'rgba(239, 236, 232, 1)' }}
       >
-        <div className="max-w-6xl mx-auto px-8">
+        <div className="max-w-6xl mx-auto px-4 md:px-8">
           {/* How to Use Title */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-8 md:mb-12">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2
+                className="text-4xl md:text-5xl lg:text-6xl"
                 style={{
                   color: '#FFF',
                   fontFamily: 'var(--font-plaster)',
-                  fontSize: '64px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
@@ -947,6 +909,7 @@ export default function LPPage() {
                 How to Use
               </h2>
               <p
+                className="text-base md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -954,7 +917,6 @@ export default function LPPage() {
                   transform: 'translate(-50%, -50%)',
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%',
@@ -967,13 +929,13 @@ export default function LPPage() {
           </div>
 
           {/* How to Use Subtitle */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <p 
+              className="text-base md:text-lg lg:text-xl"
               style={{
                 color: '#000',
                 textAlign: 'center',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '20px',
                 fontWeight: '700',
                 lineHeight: '160%'
               }}
@@ -983,65 +945,46 @@ export default function LPPage() {
           </div>
 
           {/* Steps Grid */}
-          <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 max-w-5xl mx-auto" style={{ marginTop: '24px', marginBottom: '24px' }}>
+          <div className="flex flex-col md:flex-row justify-center items-stretch gap-6 md:gap-8 max-w-5xl mx-auto">
             {/* Step 01 */}
             <div 
-              style={{
-                display: 'flex',
-                padding: '32px 24px',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '32px',
-                width: '368px',
-                height: '447px',
-                background: '#FFF',
-                borderRadius: '8px'
-              }}
+              className="flex flex-col justify-center items-center gap-6 md:gap-8 w-full md:w-1/3 p-6 md:p-8 bg-white rounded-lg"
             >
               <div className="text-center">
                 <p 
+                  className="text-base md:text-lg mb-4"
                   style={{
                     color: '#000',
                     textAlign: 'center',
                     fontFamily: 'var(--font-limelight)',
-                    fontSize: '18px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%',
-                    marginBottom: '16px',
                     textDecoration: 'underline'
                   }}
                 >
                   STEP.1
                 </p>
                 <h4 
-                  className="font-bold text-gray-800"
-                  style={{ fontSize: '20px' }}
+                  className="font-bold text-gray-800 text-lg md:text-xl"
                 >
                   お店を見つける
                 </h4>
               </div>
-              <div>
+              <div className="w-full">
                 <Image
                   src="/lp/images/how-to-use-step-01.png"
                   alt="Step 01"
                   width={320}
                   height={200}
-                  className="w-full rounded-lg"
-                  style={{
-                    height: '200px',
-                    objectFit: 'cover'
-                  }}
+                  className="w-full rounded-lg h-40 md:h-48 object-cover"
                 />
               </div>
               <p 
+                className="text-sm md:text-base text-center w-full"
                 style={{
-                  alignSelf: 'stretch',
                   color: '#000',
-                  textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
@@ -1052,62 +995,43 @@ export default function LPPage() {
 
             {/* Step 02 */}
             <div 
-              style={{
-                display: 'flex',
-                padding: '32px 24px',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '32px',
-                width: '368px',
-                height: '447px',
-                background: '#FFF',
-                borderRadius: '8px'
-              }}
+              className="flex flex-col justify-center items-center gap-6 md:gap-8 w-full md:w-1/3 p-6 md:p-8 bg-white rounded-lg"
             >
               <div className="text-center">
                 <p 
+                  className="text-base md:text-lg mb-4"
                   style={{
                     color: '#000',
                     textAlign: 'center',
                     fontFamily: 'var(--font-limelight)',
-                    fontSize: '18px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%',
-                    marginBottom: '16px',
                     textDecoration: 'underline'
                   }}
                 >
                   STEP.2
                 </p>
                 <h4 
-                  className="font-bold text-gray-800"
-                  style={{ fontSize: '20px' }}
+                  className="font-bold text-gray-800 text-lg md:text-xl"
                 >
                   スマホを見せる
                 </h4>
               </div>
-              <div>
+              <div className="w-full">
                 <Image
                   src="/lp/images/how-to-use-step-02.png"
                   alt="Step 02"
                   width={320}
                   height={200}
-                  className="w-full rounded-lg"
-                  style={{
-                    height: '200px',
-                    objectFit: 'cover'
-                  }}
+                  className="w-full rounded-lg h-40 md:h-48 object-cover"
                 />
               </div>
               <p 
+                className="text-sm md:text-base text-center w-full"
                 style={{
-                  alignSelf: 'stretch',
                   color: '#000',
-                  textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
@@ -1118,62 +1042,43 @@ export default function LPPage() {
 
             {/* Step 03 */}
             <div 
-              style={{
-                display: 'flex',
-                padding: '32px 24px',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '32px',
-                width: '368px',
-                height: '447px',
-                background: '#FFF',
-                borderRadius: '8px'
-              }}
+              className="flex flex-col justify-center items-center gap-6 md:gap-8 w-full md:w-1/3 p-6 md:p-8 bg-white rounded-lg"
             >
               <div className="text-center">
                 <p 
+                  className="text-base md:text-lg mb-4"
                   style={{
                     color: '#000',
                     textAlign: 'center',
                     fontFamily: 'var(--font-limelight)',
-                    fontSize: '18px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%',
-                    marginBottom: '16px',
                     textDecoration: 'underline'
                   }}
                 >
                   STEP.3
                 </p>
                 <h4 
-                  className="font-bold text-gray-800"
-                  style={{ fontSize: '20px' }}
+                  className="font-bold text-gray-800 text-lg md:text-xl"
                 >
                   はしごして楽しむ
                 </h4>
               </div>
-              <div>
+              <div className="w-full">
                 <Image
                   src="/lp/images/how-to-use-step-03.png"
                   alt="Step 03"
                   width={320}
                   height={200}
-                  className="w-full rounded-lg"
-                  style={{
-                    height: '200px',
-                    objectFit: 'cover'
-                  }}
+                  className="w-full rounded-lg h-40 md:h-48 object-cover"
                 />
               </div>
               <p 
+                className="text-sm md:text-base text-center w-full"
                 style={{
-                  alignSelf: 'stretch',
                   color: '#000',
-                  textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '700',
                   lineHeight: '160%'
                 }}
@@ -1186,26 +1091,25 @@ export default function LPPage() {
       </div>
 
       {/* Pricing Section */}
-      <div className="w-full py-16 md:py-24 relative overflow-hidden">
+      <div id="pricing" className="w-full py-16 md:py-24 lg:py-32 relative overflow-hidden">
         {/* Background with confetti */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: 'url(/lp/images/pricing-confetti.png)',
-            backgroundColor: '#6FC8E5',
-            height: '890.5px'
+            backgroundColor: '#6FC8E5'
           }}
         />
         
-        <div className="relative z-10 max-w-6xl mx-auto px-8">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-8">
           {/* Pricing Title */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-8 md:mb-12">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2
+                className="text-4xl md:text-5xl lg:text-6xl"
                 style={{
                   color: '#FFF',
                   fontFamily: 'var(--font-plaster)',
-                  fontSize: '64px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
@@ -1214,6 +1118,7 @@ export default function LPPage() {
                 Pricing
               </h2>
               <p
+                className="text-base md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -1221,7 +1126,6 @@ export default function LPPage() {
                   transform: 'translate(-50%, -50%)',
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%',
@@ -1234,13 +1138,13 @@ export default function LPPage() {
           </div>
 
           {/* Pricing Subtitle */}
-          <div className="flex justify-center" style={{ marginTop: '45px', marginBottom: '32px' }}>
+          <div className="flex justify-center mb-8 md:mb-12">
             <p
+              className="text-base md:text-lg lg:text-xl"
               style={{
                 color: '#FFF',
                 textAlign: 'center',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '20px',
                 fontStyle: 'normal',
                 fontWeight: '700',
                 lineHeight: '160%'
@@ -1252,28 +1156,18 @@ export default function LPPage() {
 
           {/* Pricing Content */}
           <div className="flex justify-center mb-8">
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div className="relative flex flex-col items-center w-full max-w-lg">
               {/* Top Section - White Background */}
               <div
-                style={{
-                  display: 'flex',
-                  width: '580px',
-                  padding: '56px 0 64px 0',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '24px',
-                  background: '#FFF',
-                  borderRadius: '8px'
-                }}
+                className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg"
               >
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                <div className="flex items-baseline gap-2">
                   <h3
+                    className="text-4xl md:text-5xl"
                     style={{
                       color: '#000',
                       textAlign: 'center',
                       fontFamily: 'Rubik',
-                      fontSize: '49px',
                       fontStyle: 'normal',
                       fontWeight: '600',
                       lineHeight: '100%',
@@ -1284,11 +1178,11 @@ export default function LPPage() {
                     980
                   </h3>
                   <p
+                    className="text-lg md:text-xl"
                     style={{
                       color: '#000',
                       textAlign: 'center',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '22px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -1298,23 +1192,17 @@ export default function LPPage() {
                   </p>
                 </div>
                 <div
+                  className="flex flex-col justify-center items-center px-6 md:px-8 py-3 rounded-full"
                   style={{
-                    display: 'flex',
-                    padding: '12px 32px',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: '16px',
-                    borderRadius: '9999px',
                     background: 'var(--accent-yellow, #FFD93B)'
                   }}
                 >
                   <span
+                    className="text-base md:text-lg lg:text-xl"
                     style={{
                       color: '#000',
                       textAlign: 'center',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '20px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '100%'
@@ -1327,25 +1215,15 @@ export default function LPPage() {
 
               {/* Images Section - Absolute Positioning */}
               <div
-                style={{
-                  position: 'absolute',
-                  bottom: '160px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  gap: '120px'
-                }}
+                className="absolute bottom-32 md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32 hidden md:flex"
               >
                 <Image
                   src="/lp/images/pricing-left.png"
                   alt="Left illustration"
                   width={597}
                   height={481}
+                  className="w-32 h-auto md:w-48 lg:w-[298px]"
                   style={{
-                    width: '298.5px',
-                    height: '240.5px',
                     aspectRatio: '298.50/240.50',
                     objectFit: 'cover'
                   }}
@@ -1355,9 +1233,8 @@ export default function LPPage() {
                   alt="Right illustration"
                   width={614}
                   height={476}
+                  className="w-32 h-auto md:w-48 lg:w-[307px]"
                   style={{
-                    width: '307px',
-                    height: '238px',
                     aspectRatio: '307/238',
                     objectFit: 'cover'
                   }}
@@ -1366,16 +1243,9 @@ export default function LPPage() {
 
               {/* Bottom Section - Yellow Background */}
               <div
+                className="flex items-center gap-3 md:gap-4 w-full py-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12"
                 style={{
-                  display: 'flex',
-                  width: '580px',
-                  height: '160px',
-                  paddingLeft: '24px',
-                  alignItems: 'center',
-                  gap: '16px',
-                  background: 'var(--accent-yellow, #FFD93B)',
-                  borderRadius: '8px',
-                  marginTop: '50px'
+                  background: 'var(--accent-yellow, #FFD93B)'
                 }}
               >
                 <Image
@@ -1383,24 +1253,18 @@ export default function LPPage() {
                   alt="Phone illustration"
                   width={152.5}
                   height={179.5}
+                  className="w-20 h-auto md:w-28 lg:w-[152px] flex-shrink-0 relative z-10"
                   style={{
-                    width: '152.5px',
-                    height: '179.5px',
-                    flexShrink: 0,
                     aspectRatio: '152.50/179.50',
-                    objectFit: 'cover',
-                    position: 'relative',
-                    zIndex: 10
+                    objectFit: 'cover'
                   }}
                 />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                <div className="flex flex-col gap-2 flex-1">
                   <p
+                    className="text-sm md:text-base lg:text-lg text-center"
                     style={{
-                      width: '308px',
                       color: '#000',
-                      textAlign: 'center',
                       fontFamily: '"Zen Kaku Gothic New"',
-                      fontSize: '19px',
                       fontStyle: 'normal',
                       fontWeight: '700',
                       lineHeight: '160%'
@@ -1408,26 +1272,19 @@ export default function LPPage() {
                   >
                     さいたま市みんなのアプリ会員なら
                   </p>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', justifyContent: 'center' }}>
+                  <div className="flex items-end gap-2 justify-center">
                     <div
+                      className="flex justify-center items-center w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full self-center"
                       style={{
-                        display: 'flex',
-                        width: '45px',
-                        height: '45px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '10px',
-                        borderRadius: '50%',
-                        background: '#000',
-                        alignSelf: 'center'
+                        background: '#000'
                       }}
                     >
                       <span
+                        className="text-xs md:text-sm"
                         style={{
                           color: '#FFF',
                           textAlign: 'center',
                           fontFamily: '"Zen Kaku Gothic New"',
-                          fontSize: '16px',
                           fontStyle: 'normal',
                           fontWeight: '700',
                           lineHeight: '100%'
@@ -1437,25 +1294,25 @@ export default function LPPage() {
                       </span>
                     </div>
                     <h4
+                      className="text-5xl md:text-7xl lg:text-8xl"
                       style={{
                         color: '#000',
                         textAlign: 'center',
                         fontFamily: 'Rubik',
-                        fontSize: '100px',
                         fontStyle: 'normal',
                         fontWeight: '600',
                         lineHeight: '100%',
                         letterSpacing: '5px',
-                        WebkitTextStroke: '6px #000'
+                        WebkitTextStroke: '3px #000'
                       }}
                     >
                       480
                     </h4>
                     <p
+                      className="text-xs md:text-sm"
                       style={{
                         color: '#000',
                         fontFamily: '"Zen Kaku Gothic New"',
-                        fontSize: '16px',
                         fontStyle: 'normal',
                         fontWeight: '700',
                         lineHeight: '120%'
@@ -1474,11 +1331,10 @@ export default function LPPage() {
           {/* Disclaimers */}
           <div className="text-center">
             <p 
-              className="mb-2"
+              className="mb-2 text-sm md:text-base"
               style={{
                 color: '#FFF',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '16px',
                 fontWeight: '400',
                 lineHeight: '160%'
               }}
@@ -1486,10 +1342,10 @@ export default function LPPage() {
               ※対象ドリンクは店舗により異なります。
             </p>
             <p 
+              className="text-sm md:text-base"
               style={{
                 color: '#FFF',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '16px',
                 fontWeight: '400',
                 lineHeight: '160%'
               }}
@@ -1502,18 +1358,19 @@ export default function LPPage() {
 
       {/* Stores Section */}
       <div 
+        id="stores"
         className="w-full py-16 md:py-24"
         style={{ backgroundColor: '#FFD93B' }}
       >
-        <div className="max-w-6xl mx-auto px-8">
+        <div className="max-w-6xl mx-auto px-4 md:px-8">
           {/* Stores Title */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-8 md:mb-12">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2
+                className="text-4xl md:text-5xl lg:text-6xl"
                 style={{
                   color: '#FFF',
                   fontFamily: 'var(--font-plaster)',
-                  fontSize: '64px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
@@ -1522,6 +1379,7 @@ export default function LPPage() {
                 Stores
               </h2>
               <p
+                className="text-base md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -1529,7 +1387,6 @@ export default function LPPage() {
                   transform: 'translate(-50%, -50%)',
                   color: '#000',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%',
@@ -1544,12 +1401,11 @@ export default function LPPage() {
           {/* Stores Content */}
           <div className="text-center">
             <p 
-              className="mb-8"
+              className="mb-8 md:mb-12 text-base md:text-lg lg:text-xl"
               style={{
                 color: '#000',
                 textAlign: 'center',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '20px',
                 fontWeight: '700',
                 lineHeight: '160%'
               }}
@@ -1560,27 +1416,19 @@ export default function LPPage() {
             {/* Store List Button */}
             <div className="flex justify-center">
               <button
+                className="relative inline-flex py-4 md:py-6 px-8 md:px-12 lg:px-16 justify-center items-center gap-2 rounded-full border-none cursor-pointer"
                 style={{
-                  position: 'relative',
-                  display: 'inline-flex',
-                  padding: '24px 60px 24px 40px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '10px',
-                  borderRadius: '9999px',
-                  border: 'none',
-                  background: '#FF6B6B',
-                  cursor: 'pointer'
+                  background: '#FF6B6B'
                 }}
               >
                 <span 
+                  className="text-base md:text-lg lg:text-xl"
                   style={{
                     color: '#FFF',
                     fontFamily: '"Zen Kaku Gothic New"',
                     fontStyle: 'normal',
                     fontWeight: '700',
-                    lineHeight: '100%',
-                    fontSize: '20px'
+                    lineHeight: '100%'
                   }}
                 >
                   店舗一覧はこちら
@@ -1591,11 +1439,7 @@ export default function LPPage() {
                   height="16" 
                   viewBox="0 0 9 16" 
                   fill="none"
-                  style={{
-                    position: 'absolute',
-                    right: '40px',
-                    flexShrink: 0
-                  }}
+                  className="absolute right-6 md:right-8 lg:right-10 flex-shrink-0"
                 >
                   <path 
                     d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
@@ -1611,16 +1455,16 @@ export default function LPPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="py-16 md:py-24 bg-white mt-16">
+        <div id="faq" className="py-16 md:py-24 bg-white mt-12 md:mt-16">
           <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
             {/* FAQ Title */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-8 md:mb-12">
               <div style={{ position: 'relative', display: 'inline-block' }}>
                 <h2
+                  className="text-4xl md:text-5xl lg:text-6xl"
                   style={{
                     color: 'var(--accent-yellow, #EFECE8)',
                     fontFamily: 'var(--font-plaster)',
-                    fontSize: '64px',
                     fontStyle: 'normal',
                     fontWeight: '400',
                     lineHeight: '100%'
@@ -1629,6 +1473,7 @@ export default function LPPage() {
                   FAQ
                 </h2>
                 <p
+                  className="text-base md:text-lg lg:text-xl"
                   style={{
                     position: 'absolute',
                     top: '85%',
@@ -1636,7 +1481,6 @@ export default function LPPage() {
                     transform: 'translate(-50%, -50%)',
                     color: '#000',
                     fontFamily: '"Zen Kaku Gothic New"',
-                    fontSize: '20px',
                     fontStyle: 'normal',
                     fontWeight: '700',
                     lineHeight: '100%',
@@ -1649,13 +1493,13 @@ export default function LPPage() {
             </div>
 
             {/* FAQ Description */}
-            <div className="mb-12">
+            <div className="mb-8 md:mb-12">
               <p 
+                className="text-base md:text-lg lg:text-xl"
                 style={{
                   color: '#000',
                   textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '160%'
@@ -1669,27 +1513,19 @@ export default function LPPage() {
             {/* FAQ Button */}
             <div className="flex justify-center">
               <button
+                className="relative inline-flex py-4 md:py-6 px-8 md:px-12 lg:px-16 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
                 style={{
-                  position: 'relative',
-                  display: 'inline-flex',
-                  padding: '24px 60px 24px 40px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '10px',
-                  borderRadius: '9999px',
-                  border: '3px solid #FFF',
-                  background: '#6FC8E5',
-                  cursor: 'pointer'
+                  background: '#6FC8E5'
                 }}
               >
                 <span 
+                  className="text-base md:text-lg lg:text-xl"
                   style={{
                     color: '#FFF',
                     fontFamily: '"Zen Kaku Gothic New"',
                     fontStyle: 'normal',
                     fontWeight: '700',
-                    lineHeight: '100%',
-                    fontSize: '20px'
+                    lineHeight: '100%'
                   }}
                 >
                   よくあるご質問はこちら
@@ -1700,11 +1536,7 @@ export default function LPPage() {
                   height="16" 
                   viewBox="0 0 9 16" 
                   fill="none"
-                  style={{
-                    position: 'absolute',
-                    right: '40px',
-                    flexShrink: 0
-                  }}
+                  className="absolute right-6 md:right-8 lg:right-10 flex-shrink-0"
                 >
                   <path 
                     d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
@@ -1722,17 +1554,18 @@ export default function LPPage() {
 
       {/* Store Recruitment Section */}
       <div 
-        className="w-full py-16 md:py-24 -mt-32"
+        id="recruitment"
+        className="w-full py-16 md:py-24 -mt-24 md:-mt-32"
         style={{ backgroundColor: '#6FC8E5' }}
       >
-        <div className="max-w-6xl mx-auto px-8 text-center">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 text-center">
           {/* Store Recruitment Title */}
-          <div className="mb-8">
+          <div className="mb-8 md:mb-12">
             <h2 
+              className="text-xl md:text-2xl lg:text-3xl"
               style={{
                 color: 'var(--accent-yellow, #FFD93B)',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '28px',
                 fontStyle: 'normal',
                 fontWeight: '700',
                 lineHeight: '100%'
@@ -1745,26 +1578,18 @@ export default function LPPage() {
           {/* Store Recruitment Button */}
           <div className="flex justify-center">
             <button
+              className="relative inline-flex py-4 md:py-6 px-8 md:px-12 lg:px-16 justify-center items-center gap-2 rounded-full border-none cursor-pointer"
               style={{
-                position: 'relative',
-                display: 'inline-flex',
-                padding: '24px 60px 24px 40px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '10px',
-                borderRadius: '9999px',
-                background: 'var(--accent-yellow, #FFD93B)',
-                border: 'none',
-                cursor: 'pointer'
+                background: 'var(--accent-yellow, #FFD93B)'
               }}
               onClick={() => router.push('/lp/merchant')}
             >
               <span 
+                className="text-base md:text-lg lg:text-xl"
                 style={{
                   color: '#000',
                   textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
                   lineHeight: '100%'
@@ -1778,11 +1603,7 @@ export default function LPPage() {
                 height="16" 
                 viewBox="0 0 9 16" 
                 fill="none"
-                style={{
-                  position: 'absolute',
-                  right: '40px',
-                  flexShrink: 0
-                }}
+                className="absolute right-6 md:right-8 lg:right-10 flex-shrink-0"
               >
                 <path 
                   d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
@@ -1799,42 +1620,32 @@ export default function LPPage() {
 
       {/* Footer Section */}
       <div className="w-full bg-white">
-        <div className="max-w-6xl mx-auto px-8">
+        <div className="max-w-6xl mx-auto px-4 md:px-8">
           {/* Footer Menu */}
           <div 
-            style={{
-              display: 'flex',
-              paddingTop: '40px',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '40px',
-              alignSelf: 'stretch'
-            }}
+            className="flex flex-col justify-center items-center gap-8 md:gap-10 pt-8 md:pt-12"
           >
             {/* Logo */}
-            <div className="mb-8">
+            <div className="mb-4 md:mb-8">
               <Image
                 src="/lp/images/logo.png"
                 alt="TAMANOMI"
                 width={328}
                 height={329}
+                className="w-48 h-auto md:w-64 lg:w-[328px]"
                 style={{
-                  width: '328px',
-                  height: '329px',
                   aspectRatio: '328/329'
                 }}
               />
             </div>
 
             {/* Footer Links */}
-            <div className="flex flex-wrap justify-center gap-8 mb-8">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 lg:gap-8 mb-4 md:mb-8">
               <a 
                 href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '400'
                 }}
               >
@@ -1842,10 +1653,9 @@ export default function LPPage() {
               </a>
               <a 
                 href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '400'
                 }}
               >
@@ -1853,10 +1663,9 @@ export default function LPPage() {
               </a>
               <a 
                 href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '400'
                 }}
               >
@@ -1864,10 +1673,9 @@ export default function LPPage() {
               </a>
               <a 
                 href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '400'
                 }}
               >
@@ -1875,10 +1683,9 @@ export default function LPPage() {
               </a>
               <a 
                 href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '400'
                 }}
               >
@@ -1886,10 +1693,9 @@ export default function LPPage() {
               </a>
               <a 
                 href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontSize: '16px',
                   fontWeight: '400'
                 }}
               >
@@ -1898,13 +1704,13 @@ export default function LPPage() {
             </div>
 
             {/* Copyright */}
-            <div className="pb-8">
+            <div className="pb-6 md:pb-8">
               <p 
+                className="text-sm md:text-base"
                 style={{
                   color: '#000',
                   textAlign: 'center',
                   fontFamily: 'Rubik',
-                  fontSize: '16px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%'
