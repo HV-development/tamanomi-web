@@ -99,7 +99,7 @@ export default function LPPage() {
   }, [])
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
       {/* First View */}
       <div 
         className="relative w-full min-h-screen"
@@ -752,7 +752,7 @@ export default function LPPage() {
               
               {/* Body Text */}
               <div
-                className="text-white w-full max-w-md text-center md:text-justify md:w-365"
+                className="text-white w-full max-w-md text-center md:text-justify"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
                   fontSize: '16px',
@@ -760,7 +760,8 @@ export default function LPPage() {
                   fontWeight: '400',
                   lineHeight: '160%',
                   wordBreak: 'break-word',
-                  overflowWrap: 'break-word'
+                  overflowWrap: 'break-word',
+                  maxWidth: '365px'
                 }}
               >
                 <p className="mb-4" style={{ fontWeight: '500' }}>
