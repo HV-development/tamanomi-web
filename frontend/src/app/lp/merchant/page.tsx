@@ -44,10 +44,11 @@ export default function MerchantLPPage() {
                 <Image
                   src="/lp/images/horizon-color-white.png"
                   alt="たまのみ"
-                  width={328}
-                  height={80}
-                  className="w-48 h-12 md:w-82 md:h-20"
+                  width={1312}
+                  height={320}
                   style={{
+                    width: '328px',
+                    height: '80px',
                     flexShrink: 0
                   }}
                 />
@@ -935,12 +936,13 @@ export default function MerchantLPPage() {
                 style={{
                   color: '#000',
                   textAlign: 'center',
-                  fontFamily: 'Limelight',
+                  fontFamily: 'var(--font-limelight)',
                   fontSize: '18px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%',
-                  marginBottom: '16px'
+                  marginBottom: '16px',
+                  textDecoration: 'underline'
                 }}
               >
                 STEP.1
@@ -1007,12 +1009,13 @@ export default function MerchantLPPage() {
                 style={{
                   color: '#000',
                   textAlign: 'center',
-                  fontFamily: 'Limelight',
+                  fontFamily: 'var(--font-limelight)',
                   fontSize: '18px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%',
-                  marginBottom: '16px'
+                  marginBottom: '16px',
+                  textDecoration: 'underline'
                 }}
               >
                 STEP.2
@@ -1079,12 +1082,13 @@ export default function MerchantLPPage() {
                 style={{
                   color: '#000',
                   textAlign: 'center',
-                  fontFamily: 'Limelight',
+                  fontFamily: 'var(--font-limelight)',
                   fontSize: '18px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '100%',
-                  marginBottom: '16px'
+                  marginBottom: '16px',
+                  textDecoration: 'underline'
                 }}
               >
                 STEP.3
@@ -1166,55 +1170,41 @@ export default function MerchantLPPage() {
           style={{
             position: 'relative',
             display: 'flex',
-            padding: '24px 24px 24px 40px',
+            width: '320px',
+            padding: '16px 24px',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: '10px',
+            gap: '8px',
             borderRadius: '9999px',
+            border: '3px solid #FFF',
             background: 'var(--green1, #007D4F)',
-            border: 'none',
             cursor: 'pointer'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
             <span 
               style={{
                 color: '#FFF',
-                textAlign: 'center',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '20px',
                 fontStyle: 'normal',
                 fontWeight: '700',
-                lineHeight: '100%'
+                lineHeight: '100%',
+                fontSize: '16px'
               }}
             >
-              いますぐ
-            </span>
-            <span 
-              style={{
-                color: '#FAEE00',
-                textAlign: 'center',
-                fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '20px',
-                fontStyle: 'normal',
-                fontWeight: '700',
-                lineHeight: '100%'
-              }}
-            >
-              無料
+              いますぐ<span style={{ color: '#FAEE00' }}>無料</span>で
             </span>
             <span 
               style={{
                 color: '#FFF',
-                textAlign: 'center',
                 fontFamily: '"Zen Kaku Gothic New"',
-                fontSize: '20px',
                 fontStyle: 'normal',
                 fontWeight: '700',
-                lineHeight: '100%'
+                lineHeight: '100%',
+                fontSize: '24px'
               }}
             >
-              で申し込む
+              お申し込み
             </span>
           </div>
           <svg 
@@ -1225,7 +1215,7 @@ export default function MerchantLPPage() {
             fill="none"
             style={{
               position: 'absolute',
-              right: '40px',
+              right: '24px',
               flexShrink: 0
             }}
           >

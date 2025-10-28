@@ -84,7 +84,7 @@ export default function LPPage() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
-            src="/lp/images/FV.png"
+            src="/lp/images/user-lp-fv.png"
             alt="ファーストビュー背景"
             fill
             className="object-cover"
@@ -96,42 +96,46 @@ export default function LPPage() {
         {/* Header */}
         <header className="relative z-10 w-full">
           <div className="w-full px-4 py-4 md:px-8 md:py-6" style={{ width: '100vw', margin: 0 }}>
-            <div className="flex items-center justify-between w-full">
+            <div className="flex items-center w-full">
               <div className="flex items-center">
                 <Image
                   src="/lp/images/horizon-color-white.png"
                   alt="たまのみ"
-                  width={328}
-                  height={80}
-                  className="w-48 h-12 md:w-82 md:h-20"
+                  width={1312}
+                  height={320}
                   style={{
+                    width: '328px',
+                    height: '80px',
                     flexShrink: 0
                   }}
                 />
               </div>
-              <nav className="hidden md:flex items-center space-x-10">
-                <a href="#about" className="text-white hover:text-blue-200 transition-colors text-lg">たまのみとは</a>
-                <a href="#features" className="text-white hover:text-blue-200 transition-colors text-lg">魅力</a>
-                <a href="#howto" className="text-white hover:text-blue-200 transition-colors text-lg">使い方</a>
-                <a href="#pricing" className="text-white hover:text-blue-200 transition-colors text-lg">利用料金</a>
-                <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-lg">使えるお店</a>
-              </nav>
-              <button 
-                className="text-white font-bold hover:opacity-90 transition-opacity text-sm md:text-base"
-                style={{
-                  display: 'flex',
-                  padding: '16px 24px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '10px',
-                  borderRadius: '9999px',
-                  background: 'var(--main, #6FC8E5)'
-                }}
-                onClick={() => router.push('/lp/merchant')}
-              >
-                <span className="hidden md:inline">お店の方はこちら</span>
-                <span className="md:hidden">お店の方</span>
-              </button>
+              <div style={{ flex: 1 }}></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '44px' }}>
+                <nav className="hidden md:flex items-center space-x-10">
+                  <a href="#about" className="text-white hover:text-blue-200 transition-colors text-lg">たまのみとは</a>
+                  <a href="#features" className="text-white hover:text-blue-200 transition-colors text-lg">魅力</a>
+                  <a href="#howto" className="text-white hover:text-blue-200 transition-colors text-lg">使い方</a>
+                  <a href="#pricing" className="text-white hover:text-blue-200 transition-colors text-lg">利用料金</a>
+                  <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-lg">使えるお店</a>
+                </nav>
+                <button 
+                  className="text-white font-bold hover:opacity-90 transition-opacity text-sm md:text-base"
+                  style={{
+                    display: 'flex',
+                    padding: '16px 24px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    borderRadius: '9999px',
+                    background: 'var(--main, #6FC8E5)'
+                  }}
+                  onClick={() => router.push('/lp/merchant')}
+                >
+                  <span className="hidden md:inline">お店の方はこちら</span>
+                  <span className="md:hidden">お店の方</span>
+                </button>
+              </div>
             </div>
           </div>
         </header>
@@ -181,54 +185,67 @@ export default function LPPage() {
             {/* CTA Button */}
             <div className="flex justify-center">
               <button
-                className="w-80 md:w-80 px-4 py-3 md:px-6 md:py-4"
                 style={{
+                  position: 'relative',
                   display: 'flex',
+                  width: '320px',
+                  padding: '16px 24px',
                   justifyContent: 'center',
                   alignItems: 'center',
                   gap: '8px',
                   borderRadius: '9999px',
-                  backgroundColor: '#FF6F61',
                   border: 'none',
-                  cursor: 'pointer',
-                  flexDirection: 'row',
-                  position: 'relative'
+                  background: '#FF6F61',
+                  cursor: 'pointer'
                 }}
                 onClick={() => router.push('/email-registration')}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                   <span 
-                    className="text-sm md:text-lg"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      fontSize: '16px'
                     }}
                   >
                     今すぐ始める
                   </span>
                   <span 
-                    className="text-lg md:text-2xl"
                     style={{
                       color: '#FFF',
                       fontFamily: '"Zen Kaku Gothic New"',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      fontSize: '24px'
                     }}
                   >
                     一杯無料
                   </span>
                 </div>
-                <Image
-                  src="/lp/images/arrow-right.svg"
-                  alt="Arrow right"
-                  width={40}
-                  height={40}
-                  className="w-6 h-6 md:w-10 md:h-10 absolute right-2 top-4 md:right-2 md:top-6"
-                />
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="9" 
+                  height="16" 
+                  viewBox="0 0 9 16" 
+                  fill="none"
+                  style={{
+                    position: 'absolute',
+                    right: '24px',
+                    flexShrink: 0
+                  }}
+                >
+                  <path 
+                    d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
+                    stroke="#FFF" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
             </div>
           </div>
@@ -236,17 +253,73 @@ export default function LPPage() {
 
         {/* Decorative drink icons at bottom */}
         <div className="absolute bottom-2 md:bottom-4 left-0 w-full overflow-hidden">
-          <Image
-            src="/lp/images/drink-icons.png"
-            alt="ドリンクアイコン"
-            width={1400}
-            height={200}
-            className="w-full h-16 md:h-auto"
+          <div 
             style={{
-              objectFit: 'cover',
-              objectPosition: 'center'
+              display: 'flex',
+              width: '1440px',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              gap: '64px',
+              margin: '0 auto'
             }}
-          />
+          >
+            <Image
+              src="/lp/images/fv-glass-01.svg"
+              alt="ドリンク1"
+              width={168.008}
+              height={140}
+              style={{ width: '168.008px', height: '140px', flexShrink: 0 }}
+            />
+            <Image
+              src="/lp/images/fv-glass-02.svg"
+              alt="ドリンク2"
+              width={158}
+              height={181}
+              style={{ width: '158px', height: '181px', flexShrink: 0 }}
+            />
+            <Image
+              src="/lp/images/fv-glass-03.svg"
+              alt="ドリンク3"
+              width={154}
+              height={179}
+              style={{ width: '154px', height: '179px', flexShrink: 0 }}
+            />
+            <Image
+              src="/lp/images/fv-glass-04.svg"
+              alt="ドリンク4"
+              width={185}
+              height={164}
+              style={{ width: '185px', height: '164px', flexShrink: 0 }}
+            />
+            <Image
+              src="/lp/images/fv-glass-05.svg"
+              alt="ドリンク5"
+              width={121}
+              height={146}
+              style={{ width: '121px', height: '146px', flexShrink: 0 }}
+            />
+            <Image
+              src="/lp/images/fv-glass-06.svg"
+              alt="ドリンク6"
+              width={118}
+              height={181}
+              style={{ width: '118px', height: '181px', flexShrink: 0 }}
+            />
+            <Image
+              src="/lp/images/fv-glass-07.svg"
+              alt="ドリンク7"
+              width={113}
+              height={203}
+              style={{ width: '113px', height: '203px', flexShrink: 0 }}
+            />
+            <Image
+              src="/lp/images/fv-glass-08.svg"
+              alt="ドリンク8"
+              width={124}
+              height={165}
+              style={{ width: '124px', height: '165px', flexShrink: 0 }}
+            />
+          </div>
         </div>
       </div>
 
@@ -256,7 +329,7 @@ export default function LPPage() {
           className="w-full"
           style={{
             display: 'flex',
-            padding: '40px 16px',
+            padding: '40px 120px',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
@@ -265,33 +338,23 @@ export default function LPPage() {
           }}
         >
           {/* Carousel Container */}
-          <div className="relative flex items-center justify-center w-full overflow-x-visible" style={{ flexDirection: 'row' }}>
-            {/* Left Arrow */}
-            <button 
-              className="absolute left-2 md:left-4 z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-2 shadow-lg"
-              onClick={() => handleScroll('left')}
-            >
-              <Image
-                src="/lp/images/carousel-left.png"
-                alt="前へ"
-                width={40}
-                height={40}
-                className="w-8 h-8 md:w-10 md:h-10"
-              />
-            </button>
-
-            {/* Banner Images */}
-            <div className="relative w-full" style={{ maxWidth: '1600px', margin: '0 auto' }}>
+          <div className="relative w-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* Banner Images Container */}
+            <div className="relative overflow-hidden" style={{ width: '1173px', height: '210px' }}>
               <div className="flex" style={{ gap: '24px' }}>
                 {extendedImages.map((src, i) => (
                   <div
                     key={i}
-                    className="relative flex-shrink-0 overflow-hidden rounded-lg w-80 h-44 md:w-96 md:h-52"
+                    className="relative flex-shrink-0 overflow-hidden"
                     style={{
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      transform: `translateX(-${currentSlide * (320 + 24)}px)`,
+                      width: '375px',
+                      height: '210px',
+                      borderRadius: '20px',
+                      background: '#D9D9D9',
+                      transform: `translateX(-${currentSlide * (375 + 24)}px)`,
                       transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
                     }}
                   >
@@ -307,9 +370,25 @@ export default function LPPage() {
               </div>
             </div>
 
+            {/* Left Arrow */}
+            <button 
+              className="absolute z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-2 shadow-lg"
+              style={{ left: '0' }}
+              onClick={() => handleScroll('left')}
+            >
+              <Image
+                src="/lp/images/carousel-left.png"
+                alt="前へ"
+                width={40}
+                height={40}
+                className="w-8 h-8 md:w-10 md:h-10"
+              />
+            </button>
+
             {/* Right Arrow */}
             <button 
-              className="absolute right-2 md:right-4 z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-2 shadow-lg"
+              className="absolute z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-2 shadow-lg"
+              style={{ right: '0' }}
               onClick={() => handleScroll('right')}
             >
               <Image
@@ -353,44 +432,121 @@ export default function LPPage() {
         
         {/* Content */}
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-center min-h-screen px-4 md:px-8 py-16">
-          {/* Central Image */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 z-20 w-64 md:w-96">
-            <Image
-              src="/lp/images/about-section-image.png"
-              alt="About Section"
-              width={400}
-              height={600}
-              className="max-w-full h-auto"
-            />
-          </div>
-          
           {/* Left Content */}
           <div className="w-full md:w-1/2 flex justify-center items-center pr-0 md:pr-8 mb-8 md:mb-0">
-            <Image
-              src="/lp/images/about-left-text.png"
-              alt="たまのみ片手に街を歩こう"
-              width={300}
-              height={200}
-              className="max-w-full h-auto w-64 md:w-80"
-            />
+            <p
+              style={{
+                color: '#000',
+                fontFamily: '"Zen Kaku Gothic New"',
+                fontSize: '46px',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                lineHeight: '160%',
+                textAlign: 'center'
+              }}
+            >
+              たまのみ片手に
+              <br />
+              街を歩こう
+            </p>
           </div>
-          
+
+          {/* Central Image - Phone, Text Logo, and Character */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 z-20">
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {/* Text Logo - top center */}
+              <div style={{ 
+                display: 'flex',
+                width: '326.16px',
+                height: '113.16px',
+                paddingRight: '0.01px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexShrink: 0,
+                marginBottom: '20px'
+              }}>
+                <Image
+                  src="/lp/images/about-text-logo.png"
+                  alt="たまのみテキストロゴ"
+                  width={1305}
+                  height={453}
+                  style={{ width: '326.16px', height: '113.16px', objectFit: 'contain' }}
+                />
+              </div>
+              {/* Phone and Character container */}
+              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Phone Image */}
+                <div style={{ position: 'relative', zIndex: 15 }}>
+                  <Image
+                    src="/lp/images/about-phone.png"
+                    alt="スマホ画面"
+                    width={860}
+                    height={1740}
+                    style={{
+                      width: '215px',
+                      height: '435px',
+                      aspectRatio: '43/87',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+              {/* Character - overlapping bottom of phone */}
+              <div style={{ marginTop: '-40px', zIndex: 25, position: 'relative' }}>
+                <Image
+                  src="/lp/images/about-character.png"
+                  alt="たまのみキャラクター"
+                  width={1520}
+                  height={602}
+                  style={{ 
+                    width: '380px', 
+                    height: '150.5px',
+                    aspectRatio: '380.00/150.50',
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
+              </div>
+            </div>
+          </div>
+
           {/* Right Content */}
           <div className="w-full md:w-1/2 flex flex-col justify-center items-center pl-0 md:pl-8">
-            <div className="w-full max-w-sm md:w-[350px] flex flex-col justify-center items-center">
+            <div className="w-full max-w-sm md:w-[365px] flex flex-col justify-center items-center">
               {/* Heading */}
-              <div className="mb-6">
-                <Image
-                  src="/lp/images/about-right-heading.png"
-                  alt="About: たまのみとは?"
-                  width={200}
-                  height={60}
-                  className="max-w-full h-auto"
-                />
+              <div className="mb-6" style={{ position: 'relative', display: 'inline-block' }}>
+                <h2
+                  style={{
+                    color: 'var(--accent-yellow, #FFD93B)',
+                    fontFamily: 'var(--font-plaster)',
+                    fontSize: '64px',
+                    fontStyle: 'normal',
+                    fontWeight: '400',
+                    lineHeight: '100%'
+                  }}
+                >
+                  About
+                </h2>
+                <p
+                  style={{
+                    position: 'absolute',
+                    top: '85%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: '#000',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontSize: '20px',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '100%',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  たまのみとは？
+                </p>
               </div>
               
               {/* Body Text */}
-              <div className="text-white text-sm leading-relaxed text-center">
+              <div className="text-white text-sm leading-relaxed text-center" style={{ width: '365px' }}>
                 <p className="mb-4">
                   「たまのみ」は、毎日1軒につきドリンクが1杯無料になる新しい&ldquo;Welcomeドリンク&rdquo;サービスです。
                 </p>
@@ -411,27 +567,108 @@ export default function LPPage() {
         <div className="max-w-6xl mx-auto px-8">
           {/* Features Title */}
           <div className="flex justify-center mb-16">
-            <Image
-              src="/lp/images/features-title.png"
-              alt="Features"
-              width={300}
-              height={80}
-              className="max-w-full h-auto"
-            />
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <h2 
+                style={{
+                  color: '#EFECE8',
+                  fontFamily: 'var(--font-plaster)',
+                  fontSize: '64px',
+                  fontStyle: 'normal',
+                  fontWeight: '400',
+                  lineHeight: '100%'
+                }}
+              >
+                Features
+              </h2>
+              <p 
+                style={{
+                  position: 'absolute',
+                  top: '85%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  color: '#000',
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '20px',
+                  fontStyle: 'normal',
+                  fontWeight: '700',
+                  lineHeight: '100%',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                たまのみの魅力
+              </p>
+            </div>
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-20 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 mx-auto" style={{ rowGap: '80px', columnGap: '80px' }}>
             {/* Feature 01 */}
-            <div className="flex flex-col items-center text-center gap-6">
-              <div className="flex-shrink-0">
+            <div className="flex flex-col items-center text-center gap-6" style={{ width: '379px', justifySelf: 'end' }}>
+              <div style={{ position: 'relative', width: '379px', height: '379px' }}>
+                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
+                  <p 
+                    style={{
+                      color: 'var(--main, #6FC8E5)',
+                      textAlign: 'justify',
+                      fontFamily: 'var(--font-limelight)',
+                      fontSize: '15px',
+                      fontStyle: 'normal',
+                      fontWeight: '400',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    feature
+                  </p>
+                  <h3 
+                    style={{
+                      color: 'var(--main, #6FC8E5)',
+                      textAlign: 'justify',
+                      fontFamily: 'var(--font-limelight)',
+                      fontSize: '66px',
+                      fontStyle: 'normal',
+                      fontWeight: '400',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    01
+                  </h3>
+                </div>
                 <Image
-                  src="/lp/images/feature-01-beer.png"
+                  src="/lp/images/feature-01-beer-circle.png"
                   alt="1店舗につき1杯無料!"
-                  width={300}
-                  height={300}
-                  className="max-w-full h-auto w-64 md:w-80"
+                  width={379}
+                  height={379}
+                  style={{
+                    width: '379px',
+                    height: '379px',
+                    objectFit: 'cover',
+                    borderRadius: '50%'
+                  }}
                 />
+                <div 
+                  style={{
+                    display: 'flex',
+                    padding: '3px 16px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: 'absolute',
+                    bottom: '40px',
+                    background: 'var(--main, #6FC8E5)'
+                  }}
+                >
+                  <span 
+                    style={{
+                      color: '#FFF',
+                      fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '20px',
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    1店舗につき1杯無料！
+                  </span>
+                </div>
               </div>
               <div className="text-gray-700 text-sm leading-relaxed max-w-md">
                 <p className="mb-2">お酒でもソフトドリンクでもOK。</p>
@@ -444,15 +681,72 @@ export default function LPPage() {
             </div>
 
             {/* Feature 02 */}
-            <div className="flex flex-col items-center text-center gap-6">
-              <div className="flex-shrink-0">
+            <div className="flex flex-col items-center text-center gap-6" style={{ width: '379px', justifySelf: 'start' }}>
+              <div style={{ position: 'relative', width: '379px', height: '379px' }}>
+                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
+                  <p 
+                    style={{
+                      color: 'var(--main, #6FC8E5)',
+                      textAlign: 'justify',
+                      fontFamily: 'var(--font-limelight)',
+                      fontSize: '15px',
+                      fontStyle: 'normal',
+                      fontWeight: '400',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    feature
+                  </p>
+                  <h3 
+                    style={{
+                      color: 'var(--main, #6FC8E5)',
+                      textAlign: 'justify',
+                      fontFamily: 'var(--font-limelight)',
+                      fontSize: '66px',
+                      fontStyle: 'normal',
+                      fontWeight: '400',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    02
+                  </h3>
+                </div>
                 <Image
-                  src="/lp/images/feature-02-street.png"
+                  src="/lp/images/feature-02-street-circle.png"
                   alt="1日で複数店舗をはしごできる!"
-                  width={300}
-                  height={300}
-                  className="max-w-full h-auto w-64 md:w-80"
+                  width={379}
+                  height={379}
+                  style={{
+                    width: '379px',
+                    height: '379px',
+                    objectFit: 'cover',
+                    borderRadius: '50%'
+                  }}
                 />
+                <div 
+                  style={{
+                    display: 'flex',
+                    padding: '3px 16px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: 'absolute',
+                    bottom: '40px',
+                    background: 'var(--main, #6FC8E5)'
+                  }}
+                >
+                  <span 
+                    style={{
+                      color: '#FFF',
+                      fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '20px',
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    1日で複数店舗をはしごできる！
+                  </span>
+                </div>
               </div>
               <div className="text-gray-700 text-sm leading-relaxed max-w-md">
                 <p className="mb-2">1店舗につき1杯無料だから、</p>
@@ -465,15 +759,72 @@ export default function LPPage() {
             </div>
 
             {/* Feature 03 */}
-            <div className="flex flex-col items-center text-center gap-6">
-              <div className="flex-shrink-0">
+            <div className="flex flex-col items-center text-center gap-6" style={{ width: '379px', justifySelf: 'end' }}>
+              <div style={{ position: 'relative', width: '379px', height: '379px' }}>
+                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
+                  <p
+                    style={{
+                      color: 'var(--main, #6FC8E5)',
+                      textAlign: 'justify',
+                      fontFamily: 'var(--font-limelight)',
+                      fontSize: '15px',
+                      fontStyle: 'normal',
+                      fontWeight: '400',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    feature
+                  </p>
+                  <h3
+                    style={{
+                      color: 'var(--main, #6FC8E5)',
+                      textAlign: 'justify',
+                      fontFamily: 'var(--font-limelight)',
+                      fontSize: '66px',
+                      fontStyle: 'normal',
+                      fontWeight: '400',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    03
+                  </h3>
+                </div>
                 <Image
-                  src="/lp/images/feature-03-drink.png"
+                  src="/lp/images/feature-03-drink-circle.png"
                   alt="お酒が苦手でも楽しめる!"
-                  width={300}
-                  height={300}
-                  className="max-w-full h-auto w-64 md:w-80"
+                  width={379}
+                  height={379}
+                  style={{
+                    width: '379px',
+                    height: '379px',
+                    objectFit: 'cover',
+                    borderRadius: '50%'
+                  }}
                 />
+                <div 
+                  style={{
+                    display: 'flex',
+                    padding: '3px 16px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: 'absolute',
+                    bottom: '40px',
+                    background: 'var(--main, #6FC8E5)'
+                  }}
+                >
+                  <span 
+                    style={{
+                      color: '#FFF',
+                      fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '20px',
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    お酒が苦手でも楽しめる！
+                  </span>
+                </div>
               </div>
               <div className="text-gray-700 text-sm leading-relaxed max-w-md">
                 <p className="mb-2">「たまのみ」は&ldquo;飲める人だけ&rdquo;の</p>
@@ -486,15 +837,72 @@ export default function LPPage() {
             </div>
 
             {/* Feature 04 */}
-            <div className="flex flex-col items-center text-center gap-6">
-              <div className="flex-shrink-0">
+            <div className="flex flex-col items-center text-center gap-6" style={{ width: '379px', justifySelf: 'start' }}>
+              <div style={{ position: 'relative', width: '379px', height: '379px' }}>
+                <div style={{ position: 'absolute', top: '0', left: '0', zIndex: 10 }}>
+                  <p
+                    style={{
+                      color: 'var(--main, #6FC8E5)',
+                      textAlign: 'justify',
+                      fontFamily: 'var(--font-limelight)',
+                      fontSize: '15px',
+                      fontStyle: 'normal',
+                      fontWeight: '400',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    feature
+                  </p>
+                  <h3
+                    style={{
+                      color: 'var(--main, #6FC8E5)',
+                      textAlign: 'justify',
+                      fontFamily: 'var(--font-limelight)',
+                      fontSize: '66px',
+                      fontStyle: 'normal',
+                      fontWeight: '400',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    04
+                  </h3>
+                </div>
                 <Image
-                  src="/lp/images/feature-04-server.png"
+                  src="/lp/images/feature-04-server-circle.png"
                   alt="新しいお店との出会い!"
-                  width={300}
-                  height={300}
-                  className="max-w-full h-auto w-64 md:w-80"
+                  width={379}
+                  height={379}
+                  style={{
+                    width: '379px',
+                    height: '379px',
+                    objectFit: 'cover',
+                    borderRadius: '50%'
+                  }}
                 />
+                <div 
+                  style={{
+                    display: 'flex',
+                    padding: '3px 16px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: 'absolute',
+                    bottom: '40px',
+                    background: 'var(--main, #6FC8E5)'
+                  }}
+                >
+                  <span 
+                    style={{
+                      color: '#FFF',
+                      fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '20px',
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    新しいお店との出会い！
+                  </span>
+                </div>
               </div>
               <div className="text-gray-700 text-sm leading-relaxed max-w-md">
                 <p className="mb-2">普段は行かないお店でも、</p>
@@ -518,13 +926,37 @@ export default function LPPage() {
         <div className="max-w-6xl mx-auto px-8">
           {/* How to Use Title */}
           <div className="flex justify-center mb-8">
-            <Image
-              src="/lp/images/how-to-use-title.png"
-              alt="How to Use"
-              width={400}
-              height={120}
-              className="max-w-full h-auto"
-            />
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <h2
+                style={{
+                  color: '#FFF',
+                  fontFamily: 'var(--font-plaster)',
+                  fontSize: '64px',
+                  fontStyle: 'normal',
+                  fontWeight: '400',
+                  lineHeight: '100%'
+                }}
+              >
+                How to Use
+              </h2>
+              <p
+                style={{
+                  position: 'absolute',
+                  top: '85%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  color: '#000',
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '20px',
+                  fontStyle: 'normal',
+                  fontWeight: '700',
+                  lineHeight: '100%',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                たまのみの使い方
+              </p>
+            </div>
           </div>
 
           {/* How to Use Subtitle */}
@@ -547,28 +979,35 @@ export default function LPPage() {
           <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 max-w-5xl mx-auto" style={{ marginTop: '24px', marginBottom: '24px' }}>
             {/* Step 01 */}
             <div 
-              className="bg-white rounded-lg shadow-lg mx-auto"
               style={{
                 display: 'flex',
-                padding: '24px 24px',
+                padding: '32px 24px',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '32px',
-                width: '320px',
-                height: '383px'
+                width: '368px',
+                height: '447px',
+                background: '#FFF',
+                borderRadius: '8px'
               }}
             >
               <div className="text-center">
-                <div className="flex justify-center mb-2">
-                  <Image
-                    src="/lp/images/step-01-number.png"
-                    alt="STEP.1"
-                    width={80}
-                    height={18}
-                    className="mx-auto"
-                  />
-                </div>
+                <p 
+                  style={{
+                    color: '#000',
+                    textAlign: 'center',
+                    fontFamily: 'var(--font-limelight)',
+                    fontSize: '18px',
+                    fontStyle: 'normal',
+                    fontWeight: '400',
+                    lineHeight: '100%',
+                    marginBottom: '16px',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  STEP.1
+                </p>
                 <h4 
                   className="font-bold text-gray-800"
                   style={{ fontSize: '20px' }}
@@ -578,7 +1017,7 @@ export default function LPPage() {
               </div>
               <div>
                 <Image
-                  src="/lp/images/step-01-image.png"
+                  src="/lp/images/how-to-use-step-01.png"
                   alt="Step 01"
                   width={320}
                   height={200}
@@ -590,9 +1029,10 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-base font-bold leading-relaxed"
                 style={{
+                  alignSelf: 'stretch',
                   color: '#000',
+                  textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
                   fontSize: '16px',
                   fontWeight: '700',
@@ -605,28 +1045,35 @@ export default function LPPage() {
 
             {/* Step 02 */}
             <div 
-              className="bg-white rounded-lg shadow-lg mx-auto"
               style={{
                 display: 'flex',
-                padding: '24px 24px',
+                padding: '32px 24px',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '32px',
-                width: '320px',
-                height: '383px'
+                width: '368px',
+                height: '447px',
+                background: '#FFF',
+                borderRadius: '8px'
               }}
             >
               <div className="text-center">
-                <div className="flex justify-center mb-2">
-                  <Image
-                    src="/lp/images/step-02-number.png"
-                    alt="STEP.2"
-                    width={80}
-                    height={18}
-                    className="mx-auto"
-                  />
-                </div>
+                <p 
+                  style={{
+                    color: '#000',
+                    textAlign: 'center',
+                    fontFamily: 'var(--font-limelight)',
+                    fontSize: '18px',
+                    fontStyle: 'normal',
+                    fontWeight: '400',
+                    lineHeight: '100%',
+                    marginBottom: '16px',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  STEP.2
+                </p>
                 <h4 
                   className="font-bold text-gray-800"
                   style={{ fontSize: '20px' }}
@@ -636,7 +1083,7 @@ export default function LPPage() {
               </div>
               <div>
                 <Image
-                  src="/lp/images/step-02-image.png"
+                  src="/lp/images/how-to-use-step-02.png"
                   alt="Step 02"
                   width={320}
                   height={200}
@@ -648,9 +1095,10 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-base font-bold leading-relaxed"
                 style={{
+                  alignSelf: 'stretch',
                   color: '#000',
+                  textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
                   fontSize: '16px',
                   fontWeight: '700',
@@ -663,28 +1111,35 @@ export default function LPPage() {
 
             {/* Step 03 */}
             <div 
-              className="bg-white rounded-lg shadow-lg mx-auto"
               style={{
                 display: 'flex',
-                padding: '24px 24px',
+                padding: '32px 24px',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '32px',
-                width: '320px',
-                height: '383px'
+                width: '368px',
+                height: '447px',
+                background: '#FFF',
+                borderRadius: '8px'
               }}
             >
               <div className="text-center">
-                <div className="flex justify-center mb-2">
-                  <Image
-                    src="/lp/images/step-03-number.png"
-                    alt="STEP.3"
-                    width={80}
-                    height={18}
-                    className="mx-auto"
-                  />
-                </div>
+                <p 
+                  style={{
+                    color: '#000',
+                    textAlign: 'center',
+                    fontFamily: 'var(--font-limelight)',
+                    fontSize: '18px',
+                    fontStyle: 'normal',
+                    fontWeight: '400',
+                    lineHeight: '100%',
+                    marginBottom: '16px',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  STEP.3
+                </p>
                 <h4 
                   className="font-bold text-gray-800"
                   style={{ fontSize: '20px' }}
@@ -694,7 +1149,7 @@ export default function LPPage() {
               </div>
               <div>
                 <Image
-                  src="/lp/images/step-03-image.png"
+                  src="/lp/images/how-to-use-step-03.png"
                   alt="Step 03"
                   width={320}
                   height={200}
@@ -706,9 +1161,10 @@ export default function LPPage() {
                 />
               </div>
               <p 
-                className="text-base font-bold leading-relaxed"
                 style={{
+                  alignSelf: 'stretch',
                   color: '#000',
+                  textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
                   fontSize: '16px',
                   fontWeight: '700',
@@ -736,25 +1192,276 @@ export default function LPPage() {
         
         <div className="relative z-10 max-w-6xl mx-auto px-8">
           {/* Pricing Title */}
-          <div className="flex justify-center mb-8">
-            <Image
-              src="/lp/images/pricing-title.png"
-              alt="Pricing"
-              width={200}
-              height={60}
-              className="max-w-full h-auto"
-            />
+          <div className="flex justify-center">
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <h2
+                style={{
+                  color: '#FFF',
+                  fontFamily: 'var(--font-plaster)',
+                  fontSize: '64px',
+                  fontStyle: 'normal',
+                  fontWeight: '400',
+                  lineHeight: '100%'
+                }}
+              >
+                Pricing
+              </h2>
+              <p
+                style={{
+                  position: 'absolute',
+                  top: '85%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  color: '#000',
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '20px',
+                  fontStyle: 'normal',
+                  fontWeight: '700',
+                  lineHeight: '100%',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                利用料金
+              </p>
+            </div>
           </div>
 
-          {/* Pricing Background Image */}
+          {/* Pricing Subtitle */}
+          <div className="flex justify-center" style={{ marginTop: '45px', marginBottom: '32px' }}>
+            <p
+              style={{
+                color: '#FFF',
+                textAlign: 'center',
+                fontFamily: '"Zen Kaku Gothic New"',
+                fontSize: '20px',
+                fontStyle: 'normal',
+                fontWeight: '700',
+                lineHeight: '160%'
+              }}
+            >
+              1日あたり約30円でちょい飲み体験
+            </p>
+          </div>
+
+          {/* Pricing Content */}
           <div className="flex justify-center mb-8">
-            <Image
-              src="/lp/images/pricing-background.png"
-              alt="Pricing Information"
-              width={900}
-              height={506}
-              className="max-w-full h-auto rounded-lg"
-            />
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {/* Top Section - White Background */}
+              <div
+                style={{
+                  display: 'flex',
+                  width: '580px',
+                  padding: '56px 0 64px 0',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '24px',
+                  background: '#FFF',
+                  borderRadius: '8px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                  <h3
+                    style={{
+                      color: '#000',
+                      textAlign: 'center',
+                      fontFamily: 'Rubik',
+                      fontSize: '49px',
+                      fontStyle: 'normal',
+                      fontWeight: '600',
+                      lineHeight: '100%',
+                      letterSpacing: '1px',
+                      WebkitTextStroke: '3px #000'
+                    }}
+                  >
+                    980
+                  </h3>
+                  <p
+                    style={{
+                      color: '#000',
+                      textAlign: 'center',
+                      fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '22px',
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    円/月額（税込）
+                  </p>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    padding: '12px 32px',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '16px',
+                    borderRadius: '9999px',
+                    background: 'var(--accent-yellow, #FFD93B)'
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#000',
+                      textAlign: 'center',
+                      fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '20px',
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '100%'
+                    }}
+                  >
+                    1日1件1杯無料
+                  </span>
+                </div>
+              </div>
+
+              {/* Images Section - Absolute Positioning */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '160px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  gap: '120px'
+                }}
+              >
+                <Image
+                  src="/lp/images/pricing-left.png"
+                  alt="Left illustration"
+                  width={597}
+                  height={481}
+                  style={{
+                    width: '298.5px',
+                    height: '240.5px',
+                    aspectRatio: '298.50/240.50',
+                    objectFit: 'cover'
+                  }}
+                />
+                <Image
+                  src="/lp/images/pricing-right.png"
+                  alt="Right illustration"
+                  width={614}
+                  height={476}
+                  style={{
+                    width: '307px',
+                    height: '238px',
+                    aspectRatio: '307/238',
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
+
+              {/* Bottom Section - Yellow Background */}
+              <div
+                style={{
+                  display: 'flex',
+                  width: '580px',
+                  height: '160px',
+                  paddingLeft: '24px',
+                  alignItems: 'center',
+                  gap: '16px',
+                  background: 'var(--accent-yellow, #FFD93B)',
+                  borderRadius: '8px',
+                  marginTop: '50px'
+                }}
+              >
+                <Image
+                  src="/lp/images/pricing-phone.png"
+                  alt="Phone illustration"
+                  width={152.5}
+                  height={179.5}
+                  style={{
+                    width: '152.5px',
+                    height: '179.5px',
+                    flexShrink: 0,
+                    aspectRatio: '152.50/179.50',
+                    objectFit: 'cover',
+                    position: 'relative',
+                    zIndex: 10
+                  }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                  <p
+                    style={{
+                      width: '308px',
+                      color: '#000',
+                      textAlign: 'center',
+                      fontFamily: '"Zen Kaku Gothic New"',
+                      fontSize: '19px',
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '160%'
+                    }}
+                  >
+                    さいたま市みんなのアプリ会員なら
+                  </p>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', justifyContent: 'center' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        width: '45px',
+                        height: '45px',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '10px',
+                        borderRadius: '50%',
+                        background: '#000',
+                        alignSelf: 'center'
+                      }}
+                    >
+                      <span
+                        style={{
+                          color: '#FFF',
+                          textAlign: 'center',
+                          fontFamily: '"Zen Kaku Gothic New"',
+                          fontSize: '16px',
+                          fontStyle: 'normal',
+                          fontWeight: '700',
+                          lineHeight: '100%'
+                        }}
+                      >
+                        月額
+                      </span>
+                    </div>
+                    <h4
+                      style={{
+                        color: '#000',
+                        textAlign: 'center',
+                        fontFamily: 'Rubik',
+                        fontSize: '100px',
+                        fontStyle: 'normal',
+                        fontWeight: '600',
+                        lineHeight: '100%',
+                        letterSpacing: '5px',
+                        WebkitTextStroke: '6px #000'
+                      }}
+                    >
+                      480
+                    </h4>
+                    <p
+                      style={{
+                        color: '#000',
+                        fontFamily: '"Zen Kaku Gothic New"',
+                        fontSize: '16px',
+                        fontStyle: 'normal',
+                        fontWeight: '700',
+                        lineHeight: '120%'
+                      }}
+                    >
+                      円で
+                      <br />
+                      利用可能！
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Disclaimers */}
@@ -794,13 +1501,37 @@ export default function LPPage() {
         <div className="max-w-6xl mx-auto px-8">
           {/* Stores Title */}
           <div className="flex justify-center mb-8">
-            <Image
-              src="/lp/images/stores.png"
-              alt="Stores"
-              width={200}
-              height={60}
-              className="max-w-full h-auto"
-            />
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <h2
+                style={{
+                  color: '#FFF',
+                  fontFamily: 'var(--font-plaster)',
+                  fontSize: '64px',
+                  fontStyle: 'normal',
+                  fontWeight: '400',
+                  lineHeight: '100%'
+                }}
+              >
+                Stores
+              </h2>
+              <p
+                style={{
+                  position: 'absolute',
+                  top: '85%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  color: '#000',
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontSize: '20px',
+                  fontStyle: 'normal',
+                  fontWeight: '700',
+                  lineHeight: '100%',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                使えるお店
+              </p>
+            </div>
           </div>
 
           {/* Stores Content */}
@@ -822,18 +1553,51 @@ export default function LPPage() {
             {/* Store List Button */}
             <div className="flex justify-center">
               <button
-                className="text-white font-bold rounded-full"
                 style={{
-                  display: 'flex',
-                  padding: '24px 24px 24px 40px',
+                  position: 'relative',
+                  display: 'inline-flex',
+                  padding: '24px 60px 24px 40px',
                   justifyContent: 'center',
                   alignItems: 'center',
                   gap: '10px',
-                  backgroundColor: '#FF6B6B'
+                  borderRadius: '9999px',
+                  border: 'none',
+                  background: '#FF6B6B',
+                  cursor: 'pointer'
                 }}
               >
-                <span>店舗一覧はこちら</span>
-                <span>&gt;</span>
+                <span 
+                  style={{
+                    color: '#FFF',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '100%',
+                    fontSize: '20px'
+                  }}
+                >
+                  店舗一覧はこちら
+                </span>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="9" 
+                  height="16" 
+                  viewBox="0 0 9 16" 
+                  fill="none"
+                  style={{
+                    position: 'absolute',
+                    right: '40px',
+                    flexShrink: 0
+                  }}
+                >
+                  <path 
+                    d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
+                    stroke="#FFF" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
             </div>
           </div>
@@ -844,13 +1608,37 @@ export default function LPPage() {
           <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
             {/* FAQ Title */}
             <div className="flex justify-center mb-8">
-              <Image
-                src="/lp/images/faq.png"
-                alt="FAQ"
-                width={120}
-                height={10}
-                className="mx-auto"
-              />
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <h2
+                  style={{
+                    color: 'var(--accent-yellow, #EFECE8)',
+                    fontFamily: 'var(--font-plaster)',
+                    fontSize: '64px',
+                    fontStyle: 'normal',
+                    fontWeight: '400',
+                    lineHeight: '100%'
+                  }}
+                >
+                  FAQ
+                </h2>
+                <p
+                  style={{
+                    position: 'absolute',
+                    top: '85%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: '#000',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontSize: '20px',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '100%',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  よくあるご質問
+                </p>
+              </div>
             </div>
 
             {/* FAQ Description */}
@@ -874,19 +1662,51 @@ export default function LPPage() {
             {/* FAQ Button */}
             <div className="flex justify-center">
               <button
-                className="text-white font-bold"
                 style={{
-                  display: 'flex',
-                  padding: '24px 24px 24px 40px',
+                  position: 'relative',
+                  display: 'inline-flex',
+                  padding: '24px 60px 24px 40px',
                   justifyContent: 'center',
                   alignItems: 'center',
                   gap: '10px',
                   borderRadius: '9999px',
-                  backgroundColor: '#6FC8E5'
+                  border: '3px solid #FFF',
+                  background: '#6FC8E5',
+                  cursor: 'pointer'
                 }}
               >
-                <span>よくあるご質問はこちら</span>
-                <span>&gt;</span>
+                <span 
+                  style={{
+                    color: '#FFF',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '100%',
+                    fontSize: '20px'
+                  }}
+                >
+                  よくあるご質問はこちら
+                </span>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="9" 
+                  height="16" 
+                  viewBox="0 0 9 16" 
+                  fill="none"
+                  style={{
+                    position: 'absolute',
+                    right: '40px',
+                    flexShrink: 0
+                  }}
+                >
+                  <path 
+                    d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
+                    stroke="#FFF" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
             </div>
           </div>
@@ -920,8 +1740,8 @@ export default function LPPage() {
             <button
               style={{
                 position: 'relative',
-                display: 'flex',
-                padding: '24px 24px 24px 40px',
+                display: 'inline-flex',
+                padding: '24px 60px 24px 40px',
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '10px',
@@ -946,11 +1766,11 @@ export default function LPPage() {
                 お店の方はこちら
               </span>
               <svg 
-                width="14" 
-                height="7" 
-                viewBox="0 0 14 7" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg" 
+                width="9" 
+                height="16" 
+                viewBox="0 0 9 16" 
+                fill="none"
                 style={{
                   position: 'absolute',
                   right: '40px',
@@ -958,7 +1778,7 @@ export default function LPPage() {
                 }}
               >
                 <path 
-                  d="M1 3.5H13M13 3.5L10 1M13 3.5L10 6" 
+                  d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
                   stroke="#000" 
                   strokeWidth="2" 
                   strokeLinecap="round" 

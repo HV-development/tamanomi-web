@@ -1,5 +1,18 @@
 import type { Metadata } from 'next'
+import { Limelight, Plaster } from 'next/font/google'
 import './globals.css'
+
+const limelight = Limelight({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-limelight',
+})
+
+const plaster = Plaster({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-plaster',
+})
 
 export const metadata: Metadata = {
   title: 'たまのみ - さいたま市のお得なサービス',
@@ -22,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>
+      <body className={`${limelight.variable} ${plaster.variable}`}>
         {children}
       </body>
     </html>
