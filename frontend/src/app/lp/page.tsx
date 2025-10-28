@@ -432,22 +432,28 @@ export default function LPPage() {
           {/* Carousel Container */}
           <div className="relative w-full max-w-6xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* Banner Images Container */}
-            <div className="relative overflow-hidden w-full" style={{ height: '210px', maxHeight: '40vw' }}>
-              <div className="flex" style={{ gap: '24px' }}>
+            <div className="relative overflow-hidden" style={{ width: '100%', maxWidth: '303px', height: '170px' }}>
+              <div 
+                className="flex absolute left-1/2"
+                style={{ 
+                  gap: '16px',
+                  transform: `translateX(calc(-50% - ${currentSlide * (303 + 16)}px))`,
+                  transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
+                }}
+              >
                 {extendedImages.map((src, i) => (
                   <div
                     key={i}
-                    className="relative flex-shrink-0 overflow-hidden w-full md:w-[375px]"
+                    className="relative flex-shrink-0 overflow-hidden"
                     style={{
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      height: '210px',
-                      maxHeight: '40vw',
+                      width: '303px',
+                      height: '170px',
+                      aspectRatio: '303/170',
                       borderRadius: '20px',
-                      background: '#D9D9D9',
-                      transform: `translateX(-${currentSlide * (375 + 24)}px)`,
-                      transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
+                      background: '#D9D9D9'
                     }}
                   >
                     {src ? (
@@ -468,29 +474,59 @@ export default function LPPage() {
 
             {/* Left Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-1 md:p-2 shadow-lg left-0 md:-left-4"
+              className="absolute z-10 hover:opacity-80 transition-opacity"
               onClick={() => handleScroll('left')}
+              style={{
+                display: 'flex',
+                width: '32px',
+                height: '32px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                aspectRatio: '1/1',
+                position: 'absolute',
+                left: '28px',
+                top: '69px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0
+              }}
             >
               <Image
-                src="/lp/images/carousel-left.png"
+                src="/lp/images/carousel-arrow-left.svg"
                 alt="前へ"
-                width={40}
-                height={40}
-                className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10"
+                width={7}
+                height={12}
               />
             </button>
 
             {/* Right Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity bg-white rounded-full p-1 md:p-2 shadow-lg right-0 md:-right-4"
+              className="absolute z-10 hover:opacity-80 transition-opacity"
               onClick={() => handleScroll('right')}
+              style={{
+                display: 'flex',
+                width: '32px',
+                height: '32px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                aspectRatio: '1/1',
+                position: 'absolute',
+                right: '28px',
+                top: '69px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0
+              }}
             >
               <Image
-                src="/lp/images/carousel-right.png"
+                src="/lp/images/carousel-arrow-right.svg"
                 alt="次へ"
-                width={40}
-                height={40}
-                className="w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10"
+                width={7}
+                height={12}
               />
             </button>
           </div>
