@@ -790,12 +790,13 @@ export default function LPPage() {
                   <p 
                     style={{
                       color: 'var(--main, #6FC8E5)',
-                      textAlign: 'justify',
-                      fontFamily: 'Limelight',
+                      textAlign: 'left',
+                      fontFamily: 'var(--font-limelight)',
                       fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     feature
@@ -803,12 +804,13 @@ export default function LPPage() {
                   <h3 
                     style={{
                       color: 'var(--main, #6FC8E5)',
-                      textAlign: 'justify',
-                      fontFamily: 'Limelight',
+                      textAlign: 'left',
+                      fontFamily: 'var(--font-limelight)',
                       fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     01
@@ -861,12 +863,13 @@ export default function LPPage() {
                   <p 
                     style={{
                       color: 'var(--main, #6FC8E5)',
-                      textAlign: 'justify',
-                      fontFamily: 'Limelight',
+                      textAlign: 'left',
+                      fontFamily: 'var(--font-limelight)',
                       fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     feature
@@ -874,12 +877,13 @@ export default function LPPage() {
                   <h3 
                     style={{
                       color: 'var(--main, #6FC8E5)',
-                      textAlign: 'justify',
-                      fontFamily: 'Limelight',
+                      textAlign: 'left',
+                      fontFamily: 'var(--font-limelight)',
                       fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     02
@@ -932,12 +936,13 @@ export default function LPPage() {
                   <p
                     style={{
                       color: 'var(--main, #6FC8E5)',
-                      textAlign: 'justify',
-                      fontFamily: 'Limelight',
+                      textAlign: 'left',
+                      fontFamily: 'var(--font-limelight)',
                       fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     feature
@@ -945,12 +950,13 @@ export default function LPPage() {
                   <h3
                     style={{
                       color: 'var(--main, #6FC8E5)',
-                      textAlign: 'justify',
-                      fontFamily: 'Limelight',
+                      textAlign: 'left',
+                      fontFamily: 'var(--font-limelight)',
                       fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     03
@@ -1003,12 +1009,13 @@ export default function LPPage() {
                   <p
                     style={{
                       color: 'var(--main, #6FC8E5)',
-                      textAlign: 'justify',
-                      fontFamily: 'Limelight',
+                      textAlign: 'left',
+                      fontFamily: 'var(--font-limelight)',
                       fontSize: '15px',
                       fontStyle: 'normal',
                       fontWeight: '400',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     feature
@@ -1016,12 +1023,13 @@ export default function LPPage() {
                   <h3
                     style={{
                       color: 'var(--main, #6FC8E5)',
-                      textAlign: 'justify',
-                      fontFamily: 'Limelight',
+                      textAlign: 'left',
+                      fontFamily: 'var(--font-limelight)',
                       fontSize: '66px',
                       fontStyle: 'normal',
                       fontWeight: '400',
-                      lineHeight: '100%'
+                      lineHeight: '100%',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     04
