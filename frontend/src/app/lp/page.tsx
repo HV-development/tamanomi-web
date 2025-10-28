@@ -408,18 +408,18 @@ export default function LPPage() {
 
           {/* Pagination Dots */}
           <div className="flex justify-center space-x-2 md:space-x-3">
-            {[1, 2, 3].map((index) => (
+            {images.map((_, index) => (
               <button 
                 key={index} 
                 className="p-1 hover:opacity-80 transition-opacity"
-                onClick={() => goToSlide(index - 1)}
+                onClick={() => goToSlide(index)}
               >
                 <div
                   style={{
                     width: '16px',
                     height: '16px',
                     borderRadius: '50%',
-                    backgroundColor: currentSlide === (index - 1) ? '#6FC8E5' : '#D9D9D9',
+                    backgroundColor: (currentSlide % images.length) === index ? '#6FC8E5' : '#D9D9D9',
                     transition: 'background-color 0.3s ease'
                   }}
                 />
