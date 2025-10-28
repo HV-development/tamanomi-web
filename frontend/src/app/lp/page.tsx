@@ -432,7 +432,7 @@ export default function LPPage() {
           {/* Carousel Container */}
           <div className="relative w-full max-w-6xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* Banner Images Container */}
-            <div className="relative overflow-hidden" style={{ width: '100%', maxWidth: '303px', height: '170px' }}>
+            <div className="relative overflow-hidden" style={{ width: '100%', maxWidth: '375px', height: '170px' }}>
               <div 
                 className="flex absolute left-1/2"
                 style={{ 
@@ -485,7 +485,7 @@ export default function LPPage() {
                 gap: '10px',
                 aspectRatio: '1/1',
                 position: 'absolute',
-                left: '8px',
+                left: '12px',
                 top: '69px',
                 borderRadius: '9999px',
                 background: 'var(--main, #6FC8E5)',
@@ -515,7 +515,7 @@ export default function LPPage() {
                 gap: '10px',
                 aspectRatio: '1/1',
                 position: 'absolute',
-                right: '8px',
+                right: '12px',
                 top: '69px',
                 borderRadius: '9999px',
                 background: 'var(--main, #6FC8E5)',
