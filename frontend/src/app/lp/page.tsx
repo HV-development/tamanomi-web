@@ -545,12 +545,47 @@ export default function LPPage() {
               <br />
               街を歩こう
             </p>
+            
+            {/* Phone and Character - モバイル・タブレットのみ */}
+            <div className="mt-8 lg:hidden">
+              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Phone Image */}
+                <div style={{ position: 'relative', zIndex: 15 }}>
+                  <Image
+                    src="/lp/images/about-phone.png"
+                    alt="スマホ画面"
+                    width={860}
+                    height={1740}
+                    className="w-32 h-auto md:w-40"
+                    style={{
+                      aspectRatio: '43/87',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+                {/* Character - overlapping bottom of phone */}
+                <div className="-mt-6 md:-mt-8" style={{ zIndex: 21, position: 'relative' }}>
+                  <Image
+                    src="/lp/images/about-character.png"
+                    alt="たまのみキャラクター"
+                    width={1520}
+                    height={602}
+                    className="w-56 h-auto md:w-72"
+                    style={{ 
+                      aspectRatio: '380.00/150.50',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Central Image - Phone, Text Logo, and Character */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:flex" style={{ zIndex: 20 }}>
+          {/* モバイル: Left Content内、PC: 中央に絶対配置 */}
+          <div className="hidden lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:flex" style={{ zIndex: 20 }}>
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {/* Text Logo - top center */}
+              {/* Text Logo - top center (PCのみ) */}
               <div className="mb-4 md:mb-5" style={{ 
                 display: 'flex',
                 justifyContent: 'center',
