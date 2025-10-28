@@ -346,14 +346,14 @@ export default function LPPage() {
         {/* Decorative drink icons at bottom */}
         <div className="absolute bottom-2 md:bottom-4 left-0 w-full overflow-hidden">
           <div 
-            className="flex justify-center items-end gap-4 sm:gap-8 md:gap-12 lg:gap-16 max-w-7xl mx-auto px-4"
+            className="flex justify-center items-end gap-3 sm:gap-4 md:gap-6 lg:gap-8"
           >
             <Image
               src="/lp/images/fv-glass-01.svg"
               alt="ドリンク1"
               width={168.008}
               height={140}
-              className="w-12 h-10 sm:w-16 sm:h-12 md:w-24 md:h-20 lg:w-[168px] lg:h-[140px]"
+              className="w-10 h-8 sm:w-14 sm:h-12 md:w-20 md:h-16 lg:w-[168px] lg:h-[140px]"
               style={{ flexShrink: 0 }}
             />
             <Image
@@ -361,7 +361,7 @@ export default function LPPage() {
               alt="ドリンク2"
               width={158}
               height={181}
-              className="w-12 h-14 sm:w-16 sm:h-18 md:w-20 md:h-24 lg:w-[158px] lg:h-[181px]"
+              className="w-10 h-12 sm:w-14 sm:h-16 md:w-18 md:h-20 lg:w-[158px] lg:h-[181px]"
               style={{ flexShrink: 0 }}
             />
             <Image
@@ -369,7 +369,7 @@ export default function LPPage() {
               alt="ドリンク3"
               width={154}
               height={179}
-              className="w-12 h-14 sm:w-16 sm:h-18 md:w-20 md:h-24 lg:w-[154px] lg:h-[179px]"
+              className="w-10 h-12 sm:w-14 sm:h-16 md:w-18 md:h-20 lg:w-[154px] lg:h-[179px]"
               style={{ flexShrink: 0 }}
             />
             <Image
@@ -377,7 +377,7 @@ export default function LPPage() {
               alt="ドリンク4"
               width={185}
               height={164}
-              className="w-14 h-12 sm:w-18 sm:h-16 md:w-24 md:h-20 lg:w-[185px] lg:h-[164px]"
+              className="w-12 h-10 sm:w-16 sm:h-14 md:w-20 md:h-18 lg:w-[185px] lg:h-[164px]"
               style={{ flexShrink: 0 }}
             />
             <Image
@@ -385,7 +385,7 @@ export default function LPPage() {
               alt="ドリンク5"
               width={121}
               height={146}
-              className="hidden sm:block w-12 h-14 md:w-16 md:h-18 lg:w-[121px] lg:h-[146px]"
+              className="w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-16 lg:w-[121px] lg:h-[146px]"
               style={{ flexShrink: 0 }}
             />
             <Image
@@ -393,7 +393,7 @@ export default function LPPage() {
               alt="ドリンク6"
               width={118}
               height={181}
-              className="hidden md:block w-16 h-20 lg:w-[118px] lg:h-[181px]"
+              className="w-10 h-14 sm:w-12 sm:h-16 md:w-14 md:h-18 lg:w-[118px] lg:h-[181px]"
               style={{ flexShrink: 0 }}
             />
             <Image
@@ -401,7 +401,7 @@ export default function LPPage() {
               alt="ドリンク7"
               width={113}
               height={203}
-              className="hidden lg:block w-[113px] h-[203px]"
+              className="w-9 h-16 sm:w-11 sm:h-18 md:w-12 md:h-20 lg:w-[113px] lg:h-[203px]"
               style={{ flexShrink: 0 }}
             />
             <Image
@@ -409,7 +409,7 @@ export default function LPPage() {
               alt="ドリンク8"
               width={124}
               height={165}
-              className="hidden lg:block w-[124px] h-[165px]"
+              className="w-10 h-13 sm:w-12 sm:h-16 md:w-14 md:h-18 lg:w-[124px] lg:h-[165px]"
               style={{ flexShrink: 0 }}
             />
           </div>
