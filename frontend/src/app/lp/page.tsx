@@ -14,7 +14,7 @@ const images = [
 export default function LPPage() {
   const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [currentSlide, setCurrentSlide] = useState(3) // 2回目のセットの先頭から開始
+  const [currentSlide, setCurrentSlide] = useState(images.length) // 2回目のセットの先頭から開始
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
 
@@ -33,34 +33,38 @@ export default function LPPage() {
     if (direction === 'right') {
       setCurrentSlide((prev) => {
         const newIndex = prev + 1
-        // 3回目のセットの最後に到達したら、1回目のセットの先頭に瞬間移動
-        if (newIndex >= images.length * 2) {
-          setTimeout(() => setCurrentSlide(0), 500) // 1回目のセットの先頭
-          return images.length * 2 // 3回目のセットの最後
-        }
         return newIndex
       })
     } else {
       setCurrentSlide((prev) => {
         const newIndex = prev - 1
-        // 1回目のセットの最初に到達したら、3回目のセットの最後に瞬間移動
-        if (newIndex < 0) {
-          setTimeout(() => setCurrentSlide(images.length * 2 - 1), 500) // 3回目のセットの最後
-          return -1 // 1回目のセットの最初
-        }
         return newIndex
       })
     }
     
-    // トランジション完了後にフラグをリセット
-    setTimeout(() => setIsTransitioning(false), 500)
+    // トランジション完了後にフラグをリセットし、必要なら瞬間移動
+    setTimeout(() => {
+      setIsTransitioning(false)
+      
+      setCurrentSlide((prev) => {
+        // 3回目のセットに入ったら、2回目のセットの同じ位置に瞬間移動
+        if (prev >= images.length * 2) {
+          return prev - images.length
+        }
+        // 1回目のセットに入ったら、2回目のセットの同じ位置に瞬間移動
+        if (prev < images.length) {
+          return prev + images.length
+        }
+        return prev
+      })
+    }, 500)
   }
 
   const goToSlide = (index: number) => {
     if (isTransitioning) return
     
     setIsTransitioning(true)
-    setCurrentSlide(index) // 2回目のセットの該当位置
+    setCurrentSlide(images.length + index) // 2回目のセットの該当位置
     
     // トランジション完了後にフラグをリセット
     setTimeout(() => setIsTransitioning(false), 500)
@@ -488,7 +492,7 @@ export default function LPPage() {
 
             {/* Left Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity left-[12px] top-[69px] md:left-[50px] md:top-[89px] w-8 h-8 md:w-12 md:h-12"
+              className="absolute z-10 hover:opacity-80 transition-opacity left-[12px] top-[69px] md:left-[70px] md:top-[89px] w-8 h-8 md:w-12 md:h-12"
               onClick={() => handleScroll('left')}
               style={{
                 display: 'flex',
@@ -513,7 +517,7 @@ export default function LPPage() {
 
             {/* Right Arrow */}
             <button 
-              className="absolute z-10 hover:opacity-80 transition-opacity right-[12px] top-[69px] md:right-[50px] md:top-[89px] w-8 h-8 md:w-12 md:h-12"
+              className="absolute z-10 hover:opacity-80 transition-opacity right-[12px] top-[69px] md:right-[70px] md:top-[89px] w-8 h-8 md:w-12 md:h-12"
               onClick={() => handleScroll('right')}
               style={{
                 display: 'flex',
