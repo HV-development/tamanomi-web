@@ -695,7 +695,7 @@ export default function LPPage() {
                   className="md:text-5xl lg:text-6xl"
                   style={{
                     color: 'var(--accent-yellow, #FFD93B)',
-                    fontFamily: 'Plaster',
+                    fontFamily: 'var(--font-plaster)',
                     fontSize: '48px',
                     fontStyle: 'normal',
                     fontWeight: '400',
