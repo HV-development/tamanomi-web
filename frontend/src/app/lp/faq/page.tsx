@@ -391,8 +391,8 @@ export default function FAQPage() {
             >
               お問い合わせフォームよりご連絡ください
             </p>
-            <a
-              href="#"
+            <Link
+              href="/lp/contact"
               className="inline-flex py-3 md:py-4 px-8 md:px-12 justify-center items-center gap-2 rounded-full border-none cursor-pointer hover:opacity-90 transition-opacity"
               style={{
                 background: '#6FC8E5',
@@ -404,7 +404,7 @@ export default function FAQPage() {
               }}
             >
               お問い合わせ
-            </a>
+            </Link>
           </div>
         </div>
       </main>
@@ -436,8 +436,8 @@ export default function FAQPage() {
               >
                 よくあるご質問
               </Link>
-              <a 
-                href="#"
+              <Link 
+                href="/lp/contact"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -445,7 +445,7 @@ export default function FAQPage() {
                 }}
               >
                 お問い合わせ
-              </a>
+              </Link>
               <a 
                 href="#"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"

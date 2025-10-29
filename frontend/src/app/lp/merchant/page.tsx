@@ -115,6 +115,13 @@ export default function MerchantLPPage() {
                   >
                     お申し込み方法
                   </a>
+                  <Link 
+                    href="/lp/contact?type=merchant" 
+                    className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    お問い合わせ
+                  </Link>
                 </nav>
               </div>
             )}
@@ -370,6 +377,7 @@ export default function MerchantLPPage() {
                   <a href="#overview" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">概要</a>
                   <a href="#benefits" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">飲食店様のメリット</a>
                   <a href="#how-to-apply" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">お申し込み方法</a>
+                  <Link href="/lp/contact?type=merchant" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">お問い合わせ</Link>
                 </nav>
                 
                 <Link 
@@ -453,6 +461,13 @@ export default function MerchantLPPage() {
                 >
                   お申し込み方法
                 </a>
+                <Link 
+                  href="/lp/contact?type=merchant" 
+                  className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  お問い合わせ
+                </Link>
               </nav>
             </div>
           )}
@@ -1481,8 +1496,8 @@ export default function MerchantLPPage() {
               >
                 よくあるご質問
               </a>
-              <a 
-                href="#" 
+              <Link 
+                href="/lp/contact?type=merchant" 
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -1490,7 +1505,7 @@ export default function MerchantLPPage() {
                 }}
               >
                 お問い合わせ
-              </a>
+              </Link>
               <a 
                 href="#" 
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
