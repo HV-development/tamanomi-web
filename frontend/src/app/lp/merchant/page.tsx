@@ -24,6 +24,14 @@ export default function MerchantLPPage() {
             priority
           />
           <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+          
+          {/* Green Background Overlay - Mobile Only (Bottom Half) */}
+          <div 
+            className="lg:hidden absolute inset-x-0 bottom-0 h-1/2"
+            style={{
+              background: 'var(--green1, #007D4F)'
+            }}
+          ></div>
         </div>
 
         {/* Header */}
