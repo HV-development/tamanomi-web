@@ -1189,7 +1189,7 @@ export default function MerchantLPPage() {
               className="text-sm md:text-base w-full"
               style={{
                 color: '#000',
-                textAlign: 'center',
+                textAlign: 'left',
                 fontFamily: '"Zen Kaku Gothic New"',
                 fontStyle: 'normal',
                 fontWeight: '700',
@@ -1245,7 +1245,7 @@ export default function MerchantLPPage() {
               className="text-sm md:text-base w-full"
               style={{
                 color: '#000',
-                textAlign: 'center',
+                textAlign: 'left',
                 fontFamily: '"Zen Kaku Gothic New"',
                 fontSize: '16px',
                 fontStyle: 'normal',
@@ -1302,7 +1302,7 @@ export default function MerchantLPPage() {
               className="text-sm md:text-base w-full"
               style={{
                 color: '#000',
-                textAlign: 'center',
+                textAlign: 'left',
                 fontFamily: '"Zen Kaku Gothic New"',
                 fontStyle: 'normal',
                 fontWeight: '700',
