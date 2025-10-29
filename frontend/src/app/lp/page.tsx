@@ -753,7 +753,7 @@ export default function LPPage() {
               
               {/* Body Text */}
               <div
-                className="text-white w-full max-w-md text-center md:text-justify"
+                className="text-white w-full text-center md:text-justify md:max-w-[365px]"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
                   fontSize: '16px',
@@ -761,8 +761,7 @@ export default function LPPage() {
                   fontWeight: '400',
                   lineHeight: '160%',
                   wordBreak: 'break-word',
-                  overflowWrap: 'break-word',
-                  maxWidth: '365px'
+                  overflowWrap: 'break-word'
                 }}
               >
                 <p className="mb-4" style={{ fontWeight: '500' }}>
