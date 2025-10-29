@@ -263,7 +263,7 @@ export default function LPPage() {
             {/* Main Title */}
             <div className="mb-8 md:mb-6 relative">
               <h1 
-                className="md:text-[80px]"
+                className="md:text-[80px] md:mt-14"
                 style={{
                   alignSelf: 'stretch',
                   color: '#FFF',
