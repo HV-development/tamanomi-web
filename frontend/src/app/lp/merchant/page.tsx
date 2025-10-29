@@ -290,9 +290,9 @@ export default function MerchantLPPage() {
 
           {/* CTAボタン */}
           <button
-            className="relative flex w-full max-w-sm px-6 py-4 justify-center items-center gap-2 rounded-full border-2 border-white cursor-pointer"
+            className="relative flex w-[320px] md:w-full md:max-w-sm px-6 py-4 justify-center items-center gap-2 rounded-full border-[3px] md:border-2 border-white cursor-pointer"
             style={{
-              background: '#007D4F'
+              background: 'var(--green1, #007D4F)'
             }}
           >
             <div className="flex flex-col items-center gap-1">
