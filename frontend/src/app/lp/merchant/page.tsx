@@ -24,7 +24,7 @@ export default function MerchantLPPage() {
           />
           
           {/* Header - スマホ用 */}
-          <header className="absolute top-0 left-0 right-0 z-10 w-full">
+          <header className="absolute top-0 left-0 right-0 z-[1000] w-full">
             <div className="w-full px-[39px] md:px-4 py-4">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center">
@@ -353,7 +353,7 @@ export default function MerchantLPPage() {
           </div>
 
           {/* Header - PC用 */}
-          <header className="absolute top-0 left-0 right-0 z-30 w-full">
+          <header className="absolute top-0 left-0 right-0 z-[1000] w-full">
           <div className="w-full px-[39px] py-4 md:px-8 md:py-6">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
