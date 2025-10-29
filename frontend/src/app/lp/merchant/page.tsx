@@ -692,7 +692,7 @@ export default function MerchantLPPage() {
             </div>
 
             {/* CTA Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-0 md:mt-16">
               <button
                 className="relative flex w-64 md:w-72 lg:w-80 px-4 py-3 md:px-6 md:py-4 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
                 style={{
