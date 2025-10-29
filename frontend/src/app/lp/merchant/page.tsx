@@ -12,31 +12,36 @@ export default function MerchantLPPage() {
     <div className="w-full">
       {/* First View - 飲食店向け */}
       <div className="w-full">
-        {/* 上半分: 背景画像とヘッダー（スマホのみ height 195px） */}
-        <div className="relative w-full h-[195px] md:min-h-[50vh]">
+        {/* 上半分: 背景画像とヘッダー */}
+        <div className="relative w-full">
           {/* Background Image */}
-          <div className="absolute inset-0">
+          <div className="relative w-full">
             {/* スマホ用画像 */}
-            <Image
-              src="/lp/images/merchant-fv-sp.png"
-              alt="飲食店向けファーストビュー"
-              fill
-              className="object-cover md:hidden"
-              priority
-            />
+            <div className="relative w-full md:hidden">
+              <Image
+                src="/lp/images/merchant-fv-sp.png"
+                alt="飲食店向けファーストビュー"
+                width={375}
+                height={812}
+                className="w-full h-auto"
+                priority
+              />
+            </div>
             {/* PC用画像 */}
-            <Image
-              src="/lp/images/merchant-fv.png"
-              alt="飲食店向けファーストビュー"
-              fill
-              className="object-cover hidden md:block"
-              priority
-            />
+            <div className="relative w-full hidden md:block" style={{ minHeight: '50vh' }}>
+              <Image
+                src="/lp/images/merchant-fv.png"
+                alt="飲食店向けファーストビュー"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
             <div className="absolute inset-0 bg-black bg-opacity-10"></div>
           </div>
 
           {/* Header */}
-          <header className="relative z-10 w-full">
+          <header className="absolute top-0 left-0 right-0 z-10 w-full">
           <div className="w-full px-4 py-4 md:px-8 md:py-6">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
@@ -139,12 +144,11 @@ export default function MerchantLPPage() {
         </header>
         </div>
 
-        {/* 下半分: Main Content（スマホのみ #7FBE26 背景） */}
+        {/* 下半分: Main Content */}
         <div 
-          className="w-full bg-[#7FBE26] md:bg-transparent md:relative md:z-10"
+          className="w-full bg-[#7FBE26] pt-14 pb-14 md:bg-transparent md:absolute md:top-0 md:left-0 md:right-0 md:pt-[30vh] md:pb-[10vh] md:z-10"
           style={{
             display: 'flex',
-            padding: '240px 0 56px 0',
             flexDirection: 'column',
             justifyContent: 'flex-end',
             alignItems: 'center',
