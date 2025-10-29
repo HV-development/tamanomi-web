@@ -143,7 +143,7 @@ export default function MerchantLPPage() {
         >
           {/* 白いボックス */}
           <div 
-            className="bg-white px-6 py-4 mb-8 -mt-32 md:mt-0 relative z-50"
+            className="bg-white px-6 py-4 mb-10 md:mb-8 -mt-[200px] md:mt-0 relative z-50"
             style={{
               display: 'inline-block'
             }}
@@ -292,7 +292,7 @@ export default function MerchantLPPage() {
           <button
             className="relative flex w-full max-w-sm px-6 py-4 justify-center items-center gap-2 rounded-full border-2 border-white cursor-pointer"
             style={{
-              background: '#7FBE26'
+              background: '#007D4F'
             }}
           >
             <div className="flex flex-col items-center gap-1">
