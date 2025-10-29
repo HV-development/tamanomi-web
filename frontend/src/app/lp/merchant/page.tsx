@@ -143,7 +143,7 @@ export default function MerchantLPPage() {
         >
           {/* 白いボックス */}
           <div 
-            className="bg-white px-6 py-4 mb-8 -mt-12 md:mt-0"
+            className="bg-white px-6 py-4 mb-8 -mt-32 md:mt-0"
             style={{
               display: 'inline-block'
             }}
