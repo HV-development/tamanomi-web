@@ -52,8 +52,8 @@ export default function LPPage() {
     setIsTransitioning(true)
     
     // スライドを増減（無限に）
-    const newSlide = direction === 'right' ? currentSlide + 1 : currentSlide - 1
-    setCurrentSlide(newSlide)
+    const delta = direction === 'right' ? -1 : 1
+    setCurrentSlide(prev => prev + delta)
     
     // トランジション完了後に境界チェックと瞬間移動
     setTimeout(() => {
