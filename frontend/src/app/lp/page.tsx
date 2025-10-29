@@ -263,7 +263,7 @@ export default function LPPage() {
             {/* Main Title */}
             <div className="mb-8 md:mb-6 relative">
               <h1 
-                className="md:text-[80px] md:mt-[120px]"
+                className="md:text-[80px] md:mt-[80px]"
                 style={{
                   alignSelf: 'stretch',
                   color: '#FFF',
@@ -282,7 +282,7 @@ export default function LPPage() {
                 alt="1軒"
                 width={91}
                 height={74}
-                className="absolute left-16 top-[-80px] md:left-16 md:top-[60px] lg:top-[0px] md:w-[155.29px] md:h-[127.06px]"
+                className="absolute left-16 top-[-80px] md:left-16 md:top-[40px] lg:top-[-70px] md:w-[155.29px] md:h-[127.06px]"
                 style={{
                   width: '91px',
                   height: '74px',

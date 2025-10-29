@@ -25,7 +25,7 @@ export default function MerchantLPPage() {
           
           {/* Header - スマホ用 */}
           <header className="absolute top-0 left-0 right-0 z-10 w-full">
-            <div className="w-full px-4 py-4">
+            <div className="w-full px-[39px] md:px-4 py-4">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center">
                   <Image
@@ -138,7 +138,7 @@ export default function MerchantLPPage() {
 
         {/* 下半分: 緑背景 + コンテンツ */}
         <div 
-          className="w-full min-h-[50vh] flex flex-col items-center justify-center px-4 py-8 mt-6"
+          className="w-full min-h-[50vh] flex flex-col items-center justify-center px-[39px] md:px-4 py-8 mt-6"
           style={{ background: '#7FBE26' }}
         >
           {/* 白いボックス */}
@@ -354,7 +354,7 @@ export default function MerchantLPPage() {
 
           {/* Header - PC用 */}
           <header className="absolute top-0 left-0 right-0 z-30 w-full">
-          <div className="w-full px-4 py-4 md:px-8 md:py-6">
+          <div className="w-full px-[39px] py-4 md:px-8 md:py-6">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
                 <Image
@@ -471,7 +471,7 @@ export default function MerchantLPPage() {
             alignSelf: 'stretch'
           }}
         >
-          <div className="text-center max-w-4xl px-4 md:px-0 -mt-[200px] md:mt-0 relative z-30">
+          <div className="text-center max-w-4xl px-[39px] md:px-0 -mt-[200px] md:mt-0 relative z-30">
             {/* Main Title */}
             <div className="mb-6 md:mb-10">
               <h1 
@@ -749,7 +749,7 @@ export default function MerchantLPPage() {
 
       {/* Overview Section */}
       <div id="overview" className="w-full bg-white py-12 md:py-16 lg:py-24">
-        <div className="px-4 md:px-8 lg:px-16 xl:px-52">
+        <div className="px-[39px] md:px-8 lg:px-16 xl:px-52">
           {/* Overview Content */}
           <div 
             className="flex flex-col lg:flex-row items-center gap-8 md:gap-12 lg:gap-20"
@@ -815,7 +815,7 @@ export default function MerchantLPPage() {
 
       {/* Benefits Section */}
       <div id="benefits" className="w-full py-12 md:py-16 lg:py-24" style={{ backgroundColor: '#F5F5F5' }}>
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <div className="max-w-6xl mx-auto px-[39px] md:px-[120px]">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 
               className="text-2xl md:text-3xl lg:text-4xl mb-6 md:mb-8 lg:mb-11"
@@ -849,20 +849,36 @@ export default function MerchantLPPage() {
           >
             {/* Merit 1 - 左上 */}
             <div 
-              className="flex items-start gap-4 md:gap-6"
+              className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6"
             >
-              <div className="flex-shrink-0">
-                <Image
-                  src="/lp/images/benefit-free-cost.png"
-                  alt="初期費用・掲載費無料"
-                  width={120}
-                  height={120}
-                  className="w-20 h-20 md:w-24 md:h-24 lg:w-[120px] lg:h-[120px]"
-                />
-              </div>
-              <div className="flex-1">
+              {/* スマホ: 画像とタイトルを横並び */}
+              <div className="flex flex-row gap-4 items-center md:items-start md:gap-0 md:flex-shrink-0">
+                <div className="flex-shrink-0">
+                  <Image
+                    src="/lp/images/benefit-free-cost.png"
+                    alt="初期費用・掲載費無料"
+                    width={120}
+                    height={120}
+                    className="w-[70px] h-[70px] md:w-20 md:h-20 lg:w-[120px] lg:h-[120px]"
+                  />
+                </div>
                 <h3 
-                  className="text-lg md:text-xl mb-2 md:mb-3"
+                  className="text-lg md:text-xl flex-1 md:hidden"
+                  style={{
+                    color: '#000',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '160%'
+                  }}
+                >
+                  初期費用・掲載費【無料】
+                </h3>
+              </div>
+              {/* PCレイアウト: タイトルと説明テキスト */}
+              <div className="flex-1 flex flex-col gap-2 md:gap-3">
+                <h3 
+                  className="hidden md:block text-lg md:text-xl"
                   style={{
                     color: '#000',
                     fontFamily: '"Zen Kaku Gothic New"',
@@ -874,10 +890,9 @@ export default function MerchantLPPage() {
                   初期費用・掲載費【無料】
                 </h3>
                 <p 
-                  className="text-sm md:text-base"
+                  className="text-sm md:text-base text-left md:text-justify"
                   style={{
                     color: '#000',
-                    textAlign: 'justify',
                     fontFamily: '"Zen Kaku Gothic New"',
                     fontStyle: 'normal',
                     fontWeight: '400',
@@ -891,20 +906,36 @@ export default function MerchantLPPage() {
 
             {/* Merit 2 - 右上 */}
             <div 
-              className="flex items-start gap-4 md:gap-6"
+              className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6"
             >
-              <div className="flex-shrink-0">
-                <Image
-                  src="/lp/images/benefit-drink.png"
-                  alt="無料ドリンクで集客"
-                  width={120}
-                  height={120}
-                  className="w-20 h-20 md:w-24 md:h-24 lg:w-[120px] lg:h-[120px]"
-                />
-              </div>
-              <div className="flex-1">
+              {/* スマホ: 画像とタイトルを横並び */}
+              <div className="flex flex-row gap-4 items-center md:items-start md:gap-0 md:flex-shrink-0">
+                <div className="flex-shrink-0">
+                  <Image
+                    src="/lp/images/benefit-drink.png"
+                    alt="無料ドリンクで集客"
+                    width={120}
+                    height={120}
+                    className="w-[70px] h-[70px] md:w-20 md:h-20 lg:w-[120px] lg:h-[120px]"
+                  />
+                </div>
                 <h3 
-                  className="text-lg md:text-xl mb-2 md:mb-3"
+                  className="text-lg md:text-xl flex-1 md:hidden"
+                  style={{
+                    color: '#000',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '160%'
+                  }}
+                >
+                  無料ドリンクで集客＆回遊を促進
+                </h3>
+              </div>
+              {/* PCレイアウト: タイトルと説明テキスト */}
+              <div className="flex-1 flex flex-col gap-2 md:gap-3">
+                <h3 
+                  className="hidden md:block text-lg md:text-xl"
                   style={{
                     color: '#000',
                     fontFamily: '"Zen Kaku Gothic New"',
@@ -916,10 +947,9 @@ export default function MerchantLPPage() {
                   無料ドリンクで集客＆回遊を促進
                 </h3>
                 <p 
-                  className="text-sm md:text-base"
+                  className="text-sm md:text-base text-left md:text-justify"
                   style={{
                     color: '#000',
-                    textAlign: 'justify',
                     fontFamily: '"Zen Kaku Gothic New"',
                     fontStyle: 'normal',
                     fontWeight: '400',
@@ -933,20 +963,36 @@ export default function MerchantLPPage() {
 
             {/* Merit 3 - 左下 */}
             <div 
-              className="flex items-start gap-4 md:gap-6"
+              className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6"
             >
-              <div className="flex-shrink-0">
-                <Image
-                  src="/lp/images/benefit-connection.png"
-                  alt="新しいお客様との接点づくり"
-                  width={120}
-                  height={120}
-                  className="w-20 h-20 md:w-24 md:h-24 lg:w-[120px] lg:h-[120px]"
-                />
-              </div>
-              <div className="flex-1">
+              {/* スマホ: 画像とタイトルを横並び */}
+              <div className="flex flex-row gap-4 items-center md:items-start md:gap-0 md:flex-shrink-0">
+                <div className="flex-shrink-0">
+                  <Image
+                    src="/lp/images/benefit-connection.png"
+                    alt="新しいお客様との接点づくり"
+                    width={120}
+                    height={120}
+                    className="w-[70px] h-[70px] md:w-20 md:h-20 lg:w-[120px] lg:h-[120px]"
+                  />
+                </div>
                 <h3 
-                  className="text-lg md:text-xl mb-2 md:mb-3"
+                  className="text-lg md:text-xl flex-1 md:hidden"
+                  style={{
+                    color: '#000',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '160%'
+                  }}
+                >
+                  新しいお客様との接点づくり
+                </h3>
+              </div>
+              {/* PCレイアウト: タイトルと説明テキスト */}
+              <div className="flex-1 flex flex-col gap-2 md:gap-3">
+                <h3 
+                  className="hidden md:block text-lg md:text-xl"
                   style={{
                     color: '#000',
                     fontFamily: '"Zen Kaku Gothic New"',
@@ -958,10 +1004,9 @@ export default function MerchantLPPage() {
                   新しいお客様との接点づくり
                 </h3>
                 <p 
-                  className="text-sm md:text-base"
+                  className="text-sm md:text-base text-left md:text-justify"
                   style={{
                     color: '#000',
-                    textAlign: 'justify',
                     fontFamily: '"Zen Kaku Gothic New"',
                     fontStyle: 'normal',
                     fontWeight: '400',
@@ -975,20 +1020,36 @@ export default function MerchantLPPage() {
 
             {/* Merit 4 - 右下 */}
             <div 
-              className="flex items-start gap-4 md:gap-6"
+              className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6"
             >
-              <div className="flex-shrink-0">
-                <Image
-                  src="/lp/images/benefit-support.png"
-                  alt="簡単導入＆安心サポート"
-                  width={120}
-                  height={120}
-                  className="w-20 h-20 md:w-24 md:h-24 lg:w-[120px] lg:h-[120px]"
-                />
-              </div>
-              <div className="flex-1">
+              {/* スマホ: 画像とタイトルを横並び */}
+              <div className="flex flex-row gap-4 items-center md:items-start md:gap-0 md:flex-shrink-0">
+                <div className="flex-shrink-0">
+                  <Image
+                    src="/lp/images/benefit-support.png"
+                    alt="簡単導入＆安心サポート"
+                    width={120}
+                    height={120}
+                    className="w-[70px] h-[70px] md:w-20 md:h-20 lg:w-[120px] lg:h-[120px]"
+                  />
+                </div>
                 <h3 
-                  className="text-lg md:text-xl mb-2 md:mb-3"
+                  className="text-lg md:text-xl flex-1 md:hidden"
+                  style={{
+                    color: '#000',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    lineHeight: '160%'
+                  }}
+                >
+                  簡単導入＆安心サポート
+                </h3>
+              </div>
+              {/* PCレイアウト: タイトルと説明テキスト */}
+              <div className="flex-1 flex flex-col gap-2 md:gap-3">
+                <h3 
+                  className="hidden md:block text-lg md:text-xl"
                   style={{
                     color: '#000',
                     fontFamily: '"Zen Kaku Gothic New"',
@@ -1000,10 +1061,9 @@ export default function MerchantLPPage() {
                   簡単導入＆安心サポート
                 </h3>
                 <p 
-                  className="text-sm md:text-base"
+                  className="text-sm md:text-base text-left md:text-justify"
                   style={{
                     color: '#000',
-                    textAlign: 'justify',
                     fontFamily: '"Zen Kaku Gothic New"',
                     fontStyle: 'normal',
                     fontWeight: '400',
@@ -1020,7 +1080,7 @@ export default function MerchantLPPage() {
 
       {/* Simple Process Section */}
       <div className="w-full bg-white py-12 md:py-16 lg:py-24">
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <div className="max-w-6xl mx-auto px-[39px] md:px-8">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 
               className="text-2xl md:text-3xl lg:text-4xl mb-6 md:mb-8 lg:mb-11"
@@ -1032,7 +1092,8 @@ export default function MerchantLPPage() {
                 lineHeight: '100%'
               }}
             >
-              お店の対応はシンプル！約3秒で完了
+              お店の対応はシンプル！<br className="md:hidden" />
+              約3秒で完了
             </h2>
             <p 
               className="text-base md:text-lg"
@@ -1067,7 +1128,7 @@ export default function MerchantLPPage() {
 
             {/* Arrow */}
             <div 
-              className="w-10 h-10 flex items-center justify-center bg-[#007D4F] rounded-full flex-shrink-0 rotate-90 md:rotate-0"
+              className="w-10 h-10 flex items-center justify-center bg-[#007D4F] rounded-full flex-shrink-0 md:-rotate-90"
             >
               <svg 
                 width="17" 
@@ -1106,7 +1167,7 @@ export default function MerchantLPPage() {
       {/* How to Apply Section */}
       <div 
         id="how-to-apply" 
-        className="flex flex-col justify-center items-center gap-6 md:gap-8 lg:gap-11 py-12 px-4 md:py-16 md:px-8 lg:py-20 lg:px-16 xl:px-30"
+        className="flex flex-col justify-center items-center gap-6 md:gap-8 lg:gap-11 py-12 px-[39px] md:py-16 md:px-8 lg:py-20 lg:px-16 xl:px-30"
         style={{
           background: '#7FBE26'
         }}
@@ -1146,7 +1207,7 @@ export default function MerchantLPPage() {
         >
           {/* Step 1 Card */}
           <div 
-            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 md:w-[368px] md:flex-none bg-white rounded-lg p-6 md:p-8"
+            className="flex flex-col justify-center items-center gap-6 md:gap-8 w-[312px] md:w-[368px] flex-shrink-0 bg-white rounded-lg p-6 md:p-8"
           >
             <div className="text-center">
               <p 
@@ -1202,7 +1263,7 @@ export default function MerchantLPPage() {
 
           {/* Step 2 Card */}
           <div 
-            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 md:w-[368px] md:flex-none bg-white rounded-lg p-6 md:p-8"
+            className="flex flex-col justify-center items-center gap-6 md:gap-8 w-[312px] md:w-[368px] flex-shrink-0 bg-white rounded-lg p-6 md:p-8"
           >
             <div className="text-center">
               <p 
@@ -1259,7 +1320,7 @@ export default function MerchantLPPage() {
 
           {/* Step 3 Card */}
           <div 
-            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 md:w-[368px] md:flex-none bg-white rounded-lg p-6 md:p-8"
+            className="flex flex-col justify-center items-center gap-6 md:gap-8 w-[312px] md:w-[368px] flex-shrink-0 bg-white rounded-lg p-6 md:p-8"
           >
             <div className="text-center">
               <p 
@@ -1317,7 +1378,7 @@ export default function MerchantLPPage() {
 
       {/* Final CTA Section */}
       <div 
-        className="flex flex-col justify-center items-center gap-6 md:gap-8 lg:gap-10 py-12 px-4 md:py-16 md:px-8 lg:px-16 xl:px-30"
+        className="flex flex-col justify-center items-center gap-6 md:gap-8 lg:gap-10 py-12 px-[39px] md:py-16 md:px-8 lg:px-16 xl:px-30"
         style={{
           background: '#FAEE00'
         }}
@@ -1390,7 +1451,7 @@ export default function MerchantLPPage() {
 
       {/* Footer Section */}
       <div className="w-full bg-white border-t">
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <div className="max-w-6xl mx-auto px-[39px] md:px-8">
           <div 
             className="flex flex-col justify-center items-center gap-8 md:gap-10 pt-8 md:pt-12"
           >
