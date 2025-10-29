@@ -1862,8 +1862,9 @@ export default function LPPage() {
 
             {/* FAQ Button */}
             <div className="flex justify-center">
-              <button
-                className="relative inline-flex py-4 md:py-6 px-8 md:px-12 lg:px-16 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
+              <Link
+                href="/lp/faq"
+                className="relative inline-flex py-4 md:py-6 px-8 md:px-12 lg:px-16 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer hover:opacity-90 transition-opacity"
                 style={{
                   background: '#6FC8E5'
                 }}
@@ -1896,7 +1897,7 @@ export default function LPPage() {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -1991,8 +1992,8 @@ export default function LPPage() {
 
             {/* Footer Links */}
             <div className="flex flex-wrap justify-center gap-4 md:gap-6 lg:gap-8 mb-4 md:mb-8">
-              <a 
-                href="#" 
+              <Link 
+                href="/lp/faq"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -2000,7 +2001,7 @@ export default function LPPage() {
                 }}
               >
                 よくあるご質問
-              </a>
+              </Link>
               <a 
                 href="#" 
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
