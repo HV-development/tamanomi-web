@@ -156,7 +156,7 @@ export default function MerchantLPPage() {
             alignSelf: 'stretch'
           }}
         >
-          <div className="text-center max-w-4xl px-4 md:px-0">
+          <div className="text-center max-w-4xl px-4 md:px-0 -mt-[200px] md:mt-0">
             {/* Main Title */}
             <div className="mb-6 md:mb-8">
               <h1 
@@ -377,7 +377,7 @@ export default function MerchantLPPage() {
             </div>
 
             {/* CTA Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-[200px] md:mt-0">
               <button
                 className="relative flex w-64 md:w-72 lg:w-80 px-4 py-3 md:px-6 md:py-4 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
                 style={{
