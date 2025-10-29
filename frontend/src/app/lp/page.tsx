@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -116,7 +117,7 @@ export default function LPPage() {
         }}
       >
         {/* Background Image */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <Image
             src="/lp/images/user-lp-fv.png"
             alt="ファーストビュー背景"
@@ -153,7 +154,8 @@ export default function LPPage() {
                   <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使えるお店</a>
                 </nav>
                 
-                <button 
+                <Link 
+                  href="/lp/merchant"
                   className="text-white font-bold hover:opacity-90 transition-opacity text-xs md:text-sm lg:text-base px-4 py-2 md:px-6 md:py-4"
                   style={{
                     display: 'flex',
@@ -163,11 +165,10 @@ export default function LPPage() {
                     borderRadius: '9999px',
                     background: 'var(--main, #6FC8E5)'
                   }}
-                  onClick={() => router.push('/lp/merchant')}
                 >
                   <span className="hidden md:inline">お店の方はこちら</span>
                   <span className="md:hidden">お店の方</span>
-                </button>
+                </Link>
 
                 {/* ハンバーガーメニューアイコン（モバイルのみ表示） */}
                 <button

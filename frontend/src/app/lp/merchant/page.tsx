@@ -1,51 +1,358 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function MerchantLPPage() {
-  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <div className="w-full">
       {/* First View - 飲食店向け */}
-      <div className="w-full">
+      
+      {/* スマホ専用FV (md未満) */}
+      <div className="md:hidden w-full min-h-screen flex flex-col">
+        {/* 上半分: 背景画像とヘッダー */}
+        <div className="relative w-full h-[50vh] flex-shrink-0">
+          <Image
+            src="/lp/images/merchant-fv-sp.png"
+            alt="飲食店向けファーストビュー"
+            fill
+            className="object-cover"
+            priority
+          />
+          
+          {/* Header - スマホ用 */}
+          <header className="absolute top-0 left-0 right-0 z-10 w-full">
+            <div className="w-full px-4 py-4">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center">
+                  <Image
+                    src="/lp/images/horizon-color-white.png"
+                    alt="たまのみ"
+                    width={1312}
+                    height={320}
+                    className="w-40 h-10 flex-shrink-0"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <Link 
+                    href="/lp"
+                    className="text-white font-bold hover:opacity-90 transition-opacity text-xs px-4 py-3 rounded-full"
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      background: 'var(--main, #6FC8E5)'
+                    }}
+                  >
+                    ユーザー
+                  </Link>
+
+                  {/* ハンバーガーメニューアイコン */}
+                  <button
+                    className="flex flex-col justify-center items-center cursor-pointer mr-4"
+                    style={{ gap: '6px' }}
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    aria-label="メニュー"
+                  >
+                    <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                    <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                    <div style={{ width: '24px', height: '2px', background: '#FFF' }}></div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* モバイルメニュー */}
+            {isMobileMenuOpen && (
+              <div 
+                className="fixed inset-0 w-full h-full"
+                style={{
+                  background: '#FFF',
+                  display: 'flex',
+                  paddingBottom: '184px',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  gap: '32px',
+                  flex: '1 0 0',
+                  alignSelf: 'stretch',
+                  zIndex: 9999
+                }}
+              >
+                {/* 閉じるボタン */}
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+                  aria-label="メニューを閉じる"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="#007D4F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                <nav className="flex flex-col items-center gap-8 py-8">
+                  <a 
+                    href="#overview" 
+                    className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    概要
+                  </a>
+                  <a 
+                    href="#benefits" 
+                    className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    飲食店様のメリット
+                  </a>
+                  <a 
+                    href="#how-to-apply" 
+                    className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    お申し込み方法
+                  </a>
+                </nav>
+              </div>
+            )}
+          </header>
+          
+          {/* 上半分のテキスト */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <h1 
+              className="text-white text-center text-2xl px-4"
+              style={{
+                fontFamily: '"Zen Kaku Gothic New"',
+                fontWeight: '700',
+                lineHeight: '120%'
+              }}
+            >
+              掲載料無料で<br />
+              お店の売上アップに
+            </h1>
+          </div>
+        </div>
+
+        {/* 下半分: 緑背景 + コンテンツ */}
+        <div 
+          className="w-full min-h-[50vh] flex flex-col items-center justify-center px-4 py-8"
+          style={{ background: 'var(--green1, #007D4F)' }}
+        >
+          {/* 白いボックス */}
+          <div 
+            className="bg-white px-6 py-4 mb-8"
+            style={{
+              display: 'inline-block'
+            }}
+          >
+            <h2 
+              className="text-4xl leading-tight"
+              style={{
+                color: 'var(--green1, #007D4F)',
+                fontFamily: '"Zen Kaku Gothic New"',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}
+            >
+              たまのみ掲載店<br />
+              募集中
+            </h2>
+          </div>
+
+          {/* 料金情報 */}
+          <div className="flex flex-row items-stretch gap-0 mb-8 w-full max-w-sm">
+            {/* 初期費用 */}
+            <div className="flex-1 flex flex-col items-center gap-2 px-2">
+              <div 
+                className="px-3 py-1 rounded-full"
+                style={{ background: '#FAEE00' }}
+              >
+                <span 
+                  className="text-sm"
+                  style={{
+                    color: 'var(--green1, #007D4F)',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontWeight: '700'
+                  }}
+                >
+                  初期費用
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span 
+                  className="text-5xl text-white"
+                  style={{
+                    fontFamily: 'Commissioner',
+                    fontWeight: '600'
+                  }}
+                >
+                  0
+                </span>
+                <span 
+                  className="text-xl text-white"
+                  style={{
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontWeight: '700'
+                  }}
+                >
+                  円
+                </span>
+              </div>
+            </div>
+
+            {/* 縦線 */}
+            <div className="w-0.5 bg-white self-stretch"></div>
+
+            {/* 掲載料 */}
+            <div className="flex-1 flex flex-col items-center gap-2 px-2">
+              <div 
+                className="px-3 py-1 rounded-full"
+                style={{ background: '#FAEE00' }}
+              >
+                <span 
+                  className="text-sm"
+                  style={{
+                    color: 'var(--green1, #007D4F)',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontWeight: '700'
+                  }}
+                >
+                  掲載料
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span 
+                  className="text-5xl text-white"
+                  style={{
+                    fontFamily: 'Commissioner',
+                    fontWeight: '600'
+                  }}
+                >
+                  0
+                </span>
+                <span 
+                  className="text-xl text-white"
+                  style={{
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontWeight: '700'
+                  }}
+                >
+                  円
+                </span>
+              </div>
+            </div>
+
+            {/* 縦線 */}
+            <div className="w-0.5 bg-white self-stretch"></div>
+
+            {/* 解約金 */}
+            <div className="flex-1 flex flex-col items-center gap-2 px-2">
+              <div 
+                className="px-3 py-1 rounded-full"
+                style={{ background: '#FAEE00' }}
+              >
+                <span 
+                  className="text-sm"
+                  style={{
+                    color: 'var(--green1, #007D4F)',
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontWeight: '700'
+                  }}
+                >
+                  解約金
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span 
+                  className="text-5xl text-white"
+                  style={{
+                    fontFamily: 'Commissioner',
+                    fontWeight: '600'
+                  }}
+                >
+                  0
+                </span>
+                <span 
+                  className="text-xl text-white"
+                  style={{
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontWeight: '700'
+                  }}
+                >
+                  円
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* CTAボタン */}
+          <button
+            className="relative flex w-full max-w-sm px-6 py-4 justify-center items-center gap-2 rounded-full border-2 border-white cursor-pointer"
+            style={{
+              background: 'var(--green1, #007D4F)'
+            }}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <span 
+                className="text-sm text-white"
+                style={{
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontWeight: '700'
+                }}
+              >
+                今すぐ無料で
+              </span>
+              <span 
+                className="text-xl text-white"
+                style={{
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontWeight: '700'
+                }}
+              >
+                お申し込み
+              </span>
+            </div>
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="9" 
+              height="16" 
+              viewBox="0 0 9 16" 
+              fill="none"
+              className="absolute right-6 flex-shrink-0"
+            >
+              <path 
+                d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
+                stroke="#FFF" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* PC用FV (md以上) */}
+      <div className="hidden md:block w-full">
         {/* 上半分: 背景画像とヘッダー */}
         <div className="relative w-full md:min-h-screen">
           {/* Background Image */}
           <div className="relative w-full md:absolute md:inset-0">
-            {/* スマホ用画像 */}
-            <div className="relative w-full md:hidden">
-              <Image
-                src="/lp/images/merchant-fv-sp.png"
-                alt="飲食店向けファーストビュー"
-                width={375}
-                height={812}
-                className="w-full h-auto"
-                priority
-              />
-              {/* Green Background Overlay - Mobile Only (Bottom Half) */}
-              <div 
-                className="absolute inset-x-0 bottom-0 h-1/2"
-                style={{
-                  background: 'var(--green1, #007D4F)'
-                }}
-              ></div>
-            </div>
             {/* PC用画像 */}
             <Image
               src="/lp/images/merchant-fv.png"
               alt="飲食店向けファーストビュー"
               fill
-              className="object-cover hidden md:block"
+              className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+            <div className="absolute inset-0 bg-black bg-opacity-10 pointer-events-none"></div>
           </div>
 
-          {/* Header */}
+          {/* Header - PC用 */}
           <header className="absolute top-0 left-0 right-0 z-10 w-full">
           <div className="w-full px-4 py-4 md:px-8 md:py-6">
             <div className="flex items-center justify-between w-full">
@@ -65,16 +372,19 @@ export default function MerchantLPPage() {
                   <a href="#how-to-apply" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">お申し込み方法</a>
                 </nav>
                 
-                <button 
+                <Link 
+                  href="/lp"
                   className="text-white font-bold hover:opacity-90 transition-opacity text-xs md:text-sm lg:text-base px-4 py-3 md:px-6 md:py-4 rounded-full"
                   style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     background: 'var(--main, #6FC8E5)'
                   }}
-                  onClick={() => router.push('/lp')}
                 >
                   <span className="hidden md:inline">ユーザーはこちら</span>
                   <span className="md:hidden">ユーザー</span>
-                </button>
+                </Link>
 
                 {/* ハンバーガーメニューアイコン（モバイル・タブレットのみ表示） */}
                 <button
