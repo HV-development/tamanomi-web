@@ -1146,7 +1146,7 @@ export default function MerchantLPPage() {
         >
           {/* Step 1 Card */}
           <div 
-            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 bg-white rounded-lg p-6 md:p-8"
+            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 md:w-[368px] md:flex-none bg-white rounded-lg p-6 md:p-8"
           >
             <div className="text-center">
               <p 
@@ -1202,7 +1202,7 @@ export default function MerchantLPPage() {
 
           {/* Step 2 Card */}
           <div 
-            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 bg-white rounded-lg p-6 md:p-8"
+            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 md:w-[368px] md:flex-none bg-white rounded-lg p-6 md:p-8"
           >
             <div className="text-center">
               <p 
@@ -1259,7 +1259,7 @@ export default function MerchantLPPage() {
 
           {/* Step 3 Card */}
           <div 
-            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 bg-white rounded-lg p-6 md:p-8"
+            className="flex flex-col justify-center items-center gap-6 md:gap-8 flex-1 md:w-[368px] md:flex-none bg-white rounded-lg p-6 md:p-8"
           >
             <div className="text-center">
               <p 
