@@ -8,9 +8,6 @@ dependencies:
   '@hookform/resolvers':
     specifier: ^3.9.1
     version: 3.10.0(react-hook-form@7.64.0)
-  '@hv-development/schemas':
-    specifier: ^1.27.0
-    version: 1.27.0
   '@radix-ui/react-accordion':
     specifier: 1.2.2
     version: 1.2.2(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
@@ -536,13 +533,6 @@ packages:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
     dev: true
-
-  /@hv-development/schemas@1.27.0:
-    resolution: {integrity: sha512-1zhyboxbNrCIABTaofN5ou+ZjHxQYqVvJfhATE89jzYwykUUdzbslR1rQ2HsKztk1glGg3zzZddsYUCfiIM+Cg==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.27.0/6d96971e7f163d7bb487f11cbb75f7b3a839523c}
-    engines: {node: 22.x}
-    dependencies:
-      zod: 3.25.76
-    dev: false
 
   /@img/colour@1.0.0:
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}

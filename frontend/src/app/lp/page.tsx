@@ -152,6 +152,7 @@ export default function LPPage() {
                   <a href="#howto" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使い方</a>
                   <a href="#pricing" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">利用料金</a>
                   <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使えるお店</a>
+                  <Link href="/lp/contact" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">お問い合わせ</Link>
                 </nav>
                 
                 <Link 
@@ -251,6 +252,13 @@ export default function LPPage() {
                 >
                   使えるお店
                 </a>
+                <Link 
+                  href="/lp/contact" 
+                  className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  お問い合わせ
+                </Link>
               </nav>
             </div>
           )}
@@ -2002,8 +2010,8 @@ export default function LPPage() {
               >
                 よくあるご質問
               </Link>
-              <a 
-                href="#" 
+              <Link 
+                href="/lp/contact" 
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -2011,7 +2019,7 @@ export default function LPPage() {
                 }}
               >
                 お問い合わせ
-              </a>
+              </Link>
               <a 
                 href="#" 
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
