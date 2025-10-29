@@ -139,7 +139,7 @@ export default function MerchantLPPage() {
         {/* 下半分: 緑背景 + コンテンツ */}
         <div 
           className="w-full min-h-[50vh] flex flex-col items-center justify-center px-4 py-8"
-          style={{ background: 'var(--green1, #007D4F)' }}
+          style={{ background: '#7FBE26' }}
         >
           {/* 白いボックス */}
           <div 
@@ -292,7 +292,7 @@ export default function MerchantLPPage() {
           <button
             className="relative flex w-full max-w-sm px-6 py-4 justify-center items-center gap-2 rounded-full border-2 border-white cursor-pointer"
             style={{
-              background: 'var(--green1, #007D4F)'
+              background: '#7FBE26'
             }}
           >
             <div className="flex flex-col items-center gap-1">
@@ -353,7 +353,7 @@ export default function MerchantLPPage() {
           </div>
 
           {/* Header - PC用 */}
-          <header className="absolute top-0 left-0 right-0 z-10 w-full">
+          <header className="absolute top-0 left-0 right-0 z-30 w-full">
           <div className="w-full px-4 py-4 md:px-8 md:py-6">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
@@ -461,7 +461,7 @@ export default function MerchantLPPage() {
 
         {/* 下半分: Main Content */}
         <div 
-          className="w-full bg-[#7FBE26] pt-14 pb-14 md:bg-transparent md:absolute md:top-0 md:left-0 md:right-0 md:pt-[30vh] md:pb-[10vh] z-20 md:z-10"
+          className="w-full bg-[#7FBE26] pt-14 pb-14 md:bg-transparent md:absolute md:top-0 md:left-0 md:right-0 md:pt-[30vh] md:pb-[10vh] z-20 md:z-0"
           style={{
             display: 'flex',
             flexDirection: 'column',
