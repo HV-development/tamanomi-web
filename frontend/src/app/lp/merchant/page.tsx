@@ -11,23 +11,23 @@ export default function MerchantLPPage() {
   return (
     <div className="w-full">
       {/* First View - 飲食店向け */}
-      <div 
-        className="relative w-full min-h-screen"
-      >
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <Image
-            src="/lp/images/merchant-fv.png"
-            alt="飲食店向けファーストビュー"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-        </div>
+      <div className="w-full">
+        {/* 上半分: 背景画像とヘッダー（スマホのみ height 195px） */}
+        <div className="relative w-full h-[195px] md:min-h-[50vh]">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <Image
+              src="/lp/images/merchant-fv.png"
+              alt="飲食店向けファーストビュー"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+          </div>
 
-        {/* Header */}
-        <header className="relative z-10 w-full">
+          {/* Header */}
+          <header className="relative z-10 w-full">
           <div className="w-full px-4 py-4 md:px-8 md:py-6">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
@@ -128,10 +128,22 @@ export default function MerchantLPPage() {
             </div>
           )}
         </header>
+        </div>
 
-        {/* Main Content */}
-        <div className="relative z-10 w-full flex items-center justify-center px-4 py-16 md:py-24 lg:py-32">
-          <div className="text-center max-w-4xl">
+        {/* 下半分: Main Content（スマホのみ #7FBE26 背景） */}
+        <div 
+          className="w-full bg-[#7FBE26] md:bg-transparent md:relative md:z-10"
+          style={{
+            display: 'flex',
+            padding: '240px 0 56px 0',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: '40px',
+            alignSelf: 'stretch'
+          }}
+        >
+          <div className="text-center max-w-4xl px-4 md:px-0">
             {/* Main Title */}
             <div className="mb-6 md:mb-8">
               <h1 
@@ -166,16 +178,16 @@ export default function MerchantLPPage() {
 
             {/* Pricing Info */}
             <div 
-              className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 mb-8 md:mb-12"
+              className="flex flex-row md:flex-row justify-center items-stretch gap-0 md:gap-6"
             >
-              {/* 縦線（左端） - hidden on mobile */}
+              {/* 縦線（左端） - PCのみ */}
               <div 
                 className="hidden md:block w-0.5 self-stretch bg-white"
               ></div>
 
               {/* 初期費用 */}
               <div 
-                className="flex items-center gap-2 md:gap-3"
+                className="flex flex-col md:flex-row items-center gap-3 md:gap-3 px-4 md:px-0"
               >
                 <div 
                   className="flex px-3 py-1 md:px-4 md:py-1 justify-center items-center rounded-full"
@@ -197,7 +209,7 @@ export default function MerchantLPPage() {
                     初期費用
                   </span>
                 </div>
-                <div className="flex items-baseline gap-1">
+                <div className="flex flex-row md:flex-row items-baseline gap-1">
                   <span 
                     className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl"
                     style={{
@@ -229,12 +241,12 @@ export default function MerchantLPPage() {
 
               {/* 縦線 */}
               <div 
-                className="hidden md:block w-0.5 self-stretch bg-white"
+                className="w-0.5 md:w-0.5 self-stretch bg-white"
               ></div>
 
               {/* 掲載料 */}
               <div 
-                className="flex items-center gap-2 md:gap-3"
+                className="flex flex-col md:flex-row items-center gap-3 md:gap-3 px-4 md:px-0"
               >
                 <div 
                   className="flex px-3 py-1 md:px-4 md:py-1 justify-center items-center rounded-full"
@@ -256,7 +268,7 @@ export default function MerchantLPPage() {
                     掲載料
                   </span>
                 </div>
-                <div className="flex items-baseline gap-1">
+                <div className="flex flex-row md:flex-row items-baseline gap-1">
                   <span 
                     className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl"
                     style={{
@@ -288,12 +300,12 @@ export default function MerchantLPPage() {
 
               {/* 縦線 */}
               <div 
-                className="hidden md:block w-0.5 self-stretch bg-white"
+                className="w-0.5 md:w-0.5 self-stretch bg-white"
               ></div>
 
               {/* 解約金 */}
               <div 
-                className="flex items-center gap-2 md:gap-3"
+                className="flex flex-col md:flex-row items-center gap-3 md:gap-3 px-4 md:px-0"
               >
                 <div 
                   className="flex px-3 py-1 md:px-4 md:py-1 justify-center items-center rounded-full"
@@ -315,7 +327,7 @@ export default function MerchantLPPage() {
                     解約金
                   </span>
                 </div>
-                <div className="flex items-baseline gap-1">
+                <div className="flex flex-row md:flex-row items-baseline gap-1">
                   <span 
                     className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl"
                     style={{
@@ -345,7 +357,7 @@ export default function MerchantLPPage() {
                 </div>
               </div>
 
-              {/* 縦線（右端） - hidden on mobile */}
+              {/* 縦線（右端） - PCのみ */}
               <div 
                 className="hidden md:block w-0.5 self-stretch bg-white"
               ></div>
