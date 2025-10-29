@@ -149,18 +149,17 @@ export default function MerchantLPPage() {
                 お店の売上アップに
               </h1>
               <h2 
-                className="inline-block px-3 py-2 md:px-4 md:py-2 text-[40px] md:text-5xl lg:text-6xl xl:text-7xl"
+                className="inline-block px-3 py-2 md:px-4 md:py-2 text-[40px] md:text-5xl lg:text-6xl xl:text-7xl leading-[120%] md:leading-[100%]"
                 style={{
                   backgroundColor: '#FFF',
                   color: 'var(--green1, #007D4F)',
                   textAlign: 'center',
                   fontFamily: '"Zen Kaku Gothic New"',
                   fontStyle: 'normal',
-                  fontWeight: '700',
-                  lineHeight: '120%'
+                  fontWeight: '700'
                 }}
               >
-                たまのみ掲載店<br />
+                たまのみ掲載店<br className="md:hidden" />
                 募集中
               </h2>
             </div>
