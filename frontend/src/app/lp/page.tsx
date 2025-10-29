@@ -282,7 +282,7 @@ export default function LPPage() {
                 alt="1軒"
                 width={91}
                 height={74}
-                className="absolute left-16 top-[-80px] md:left-16 md:top-[-80px] lg:top-[-120px] md:w-[155.29px] md:h-[127.06px]"
+                className="absolute left-16 top-[-80px] md:left-16 md:top-[60px] lg:top-[0px] md:w-[155.29px] md:h-[127.06px]"
                 style={{
                   width: '91px',
                   height: '74px',
