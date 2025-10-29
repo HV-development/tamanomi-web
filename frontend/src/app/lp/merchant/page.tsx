@@ -138,7 +138,7 @@ export default function MerchantLPPage() {
 
         {/* 下半分: 緑背景 + コンテンツ */}
         <div 
-          className="w-full min-h-[50vh] flex flex-col items-center justify-center px-4 py-8"
+          className="w-full min-h-[50vh] flex flex-col items-center justify-center px-4 py-8 mt-6"
           style={{ background: '#7FBE26' }}
         >
           {/* 白いボックス */}
