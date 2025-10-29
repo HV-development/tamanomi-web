@@ -163,7 +163,7 @@ export default function MerchantLPPage() {
           </div>
 
           {/* 料金情報 */}
-          <div className="flex flex-row items-stretch gap-0 mb-8 w-full max-w-sm">
+          <div className="flex flex-row items-stretch gap-0 mb-10 md:mb-8 w-full max-w-sm">
             {/* 初期費用 */}
             <div className="flex-1 flex flex-col items-center gap-2 px-2">
               <div 
