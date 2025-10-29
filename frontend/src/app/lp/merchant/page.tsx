@@ -16,11 +16,20 @@ export default function MerchantLPPage() {
         <div className="relative w-full h-[195px] md:min-h-[50vh]">
           {/* Background Image */}
           <div className="absolute inset-0">
+            {/* スマホ用画像 */}
+            <Image
+              src="/lp/images/merchant-fv-sp.png"
+              alt="飲食店向けファーストビュー"
+              fill
+              className="object-cover md:hidden"
+              priority
+            />
+            {/* PC用画像 */}
             <Image
               src="/lp/images/merchant-fv.png"
               alt="飲食店向けファーストビュー"
               fill
-              className="object-cover"
+              className="object-cover hidden md:block"
               priority
             />
             <div className="absolute inset-0 bg-black bg-opacity-10"></div>
