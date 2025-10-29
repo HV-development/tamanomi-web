@@ -144,7 +144,7 @@ export default function MerchantLPPage() {
 
         {/* 下半分: Main Content */}
         <div 
-          className="w-full bg-[#7FBE26] pt-14 pb-14 md:bg-transparent md:absolute md:top-0 md:left-0 md:right-0 md:pt-[30vh] md:pb-[10vh] z-20 md:z-10"
+          className="w-full bg-[#7FBE26] pt-[240px] pb-14 md:bg-transparent md:absolute md:top-0 md:left-0 md:right-0 md:pt-[30vh] md:pb-[10vh] z-20 md:z-10"
           style={{
             display: 'flex',
             flexDirection: 'column',
