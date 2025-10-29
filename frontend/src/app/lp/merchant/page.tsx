@@ -13,9 +13,9 @@ export default function MerchantLPPage() {
       {/* First View - 飲食店向け */}
       <div className="w-full">
         {/* 上半分: 背景画像とヘッダー */}
-        <div className="relative w-full">
+        <div className="relative w-full md:min-h-screen">
           {/* Background Image */}
-          <div className="relative w-full">
+          <div className="relative w-full md:absolute md:inset-0">
             {/* スマホ用画像 */}
             <div className="relative w-full md:hidden">
               <Image
@@ -28,15 +28,13 @@ export default function MerchantLPPage() {
               />
             </div>
             {/* PC用画像 */}
-            <div className="relative w-full hidden md:block" style={{ minHeight: '50vh' }}>
-              <Image
-                src="/lp/images/merchant-fv.png"
-                alt="飲食店向けファーストビュー"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
+            <Image
+              src="/lp/images/merchant-fv.png"
+              alt="飲食店向けファーストビュー"
+              fill
+              className="object-cover hidden md:block"
+              priority
+            />
             <div className="absolute inset-0 bg-black bg-opacity-10"></div>
           </div>
 
@@ -144,11 +142,10 @@ export default function MerchantLPPage() {
         </header>
         </div>
 
-        {/* 下半分: Main Content */}
+        {/* 下半分: Main Content - PCのみ */}
         <div 
-          className="w-full bg-[#7FBE26] pt-14 pb-14 md:bg-transparent md:absolute md:top-0 md:left-0 md:right-0 md:pt-[30vh] md:pb-[10vh] z-20 md:z-10"
+          className="hidden md:flex w-full md:absolute md:top-0 md:left-0 md:right-0 md:pt-[30vh] md:pb-[10vh] md:z-10"
           style={{
-            display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
             alignItems: 'center',
@@ -156,7 +153,7 @@ export default function MerchantLPPage() {
             alignSelf: 'stretch'
           }}
         >
-          <div className="text-center max-w-4xl px-4 md:px-0 -mt-[200px] md:mt-0 relative z-30">
+          <div className="text-center max-w-4xl px-4 relative z-30">
             {/* Main Title */}
             <div className="mb-6 md:mb-8">
               <h1 
@@ -377,7 +374,7 @@ export default function MerchantLPPage() {
             </div>
 
             {/* CTA Button */}
-            <div className="flex justify-center mt-[200px] md:mt-0">
+            <div className="flex justify-center">
               <button
                 className="relative flex w-64 md:w-72 lg:w-80 px-4 py-3 md:px-6 md:py-4 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
                 style={{
