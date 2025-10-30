@@ -11,7 +11,7 @@
     "secret:generate": "tsx ../scripts/generate-secret.ts"
   },
   "dependencies": {
-    "@hv-development/schemas": "^1.28.0",
+    "@hv-development/schemas": "^1.28.2",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
