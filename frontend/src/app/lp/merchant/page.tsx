@@ -296,49 +296,51 @@ export default function MerchantLPPage() {
           </div>
 
           {/* CTAボタン */}
-          <button
-            className="relative flex w-[320px] md:w-full md:max-w-sm px-6 py-4 justify-center items-center gap-2 rounded-full border-[3px] md:border-2 border-white cursor-pointer"
-            style={{
-              background: 'var(--green1, #007D4F)'
-            }}
-          >
-            <div className="flex flex-col items-center gap-1">
-              <span 
-                className="text-sm text-white"
-                style={{
-                  fontFamily: '"Zen Kaku Gothic New"',
-                  fontWeight: '700'
-                }}
-              >
-                今すぐ無料で
-              </span>
-              <span 
-                className="text-xl text-white"
-                style={{
-                  fontFamily: '"Zen Kaku Gothic New"',
-                  fontWeight: '700'
-                }}
-              >
-                お申し込み
-              </span>
-            </div>
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="9" 
-              height="16" 
-              viewBox="0 0 9 16" 
-              fill="none"
-              className="absolute right-6 flex-shrink-0"
+          <Link href="/lp/merchant/apply">
+            <button
+              className="relative flex w-[320px] md:w-full md:max-w-sm px-6 py-4 justify-center items-center gap-2 rounded-full border-[3px] md:border-2 border-white cursor-pointer"
+              style={{
+                background: 'var(--green1, #007D4F)'
+              }}
             >
-              <path 
-                d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
-                stroke="#FFF" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+              <div className="flex flex-col items-center gap-1">
+                <span 
+                  className="text-sm text-white"
+                  style={{
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontWeight: '700'
+                  }}
+                >
+                  今すぐ無料で
+                </span>
+                <span 
+                  className="text-xl text-white"
+                  style={{
+                    fontFamily: '"Zen Kaku Gothic New"',
+                    fontWeight: '700'
+                  }}
+                >
+                  お申し込み
+                </span>
+              </div>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="9" 
+                height="16" 
+                viewBox="0 0 9 16" 
+                fill="none"
+                className="absolute right-6 flex-shrink-0"
+              >
+                <path 
+                  d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
+                  stroke="#FFF" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -708,55 +710,57 @@ export default function MerchantLPPage() {
 
             {/* CTA Button */}
             <div className="flex justify-center mt-0 md:mt-16">
-              <button
-                className="relative flex w-64 md:w-72 lg:w-80 px-4 py-3 md:px-6 md:py-4 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
-                style={{
-                  background: 'var(--green1, #007D4F)'
-                }}
-              >
-                <div className="flex flex-col items-center gap-1">
-                  <span 
-                    className="text-sm md:text-base"
-                    style={{
-                      color: '#FFF',
-                      fontFamily: '"Zen Kaku Gothic New"',
-                      fontStyle: 'normal',
-                      fontWeight: '700',
-                      lineHeight: '100%'
-                    }}
-                  >
-                    今すぐ無料で
-                  </span>
-                  <span 
-                    className="text-lg md:text-xl lg:text-2xl"
-                    style={{
-                      color: '#FFF',
-                      fontFamily: '"Zen Kaku Gothic New"',
-                      fontStyle: 'normal',
-                      fontWeight: '700',
-                      lineHeight: '100%'
-                    }}
-                  >
-                    お申し込み
-                  </span>
-                </div>
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="9" 
-                  height="16" 
-                  viewBox="0 0 9 16" 
-                  fill="none"
-                  className="absolute right-4 md:right-6 flex-shrink-0"
+              <Link href="/lp/merchant/apply">
+                <button
+                  className="relative flex w-64 md:w-72 lg:w-80 px-4 py-3 md:px-6 md:py-4 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
+                  style={{
+                    background: 'var(--green1, #007D4F)'
+                  }}
                 >
-                  <path 
-                    d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
-                    stroke="#FFF" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+                  <div className="flex flex-col items-center gap-1">
+                    <span 
+                      className="text-sm md:text-base"
+                      style={{
+                        color: '#FFF',
+                        fontFamily: '"Zen Kaku Gothic New"',
+                        fontStyle: 'normal',
+                        fontWeight: '700',
+                        lineHeight: '100%'
+                      }}
+                    >
+                      今すぐ無料で
+                    </span>
+                    <span 
+                      className="text-lg md:text-xl lg:text-2xl"
+                      style={{
+                        color: '#FFF',
+                        fontFamily: '"Zen Kaku Gothic New"',
+                        fontStyle: 'normal',
+                        fontWeight: '700',
+                        lineHeight: '100%'
+                      }}
+                    >
+                      お申し込み
+                    </span>
+                  </div>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="9" 
+                    height="16" 
+                    viewBox="0 0 9 16" 
+                    fill="none"
+                    className="absolute right-4 md:right-6 flex-shrink-0"
+                  >
+                    <path 
+                      d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
+                      stroke="#FFF" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -1413,55 +1417,57 @@ export default function MerchantLPPage() {
         </h2>
 
         {/* CTA Button */}
-        <button
-          className="relative flex w-64 md:w-72 lg:w-80 px-4 py-3 md:px-6 md:py-4 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
-          style={{
-            background: 'var(--green1, #007D4F)'
-          }}
-        >
-          <div className="flex flex-col items-center gap-1">
-            <span 
-              className="text-sm md:text-base"
-              style={{
-                color: '#FFF',
-                fontFamily: '"Zen Kaku Gothic New"',
-                fontStyle: 'normal',
-                fontWeight: '700',
-                lineHeight: '100%'
-              }}
-            >
-              いますぐ<span style={{ color: '#FAEE00' }}>無料</span>で
-            </span>
-            <span 
-              className="text-lg md:text-xl lg:text-2xl"
-              style={{
-                color: '#FFF',
-                fontFamily: '"Zen Kaku Gothic New"',
-                fontStyle: 'normal',
-                fontWeight: '700',
-                lineHeight: '100%'
-              }}
-            >
-              お申し込み
-            </span>
-          </div>
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="9" 
-            height="16" 
-            viewBox="0 0 9 16" 
-            fill="none"
-            className="absolute right-4 md:right-6 flex-shrink-0"
+        <Link href="/lp/merchant/apply">
+          <button
+            className="relative flex w-64 md:w-72 lg:w-80 px-4 py-3 md:px-6 md:py-4 justify-center items-center gap-2 rounded-full border-2 md:border-3 border-white cursor-pointer"
+            style={{
+              background: 'var(--green1, #007D4F)'
+            }}
           >
-            <path 
-              d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
-              stroke="#FFF" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+            <div className="flex flex-col items-center gap-1">
+              <span 
+                className="text-sm md:text-base"
+                style={{
+                  color: '#FFF',
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontStyle: 'normal',
+                  fontWeight: '700',
+                  lineHeight: '100%'
+                }}
+              >
+                いますぐ<span style={{ color: '#FAEE00' }}>無料</span>で
+              </span>
+              <span 
+                className="text-lg md:text-xl lg:text-2xl"
+                style={{
+                  color: '#FFF',
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontStyle: 'normal',
+                  fontWeight: '700',
+                  lineHeight: '100%'
+                }}
+              >
+                お申し込み
+              </span>
+            </div>
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="9" 
+              height="16" 
+              viewBox="0 0 9 16" 
+              fill="none"
+              className="absolute right-4 md:right-6 flex-shrink-0"
+            >
+              <path 
+                d="M0.999838 14.3333L7.6665 7.66667L0.999838 1" 
+                stroke="#FFF" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </Link>
       </div>
 
       {/* Footer Section */}

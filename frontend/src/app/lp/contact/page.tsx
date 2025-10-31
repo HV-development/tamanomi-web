@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import {
   userContactFormSchema,
   merchantContactFormSchema,
@@ -22,7 +22,6 @@ console.log('🔍 インポート確認:', {
 type ContactFormData = UserContactFormData | MerchantContactFormData
 
 function ContactFormContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   
@@ -64,7 +63,7 @@ function ContactFormContent() {
       setErrors({})
       console.log('✅ バリデーション成功')
       return true
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ バリデーション失敗:', error)
       if (error && typeof error === 'object' && 'errors' in error) {
         const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> }
@@ -137,7 +136,7 @@ function ContactFormContent() {
         console.log('❌ 送信失敗:', data)
         setSubmitError(data.message || 'お問い合わせの送信に失敗しました')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ お問い合わせ送信エラー:', error)
       setSubmitError('お問い合わせの送信中にエラーが発生しました')
     } finally {
