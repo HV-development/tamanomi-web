@@ -46,6 +46,8 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       description: shop.description || '',
       thumbnailUrl: shop.images?.[0] || '',
       isFavorite: false,
+      latitude: shop.latitude ? Number(shop.latitude) : undefined,
+      longitude: shop.longitude ? Number(shop.longitude) : undefined,
       usageScenes: (shop.scenes || shop.sceneIds || [])
         .map((s: any) => (typeof s === 'string' ? s : s?.name))
         .filter(Boolean),

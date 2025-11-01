@@ -108,7 +108,15 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
   }
 
   const handleMapClick = () => {
-    // Googleマップで店舗を検索
+    // 座標がある場合は緯度経度クエリで開く（精度が高い）
+    if (typeof store.latitude === 'number' && typeof store.longitude === 'number') {
+      const lat = store.latitude.toFixed(7)
+      const lng = store.longitude.toFixed(7)
+      const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+      window.open(googleMapsUrl, "_blank")
+      return
+    }
+    // 座標が無い場合は名称+住所で検索
     const query = encodeURIComponent(`${store.name} ${store.address}`)
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`
     window.open(googleMapsUrl, "_blank")

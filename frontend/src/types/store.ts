@@ -24,6 +24,8 @@ export interface Store {
   description: string
   thumbnailUrl?: string
   isFavorite: boolean
+  latitude?: number
+  longitude?: number
 
   // 詳細情報（任意）
   website?: string
