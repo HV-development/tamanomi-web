@@ -17,7 +17,8 @@ interface ApiOptions extends RequestInit {
 }
 
 export class ApiClient {
-  private static baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  // NEXT_PUBLIC_API_BASE_URL は廃止。フロントからは Next API への相対パスを利用する。
+  private static baseUrl = '';
 
   /**
    * API呼び出しの共通処理

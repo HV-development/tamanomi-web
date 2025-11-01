@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import { HomeContainer } from "../organisms/HomeContainer"
 import { LoginLayout } from "./LoginLayout"
@@ -31,11 +31,12 @@ import { HamburgerMenu } from "../molecules/HamburgerMenu"
 import { UsageGuideModal } from "@/components/organisms/UsageGuideModal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
+import { useInfiniteStores } from "@/hooks/useInfiniteStores"
 
 
 export function HomeLayout() {
   // Context から必要な値を取得
-  const { state, handlers, auth, navigation, filters, computedValues } = useAppContext()
+  const { state, dispatch, handlers, auth, navigation, filters, computedValues } = useAppContext()
 
   // ポップアップとモーダルの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
@@ -144,6 +145,53 @@ export function HomeLayout() {
   const onStoreDetailClose = handlers.handleStoreDetailPopupClose
   const isStoreDetailPopupOpen = state.isStoreDetailPopupOpen
   const currentUserRank = computedValues.currentUserRank
+
+  // 無限スクロール: 初回ロードと追加ロード
+  const { isLoading: isStoresLoading, isLoadingMore, error, hasMore, sentinelRef, loadNext, items } = useInfiniteStores({ limit: 5 })
+
+  // 初回ページの要素を Context の stores に反映するため、監視と反映
+  const initialAppliedRef = useRef(false)
+  useEffect(() => {
+    // フックが管理する items を Context の stores に反映
+    if (!initialAppliedRef.current && !isStoresLoading) {
+      initialAppliedRef.current = true
+    }
+    // 長さが違う or 先頭IDが違う場合に更新（簡易判定）
+    const needUpdate = (state.stores?.length || 0) !== (items?.length || 0)
+      || (state.stores?.[0]?.id !== items?.[0]?.id)
+    if (needUpdate) {
+      dispatch({ type: 'SET_STORES', payload: items })
+      dispatch({ type: 'SET_DATA_LOADED', payload: true })
+    }
+  }, [items, isStoresLoading, dispatch, state.stores])
+
+  // 追加ロード時の stores 追記（セントリネル交差で loadNext 実行済み）
+  // 追加ロードはフック内部の items 更新で反映されるため、ここでの明示的処理は不要
+
+  // 先頭へ戻るフローティングボタンの制御
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    const onScroll = () => {
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current)
+        hideTimerRef.current = null
+      }
+      if (window.scrollY > 200) {
+        setShowBackToTop(true)
+        hideTimerRef.current = setTimeout(() => {
+          setShowBackToTop(false)
+        }, 1500)
+      } else {
+        setShowBackToTop(false)
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+    }
+  }, [])
 
   // ランクに基づく背景色を取得
   const getBackgroundColorByRank = (rank: string | null, isAuth: boolean) => {
@@ -520,6 +568,9 @@ export function HomeLayout() {
           onFavoriteToggle={onFavoriteToggle}
           onCouponsClick={onCouponsClick}
           isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
+          loadMoreRef={sentinelRef}
+          isLoadingMore={isLoadingMore}
+          bottomError={error}
           backgroundColorClass={backgroundColorClass}
         />
       </div>
@@ -597,6 +648,17 @@ export function HomeLayout() {
 
       {/* フッターナビゲーション */}
       <FooterNavigation />
+
+      {/* 先頭へ戻るフローティングボタン */}
+      {showBackToTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-20 right-4 z-40 px-4 py-3 rounded-full shadow-lg bg-green-600 text-white text-sm hover:bg-green-700 transition-colors"
+          aria-label="先頭へ戻る"
+        >
+          先頭へ戻る
+        </button>
+      )}
 
     </div>
   )
