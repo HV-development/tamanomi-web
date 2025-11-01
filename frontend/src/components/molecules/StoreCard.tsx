@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { Navigation, Phone } from "lucide-react"
+import { Phone } from "lucide-react"
 import { FavoriteButton } from "@/components/atoms/FavoriteButton"
 import type { Store } from "@/types/store"
 import { getGenreColor } from "@/utils/genre-colors"
@@ -170,10 +170,10 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
               </button>
               <button
                 onClick={handleMapClick}
-                className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200 text-green-600 text-xs font-semibold"
                 aria-label="Googleマップで表示"
               >
-                <Navigation className="w-4 h-4 text-green-600 hover:text-green-700 fill-current transition-colors" />
+                MAP
               </button>
           </div>
         </div>
