@@ -44,15 +44,19 @@ const getStoreFoodImage = (genre: string) => {
 
 export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClick, showDistance = false, className = "" }: StoreCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isImageError, setIsImageError] = useState(false)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
 
   // 画像配列を作成
   const images = [
-    store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    store.thumbnailUrl || "",
     getStoreInteriorImage(store.genre),
     getStoreFoodImage(store.genre)
   ]
+
+  const hasThumbnail = Boolean(store.thumbnailUrl)
+  const shouldShowPlaceholder = !hasThumbnail || isImageError
 
   const handleImageClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -175,40 +179,52 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
         </div>
       </div>
 
-      {/* 店舗写真カルーセル */}
+      {/* 店舗写真カルーセル / 画像なしプレースホルダ */}
       <div className="relative overflow-hidden">
-        <div 
-          className="w-full aspect-[3/1] cursor-pointer select-none relative rounded-lg overflow-hidden" 
-          onClick={handleImageAreaClick}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <Image
-            src={images[currentImageIndex]}
-            alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
-            fill
-            className="object-cover transition-opacity duration-300 pointer-events-none"
-          />
-        </div>
-        
-        {/* インジケーター */}
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-          <div className="flex gap-1">
-            {images.map((_, index) => (
-              <div
-                key={index}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  index === currentImageIndex ? "bg-white" : "bg-white/60"
-                }`}
-              ></div>
-            ))}
-          </div>
-        </div>
+        {shouldShowPlaceholder ? (
+          <button
+            onClick={handleImageAreaClick}
+            className="w-full aspect-[4/3] md:aspect-[16/9] rounded-lg border border-gray-300 bg-gray-200 flex items-center justify-center cursor-pointer"
+            aria-label="画像なし"
+          >
+            <span className="text-black text-sm">no image</span>
+          </button>
+        ) : (
+          <>
+            <div 
+              className="w-full aspect-[4/3] md:aspect-[16/9] cursor-pointer select-none relative rounded-lg overflow-hidden" 
+              onClick={handleImageAreaClick}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <Image
+                src={images[currentImageIndex] || store.thumbnailUrl!}
+                alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
+                fill
+                className="object-cover transition-opacity duration-300 pointer-events-none"
+                onError={() => setIsImageError(true)}
+              />
+            </div>
+            {/* インジケーター */}
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+              <div className="flex gap-1">
+                {images.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                      index === currentImageIndex ? "bg-white" : "bg-white/60"
+                    }`}
+                  ></div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* 店舗紹介 */}
-      <div className="text-sm text-gray-700 leading-relaxed">{store.description}</div>
+      <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{store.description}</div>
 
       {/* クーポンボタン */}
       <div className="pt-2">

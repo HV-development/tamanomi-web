@@ -206,8 +206,7 @@ export default function MerchantApplyPage() {
     setServerError('')
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002/api/v1'
-      const response = await fetch(`${apiBaseUrl}/merchants/apply`, {
+      const response = await fetch(`/api/merchants/apply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

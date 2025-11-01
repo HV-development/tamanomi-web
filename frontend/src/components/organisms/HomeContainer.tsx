@@ -14,9 +14,13 @@ interface HomeContainerProps {
   onCouponsClick?: (storeId: string) => void
   isModalOpen?: boolean
   backgroundColorClass?: string
+  // 追加: 無限スクロール/エラー表示用
+  loadMoreRef?: (node: Element | null) => void
+  isLoadingMore?: boolean
+  bottomError?: string | null
 }
 
-export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100" }: HomeContainerProps) {
+export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100", loadMoreRef, isLoadingMore = false, bottomError = null }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = (stores ?? []).filter(store => {
     // ジャンルフィルター
@@ -71,6 +75,30 @@ export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, 
           showDistance={isNearbyFilter}
           emptyMessage="条件に合う店舗が見つかりませんでした"
           emptyEmoji="🔍"
+        />
+
+        {/* ロード中インジケータ */}
+        {isLoadingMore && (
+          <div className="flex items-center justify-center py-6">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600" />
+          </div>
+        )}
+
+        {/* 追加ロード時のエラー表示 */}
+        {bottomError && (
+          <div className="mt-4 mx-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+            {bottomError}
+          </div>
+        )}
+
+        {/* 無限スクロール用セントリネル */}
+        <div
+          ref={(el) => {
+            if (loadMoreRef) {
+              loadMoreRef(el)
+            }
+          }}
+          className="h-1 w-full"
         />
       </div>
     </div>

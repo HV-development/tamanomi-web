@@ -1,17 +1,14 @@
 "use client"
 
-import { useEffect, useMemo, Suspense, useReducer } from "react"
+import { useMemo, Suspense, useReducer } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useFilters } from "@/hooks/useFilters"
 import { useRouter } from "next/navigation"
-import type { Store } from "@/types/store"
-import type { Notification } from "@/types/notification"
 
 // 分離したコンポーネントとフックをインポート
 import { AppContext } from "@/contexts/AppContext"
 import { initialState, appReducer } from "@/hooks/useAppReducer"
-import { useDataLoader } from "@/hooks/useDataLoader"
 import { useComputedValues } from "@/hooks/useComputedValues"
 import { useAppHandlers } from "@/hooks/useAppHandlers"
 import { HomeLayout } from "@/components/templates/HomeLayout"
@@ -27,31 +24,13 @@ export default function HomePage() {
   // useReducerで状態管理を統合
   const [state, dispatch] = useReducer(appReducer, initialState)
 
-  // データ読み込みの最適化
-  const { loadData } = useDataLoader()
-
-  // データの遅延読み込み
-  useEffect(() => {
-    const initializeData = async () => {
-      const data = await loadData()
-      dispatch({ type: 'SET_STORES', payload: data.stores as Store[] })
-      dispatch({ type: 'SET_NOTIFICATIONS', payload: data.notifications as Notification[] })
-      dispatch({ type: 'SET_DATA_LOADED', payload: true })
-    }
-
-    initializeData()
-  }, [loadData])
-
   // デバッグ用のログ（開発環境のみ）
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-    }
-  }, [state.isDataLoaded, state.stores.length, state.notifications.length, navigation.currentView, auth.isAuthenticated])
+  // state.stores は HomeLayout 内の無限スクロールで更新
 
   // 計算値をカスタムフックで分離
   const computedValues = useComputedValues(
-    state.stores as Store[] || [],
-    state.notifications as Notification[] || [],
+    state.stores || [],
+    state.notifications || [],
     auth || { isAuthenticated: false, user: undefined },
     filters || { isFavoritesFilter: false }
   )
