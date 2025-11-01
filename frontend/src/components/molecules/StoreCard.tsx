@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { Phone } from "lucide-react"
+import { Phone, Clock } from "lucide-react"
 import { FavoriteButton } from "@/components/atoms/FavoriteButton"
 import type { Store } from "@/types/store"
 import { getGenreColor } from "@/utils/genre-colors"
@@ -158,12 +158,22 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           />
         </div>
         
-        {/* ジャンルバッジと連絡先アイコン */}
+        {/* ジャンルバッジ・所在地・クーポンアイコンと連絡先アイコン */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
+            {(store.prefecture || store.city) && (
+              <span className="text-gray-600 text-sm">
+                {(store.prefecture || '') + (store.city ? ` ${store.city}` : '')}
+              </span>
+            )}
+            {store.couponUsageStart && store.couponUsageEnd && (
+              <span className="flex items-center gap-1 text-green-600" title={`${store.couponUsageStart}〜${store.couponUsageEnd}`}>
+                <Clock className="w-4 h-4" />
+              </span>
+            )}
             {showDistance && (
               <span className="text-black text-sm">現在位置から350m</span>
             )}

@@ -20,12 +20,16 @@ export interface Store {
   genre: string
   genreLabel: string
   address: string
+  prefecture?: string
+  city?: string
   phone: string
   description: string
   thumbnailUrl?: string
   isFavorite: boolean
   latitude?: number
   longitude?: number
+  couponUsageStart?: string
+  couponUsageEnd?: string
 
   // 詳細情報（任意）
   website?: string

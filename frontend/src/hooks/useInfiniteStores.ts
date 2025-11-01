@@ -42,12 +42,16 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       address:
         shop.fulladdress ||
         [shop.prefecture, shop.city, shop.address1, shop.address2].filter(Boolean).join(' '),
+      prefecture: shop.prefecture || undefined,
+      city: shop.city || undefined,
       phone: shop.phone || '',
       description: shop.description || '',
       thumbnailUrl: shop.images?.[0] || '',
       isFavorite: false,
       latitude: shop.latitude ? Number(shop.latitude) : undefined,
       longitude: shop.longitude ? Number(shop.longitude) : undefined,
+      couponUsageStart: shop.couponUsageStart || undefined,
+      couponUsageEnd: shop.couponUsageEnd || undefined,
       usageScenes: (shop.scenes || shop.sceneIds || [])
         .map((s: any) => (typeof s === 'string' ? s : s?.name))
         .filter(Boolean),
