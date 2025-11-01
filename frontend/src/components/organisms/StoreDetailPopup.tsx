@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { X } from "lucide-react"
@@ -115,6 +116,26 @@ export function StoreDetailPopup({
                 <div className="space-y-2">
                   <div className="text-base font-bold text-gray-900">禁煙・分煙</div>
                   <div className="text-base text-gray-700">{getSmokingPolicyText(store.smokingPolicy)}</div>
+                </div>
+              )}
+
+              {/* ホームページURL（任意） */}
+              {(store as any).homepageUrl && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">ホームページ</div>
+                  <div className="text-base text-gray-700 break-all">
+                    <a href={(store as any).homepageUrl} target="_blank" rel="noopener noreferrer" className="text-green-700 underline">
+                      {(store as any).homepageUrl}
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {/* クーポン利用時間（任意） */}
+              {((store as any).couponUsageStart && (store as any).couponUsageEnd) && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">クーポン利用時間</div>
+                  <div className="text-base text-gray-700">{`${(store as any).couponUsageStart}〜${(store as any).couponUsageEnd}`}</div>
                 </div>
               )}
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 
 // サーバーサイドなので NEXT_PUBLIC_ なしの環境変数を使用

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { HomeContainer } from "../organisms/HomeContainer"
 import { LoginLayout } from "./LoginLayout"
@@ -147,7 +147,7 @@ export function HomeLayout() {
   const currentUserRank = computedValues.currentUserRank
 
   // 無限スクロール: 初回ロードと追加ロード
-  const { isLoading: isStoresLoading, isLoadingMore, error, hasMore, sentinelRef, loadNext, items } = useInfiniteStores({ limit: 5 })
+  const { isLoading: isStoresLoading, isLoadingMore, error, sentinelRef, items } = useInfiniteStores({ limit: 5 })
 
   // 初回ページの要素を Context の stores に反映するため、監視と反映
   const initialAppliedRef = useRef(false)
