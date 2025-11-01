@@ -158,17 +158,12 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           />
         </div>
         
-        {/* ジャンルバッジ・所在地・クーポンアイコンと連絡先アイコン */}
+        {/* ジャンルバッジ・クーポンアイコンと連絡先アイコン */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
-            {(store.prefecture || store.city) && (
-              <span className="text-gray-600 text-sm">
-                {(store.prefecture || '') + (store.city ? ` ${store.city}` : '')}
-              </span>
-            )}
             {store.couponUsageStart && store.couponUsageEnd && (
               <span className="flex items-center gap-1 text-green-600" title={`${store.couponUsageStart}〜${store.couponUsageEnd}`}>
                 <Clock className="w-4 h-4" />
@@ -195,6 +190,11 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
               </button>
           </div>
         </div>
+        {(store.prefecture || store.city) && (
+          <div className="mt-1 text-gray-600 text-sm">
+            {(store.prefecture || '') + (store.city ? ` ${store.city}` : '')}
+          </div>
+        )}
       </div>
 
       {/* 店舗写真カルーセル / 画像なしプレースホルダ */}
