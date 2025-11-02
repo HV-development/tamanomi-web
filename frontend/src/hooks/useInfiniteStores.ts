@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Store } from '@/types/store'
+import { isFavoriteInStorage } from '@/lib/favorites-storage'
 
 interface UseInfiniteStoresOptions {
   limit?: number
@@ -90,6 +91,16 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     const digitalPayments = parsePaymentCode(shop.paymentCode)
     const hasPaymentMethods = !!shop.paymentSaicoin || !!shop.paymentTamapon || !!shop.paymentCash || creditCards.length > 0 || digitalPayments.length > 0
 
+    // セッションストレージからお気に入り状態を確認（APIから取得できない場合のフォールバック）
+    let isFavorite = shop.isFavorite || false
+    if (!isFavorite && typeof window !== 'undefined') {
+      try {
+        isFavorite = isFavoriteInStorage(shop.id)
+      } catch {
+        // セッションストレージのチェックに失敗した場合はAPIの値をそのまま使用
+      }
+    }
+
     return {
       id: shop.id,
       name: shop.name,
@@ -103,7 +114,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       phone: shop.phone || '',
       description: shop.description || '',
       thumbnailUrl: shop.images?.[0] || '',
-      isFavorite: false,
+      isFavorite,
       latitude: shop.latitude ? Number(shop.latitude) : undefined,
       longitude: shop.longitude ? Number(shop.longitude) : undefined,
       couponUsageStart: shop.couponUsageStart || undefined,
@@ -148,11 +159,21 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
   const fetchPage = useCallback(
     async (targetPage: number) => {
       try {
+        // 認証トークンを取得（存在する場合）
+        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        }
+        
+        // 認証トークンが存在する場合はAuthorizationヘッダーに含める
+        if (accessToken) {
+          headers['Authorization'] = `Bearer ${accessToken}`
+        }
+        
         const res = await fetch(`/api/shops?page=${targetPage}&limit=${limit}`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
         })
 
         if (!res.ok) {

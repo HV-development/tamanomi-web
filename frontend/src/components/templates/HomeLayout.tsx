@@ -32,6 +32,7 @@ import { UsageGuideModal } from "@/components/organisms/UsageGuideModal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"
+import { useFavorites } from "@/hooks/useFavorites"
 
 
 export function HomeLayout() {
@@ -54,10 +55,14 @@ export function HomeLayout() {
   const isAuthenticated = auth.isAuthenticated
   const isLoading = auth.isLoading
   const signupData = state.signupData
-  const favoriteStores = computedValues.favoriteStores
+  const isFavoritesOpen = state.isFavoritesOpen
   const historyStores: Store[] = [] // TODO: 履歴データの実装
   const isHistoryOpen = state.isHistoryOpen
-  const isFavoritesOpen = state.isFavoritesOpen
+  
+  // お気に入り一覧をAPIから取得、またはセッションストレージから取得
+  const { favoriteStores: apiFavoriteStores } = useFavorites(isFavoritesOpen, isAuthenticated, { allStores: stores })
+  // ローカルフィルタリングによるお気に入り一覧（フィルター表示用）
+  const favoriteStores = isFavoritesOpen ? apiFavoriteStores : computedValues.favoriteStores
   const user = auth.user
   const plan = auth.plan
   const usageHistory = auth.usageHistory || []

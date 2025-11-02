@@ -386,12 +386,121 @@ export const useAppHandlers = (
         dispatch({ type: 'MARK_ALL_NOTIFICATIONS_READ' })
     }, [dispatch])
 
-    const handleFavoriteToggle = useCallback((storeId: string) => {
+    const handleFavoriteToggle = useCallback(async (storeId: string) => {
+        // 未認証の場合はセッションストレージに保存（モーダルは表示しない）
+        if (!auth.isAuthenticated) {
+            try {
+                // セッションストレージにお気に入りを保存
+                const { toggleFavoriteInStorage } = await import('@/lib/favorites-storage')
+                toggleFavoriteInStorage(storeId)
+                
+                // UIを更新
+                dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+            } catch (error) {
+                console.error('セッションストレージへの保存エラー:', error)
+            }
+            return
+        }
+
+        // 認証済みの場合は楽観的更新：UIを先に更新
         dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
-    }, [dispatch])
+
+        // 認証済みの場合はAPI呼び出し
+        try {
+            // アクセストークンを取得
+            const accessToken = localStorage.getItem('accessToken')
+            if (!accessToken) {
+                throw new Error('認証情報が見つかりません。ログインしてください。')
+            }
+
+            // API呼び出し
+            let response: Response
+            let data: { isFavorite?: boolean; error?: { message?: string }; message?: string }
+            try {
+                response = await fetch(`/api/favorites/${storeId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
+                    body: JSON.stringify({}),
+                })
+
+                data = await response.json()
+
+                if (!response.ok) {
+                    // トークン期限切れの場合（401/403エラー）- セッションストレージに保存
+                    if (response.status === 401 || response.status === 403) {
+                        // トークンをクリア
+                        localStorage.removeItem('accessToken')
+                        localStorage.removeItem('refreshToken')
+                        auth.logout()
+                        
+                        // セッションストレージにお気に入りを保存
+                        try {
+                            const { toggleFavoriteInStorage } = await import('@/lib/favorites-storage')
+                            toggleFavoriteInStorage(storeId)
+                        } catch (storageError) {
+                            console.error('セッションストレージへの保存エラー:', storageError)
+                        }
+                        
+                        // UIは既に楽観的更新で更新済みなので、そのまま維持
+                        // 403エラーは正常処理なので、エラーとして扱わない（早期リターン）
+                        return
+                    }
+
+                    // その他のエラー時はロールバック（再度トグル）
+                    dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+                    throw new Error(data.error?.message || data.message || 'お気に入りの登録/削除に失敗しました')
+                }
+            } catch {
+                // ネットワークエラーなどの場合は、トークン期限切れの可能性があるのでセッションストレージに保存
+                // トークンをクリア
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('refreshToken')
+                auth.logout()
+                
+                // セッションストレージにお気に入りを保存
+                try {
+                    const { toggleFavoriteInStorage } = await import('@/lib/favorites-storage')
+                    toggleFavoriteInStorage(storeId)
+                } catch (storageError) {
+                    console.error('セッションストレージへの保存エラー:', storageError)
+                }
+                
+                // UIは既に楽観的更新で更新済みなので、そのまま維持
+                // fetchErrorは無視（早期リターン）
+                return
+            }
+
+            // APIから返された状態を反映（既に楽観的更新で更新済みだが、一応確認）
+            if (data.isFavorite !== undefined) {
+                // 状態を確認して必要に応じて調整
+                const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
+                if (currentStore && currentStore.isFavorite !== data.isFavorite) {
+                    dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+                }
+            }
+        } catch (error) {
+            // トークン期限切れエラー（403など）は既に処理済みなので、ここでは処理しない
+            // その他のエラーのみ処理
+            const errorMessage = error instanceof Error ? error.message : 'お気に入りの登録/削除に失敗しました'
+            
+            // 認証関連のエラーは既に処理済みなので、エラーログを出力しない
+            if (errorMessage.includes('無効なトークン') || errorMessage.includes('認証')) {
+                return
+            }
+            
+            // その他のエラー時はロールバック（再度トグル）
+            dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+            console.error('お気に入り登録/削除エラー:', errorMessage)
+            
+            // TODO: トーストやアラートでエラーを表示
+        }
+    }, [auth.isAuthenticated, auth, dispatch, state.stores])
 
     const handleCouponsClick = useCallback((storeId: string) => {
-        const store = state.stores.find((s) => s.id === storeId)
+        const store = state.stores.find((s: { id: string }) => s.id === storeId)
         if (store) {
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
             dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
