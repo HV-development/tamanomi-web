@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import React from 'react'
-import type { Coupon } from '@hv-development/schemas'
+import type { Coupon } from '@/types/coupon'
 
 interface CouponConfirmationPageProps {
   coupon: Coupon | null
@@ -27,18 +27,20 @@ export default function CouponConfirmationPage({
       className={`min-h-screen ${backgroundColorClass} flex flex-col`}
     >
       {/* スタッフ向け確認画面（反転表示） */}
-      <div className="flex-1 flex flex-col justify-center items-center p-4 transform scale-y-[-1]">
+      <div className="flex-1 flex flex-col justify-center items-center p-4">
         <div className="w-full max-w-xs mx-auto">
           {/* 店員への指示 */}
           <div className="text-center mb-6">
             <h2 className="text-base font-bold text-gray-900">店員の方に画面をお見せください</h2>
-            <p className="text-red-600 font-medium text-base mt-2">
-              自分では押さないでください
-            </p>
+            {coupon.drinkType === 'alcohol' && (
+              <p className="text-red-600 font-medium text-base mt-2">
+                ※20歳未満の方はアルコールは飲めません
+              </p>
+            )}
           </div>
 
           {/* メインカード */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-300 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-300 overflow-hidden transform scale-y-[-1]">
             {/* ヘッダー */}
             <div className="bg-green-600 p-3 text-white">
               <div className="flex items-center justify-center">
@@ -76,11 +78,13 @@ export default function CouponConfirmationPage({
                     </p>
 
                     {/* 利用条件 */}
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="text-xs text-gray-600">
-                        利用条件：焼き鳥2本以上のご注文
-                      </p>
-                    </div>
+                    {coupon.conditions && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-600">
+                          利用条件：{coupon.conditions}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

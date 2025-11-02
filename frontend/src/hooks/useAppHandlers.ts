@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useCallback, useState, useRef, useEffect } from "react"
-import type { AppAction, AppState, AppHandlers, Store } from '../../tamanomi-schemas/src/frontend/types'
+import type { AppAction, AppState, AppHandlers, Store } from '@hv-development/schemas'
 import { appConfig } from '@/config/appConfig'
 import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
@@ -532,11 +532,79 @@ export const useAppHandlers = (
         }
     }, [auth, dispatch, state.stores])
 
-    const handleCouponsClick = useCallback((storeId: string) => {
+    const handleCouponsClick = useCallback(async (storeId: string) => {
+        console.log('🔍 [handleCouponsClick] Called with storeId:', storeId)
         const store = state.stores.find((s: { id: string }) => s.id === storeId)
+        console.log('🔍 [handleCouponsClick] Found store:', store?.name)
+        
         if (store) {
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
             dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
+
+            // クーポンを取得
+            try {
+                const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+                console.log('🔍 [handleCouponsClick] Access token:', accessToken ? 'exists' : 'missing')
+                
+                if (!accessToken) {
+                    console.error('❌ No access token for coupon fetching')
+                    dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
+                    return
+                }
+
+                const url = `/api/coupons?shopId=${storeId}&status=active&isPublic=true&limit=100`
+                console.log('🔍 [handleCouponsClick] Fetching from:', url)
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
+                    cache: 'no-store',
+                })
+
+                console.log('🔍 [handleCouponsClick] Response status:', response.status)
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}))
+                    console.error('❌ Failed to fetch coupons:', response.status, errorData)
+                    dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
+                    return
+                }
+
+                const data = await response.json()
+                console.log('🔍 [handleCouponsClick] Response data:', {
+                    couponsCount: data.coupons?.length || 0,
+                    pagination: data.pagination
+                })
+                
+                if (data.coupons && data.coupons.length > 0) {
+                    // APIからのクーポンをfrontend用の形式に変換
+                    const storeCoupons = data.coupons.map((coupon: any) => ({
+                        id: coupon.id,
+                        name: coupon.title,
+                        description: coupon.description || '',
+                        conditions: coupon.conditions || null,
+                        imageUrl: coupon.imageUrl || '',
+                        drinkType: coupon.drinkType || null,
+                        status: coupon.status,
+                        shopId: coupon.shopId,
+                        storeName: coupon.shop?.name || store.name,
+                        uuid: coupon.id,
+                        createdAt: coupon.createdAt,
+                        updatedAt: coupon.updatedAt,
+                    }))
+                    console.log('✅ Loaded coupons from API:', storeCoupons.length, storeCoupons)
+                    dispatch({ type: 'SET_STORE_COUPONS', payload: storeCoupons })
+                } else {
+                    console.log('⚠️ No coupons found')
+                    dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
+                }
+            } catch (error) {
+                console.error('❌ Error fetching coupons:', error)
+                dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
+            }
         }
     }, [state.stores, dispatch])
 
@@ -710,22 +778,58 @@ export const useAppHandlers = (
             return
         }
 
-        // 動的インポートでクーポンデータを取得
-        import("../data/mock-coupons").then(({ mockCoupons }) => {
-            const storeCoupons = state.selectedStore ? mockCoupons[state.selectedStore.id] || [] : []
-            const coupon = storeCoupons.find((c) => c.id === couponId)
-            if (coupon) {
-                dispatch({ type: 'SET_SELECTED_COUPON', payload: coupon })
-                navigation.navigateToView("coupon-confirmation")
-                dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
-            }
-        })
-    }, [auth.isAuthenticated, state.selectedStore, navigation, dispatch])
+        // プラン未契約チェック
+        if (!auth.plan) {
+            dispatch({ type: 'SET_PLAN_REQUIRED_MODAL_OPEN', payload: true })
+            return
+        }
 
-    const handleConfirmCoupon = useCallback(() => {
-        dispatch({ type: 'SET_SUCCESS_MODAL_OPEN', payload: true })
-        navigation.navigateToView("home")
-    }, [navigation, dispatch])
+        // storeCouponsからクーポンを取得
+        const coupon = state.storeCoupons.find((c) => c.id === couponId)
+        if (coupon) {
+            dispatch({ type: 'SET_SELECTED_COUPON', payload: coupon })
+            navigation.navigateToView("coupon-confirmation")
+            dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
+        }
+    }, [auth.isAuthenticated, auth.plan, state.storeCoupons, navigation, dispatch])
+
+    const handleConfirmCoupon = useCallback(async () => {
+        if (!state.selectedCoupon || !state.selectedStore) {
+            return
+        }
+
+        try {
+            const accessToken = localStorage.getItem('accessToken')
+            if (!accessToken) {
+                alert('認証エラーが発生しました。再度ログインしてください。')
+                return
+            }
+
+            const response = await fetch(`/api/coupons/${state.selectedCoupon.id}/use`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    shopId: state.selectedStore.id
+                }),
+            })
+
+            if (!response.ok) {
+                const error = await response.json()
+                alert(error.error?.message || 'クーポンの使用に失敗しました')
+                return
+            }
+
+            // 成功時
+            dispatch({ type: 'SET_SUCCESS_MODAL_OPEN', payload: true })
+            navigation.navigateToView("home")
+        } catch (error) {
+            console.error('クーポン使用エラー:', error)
+            alert('クーポンの使用中にエラーが発生しました')
+        }
+    }, [navigation, dispatch, state.selectedCoupon, state.selectedStore])
 
     const handleSuccessModalClose = useCallback(() => {
         dispatch({ type: 'SET_SUCCESS_MODAL_OPEN', payload: false })
@@ -742,6 +846,15 @@ export const useAppHandlers = (
         dispatch({ type: 'RESET_LOGIN_STATE' })
         navigation.navigateToView("login")
     }, [navigation, dispatch])
+
+    const handlePlanRequiredModalClose = useCallback(() => {
+        dispatch({ type: 'SET_PLAN_REQUIRED_MODAL_OPEN', payload: false })
+    }, [dispatch])
+
+    const handlePlanRequiredModalRegister = useCallback(() => {
+        dispatch({ type: 'SET_PLAN_REQUIRED_MODAL_OPEN', payload: false })
+        router.push('/plan-registration')
+    }, [dispatch, router])
 
     const handleCancelCoupon = useCallback(() => {
         navigation.navigateToView("home")
@@ -1082,6 +1195,8 @@ export const useAppHandlers = (
         handleSuccessModalClose,
         handleLoginRequiredModalClose,
         handleLoginRequiredModalLogin,
+        handlePlanRequiredModalClose,
+        handlePlanRequiredModalRegister,
         handleCancelCoupon,
         handleUsageGuideClick,
         handleUsageGuideBack,

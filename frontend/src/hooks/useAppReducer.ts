@@ -1,4 +1,4 @@
-import type { AppState, AppAction } from '../../tamanomi-schemas/src/frontend/types'
+import type { AppState, AppAction } from '@hv-development/schemas'
 
 // 初期状態
 export const initialState: AppState = {
@@ -8,13 +8,14 @@ export const initialState: AppState = {
     isCouponListOpen: false,
     selectedStore: null,
     selectedCoupon: null,
+    storeCoupons: [],
     isSuccessModalOpen: false,
     isLoginRequiredModalOpen: false,
+    isPlanRequiredModalOpen: false,
     isStoreDetailPopupOpen: false,
     isFavoritesOpen: false,
     loginStep: "password",
     loginEmail: "",
-    loginError: "",
     signupData: null,
     emailChangeStep: "form",
     newEmail: "",
@@ -45,10 +46,14 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, selectedStore: action.payload }
         case 'SET_SELECTED_COUPON':
             return { ...state, selectedCoupon: action.payload }
+        case 'SET_STORE_COUPONS':
+            return { ...state, storeCoupons: action.payload }
         case 'SET_SUCCESS_MODAL_OPEN':
             return { ...state, isSuccessModalOpen: action.payload }
         case 'SET_LOGIN_REQUIRED_MODAL_OPEN':
             return { ...state, isLoginRequiredModalOpen: action.payload }
+        case 'SET_PLAN_REQUIRED_MODAL_OPEN':
+            return { ...state, isPlanRequiredModalOpen: action.payload }
         case 'SET_STORE_DETAIL_POPUP_OPEN':
             return { ...state, isStoreDetailPopupOpen: action.payload }
         case 'SET_FAVORITES_OPEN':
@@ -88,7 +93,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
                 notifications: state.notifications.map(n => ({ ...n, isRead: true }))
             }
         case 'RESET_LOGIN_STATE':
-            return { ...state, loginStep: "password", loginEmail: "", loginError: "" }
+            return { ...state, loginStep: "password", loginEmail: "" }
         case 'RESET_SIGNUP_STATE':
             return { ...state, signupData: null }
         case 'RESET_COUPON_STATE':

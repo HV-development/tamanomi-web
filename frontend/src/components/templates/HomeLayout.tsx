@@ -17,6 +17,7 @@ import { PlanChangeContainer } from "../organisms/PlanChangeContainer"
 import { CouponListPopup } from "../molecules/CouponListPopup"
 import { CouponUsedSuccessModal } from "../molecules/CouponUsedSuccessModal"
 import { LoginRequiredModal } from "../molecules/LoginRequiredModal"
+import { PlanRequiredModal } from "../molecules/PlanRequiredModal"
 import { EmailChangeSuccessModal } from "../organisms/EmailChangeSuccessModal"
 import { StoreDetailPopup } from "@/components/organisms/StoreDetailPopup"
 import { Logo } from "../atoms/Logo"
@@ -33,6 +34,8 @@ import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"
 import { useFavorites } from "@/hooks/useFavorites"
+import { calculateAge } from "@/utils/age-calculator"
+import { checkTodayUsage } from "@/utils/coupon-usage-check"
 
 
 export function HomeLayout() {
@@ -43,6 +46,7 @@ export function HomeLayout() {
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
+  const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres
@@ -145,6 +149,7 @@ export function HomeLayout() {
 
     return () => clearTimeout(timer)
   }, [stores.length, isAuthenticated, dispatch])
+
   const user = auth.user
   const plan = auth.plan
   const usageHistory = auth.usageHistory || []
@@ -153,12 +158,30 @@ export function HomeLayout() {
   const isCouponListOpen = state.isCouponListOpen
   const selectedStore = state.selectedStore
   const selectedCoupon = state.selectedCoupon
-  const storeCoupons = state.storeCoupons || []
+  const storeCoupons = state.storeCoupons
   const passwordResetStep = state.passwordResetStep
   const passwordResetEmail = state.passwordResetEmail
   const emailRegistrationStep = state.emailRegistrationStep
   const emailRegistrationEmail = state.emailRegistrationEmail
   const emailConfirmationEmail = state.emailConfirmationEmail || ""
+
+  // ユーザーの年齢を計算
+  const userAge = user ? calculateAge(user.birthDate || '') : null
+
+  // クーポン使用履歴のチェック
+  useEffect(() => {
+    const checkUsage = async () => {
+      if (!isCouponListOpen || !selectedStore || !isAuthenticated) {
+        setIsCouponUsedToday(false)
+        return
+      }
+
+      const hasUsedToday = await checkTodayUsage(selectedStore.id)
+      setIsCouponUsedToday(hasUsedToday)
+    }
+
+    checkUsage()
+  }, [isCouponListOpen, selectedStore, isAuthenticated])
 
   // イベントハンドラーを Context から取得
   const onGenresChange = filters.setSelectedGenres
@@ -221,6 +244,9 @@ export function HomeLayout() {
   const isLoginRequiredModalOpen = state.isLoginRequiredModalOpen
   const onLoginRequiredModalClose = handlers.handleLoginRequiredModalClose
   const onLoginRequiredModalLogin = handlers.handleLoginRequiredModalLogin
+  const isPlanRequiredModalOpen = state.isPlanRequiredModalOpen
+  const onPlanRequiredModalClose = handlers.handlePlanRequiredModalClose
+  const onPlanRequiredModalRegister = handlers.handlePlanRequiredModalRegister
   const onProfileEditSubmit = handlers.handleProfileEditSubmit
   const onEmailChangeSubmit = handlers.handleEmailChangeSubmit
   const onPasswordChangeSubmit = handlers.handlePasswordChangeSubmit
@@ -701,6 +727,8 @@ export function HomeLayout() {
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
         onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
+        userAge={userAge}
+        isUsedToday={isCouponUsedToday}
       />
 
       {/* 使用方法ガイドモーダル */}
@@ -721,6 +749,13 @@ export function HomeLayout() {
         isOpen={isLoginRequiredModalOpen}
         onClose={onLoginRequiredModalClose}
         onLogin={onLoginRequiredModalLogin}
+      />
+
+      {/* プランが必要なモーダル */}
+      <PlanRequiredModal
+        isOpen={isPlanRequiredModalOpen}
+        onClose={onPlanRequiredModalClose}
+        onRegisterPlan={onPlanRequiredModalRegister}
       />
 
       {/* メールアドレス変更成功モーダル */}

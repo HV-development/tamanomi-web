@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo, useEffect } from "react"
 import Image from "next/image"
 import { Ticket, X } from "lucide-react"
 import type { Coupon } from "@/types/coupon"
@@ -11,11 +12,29 @@ interface CouponListPopupProps {
   onClose: () => void
   onBack: () => void
   onUseCoupon: (couponId: string) => void
- onUsageGuideClick: () => void
+  onUsageGuideClick: () => void
+  userAge?: number | null
+  isUsedToday?: boolean
 }
 
-export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick }: CouponListPopupProps) {
+export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userAge, isUsedToday }: CouponListPopupProps) {
   if (!isOpen) return null
+
+  useEffect(() => {
+    console.log('🔍 [CouponListPopup] coupons prop:', coupons.length, coupons)
+  }, [coupons])
+
+  // フィルタリングされたクーポンリスト
+  const filteredCoupons = useMemo(() => {
+    let filtered = coupons
+
+    // 年齢制限：20歳未満の場合、アルコールクーポンを非表示
+    if (userAge !== null && userAge !== undefined && userAge < 20) {
+      filtered = filtered.filter(coupon => coupon.drinkType !== "alcohol")
+    }
+
+    return filtered
+  }, [coupons, userAge])
 
 
   return (
@@ -44,6 +63,12 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
               <h4 className="text-lg font-bold text-green-900">{storeName}</h4>
+              {/* 使用済みメッセージ */}
+              {isUsedToday && (
+                <p className="text-red-600 font-bold text-base mt-2">
+                  本日のクーポンは使用済みです
+                </p>
+              )}
              <button 
                onClick={onUsageGuideClick}
                className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
@@ -56,7 +81,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
           {/* 使用方法リンク */}
           {/* クーポンリスト */}
           <div className="flex-1 overflow-y-auto p-4 bg-transparent">
-            {coupons.length === 0 ? (
+            {filteredCoupons.length === 0 ? (
               <div className="text-center py-12">
                 <Ticket className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <div className="text-gray-500 text-lg font-medium mb-2">クーポンがありません</div>
@@ -64,10 +89,10 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
               </div>
             ) : (
               <div className="space-y-4">
-                {coupons.map((coupon) => (
+                {filteredCoupons.map((coupon) => (
                   <div
                     key={coupon.id}
-                    className="bg-white rounded-2xl border-2 border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                    className={`bg-white rounded-2xl border-2 shadow-sm transition-shadow overflow-hidden ${isUsedToday ? 'opacity-50 border-gray-300' : 'border-gray-200 hover:shadow-md'}`}
                   >
                     {/* クーポン画像 */}
                     <div className="w-full h-48 overflow-hidden relative">
@@ -89,16 +114,23 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
                       </p>
                       
                       {/* 利用条件 */}
-                      <div className="mb-4 pt-3 border-t border-gray-200">
-                        <p className="text-xs text-gray-600 text-center">
-                          利用条件：焼き鳥2本以上のご注文
-                        </p>
-                      </div>
+                      {coupon.conditions && (
+                        <div className="mb-4 pt-3 border-t border-gray-200">
+                          <p className="text-xs text-gray-600 text-center">
+                            利用条件：{coupon.conditions}
+                          </p>
+                        </div>
+                      )}
                       
                       {/* 利用ボタン */}
                       <button
                         onClick={() => onUseCoupon(coupon.id)}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                        disabled={isUsedToday}
+                        className={`w-full text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md ${
+                          isUsedToday
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-[1.02]'
+                        }`}
                       >
                         このクーポンで乾杯！
                       </button>
