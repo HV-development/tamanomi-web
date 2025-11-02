@@ -5,6 +5,7 @@ import { Phone, Clock, MapPin } from "lucide-react"
 import { FavoriteButton } from "@/components/atoms/FavoriteButton"
 import type { Store } from "@/types/store"
 import { getGenreColor } from "@/utils/genre-colors"
+import { formatDistance } from "@/utils/location"
 import { useState, useRef } from "react"
 
 interface StoreCardProps {
@@ -164,8 +165,8 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
-            {showDistance && (
-              <span className="text-black text-sm">現在位置から350m</span>
+            {showDistance && store.distance !== undefined && (
+              <span className="text-black text-sm">現在位置から{formatDistance(store.distance)}</span>
             )}
           </div>
           <div className="flex items-center gap-1">

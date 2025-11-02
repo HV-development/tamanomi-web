@@ -30,6 +30,7 @@ export interface Store {
   isFavorite: boolean
   latitude?: number
   longitude?: number
+  distance?: number // 現在位置からの距離（メートル）
   couponUsageStart?: string
   couponUsageEnd?: string
 

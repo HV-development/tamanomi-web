@@ -29,6 +29,9 @@ export const initialState: AppState = {
     emailConfirmationEmail: "",
     historyStores: [],
     isHistoryOpen: false,
+    currentLocation: null,
+    isLocationLoading: false,
+    locationError: null,
 }
 
 // リデューサー（簡略化）
@@ -137,6 +140,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, historyStores: action.payload }
         case 'SET_HISTORY_OPEN':
             return { ...state, isHistoryOpen: action.payload }
+        case 'SET_CURRENT_LOCATION':
+            return { ...state, currentLocation: action.payload }
+        case 'SET_LOCATION_LOADING':
+            return { ...state, isLocationLoading: action.payload }
+        case 'SET_LOCATION_ERROR':
+            return { ...state, locationError: action.payload }
         default:
             return state
     }

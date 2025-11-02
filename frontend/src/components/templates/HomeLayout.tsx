@@ -685,6 +685,7 @@ export function HomeLayout() {
           isLoadingMore={isLoadingMore}
           bottomError={error}
           backgroundColorClass={backgroundColorClass}
+          currentLocation={state.currentLocation}
         />
       </div>
 
