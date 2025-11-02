@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { Phone, Clock } from "lucide-react"
+import { Phone, Clock, MapPin } from "lucide-react"
 import { FavoriteButton } from "@/components/atoms/FavoriteButton"
 import type { Store } from "@/types/store"
 import { getGenreColor } from "@/utils/genre-colors"
@@ -158,17 +158,12 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           />
         </div>
         
-        {/* ジャンルバッジ・クーポンアイコンと連絡先アイコン */}
+        {/* ジャンルバッジと連絡先アイコン */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
-            {store.couponUsageStart && store.couponUsageEnd && (
-              <span className="flex items-center gap-1 text-green-600" title={`${store.couponUsageStart}〜${store.couponUsageEnd}`}>
-                <Clock className="w-4 h-4" />
-              </span>
-            )}
             {showDistance && (
               <span className="text-black text-sm">現在位置から350m</span>
             )}
@@ -190,9 +185,21 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
               </button>
           </div>
         </div>
+        
+        {/* アクセス情報 */}
         {(store.prefecture || store.city) && (
-          <div className="mt-1 text-gray-600 text-sm">
-            {(store.prefecture || '') + (store.city ? ` ${store.city}` : '')}
+          <div className="mt-2 flex items-center gap-2 text-gray-600 text-sm">
+            <MapPin className="w-5 h-5 flex-shrink-0" />
+            <span>{[store.prefecture, store.city].filter(Boolean).join(' ')}</span>
+          </div>
+        )}
+        
+        {/* 時間限定クーポン情報 */}
+        {store.couponUsageStart && store.couponUsageEnd && (
+          <div className="mt-1 flex items-center gap-2 text-green-600 text-sm">
+            <Clock className="w-5 h-5" />
+            <span className="font-medium">時間限定クーポン</span>
+            <span>{store.couponUsageStart}〜{store.couponUsageEnd}</span>
           </div>
         )}
       </div>
