@@ -26,7 +26,9 @@ RUN if [ -z "$GITHUB_TOKEN" ]; then \
 # 依存関係のインストール（公開パッケージから）
 RUN pnpm install --no-frozen-lockfile
 
-# ソースコードをコピー
+# ソースコードをコピー（node_modulesは除外される）
+# 念のため、既存のnode_modulesを削除してからコピー
+RUN rm -rf node_modules/@hv-development/schemas 2>/dev/null || true
 COPY tamanomi-web/frontend ./
 
 # トークンを含む.npmrcを削除（セキュリティのため）
