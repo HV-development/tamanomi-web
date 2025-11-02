@@ -387,14 +387,25 @@ export const useAppHandlers = (
     }, [dispatch])
 
     const handleFavoriteToggle = useCallback(async (storeId: string) => {
+        // 現在の状態を確認（UIの状態ではなく、データの状態を確認）
+        const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
+        const currentIsFavorite = currentStore?.isFavorite ?? false
+        
         // 未認証の場合はセッションストレージに保存（モーダルは表示しない）
         if (!auth.isAuthenticated) {
             try {
-                // セッションストレージにお気に入りを保存
-                const { toggleFavoriteInStorage } = await import('@/lib/favorites-storage')
-                toggleFavoriteInStorage(storeId)
+                // セッションストレージの状態も確認
+                const { isFavoriteInStorage, addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
+                const storageIsFavorite = isFavoriteInStorage(storeId)
                 
-                // UIを更新
+                // 現在の状態の逆にする（登録されている場合は削除、削除されている場合は登録）
+                if (storageIsFavorite) {
+                    removeFavoriteFromStorage(storeId)
+                } else {
+                    addFavoriteToStorage(storeId)
+                }
+                
+                // UIを更新（現在の状態の逆にする）
                 dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
             } catch (error) {
                 console.error('セッションストレージへの保存エラー:', error)
@@ -437,9 +448,15 @@ export const useAppHandlers = (
                         auth.logout()
                         
                         // セッションストレージにお気に入りを保存
+                        // 楽観的更新で既にUIが反転しているが、元の状態（currentIsFavorite）の逆に保存する
                         try {
-                            const { toggleFavoriteInStorage } = await import('@/lib/favorites-storage')
-                            toggleFavoriteInStorage(storeId)
+                            const { addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
+                            // 元の状態の逆にする（登録されていた場合は削除、削除されていた場合は登録）
+                            if (currentIsFavorite) {
+                                removeFavoriteFromStorage(storeId)
+                            } else {
+                                addFavoriteToStorage(storeId)
+                            }
                         } catch (storageError) {
                             console.error('セッションストレージへの保存エラー:', storageError)
                         }
@@ -461,9 +478,15 @@ export const useAppHandlers = (
                 auth.logout()
                 
                 // セッションストレージにお気に入りを保存
+                // 楽観的更新で既にUIが反転しているが、元の状態（currentIsFavorite）の逆に保存する
                 try {
-                    const { toggleFavoriteInStorage } = await import('@/lib/favorites-storage')
-                    toggleFavoriteInStorage(storeId)
+                    const { addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
+                    // 元の状態の逆にする（登録されていた場合は削除、削除されていた場合は登録）
+                    if (currentIsFavorite) {
+                        removeFavoriteFromStorage(storeId)
+                    } else {
+                        addFavoriteToStorage(storeId)
+                    }
                 } catch (storageError) {
                     console.error('セッションストレージへの保存エラー:', storageError)
                 }
@@ -473,12 +496,22 @@ export const useAppHandlers = (
                 return
             }
 
-            // APIから返された状態を反映（既に楽観的更新で更新済みだが、一応確認）
+            // APIから返された状態を反映
+            // 楽観的更新で既にUIをトグルしているが、APIの結果が期待と異なる場合は調整
             if (data.isFavorite !== undefined) {
-                // 状態を確認して必要に応じて調整
                 const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
-                if (currentStore && currentStore.isFavorite !== data.isFavorite) {
-                    dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+                const currentUIState = currentStore?.isFavorite ?? false
+                
+                // 楽観的更新後の状態（元の状態の逆）とAPIの結果を比較
+                // 元の状態（currentIsFavorite）の逆が期待値
+                const expectedState = !currentIsFavorite
+                
+                // APIの結果が期待値と異なる場合は調整（通常は一致するはず）
+                if (data.isFavorite !== expectedState) {
+                    // APIの結果が正しいので、UIをAPIの結果に合わせる
+                    if (currentUIState !== data.isFavorite) {
+                        dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+                    }
                 }
             }
         } catch (error) {
@@ -497,7 +530,7 @@ export const useAppHandlers = (
             
             // TODO: トーストやアラートでエラーを表示
         }
-    }, [auth.isAuthenticated, auth, dispatch, state.stores])
+    }, [auth, dispatch, state.stores])
 
     const handleCouponsClick = useCallback((storeId: string) => {
         const store = state.stores.find((s: { id: string }) => s.id === storeId)

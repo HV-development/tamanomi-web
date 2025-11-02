@@ -13,6 +13,7 @@ interface HistoryPopupProps {
 }
 
 export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCouponsClick }: HistoryPopupProps) {
+  console.log('🔍 [HistoryPopup] Rendered:', { isOpen, storesCount: stores.length, stores: stores.map(s => ({ id: s.id, name: s.name, thumbnailUrl: s.thumbnailUrl })) })
   if (!isOpen) return null
 
   return (

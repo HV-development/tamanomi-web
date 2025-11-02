@@ -63,6 +63,88 @@ export function HomeLayout() {
   const { favoriteStores: apiFavoriteStores } = useFavorites(isFavoritesOpen, isAuthenticated, { allStores: stores })
   // ローカルフィルタリングによるお気に入り一覧（フィルター表示用）
   const favoriteStores = isFavoritesOpen ? apiFavoriteStores : computedValues.favoriteStores
+
+  // 認証済みユーザーの場合、お気に入り状態を同期する
+  useEffect(() => {
+    if (!isAuthenticated || !stores.length) return
+
+    const syncFavorites = async () => {
+      try {
+        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        if (!accessToken) return
+
+        const response = await fetch('/api/favorites', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          cache: 'no-store',
+        })
+
+        if (!response.ok) {
+          return
+        }
+
+        const data = await response.json()
+        const favoriteShopIds = (data.shops || []).map((shop: { id: string }) => shop.id) as string[]
+
+        // 各店舗のisFavorite状態を同期
+        // @ts-expect-error - SYNC_FAVORITES action type will be available after schemas rebuild
+        dispatch({
+          type: 'SYNC_FAVORITES',
+          payload: favoriteShopIds
+        })
+      } catch (error) {
+        console.error('❌ [HomeLayout] Error syncing favorites:', error)
+      }
+    }
+
+    // 初回ロード時とログイン時に同期
+    syncFavorites()
+  }, [isAuthenticated, stores.length, dispatch])
+
+  // storesが変更されたときにも同期する（店舗データが読み込まれた後）
+  useEffect(() => {
+    if (!isAuthenticated || !stores.length) return
+    
+    // 少し遅延してから同期（店舗データが完全に読み込まれた後）
+    const timer = setTimeout(() => {
+      const syncFavorites = async () => {
+        try {
+          const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+          if (!accessToken) return
+
+          const response = await fetch('/api/favorites', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            cache: 'no-store',
+          })
+
+          if (!response.ok) return
+
+          const data = await response.json()
+          const favoriteShopIds = (data.shops || []).map((shop: { id: string }) => shop.id) as string[]
+
+          // 各店舗のisFavorite状態を同期
+          // @ts-expect-error - SYNC_FAVORITES action type will be available after schemas rebuild
+          dispatch({
+            type: 'SYNC_FAVORITES',
+            payload: favoriteShopIds
+          })
+        } catch (error) {
+          console.error('❌ [HomeLayout] Error syncing favorites:', error)
+        }
+      }
+      
+      syncFavorites()
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [stores.length, isAuthenticated, dispatch])
   const user = auth.user
   const plan = auth.plan
   const usageHistory = auth.usageHistory || []

@@ -63,6 +63,18 @@ export function appReducer(state: AppState, action: AppAction): AppState {
                     ? { ...state.selectedStore, isFavorite: !state.selectedStore.isFavorite }
                     : state.selectedStore
             }
+        case 'SYNC_FAVORITES':
+            const favoriteIds = new Set(action.payload)
+            return {
+                ...state,
+                stores: state.stores.map(store => ({
+                    ...store,
+                    isFavorite: favoriteIds.has(store.id)
+                })),
+                selectedStore: state.selectedStore
+                    ? { ...state.selectedStore, isFavorite: favoriteIds.has(state.selectedStore.id) }
+                    : state.selectedStore
+            }
         case 'MARK_NOTIFICATION_READ':
             return {
                 ...state,

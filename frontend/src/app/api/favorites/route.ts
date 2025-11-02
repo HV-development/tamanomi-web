@@ -9,17 +9,13 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
     
     if (!authHeader) {
-      console.log('❌ [favorites] No authorization header')
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
       )
     }
 
-    console.log('🔍 [favorites] Authorization header found, calling backend API')
-
     const fullUrl = buildApiUrl('/users/favorites')
-    console.log('🔍 [favorites] Backend URL:', fullUrl)
 
     const response = await fetch(fullUrl, {
       method: 'GET',
@@ -30,13 +26,9 @@ export async function GET(request: NextRequest) {
       cache: 'no-store',
     })
 
-    console.log('🔍 [favorites] Backend response status:', response.status)
-
     const data = await response.json()
 
     if (!response.ok) {
-      console.error('❌ [favorites] Backend API error:', data)
-      
       // 403エラーの場合（アカウントタイプ不一致）は特別に処理
       if (response.status === 403) {
         return NextResponse.json(
@@ -51,7 +43,6 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    console.log('🔍 [favorites] Backend response data:', data)
     return NextResponse.json(data)
 
   } catch (error) {
