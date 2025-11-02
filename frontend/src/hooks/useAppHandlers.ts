@@ -579,7 +579,7 @@ export const useAppHandlers = (
                     return
                 }
 
-                const url = `/api/coupons?shopId=${storeId}&status=active&isPublic=true&limit=100`
+                const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
                 console.log('🔍 [handleCouponsClick] Fetching from:', url)
                 
                 const response = await fetch(url, {
