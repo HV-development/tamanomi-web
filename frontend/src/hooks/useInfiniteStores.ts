@@ -34,6 +34,62 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
   const [items, setItems] = useState<Store[]>([])
 
   const mapShopToStore = useCallback((shop: any): Store => {
+    // paymentCreditとpaymentCodeの構造を解析
+    const parsePaymentCredit = (paymentCredit: any): string[] => {
+      if (!paymentCredit) return []
+      let brands: string[] = []
+      let other: string | undefined
+      
+      if (typeof paymentCredit === 'string') {
+        try {
+          const parsed = JSON.parse(paymentCredit)
+          brands = Array.isArray(parsed.brands) ? parsed.brands : []
+          other = parsed.other
+        } catch {
+          return []
+        }
+      } else if (typeof paymentCredit === 'object') {
+        brands = Array.isArray(paymentCredit.brands) ? paymentCredit.brands : []
+        other = paymentCredit.other
+      }
+      
+      // otherがある場合は配列に追加
+      if (other && other.trim()) {
+        return [...brands, other]
+      }
+      return brands
+    }
+
+    const parsePaymentCode = (paymentCode: any): string[] => {
+      if (!paymentCode) return []
+      let services: string[] = []
+      let other: string | undefined
+      
+      if (typeof paymentCode === 'string') {
+        try {
+          const parsed = JSON.parse(paymentCode)
+          services = Array.isArray(parsed.services) ? parsed.services : []
+          other = parsed.other
+        } catch {
+          return []
+        }
+      } else if (typeof paymentCode === 'object') {
+        services = Array.isArray(paymentCode.services) ? paymentCode.services : []
+        other = paymentCode.other
+      }
+      
+      // otherがある場合は配列に追加
+      if (other && other.trim()) {
+        return [...services, other]
+      }
+      return services
+    }
+
+    // paymentMethodsを構築
+    const creditCards = parsePaymentCredit(shop.paymentCredit)
+    const digitalPayments = parsePaymentCode(shop.paymentCode)
+    const hasPaymentMethods = !!shop.paymentSaicoin || !!shop.paymentTamapon || !!shop.paymentCash || creditCards.length > 0 || digitalPayments.length > 0
+
     return {
       id: shop.id,
       name: shop.name,
@@ -52,9 +108,32 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       longitude: shop.longitude ? Number(shop.longitude) : undefined,
       couponUsageStart: shop.couponUsageStart || undefined,
       couponUsageEnd: shop.couponUsageEnd || undefined,
-      usageScenes: (shop.scenes || shop.sceneIds || [])
-        .map((s: any) => (typeof s === 'string' ? s : s?.name))
-        .filter(Boolean),
+      homepageUrl: shop.homepageUrl || undefined,
+      details: shop.details || undefined,
+      businessHours: shop.businessHours || undefined,
+      closedDays: shop.holidays || shop.closedDays || undefined,
+      holidays: shop.holidays || undefined,
+      smokingPolicy: shop.smokingType || shop.smokingPolicy || undefined,
+      usageScenes: (() => {
+        // 利用シーンの配列を構築
+        const scenes: string[] = (shop.scenes || shop.sceneIds || [])
+          .map((s: any) => (typeof s === 'string' ? s : s?.name))
+          .filter(Boolean)
+        
+        // customSceneTextがある場合は「その他：customSceneText」の形式で追加
+        if (shop.customSceneText && shop.customSceneText.trim()) {
+          scenes.push(`その他：${shop.customSceneText.trim()}`)
+        }
+        
+        return scenes
+      })(),
+      paymentMethods: hasPaymentMethods ? {
+        saicoin: !!shop.paymentSaicoin,
+        tamapon: !!shop.paymentTamapon,
+        cash: !!shop.paymentCash,
+        creditCards,
+        digitalPayments,
+      } : undefined,
       status: shop.status || 'active',
       merchantId: shop.merchantId,
       email: shop.merchant?.account?.email || shop.accountEmail || '',

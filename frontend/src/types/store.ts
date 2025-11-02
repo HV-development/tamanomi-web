@@ -9,6 +9,8 @@ export interface StoreBudget {
 }
 
 export interface StorePaymentMethods {
+  saicoin?: boolean
+  tamapon?: boolean
   cash?: boolean
   creditCards: string[]
   digitalPayments: string[]
@@ -33,8 +35,11 @@ export interface Store {
 
   // 詳細情報（任意）
   website?: string
+  homepageUrl?: string
+  details?: string
   businessHours?: string
   closedDays?: string
+  holidays?: string
   budget?: StoreBudget
   smokingPolicy?: 'NON_SMOKING' | 'SMOKING' | 'SEPARATED' | 'HEATED_TOBACCO' | 'UNKNOWN' | 'UNSPECIFIED' | string
   paymentMethods?: StorePaymentMethods
