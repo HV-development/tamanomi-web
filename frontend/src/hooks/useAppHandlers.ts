@@ -156,23 +156,10 @@ export const useAppHandlers = (
                 throw new Error(data.error || 'ワンタイムパスワードの認証に失敗しました')
             }
 
-            // ログイン成功
-            // トークンをlocalStorageに保存
-            if (data.accessToken) {
-                localStorage.setItem('accessToken', data.accessToken)
-            }
-            if (data.refreshToken) {
-                localStorage.setItem('refreshToken', data.refreshToken)
-            }
-
-            // プラン登録状況を確認してauth状態を更新
+            // ログイン成功 - トークンはCookieに保存されているため、プラン登録状況を確認してauth状態を更新
             let hasPlan = false
             try {
-                const userResponse = await fetch('/api/user/me', {
-                    headers: {
-                        'Authorization': `Bearer ${data.accessToken}`,
-                    },
-                })
+                const userResponse = await fetch('/api/user/me')
 
                 if (userResponse.ok) {
                     const userData = await userResponse.json()
