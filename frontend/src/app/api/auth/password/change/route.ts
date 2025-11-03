@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const fullUrl = buildApiUrl('/auth/password/change')
+    const fullUrl = buildApiUrl('/password/change')
     console.log('🔍 [password/change] Calling backend API:', fullUrl)
 
     const response = await fetch(fullUrl, {
