@@ -16,6 +16,7 @@ export const initialState: AppState = {
     isFavoritesOpen: false,
     loginStep: "password",
     loginEmail: "",
+    loginError: null,
     signupData: null,
     emailChangeStep: "form",
     newEmail: "",
