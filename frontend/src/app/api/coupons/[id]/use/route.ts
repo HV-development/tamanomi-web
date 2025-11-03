@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { getAuthHeader } from '@/lib/auth-header'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +9,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = request.headers.get('authorization')
+    const authHeader = getAuthHeader(request)
     
     if (!authHeader) {
       console.log('❌ [coupons/[id]/use] No authorization header');
@@ -67,4 +68,5 @@ export async function POST(
     )
   }
 }
+
 

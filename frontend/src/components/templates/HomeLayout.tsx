@@ -47,6 +47,7 @@ export function HomeLayout() {
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
   const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
+  const [isCheckingUsage, setIsCheckingUsage] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres
@@ -74,16 +75,13 @@ export function HomeLayout() {
 
     const syncFavorites = async () => {
       try {
-        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-        if (!accessToken) return
-
         const response = await fetch('/api/favorites', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
           },
           cache: 'no-store',
+          credentials: 'include', // Cookieを送信
         })
 
         if (!response.ok) {
@@ -116,16 +114,13 @@ export function HomeLayout() {
     const timer = setTimeout(() => {
       const syncFavorites = async () => {
         try {
-          const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-          if (!accessToken) return
-
           const response = await fetch('/api/favorites', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
             },
             cache: 'no-store',
+            credentials: 'include', // Cookieを送信
           })
 
           if (!response.ok) return
@@ -171,13 +166,28 @@ export function HomeLayout() {
   // クーポン使用履歴のチェック
   useEffect(() => {
     const checkUsage = async () => {
-      if (!isCouponListOpen || !selectedStore || !isAuthenticated) {
+      if (!isCouponListOpen || !selectedStore) {
         setIsCouponUsedToday(false)
+        setIsCheckingUsage(false)
         return
       }
 
-      const hasUsedToday = await checkTodayUsage(selectedStore.id)
-      setIsCouponUsedToday(hasUsedToday)
+      if (!isAuthenticated) {
+        setIsCouponUsedToday(false)
+        setIsCheckingUsage(false)
+        return
+      }
+
+      setIsCheckingUsage(true)
+      try {
+        const hasUsedToday = await checkTodayUsage(selectedStore.id)
+        setIsCouponUsedToday(hasUsedToday)
+      } catch (error) {
+        console.error('使用履歴チェックエラー:', error)
+        setIsCouponUsedToday(false)
+      } finally {
+        setIsCheckingUsage(false)
+      }
     }
 
     checkUsage()
@@ -237,7 +247,6 @@ export function HomeLayout() {
   const onConfirmCoupon = handlers.handleConfirmCoupon
   const onCancelCoupon = handlers.handleCancelCoupon
   const onUseSameCoupon = handlers.handleUseSameCoupon
-  const onUsageGuideClick = handlers.handleUsageGuideClick
   const onUsageGuideBack = handlers.handleUsageGuideBack
   const isSuccessModalOpen = state.isSuccessModalOpen
   const onSuccessModalClose = handlers.handleSuccessModalClose
@@ -333,7 +342,6 @@ export function HomeLayout() {
         coupon={selectedCoupon}
         onConfirm={onConfirmCoupon}
         onCancel={onCancelCoupon}
-        onUsageGuideClick={onUsageGuideClick}
       />
     )
   }
@@ -730,6 +738,7 @@ export function HomeLayout() {
         onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
         userAge={userAge}
         isUsedToday={isCouponUsedToday}
+        isCheckingUsage={isCheckingUsage}
       />
 
       {/* 使用方法ガイドモーダル */}

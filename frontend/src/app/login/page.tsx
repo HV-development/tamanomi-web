@@ -19,13 +19,15 @@ function LoginPageContent() {
     handleForgotPassword,
   } = useLoginPage()
 
-  // 認証チェック中はローディング表示
-  if (isCheckingAuth) {
+  // 認証チェック中またはローディング中はローディング表示
+  if (isCheckingAuth || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-green-600 font-medium">認証状態を確認中...</p>
+          <p className="text-green-600 font-medium">
+            {isCheckingAuth ? '認証状態を確認中...' : 'ログイン処理中...'}
+          </p>
         </div>
       </div>
     )

@@ -9,17 +9,12 @@
  */
 export async function checkTodayUsage(shopId: string): Promise<boolean> {
   try {
-    const accessToken = localStorage.getItem('accessToken');
-    
-    if (!accessToken) {
-      return false;
-    }
-
     const response = await fetch(`/api/coupons/usage-history/today?shopId=${shopId}`, {
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
       },
       cache: 'no-store',
+      credentials: 'include', // Cookieを送信
     });
 
     if (!response.ok) {
@@ -34,4 +29,6 @@ export async function checkTodayUsage(shopId: string): Promise<boolean> {
     return false;
   }
 }
+
+
 

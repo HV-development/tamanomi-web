@@ -327,6 +327,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         onChange={(value) => updateFormData("phone", value)}
         onBlur={() => handleFieldBlur("phone")}
         error={errors.phone || undefined}
+        required={true}
       />
 
       {/* 性別 */}

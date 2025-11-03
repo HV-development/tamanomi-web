@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { getAuthHeader } from '@/lib/auth-header'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +10,7 @@ export async function POST(
   { params }: { params: { shopId: string } }
 ) {
   try {
-    const authHeader = request.headers.get('authorization')
+    const authHeader = getAuthHeader(request)
     const { shopId } = params
     
     if (!authHeader) {
@@ -81,7 +82,7 @@ export async function DELETE(
   { params }: { params: { shopId: string } }
 ) {
   try {
-    const authHeader = request.headers.get('authorization')
+    const authHeader = getAuthHeader(request)
     const { shopId } = params
     
     if (!authHeader) {

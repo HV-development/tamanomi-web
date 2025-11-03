@@ -24,42 +24,30 @@ export function useAuth() {
                 // URLパラメータをクリア
                 window.history.replaceState({}, '', '/');
             } else {
-                // localStorage にアクセストークンがある場合は認証済みとする
-                const accessToken = localStorage.getItem('accessToken');
-                
-                if (accessToken) {
-                    // トークンがある場合は、ユーザー情報を取得
-                    setIsLoading(true);
-                    fetch('/api/user/me', {
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                        },
+                // Cookieにアクセストークンがある場合は認証済みとする
+                // Cookieは自動的に送信されるため、Authorizationヘッダーは不要
+                setIsLoading(true);
+                fetch('/api/user/me')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch user data');
+                        }
+                        return response.json();
                     })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch user data');
-                            }
-                            return response.json();
-                        })
-                        .then(userData => {
-                            setIsAuthenticated(true);
-                            setUser(userData);
-                            setPlan(userData.plan);
-                            setUsageHistory(userData.usageHistory || []);
-                            setPaymentHistory(userData.paymentHistory || []);
-                        })
-                        .catch(() => {
-                            // トークンが無効な場合はクリア
-                            localStorage.removeItem('accessToken');
-                            localStorage.removeItem('refreshToken');
-                            setIsAuthenticated(false);
-                        })
-                        .finally(() => {
-                            setIsLoading(false);
-                        });
-                } else {
-                    setIsAuthenticated(false);
-                }
+                    .then(userData => {
+                        setIsAuthenticated(true);
+                        setUser(userData);
+                        setPlan(userData.plan);
+                        setUsageHistory(userData.usageHistory || []);
+                        setPaymentHistory(userData.paymentHistory || []);
+                    })
+                    .catch(() => {
+                        // トークンが無効な場合は未認証とする
+                        setIsAuthenticated(false);
+                    })
+                    .finally(() => {
+                        setIsLoading(false);
+                    });
             }
         }
     }, []);
@@ -73,13 +61,17 @@ export function useAuth() {
     };
 
     const logout = () => {
-        // localStorageからトークンをクリア
+        // セッション関連データをクリア
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            // その他のセッション関連データもクリア
             sessionStorage.clear();
         }
+        
+        // Cookieからトークンをクリア（APIエンドポイント経由）
+        fetch('/api/auth/logout', {
+            method: 'POST',
+        }).catch(() => {
+            // エラーは無視
+        });
         
         setIsAuthenticated(false);
         setUser(undefined);

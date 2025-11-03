@@ -53,94 +53,14 @@ export default function HomePage() {
     }
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
-      const autoLogin = urlParams.get('auto-login')
       const view = urlParams.get('view')
-      const token = urlParams.get('token')
       
-      // ★URLパラメータからトークンを取得してlocalStorageに保存（auto-loginの場合）
-      if (autoLogin === 'true' && token) {
-        localStorage.setItem('accessToken', token)
-      }
-
-      // アクセストークンを取得
-      const accessToken = localStorage.getItem('accessToken')
-
-      // ログインしているかチェック（auto-loginパラメータがない場合のみ）
-      if (!accessToken && view !== 'map' && autoLogin !== 'true') {
-        // ログインしていない場合はログインページにリダイレクト（マップビュー以外）
-        router.push('/')
-        return
-      }
-      
-      // 自動ログイン処理（トークンがあり、まだ認証されていない場合）
-      if (accessToken && !auth.isAuthenticated) {
-        // トークンがある場合、ユーザー情報を取得
-        fetch('/api/user/me', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Failed to fetch user data')
-            }
-            return response.json()
-          })
-          .then(userData => {
-            // ユーザーデータでauth.loginを呼び出す
-            auth.login(userData, userData.plan, [], [])
-
-            // プラン登録状況を確認して適切な画面に遷移
-            const hasPlan = userData.plan !== null && userData.plan !== undefined
-
-            // ビューパラメータに応じて遷移
-            if (view === 'mypage') {
-              // マイページに遷移
-              navigation.navigateToView("mypage", "mypage")
-              navigation.navigateToMyPage("main")
-            } else if (!view) {
-              // ビューパラメータがない場合（リロード時など）
-              if (!hasPlan) {
-                // プラン未登録の場合はプラン登録画面へ（セッションストレージにメールアドレスを保存）
-                sessionStorage.setItem('userEmail', userData.email)
-                router.push('/plan-registration')
-                return
-              } else {
-                // プラン登録済みの場合はhome画面を表示（一時的な対応）
-                // home画面をそのまま表示
-              }
-            }
-          })
-          .catch(() => {
-            // トークンが無効な場合はクリア
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('refreshToken')
-            // ログインページにリダイレクト
-            router.push('/')
-          })
-      } else if (accessToken && auth.isAuthenticated) {
-        // 既に認証済みの場合（リロード時など）
-        
-        // ビューパラメータがない場合はhome画面を表示（一時的な対応）
-        if (!view) {
-          // home画面をそのまま表示
-        } else if (view === 'mypage') {
-          navigation.navigateToView("mypage", "mypage")
-          navigation.navigateToMyPage("main")
-        }
-      } else if (!accessToken && view !== 'map') {
-        // トークンがない場合でviewパラメータがある場合の処理
-        if (view === 'mypage') {
-          navigation.navigateToView("mypage", "mypage")
-          navigation.navigateToMyPage("main")
-        }
-      }
-
-      // ★URLパラメータをクリア（auto-loginパラメータのみ削除）
-      if (autoLogin === 'true') {
-        const newUrl = new URL(window.location.href)
-        newUrl.searchParams.delete('auto-login')
-        window.history.replaceState({}, '', newUrl.toString())
+      // useAuthが自動的にCookieから認証チェックするため、特別な処理は不要
+      // ここではビューパラメータに応じた遷移のみ処理
+      if (view === 'mypage' && auth.isAuthenticated) {
+        // マイページに遷移
+        navigation.navigateToView("mypage", "mypage")
+        navigation.navigateToMyPage("main")
       }
       
       // 初期化完了フラグを立てる

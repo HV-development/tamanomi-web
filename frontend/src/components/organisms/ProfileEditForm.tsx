@@ -379,6 +379,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
         onChange={(value) => updateFormData("phone", value)}
         onBlur={() => handleBlur("phone")}
         error={errors.phone}
+        required={true}
       />
 
       {/* 性別 */}

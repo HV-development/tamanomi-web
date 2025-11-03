@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthHeader } from '@/lib/auth-header'
 
 // サーバーサイドなので NEXT_PUBLIC_ なしの環境変数を使用
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     console.log('[api/shops] → backend:', backendUrl)
 
     // クライアントの Authorization ヘッダを転送（未ログイン時は未設定のまま）
-    const authorization = request.headers.get('authorization') || undefined
+    const authorization = getAuthHeader(request) || undefined
 
     const hasInternalSecret = Boolean(process.env.INTERNAL_API_SECRET)
     if (process.env.NODE_ENV !== 'production') {

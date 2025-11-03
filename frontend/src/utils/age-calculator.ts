@@ -31,3 +31,5 @@ export function isAdult(birthDate: string | Date): boolean {
   return calculateAge(birthDate) >= 20;
 }
 
+
+

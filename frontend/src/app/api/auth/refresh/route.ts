@@ -1,40 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { getRefreshToken } from '@/lib/auth-header'
 
 export const dynamic = 'force-dynamic'
 
-
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, otp, requestId } = body
+    // Cookieからリフレッシュトークンを取得
+    const refreshToken = getRefreshToken(request)
 
-    const fullUrl = buildApiUrl('/otp/verify')
+    if (!refreshToken) {
+      return NextResponse.json(
+        { error: 'リフレッシュトークンが必要です' },
+        { status: 400 }
+      )
+    }
+
+    const fullUrl = buildApiUrl('/auth/refresh')
+    console.log('🔍 [refresh] Calling backend API:', fullUrl)
 
     const response = await fetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, otp, requestId }),
+      body: JSON.stringify({ refreshToken }),
+      cache: 'no-store',
     })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      
-      console.log('🔍 [verify-otp] Error data:', errorData)
-      console.log('🔍 [verify-otp] Response status:', response.status)
+    console.log('🔍 [refresh] Backend response status:', response.status)
 
+    const data = await response.json()
+
+    if (!response.ok) {
+      console.error('❌ [refresh] Backend API error:', data)
       return NextResponse.json(
-        { error: errorData.error?.message || errorData.message || 'OTP検証に失敗しました' },
+        { error: data.message || data.error?.message || 'トークンのリフレッシュに失敗しました' },
         { status: response.status }
       )
     }
 
-    const data = await response.json()
+    console.log('✅ [refresh] Backend response success')
 
     // トークンをhttpOnly Cookieに保存し、ボディでは返却しない
-    const res = NextResponse.json({ message: 'OTP verification successful' })
+    const res = NextResponse.json({ message: 'Token refresh successful' })
     const isSecure = (() => {
       try { return new URL(request.url).protocol === 'https:'; } catch { return process.env.NODE_ENV === 'production'; }
     })()
@@ -76,9 +85,10 @@ export async function POST(request: NextRequest) {
     }
     
     return res
-  } catch {
+  } catch (error) {
+    console.error('❌ [refresh] Route error:', error)
     return NextResponse.json(
-      { error: 'OTP検証処理中にエラーが発生しました' },
+      { error: 'トークンのリフレッシュ中にエラーが発生しました' },
       { status: 500 }
     )
   }

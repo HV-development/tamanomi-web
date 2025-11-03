@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { getAuthHeader } from '@/lib/auth-header'
 
 export const dynamic = 'force-dynamic'
 
 // お気に入り一覧取得
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
+    const authHeader = getAuthHeader(request)
     
     if (!authHeader) {
       return NextResponse.json(

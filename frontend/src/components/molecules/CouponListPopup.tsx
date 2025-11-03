@@ -15,15 +15,10 @@ interface CouponListPopupProps {
   onUsageGuideClick: () => void
   userAge?: number | null
   isUsedToday?: boolean
+  isCheckingUsage?: boolean
 }
 
-export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userAge, isUsedToday }: CouponListPopupProps) {
-  if (!isOpen) return null
-
-  useEffect(() => {
-    console.log('🔍 [CouponListPopup] coupons prop:', coupons.length, coupons)
-  }, [coupons])
-
+export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userAge, isUsedToday, isCheckingUsage = false }: CouponListPopupProps) {
   // フィルタリングされたクーポンリスト
   const filteredCoupons = useMemo(() => {
     let filtered = coupons
@@ -35,6 +30,13 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
 
     return filtered
   }, [coupons, userAge])
+
+  useEffect(() => {
+    if (!isOpen) return
+    console.log('🔍 [CouponListPopup] coupons prop:', coupons.length, coupons)
+  }, [coupons, isOpen])
+
+  if (!isOpen) return null
 
 
   return (
@@ -81,7 +83,12 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
           {/* 使用方法リンク */}
           {/* クーポンリスト */}
           <div className="flex-1 overflow-y-auto p-4 bg-transparent">
-            {filteredCoupons.length === 0 ? (
+            {isCheckingUsage ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+                <div className="text-gray-500 text-lg font-medium">読み込み中...</div>
+              </div>
+            ) : filteredCoupons.length === 0 ? (
               <div className="text-center py-12">
                 <Ticket className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <div className="text-gray-500 text-lg font-medium mb-2">クーポンがありません</div>

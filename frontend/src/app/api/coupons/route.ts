@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { getAuthHeader } from '@/lib/auth-header'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,25 +31,22 @@ export async function GET(request: NextRequest) {
     console.log('🔍 [coupons] Query params:', { shopId, page, limit, status, isPublic })
     console.log('🔍 [coupons] Query string:', queryParams.toString())
 
-    const authHeader = request.headers.get('authorization')
+    const authHeader = getAuthHeader(request)
     
-    if (!authHeader) {
-      console.log('❌ [coupons] No authorization header')
-      return NextResponse.json(
-        { error: '認証が必要です' },
-        { status: 401 }
-      )
-    }
-
     const fullUrl = `${buildApiUrl('/coupons')}?${queryParams.toString()}`
     console.log('🔍 [coupons] Calling backend API:', fullUrl)
 
+    // 認証ヘッダーがある場合のみ追加
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    if (authHeader) {
+      headers['Authorization'] = authHeader
+    }
+
     const response = await fetch(fullUrl, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
+      headers,
       cache: 'no-store',
     })
 
