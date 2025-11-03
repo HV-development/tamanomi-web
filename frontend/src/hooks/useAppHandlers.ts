@@ -557,15 +557,6 @@ export const useAppHandlers = (
 
             // クーポンを取得
             try {
-                const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-                console.log('🔍 [handleCouponsClick] Access token:', accessToken ? 'exists' : 'missing')
-                
-                if (!accessToken) {
-                    console.error('❌ No access token for coupon fetching')
-                    dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
-                    return
-                }
-
                 const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
                 console.log('🔍 [handleCouponsClick] Fetching from:', url)
                 
@@ -573,9 +564,9 @@ export const useAppHandlers = (
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`,
                     },
                     cache: 'no-store',
+                    credentials: 'include', // Cookieを送信
                 })
 
                 console.log('🔍 [handleCouponsClick] Response status:', response.status)
