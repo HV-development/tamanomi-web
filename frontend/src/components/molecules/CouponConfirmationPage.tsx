@@ -8,7 +8,6 @@ interface CouponConfirmationPageProps {
   coupon: Coupon | null
   onConfirm: () => void
   onCancel: () => void
-  onUsageGuideClick: () => void
   currentUserRank?: string | null
 }
 

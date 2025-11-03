@@ -343,7 +343,6 @@ export function HomeLayout() {
         coupon={selectedCoupon}
         onConfirm={onConfirmCoupon}
         onCancel={onCancelCoupon}
-        onUsageGuideClick={onUsageGuideClick}
       />
     )
   }
