@@ -47,6 +47,7 @@ export function HomeLayout() {
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
   const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
+  const [isCheckingUsage, setIsCheckingUsage] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres
@@ -165,13 +166,28 @@ export function HomeLayout() {
   // クーポン使用履歴のチェック
   useEffect(() => {
     const checkUsage = async () => {
-      if (!isCouponListOpen || !selectedStore || !isAuthenticated) {
+      if (!isCouponListOpen || !selectedStore) {
         setIsCouponUsedToday(false)
+        setIsCheckingUsage(false)
         return
       }
 
-      const hasUsedToday = await checkTodayUsage(selectedStore.id)
-      setIsCouponUsedToday(hasUsedToday)
+      if (!isAuthenticated) {
+        setIsCouponUsedToday(false)
+        setIsCheckingUsage(false)
+        return
+      }
+
+      setIsCheckingUsage(true)
+      try {
+        const hasUsedToday = await checkTodayUsage(selectedStore.id)
+        setIsCouponUsedToday(hasUsedToday)
+      } catch (error) {
+        console.error('使用履歴チェックエラー:', error)
+        setIsCouponUsedToday(false)
+      } finally {
+        setIsCheckingUsage(false)
+      }
     }
 
     checkUsage()
@@ -724,6 +740,7 @@ export function HomeLayout() {
         onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
         userAge={userAge}
         isUsedToday={isCouponUsedToday}
+        isCheckingUsage={isCheckingUsage}
       />
 
       {/* 使用方法ガイドモーダル */}
