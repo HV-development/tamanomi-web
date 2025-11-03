@@ -37,22 +37,22 @@ export default function CouponConfirmationPage({
     >
       {/* スタッフ向け確認画面 */}
       <div className="flex-1 flex flex-col justify-center items-center p-4">
-        <div className="w-full max-w-xs mx-auto">
+        <div className="w-full max-w-xl mx-auto">
           {/* メインカード */}
           <div className={`bg-white rounded-2xl shadow-lg border border-gray-300 overflow-hidden transition-transform duration-500 ${isRotated ? 'transform rotate-180' : ''}`}>
             {/* ヘッダー */}
-            <div className="bg-green-600 p-3 text-white">
+            <div className="bg-green-600 p-4 text-white">
               <div className="flex items-center justify-center">
-                <h3 className="text-lg font-bold text-white">クーポン使用確認</h3>
+                <h3 className="text-xl font-bold text-white">クーポン使用確認</h3>
               </div>
             </div>
 
             {/* クーポン内容 */}
-            <div className="p-6">
+            <div className="p-8">
               {/* クーポンカード */}
-              <div className="bg-gray-50 rounded-xl border border-gray-200 mb-6 overflow-hidden max-w-fit mx-auto">
+              <div className="bg-gray-50 rounded-xl border border-gray-200 mb-6 overflow-hidden">
                 {/* クーポン画像 */}
-                <div className="w-full h-32 overflow-hidden relative">
+                <div className="w-full h-64 overflow-hidden relative">
                   <Image
                     src={coupon.imageUrl || "/placeholder.svg"}
                     alt={coupon.name}
@@ -62,24 +62,24 @@ export default function CouponConfirmationPage({
                 </div>
 
                 {/* クーポン情報 */}
-                <div className="p-4">
+                <div className="p-6">
                   {/* クーポン名 */}
-                  <div className="text-center mb-2">
-                    <h4 className="font-bold text-lg text-gray-900">
+                  <div className="text-center mb-4">
+                    <h4 className="font-bold text-2xl text-gray-900">
                       {coupon.name}
                     </h4>
                   </div>
 
                   {/* クーポン説明 */}
-                  <div className="text-center">
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                  <div className="text-center mb-4">
+                    <p className="text-base text-gray-700 leading-relaxed">
                       {coupon.description}
                     </p>
 
                     {/* 利用条件 */}
                     {coupon.conditions && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <p className="text-xs text-gray-600">
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <p className="text-sm text-gray-600">
                           利用条件：{coupon.conditions}
                         </p>
                       </div>
