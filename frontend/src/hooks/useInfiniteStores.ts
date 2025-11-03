@@ -163,6 +163,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     }
   }, [])
 
+  // 最新のfetchPageを保持するためのref（初期値は空の関数）
+  const fetchPageRef = useRef<((targetPage: number) => Promise<{ items: Store[]; page: number; hasMore: boolean }>) | null>(null)
+
   const fetchPage = useCallback(
     async (targetPage: number) => {
       try {
@@ -250,9 +253,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     [limit, mapShopToStore, selectedAreas, selectedGenres]
   )
   
-  // 最新のfetchPageを保持するためのref（fetchPageの定義後に初期化）
-  const fetchPageRef = useRef(fetchPage)
-  
   // fetchPageが変更されたらrefを更新
   useEffect(() => {
     fetchPageRef.current = fetchPage
@@ -280,20 +280,55 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     }
   }, [error, fetchPage, hasMore, isLoading, isLoadingMore, page])
 
-  // フィルターが変更されたときに再取得（初回マウント時も実行）
+  // 初回ロード
+  useEffect(() => {
+    // 初回ロードは一度だけ実行
+    if (filterKeyRef.current !== '') {
+      return
+    }
+    
+    filterKeyRef.current = `${selectedAreas.join(',')}:${selectedGenres.join(',')}`
+    
+    let aborted = false
+    ;(async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const result = await fetchPage(1)
+        if (aborted) return
+        setPage(result.page)
+        setHasMore(result.hasMore)
+        setItems(result.items)
+        isFirstLoadRef.current = true
+      } catch (e) {
+        if (aborted) return
+        const message = e instanceof Error ? e.message : 'エラーが発生しました'
+        console.error('[useInfiniteStores] Initial load error:', message, e)
+        setError(message)
+      } finally {
+        if (!aborted) setIsLoading(false)
+      }
+    })()
+    return () => {
+      aborted = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // フィルターが変更されたときに再取得
   useEffect(() => {
     const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}`
     
     console.log('[useInfiniteStores] Filter effect:', {
       currentFilterKey,
       previousFilterKey: filterKeyRef.current,
-      willFetch: filterKeyRef.current !== currentFilterKey || filterKeyRef.current === '',
+      willFetch: filterKeyRef.current !== currentFilterKey && filterKeyRef.current !== '',
       selectedAreas,
       selectedGenres,
     })
     
-    // フィルターが変更された場合、または初回マウント時（filterKeyRef.currentが空文字列）の場合に再取得
-    if (filterKeyRef.current !== currentFilterKey || filterKeyRef.current === '') {
+    // フィルターが変更された場合のみ再取得（初回マウント時は上記のuseEffectで処理）
+    if (filterKeyRef.current !== currentFilterKey && filterKeyRef.current !== '') {
       filterKeyRef.current = currentFilterKey
       
       // 状態をリセット
@@ -314,7 +349,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       ;(async () => {
         try {
           // fetchPageRefを使用して最新のfetchPageを呼び出す
-          const result = await fetchPageRef.current(1)
+          // fetchPageRefは常に最新のfetchPageを保持している
+          const currentFetchPage = fetchPageRef.current || fetchPage
+          const result = await currentFetchPage(1)
           if (aborted) {
             console.log('[useInfiniteStores] Fetch aborted')
             return
@@ -341,7 +378,11 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         aborted = true
       }
     } else {
-      console.log('[useInfiniteStores] Skip fetch (same filter key)')
+      console.log('[useInfiniteStores] Skip fetch (same filter key or initial load)')
+      // 初回マウント時はfilterKeyRefを設定
+      if (filterKeyRef.current === '') {
+        filterKeyRef.current = currentFilterKey
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAreas, selectedGenres])

@@ -25,7 +25,22 @@ interface HomeContainerProps {
   currentLocation?: { latitude: number; longitude: number } | null
 }
 
-export function HomeContainer({ selectedGenres: _selectedGenres, selectedEvents, selectedAreas, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100", loadMoreRef, isLoadingMore = false, bottomError = null, currentLocation }: HomeContainerProps) {
+export function HomeContainer({ 
+  selectedGenres: _selectedGenres, // eslint-disable-line @typescript-eslint/no-unused-vars
+  selectedEvents, 
+  selectedAreas, 
+  isNearbyFilter, 
+  isFavoritesFilter, 
+  stores, 
+  onStoreClick, 
+  onFavoriteToggle, 
+  onCouponsClick, 
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100", 
+  loadMoreRef, 
+  isLoadingMore = false, 
+  bottomError = null, 
+  currentLocation 
+}: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = useMemo(() => {
     const storesList = (stores ?? []).filter(store => {

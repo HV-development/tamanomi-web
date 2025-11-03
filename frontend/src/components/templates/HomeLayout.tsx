@@ -274,7 +274,7 @@ export function HomeLayout() {
     selectedAreas: selectedAreas ?? [],
     selectedGenres: selectedGenres ?? [],
   })
-
+  
   // 初回ページの要素を Context の stores に反映するため、監視と反映
   const initialAppliedRef = useRef(false)
   useEffect(() => {
@@ -689,7 +689,7 @@ export function HomeLayout() {
           selectedAreas={selectedAreas}
           isNearbyFilter={isNearbyFilter}
           isFavoritesFilter={isFavoritesFilter}
-          stores={stores}
+          stores={items.length > 0 ? items : stores}
           onStoreClick={onStoreClick}
           onFavoriteToggle={onFavoriteToggle}
           onCouponsClick={onCouponsClick}
