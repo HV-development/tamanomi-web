@@ -13,6 +13,7 @@ import {
   type ProfileEditInput,
   validateNicknameRealtime,
   validatePostalCodeRealtime,
+  validatePhoneRealtime,
 } from "@hv-development/schemas"
 
 interface ProfileEditFormProps {
@@ -261,6 +262,13 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       } else if (postalCodeValidation.errors.length > 0) {
         setErrors({ ...errors, postalCode: postalCodeValidation.errors[0] })
       }
+    } else if (field === 'phone') {
+      const phoneValidation = validatePhoneRealtime(value)
+      if (phoneValidation.isValid) {
+        setErrors({ ...errors, phone: undefined })
+      } else if (phoneValidation.errors.length > 0) {
+        setErrors({ ...errors, phone: phoneValidation.errors[0] })
+      }
     } else if (field !== 'address' && field !== 'birthDate' && errors[field]) {
       // 住所と生年月日は編集不可なので、エラーをクリア
       setErrors({ ...errors, [field]: undefined })
@@ -282,6 +290,8 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       } else if (field === 'birthDate') {
         // 生年月日は編集不可なのでバリデーションをスキップ
         return
+      } else if (field === 'phone') {
+        profileEditSchema.pick({ phone: true }).parse({ phone: value })
       } else if (field === 'gender') {
         profileEditSchema.pick({ gender: true }).parse({ gender: value })
       } else if (field === 'saitamaAppId') {
