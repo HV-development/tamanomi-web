@@ -432,12 +432,6 @@ export const useAppHandlers = (
 
         // 認証済みの場合はAPI呼び出し
         try {
-            // アクセストークンを取得
-            const accessToken = localStorage.getItem('accessToken')
-            if (!accessToken) {
-                throw new Error('認証情報が見つかりません。ログインしてください。')
-            }
-
             // API呼び出し
             let response: Response
             let data: { isFavorite?: boolean; error?: { message?: string }; message?: string }
@@ -446,9 +440,9 @@ export const useAppHandlers = (
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`,
                     },
                     body: JSON.stringify({}),
+                    credentials: 'include', // Cookieを送信
                 })
 
                 data = await response.json()
@@ -456,9 +450,7 @@ export const useAppHandlers = (
                 if (!response.ok) {
                     // トークン期限切れの場合（401/403エラー）- セッションストレージに保存
                     if (response.status === 401 || response.status === 403) {
-                        // トークンをクリア
-                        localStorage.removeItem('accessToken')
-                        localStorage.removeItem('refreshToken')
+                        // ログアウト（Cookieはサーバーサイドでクリアされる）
                         auth.logout()
                         
                         // セッションストレージにお気に入りを保存
@@ -486,9 +478,7 @@ export const useAppHandlers = (
                 }
             } catch {
                 // ネットワークエラーなどの場合は、トークン期限切れの可能性があるのでセッションストレージに保存
-                // トークンをクリア
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('refreshToken')
+                // ログアウト（Cookieはサーバーサイドでクリアされる）
                 auth.logout()
                 
                 // セッションストレージにお気に入りを保存
@@ -586,7 +576,19 @@ export const useAppHandlers = (
                 
                 if (data.coupons && data.coupons.length > 0) {
                     // APIからのクーポンをfrontend用の形式に変換
-                    const storeCoupons = data.coupons.map((coupon: any) => ({
+                    const storeCoupons = data.coupons.map((coupon: {
+                        id: string;
+                        title: string;
+                        description?: string;
+                        conditions?: string;
+                        imageUrl?: string;
+                        drinkType?: string;
+                        status: string;
+                        shopId: string;
+                        shop?: { name: string };
+                        createdAt?: string;
+                        updatedAt?: string;
+                    }) => ({
                         id: coupon.id,
                         name: coupon.title,
                         description: coupon.description || '',
@@ -639,23 +641,17 @@ export const useAppHandlers = (
     const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
         try {
             auth.setIsLoading(true)
-            
-            // アクセストークンを取得
-            const accessToken = localStorage.getItem('accessToken')
-            if (!accessToken) {
-                throw new Error('認証情報が見つかりません。ログインしてください。')
-            }
 
             // プラン変更APIを呼び出し
             const response = await fetch('/api/user-plans/update', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
                 },
                 body: JSON.stringify({
                     planId: planId,
                 }),
+                credentials: 'include', // Cookieを送信
             })
 
             if (!response.ok) {
@@ -668,9 +664,7 @@ export const useAppHandlers = (
             // プラン変更後、新しいユーザー情報を取得してauth状態を更新
             try {
                 const userResponse = await fetch('/api/user/me', {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                    },
+                    credentials: 'include', // Cookieを送信
                 })
 
                 if (userResponse.ok) {
@@ -804,21 +798,15 @@ export const useAppHandlers = (
         }
 
         try {
-            const accessToken = localStorage.getItem('accessToken')
-            if (!accessToken) {
-                alert('認証エラーが発生しました。再度ログインしてください。')
-                return
-            }
-
             const response = await fetch(`/api/coupons/${state.selectedCoupon.id}/use`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
                 },
                 body: JSON.stringify({
                     shopId: state.selectedStore.id
                 }),
+                credentials: 'include', // Cookieを送信
             })
 
             if (!response.ok) {
@@ -972,14 +960,8 @@ export const useAppHandlers = (
             if (isDevelopment && bypassAuth) {
                 // 開発環境で認証バイパスが有効な場合、ダミートークンを使用
                 headers['Authorization'] = 'Bearer dev-bypass-token';
-            } else {
-                // 本番環境または認証バイパスが無効な場合、通常の認証処理
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    throw new Error('認証トークンが見つかりません。再度ログインしてください。');
-                }
-                headers['Authorization'] = `Bearer ${token}`;
             }
+            // Cookieは自動的に送信されるため、本番環境ではヘッダーは不要
 
             const response = await fetch('/api/auth/email/change', {
                 method: 'POST',
@@ -989,6 +971,7 @@ export const useAppHandlers = (
                     newEmail: data.newEmail,
                     confirmEmail: data.confirmEmail,
                 }),
+                credentials: 'include', // Cookieを送信
             })
 
             const result = await response.json()
@@ -997,8 +980,6 @@ export const useAppHandlers = (
                 // トークン期限切れの場合（403エラー）
                 if (response.status === 403) {
                     // トークンをクリア
-                    localStorage.removeItem('accessToken')
-                    localStorage.removeItem('refreshToken')
                     // ログアウト
                     auth.logout()
                     // ルートURL（ログイン画面）に遷移
@@ -1036,15 +1017,10 @@ export const useAppHandlers = (
     const handleEmailChangeSuccessModalClose = useCallback(() => {
         dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: false })
         
-        // 確実にトークンを削除
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        sessionStorage.clear()
-        
         // ログイン状態をリセット
         dispatch({ type: 'RESET_LOGIN_STATE' })
         
-        // authのログアウトも実行
+        // authのログアウトも実行（Cookieはサーバーサイドでクリアされる）
         auth.logout()
         
         // ブラウザのタブを閉じる
@@ -1073,14 +1049,8 @@ export const useAppHandlers = (
             if (isDevelopment && bypassAuth) {
                 // 開発環境で認証バイパスが有効な場合、ダミートークンを使用
                 headers['Authorization'] = 'Bearer dev-bypass-token';
-            } else {
-                // 本番環境または認証バイパスが無効な場合、通常の認証処理
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    throw new Error('認証トークンが見つかりません。再度ログインしてください。');
-                }
-                headers['Authorization'] = `Bearer ${token}`;
             }
+            // Cookieは自動的に送信されるため、本番環境ではヘッダーは不要
 
             const response = await fetch('/api/auth/password/change', {
                 method: 'POST',
@@ -1089,14 +1059,13 @@ export const useAppHandlers = (
                     currentPassword,
                     newPassword
                 }),
+                credentials: 'include', // Cookieを送信
             })
             const result = await response.json()
             if (!response.ok) {
                 // トークン期限切れの場合（403エラー）
                 if (response.status === 403) {
                     // トークンをクリア
-                    localStorage.removeItem('accessToken')
-                    localStorage.removeItem('refreshToken')
                     // ログアウト
                     auth.logout()
                     // ルートURL（ログイン画面）に遷移
