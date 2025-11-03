@@ -19,12 +19,6 @@ interface CouponListPopupProps {
 }
 
 export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userAge, isUsedToday, isCheckingUsage = false }: CouponListPopupProps) {
-  if (!isOpen) return null
-
-  useEffect(() => {
-    console.log('🔍 [CouponListPopup] coupons prop:', coupons.length, coupons)
-  }, [coupons])
-
   // フィルタリングされたクーポンリスト
   const filteredCoupons = useMemo(() => {
     let filtered = coupons
@@ -36,6 +30,13 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
 
     return filtered
   }, [coupons, userAge])
+
+  useEffect(() => {
+    if (!isOpen) return
+    console.log('🔍 [CouponListPopup] coupons prop:', coupons.length, coupons)
+  }, [coupons, isOpen])
+
+  if (!isOpen) return null
 
 
   return (
