@@ -74,16 +74,13 @@ export function HomeLayout() {
 
     const syncFavorites = async () => {
       try {
-        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-        if (!accessToken) return
-
         const response = await fetch('/api/favorites', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
           },
           cache: 'no-store',
+          credentials: 'include', // Cookieを送信
         })
 
         if (!response.ok) {
@@ -116,16 +113,13 @@ export function HomeLayout() {
     const timer = setTimeout(() => {
       const syncFavorites = async () => {
         try {
-          const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-          if (!accessToken) return
-
           const response = await fetch('/api/favorites', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
             },
             cache: 'no-store',
+            credentials: 'include', // Cookieを送信
           })
 
           if (!response.ok) return
