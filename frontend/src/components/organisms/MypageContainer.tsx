@@ -448,9 +448,10 @@ export const MyPageContainer = React.memo(function MyPageContainer({
             <ProfileCard user={user} onEditProfile={onEditProfile} />
           </FadeInComponent>
 
-          <FadeInComponent delay={300}>
+          {/* TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト */}
+          {/* <FadeInComponent delay={300}>
             <RankCard rankCalculations={rankCalculations} />
-          </FadeInComponent>
+          </FadeInComponent> */}
 
           <FadeInComponent delay={400}>
             <MenuButtons
