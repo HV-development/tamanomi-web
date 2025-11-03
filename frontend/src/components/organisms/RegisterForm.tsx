@@ -30,6 +30,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     address: "",
     birthDate: "",
     gender: "male",
+    phone: "",
     saitamaAppId: "",
     password: "",
     passwordConfirm: "",
@@ -315,6 +316,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         value={formData.birthDate}
         onChange={(value) => updateFormData("birthDate", value)}
         error={errors.birthDate}
+      />
+
+      {/* 電話番号 */}
+      <Input
+        type="tel"
+        label="電話番号（任意）"
+        placeholder="09012345678（ハイフンなし）"
+        value={formData.phone || ""}
+        onChange={(value) => updateFormData("phone", value)}
+        onBlur={() => handleFieldBlur("phone")}
+        error={errors.phone || undefined}
       />
 
       {/* 性別 */}

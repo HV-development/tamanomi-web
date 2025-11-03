@@ -30,6 +30,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
     address: "",
     birthDate: "",
     gender: "male",
+    phone: "",
     saitamaAppId: "",
   })
 
@@ -39,6 +40,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
     address: "",
     birthDate: "",
     gender: "male",
+    phone: "",
     saitamaAppId: "",
   })
 
@@ -64,6 +66,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       address: user.address || "",
       birthDate: formatBirthDate(user.birthDate),
       gender: (user.gender as "male" | "female" | "other") || "male",
+      phone: user.phone || "",
       saitamaAppId: (user as User & { saitamaAppId?: string }).saitamaAppId || "",
     }
     setFormData(initialData)
@@ -82,6 +85,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
     address: "住所",
     birthDate: "生年月日",
     gender: "性別",
+    phone: "電話番号",
     saitamaAppId: "さいたま市みんなのアプリID",
   } as const
 
@@ -355,6 +359,17 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
           {formData.birthDate || "生年月日は登録できません"}
         </div>
       </div>
+
+      {/* 電話番号 */}
+      <Input
+        type="tel"
+        label="電話番号（任意）"
+        placeholder="09012345678（ハイフンなし）"
+        value={formData.phone || ""}
+        onChange={(value) => updateFormData("phone", value)}
+        onBlur={() => handleBlur("phone")}
+        error={errors.phone}
+      />
 
       {/* 性別 */}
       <RadioButton
