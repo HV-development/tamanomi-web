@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { getAuthHeader } from '@/lib/auth-header'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +9,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     
     // 認証トークンを取得
-    const authHeader = request.headers.get('Authorization')
+    const authHeader = getAuthHeader(request)
     if (!authHeader) {
       return NextResponse.json(
         { success: false, message: '認証が必要です' },

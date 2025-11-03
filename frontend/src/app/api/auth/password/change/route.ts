@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthHeader } from '@/lib/auth-header'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
             token = 'dev-bypass-token';
         } else {
             // 本番環境または認証バイパスが無効な場合、通常の認証処理
-            const authHeader = request.headers.get('authorization');
+            const authHeader = getAuthHeader(request);
             if (!authHeader || !authHeader.startsWith('Bearer ')) {
                 return NextResponse.json(
                     { error: { message: '認証トークンが必要です' } },

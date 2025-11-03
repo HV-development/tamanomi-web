@@ -908,13 +908,8 @@ export const useAppHandlers = (
 
             if (isDevelopment && bypassAuth) {
                 headers['Authorization'] = 'Bearer dev-bypass-token'
-            } else {
-                const token = localStorage.getItem('accessToken')
-                if (!token) {
-                    throw new Error('認証トークンが見つかりません。再度ログインしてください。')
-                }
-                headers['Authorization'] = `Bearer ${token}`
             }
+            // Cookieは自動的に送信されるため、ヘッダーは不要
 
             // saitamaAppIdは別テーブル管理のため、更新データから除外
             // 日付フォーマットをISO形式に変換 (yyyy/MM/dd → yyyy-MM-dd)
@@ -946,20 +941,14 @@ export const useAppHandlers = (
             
             // 成功時はユーザー情報を再取得
             try {
-                const token = localStorage.getItem('accessToken')
-                if (token) {
-                    const userResponse = await fetch('/api/user/me', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                        cache: 'no-store',
-                    })
-                    
-                    if (userResponse.ok) {
-                        const userData = await userResponse.json()
-                        // authの状態を更新
-                        auth.login(userData, userData.plan, [], [])
-                    }
+                const userResponse = await fetch('/api/user/me', {
+                    cache: 'no-store',
+                })
+                
+                if (userResponse.ok) {
+                    const userData = await userResponse.json()
+                    // authの状態を更新
+                    auth.login(userData, userData.plan, [], [])
                 }
             } catch {
                 // エラー処理
