@@ -1038,23 +1038,11 @@ export const useAppHandlers = (
         // エラー状態をクリア
         dispatch({ type: 'SET_PASSWORD_CHANGE_ERROR', payload: null })
         try {
-            // 開発環境での認証バイパス機能
-            const isDevelopment = process.env.NODE_ENV === 'development';
-            const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
-
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-            };
-
-            if (isDevelopment && bypassAuth) {
-                // 開発環境で認証バイパスが有効な場合、ダミートークンを使用
-                headers['Authorization'] = 'Bearer dev-bypass-token';
-            }
-            // Cookieは自動的に送信されるため、本番環境ではヘッダーは不要
-
             const response = await fetch('/api/auth/password/change', {
                 method: 'POST',
-                headers,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
                     currentPassword,
                     newPassword
