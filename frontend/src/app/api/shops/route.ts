@@ -11,9 +11,25 @@ export async function GET(request: NextRequest) {
     const searchParams = url.searchParams
     const page = searchParams.get('page') || '1'
     const limit = searchParams.get('limit') || '5'
+    const city = searchParams.get('city')
+    const genreId = searchParams.get('genreId')
+
+    // クエリパラメータを構築
+    const backendParams = new URLSearchParams({
+      page,
+      limit,
+    })
+    
+    // フィルターパラメータを追加
+    if (city) {
+      backendParams.append('city', city)
+    }
+    if (genreId) {
+      backendParams.append('genreId', genreId)
+    }
 
     // 公開エンドポイントに切替（未ログインでも取得可能）
-    const backendUrl = `${API_BASE_URL}/api/v1/public/shops?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`
+    const backendUrl = `${API_BASE_URL}/api/v1/public/shops?${backendParams.toString()}`
     console.log('[api/shops] → backend:', backendUrl)
 
     // クライアントの Authorization ヘッダを転送（未ログイン時は未設定のまま）

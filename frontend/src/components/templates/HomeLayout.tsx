@@ -269,7 +269,11 @@ export function HomeLayout() {
   const currentUserRank = computedValues.currentUserRank
 
   // 無限スクロール: 初回ロードと追加ロード
-  const { isLoading: isStoresLoading, isLoadingMore, error, sentinelRef, items } = useInfiniteStores({ limit: 5 })
+  const { isLoading: isStoresLoading, isLoadingMore, error, sentinelRef, items } = useInfiniteStores({ 
+    limit: 5,
+    selectedAreas: selectedAreas ?? [],
+    selectedGenres: selectedGenres ?? [],
+  })
 
   // 初回ページの要素を Context の stores に反映するため、監視と反映
   const initialAppliedRef = useRef(false)
@@ -682,6 +686,7 @@ export function HomeLayout() {
         <HomeContainer
           selectedGenres={selectedGenres}
           selectedEvents={selectedEvents}
+          selectedAreas={selectedAreas}
           isNearbyFilter={isNearbyFilter}
           isFavoritesFilter={isFavoritesFilter}
           stores={stores}

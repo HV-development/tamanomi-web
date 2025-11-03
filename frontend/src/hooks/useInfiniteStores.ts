@@ -4,9 +4,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Store } from '@/types/store'
 import { isFavoriteInStorage } from '@/lib/favorites-storage'
+import { mapAreasToCities } from '@/utils/area-mapping'
+import { mapGenresToIds } from '@/utils/genre-mapping'
 
 interface UseInfiniteStoresOptions {
   limit?: number
+  selectedAreas?: string[]
+  selectedGenres?: string[]
 }
 
 interface UseInfiniteStoresResult {
@@ -21,7 +25,7 @@ interface UseInfiniteStoresResult {
 }
 
 export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseInfiniteStoresResult {
-  const { limit = 5 } = options
+  const { limit = 5, selectedAreas = [], selectedGenres = [] } = options
 
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -33,6 +37,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
   const sentinelElementRef = useRef<Element | null>(null)
   const isFirstLoadRef = useRef(true)
   const [items, setItems] = useState<Store[]>([])
+  
+  // フィルターが変更されたときに再取得するためのキー
+  const filterKeyRef = useRef<string>('')
 
   const mapShopToStore = useCallback((shop: any): Store => {
     // paymentCreditとpaymentCodeの構造を解析
@@ -171,21 +178,64 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           headers['Authorization'] = `Bearer ${accessToken}`
         }
         
-        const res = await fetch(`/api/shops?page=${targetPage}&limit=${limit}`, {
+        // フィルターパラメータを構築
+        const queryParams = new URLSearchParams({
+          page: targetPage.toString(),
+          limit: limit.toString(),
+        })
+        
+        // エリアフィルターを追加（複数エリアの場合はOR条件で処理）
+        if (selectedAreas.length > 0) {
+          const cities = mapAreasToCities(selectedAreas)
+          console.log('[useInfiniteStores] Map areas to cities:', { selectedAreas, cities })
+          // 複数のエリアがある場合は、各エリアに対してクエリを実行する必要があるが、
+          // バックエンドAPIが複数のcityパラメータをサポートしているか確認が必要
+          // 暫定的には最初のエリアのみを使用
+          if (cities.length > 0) {
+            queryParams.append('city', cities[0])
+          }
+        }
+        
+        // ジャンルフィルターを追加
+        if (selectedGenres.length > 0) {
+          const genreIds = await mapGenresToIds(selectedGenres)
+          console.log('[useInfiniteStores] Map genres to IDs:', { selectedGenres, genreIds })
+          // 複数のジャンルがある場合は、各ジャンルに対してクエリを実行する必要があるが、
+          // バックエンドAPIが複数のgenreIdパラメータをサポートしているか確認が必要
+          // 暫定的には最初のジャンルのみを使用
+          if (genreIds.length > 0) {
+            queryParams.append('genreId', genreIds[0])
+          }
+        }
+        
+        const url = `/api/shops?${queryParams.toString()}`
+        console.log('[useInfiniteStores] Fetching:', url)
+        
+        const res = await fetch(url, {
           method: 'GET',
           headers,
         })
 
+        console.log('[useInfiniteStores] Response status:', res.status)
+        
         if (!res.ok) {
           const data = await res.json().catch(() => ({}))
           const message = data?.error?.message || '店舗情報の取得に失敗しました'
+          console.error('[useInfiniteStores] Response error:', data)
           throw new Error(message)
         }
 
         const data = await res.json()
+        console.log('[useInfiniteStores] Response data:', {
+          shopsCount: data?.shops?.length || 0,
+          pagination: data?.pagination,
+        })
+        
         const items: Store[] = (data?.shops || []).map(mapShopToStore)
         const pagination = data?.pagination || {}
         const totalPages = typeof pagination.totalPages === 'number' ? pagination.totalPages : targetPage
+
+        console.log('[useInfiniteStores] Mapped items:', items.length)
 
         return {
           items,
@@ -197,8 +247,16 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         throw new Error(message)
       }
     },
-    [limit, mapShopToStore]
+    [limit, mapShopToStore, selectedAreas, selectedGenres]
   )
+  
+  // 最新のfetchPageを保持するためのref（fetchPageの定義後に初期化）
+  const fetchPageRef = useRef(fetchPage)
+  
+  // fetchPageが変更されたらrefを更新
+  useEffect(() => {
+    fetchPageRef.current = fetchPage
+  }, [fetchPage])
 
   const loadNext = useCallback(async () => {
     // 直近でエラーが発生している場合や、ロード中/末尾到達時は再取得しない
@@ -222,30 +280,71 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     }
   }, [error, fetchPage, hasMore, isLoading, isLoadingMore, page])
 
-  // 初回ロード
+  // フィルターが変更されたときに再取得（初回マウント時も実行）
   useEffect(() => {
-    let aborted = false
-    ;(async () => {
+    const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}`
+    
+    console.log('[useInfiniteStores] Filter effect:', {
+      currentFilterKey,
+      previousFilterKey: filterKeyRef.current,
+      willFetch: filterKeyRef.current !== currentFilterKey || filterKeyRef.current === '',
+      selectedAreas,
+      selectedGenres,
+    })
+    
+    // フィルターが変更された場合、または初回マウント時（filterKeyRef.currentが空文字列）の場合に再取得
+    if (filterKeyRef.current !== currentFilterKey || filterKeyRef.current === '') {
+      filterKeyRef.current = currentFilterKey
+      
+      // 状態をリセット
+      setPage(1)
+      setHasMore(true)
       setIsLoading(true)
       setError(null)
-      try {
-        const result = await fetchPage(1)
-        if (aborted) return
-        setPage(result.page)
-        setHasMore(result.hasMore)
-        setItems(result.items)
-      } catch (e) {
-        if (aborted) return
-        const message = e instanceof Error ? e.message : 'エラーが発生しました'
-        setError(message)
-      } finally {
-        if (!aborted) setIsLoading(false)
+      setItems([])
+      isFirstLoadRef.current = true
+      
+      console.log('[useInfiniteStores] Starting fetch...', {
+        selectedAreas,
+        selectedGenres,
+      })
+      
+      // 再取得を実行（fetchPageRefを使用して最新のfetchPageを参照）
+      let aborted = false
+      ;(async () => {
+        try {
+          // fetchPageRefを使用して最新のfetchPageを呼び出す
+          const result = await fetchPageRef.current(1)
+          if (aborted) {
+            console.log('[useInfiniteStores] Fetch aborted')
+            return
+          }
+          console.log('[useInfiniteStores] Fetch success:', {
+            itemsCount: result.items.length,
+            page: result.page,
+            hasMore: result.hasMore,
+          })
+          setPage(result.page)
+          setHasMore(result.hasMore)
+          setItems(result.items)
+        } catch (e) {
+          if (aborted) return
+          const message = e instanceof Error ? e.message : 'エラーが発生しました'
+          console.error('[useInfiniteStores] Fetch error:', message, e)
+          setError(message)
+        } finally {
+          if (!aborted) setIsLoading(false)
+        }
+      })()
+      
+      return () => {
+        aborted = true
       }
-    })()
-    return () => {
-      aborted = true
+    } else {
+      console.log('[useInfiniteStores] Skip fetch (same filter key)')
     }
-  }, [fetchPage])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAreas, selectedGenres])
 
   // IntersectionObserver 設定
   const sentinelRef = useCallback(

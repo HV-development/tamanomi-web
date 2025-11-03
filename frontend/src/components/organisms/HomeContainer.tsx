@@ -4,10 +4,12 @@ import { useMemo } from "react"
 import { StoreList } from "@/components/molecules/StoreList";
 import type { Store } from "@/types/store";
 import { calculateDistance } from "@/utils/location";
+import { mapAreasToCities } from "@/utils/area-mapping";
 
 interface HomeContainerProps {
   selectedGenres: string[] | undefined
   selectedEvents: string[] | undefined
+  selectedAreas?: string[] | undefined
   isNearbyFilter: boolean
   isFavoritesFilter: boolean
   stores: Store[] | undefined
@@ -23,14 +25,29 @@ interface HomeContainerProps {
   currentLocation?: { latitude: number; longitude: number } | null
 }
 
-export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100", loadMoreRef, isLoadingMore = false, bottomError = null, currentLocation }: HomeContainerProps) {
+export function HomeContainer({ selectedGenres: _selectedGenres, selectedEvents, selectedAreas, isNearbyFilter, isFavoritesFilter, stores, onStoreClick, onFavoriteToggle, onCouponsClick, backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100", loadMoreRef, isLoadingMore = false, bottomError = null, currentLocation }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = useMemo(() => {
     const storesList = (stores ?? []).filter(store => {
-    // ジャンルフィルター
-    if ((selectedGenres?.length ?? 0) > 0 && !selectedGenres?.includes(store.genre)) {
-      return false
+    // エリアフィルター（クライアントサイドフォールバック）
+    if ((selectedAreas?.length ?? 0) > 0) {
+      const selectedCities = mapAreasToCities(selectedAreas)
+      // 店舗のcityが選択されたエリアの市区町村名に含まれているかチェック
+      if (store.city && selectedCities.length > 0) {
+        const matchesArea = selectedCities.some(city => store.city?.includes(city))
+        if (!matchesArea) {
+          return false
+        }
+      } else if (!store.city) {
+        // 店舗にcity情報がない場合は除外（フィルターが適用されている場合）
+        return false
+      }
     }
+    // ジャンルフィルター（サーバーサイドでフィルタリング済みのため、クライアントサイドでは不要）
+    // サーバーサイドで既にフィルタリングされているため、ここでのフィルタリングは不要
+    // if ((selectedGenres?.length ?? 0) > 0 && !selectedGenres?.includes(store.genre)) {
+    //   return false
+    // }
     // イベントフィルター
     if ((selectedEvents?.length ?? 0) > 0 && store.usageScenes) {
       const hasMatchingEvent = selectedEvents?.some(event => {
@@ -93,7 +110,7 @@ export function HomeContainer({ selectedGenres, selectedEvents, isNearbyFilter, 
     }
 
     return storesList
-  }, [stores, selectedGenres, selectedEvents, isFavoritesFilter, isNearbyFilter, currentLocation])
+  }, [stores, selectedAreas, selectedEvents, isFavoritesFilter, isNearbyFilter, currentLocation])
 
   return (
     <div className={`flex-1 relative ${backgroundColorClass}`}>
