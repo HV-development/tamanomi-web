@@ -182,11 +182,14 @@ export const useLoginPage = () => {
           router.push('/home')
         }
       }
+      
+      // 成功時はsetIsLoading(false)を呼ばない（リダイレクト後に自動的にアンマウントされるため）
+      // ローディング表示を維持して、home画面の読み込み完了まで表示し続ける
+      return
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました'
       console.error('OTP verification error:', errorMessage) // デバッグログ
       setError(errorMessage)
-    } finally {
       setIsLoading(false)
     }
   }, [email, requestId, router])
