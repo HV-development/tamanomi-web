@@ -27,7 +27,6 @@ export default function CouponConfirmationPage({
   }
 
   const handleUse = () => {
-    setIsRotated(false)
     onConfirm()
   }
 
