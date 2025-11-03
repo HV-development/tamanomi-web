@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.10.0
     version: 3.10.0(react-hook-form@7.65.0)
   '@hv-development/schemas':
-    specifier: ^1.43.0
-    version: 1.43.0
+    specifier: file:../../tamanomi-schemas
+    version: file:../../tamanomi-schemas
   '@radix-ui/react-accordion':
     specifier: 1.2.2
     version: 1.2.2(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
@@ -536,13 +536,6 @@ packages:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
     dev: true
-
-  /@hv-development/schemas@1.43.0:
-    resolution: {integrity: sha512-nJCFw2OUtBbt8B6ZFdMJ4jdeXt0xB7iCc7IhJMdB9YQgxblawCO07xu9rm3KKm9S9jiuB1IY4jX7q2cuwIwLhQ==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.43.0/bf2b7a6e286d03b2d7bc8ab0c9bc3951c6a938f1}
-    engines: {node: 22.x}
-    dependencies:
-      zod: 3.25.76
-    dev: false
 
   /@img/colour@1.0.0:
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
@@ -5771,4 +5764,12 @@ packages:
 
   /zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+    dev: false
+
+  file:../../tamanomi-schemas:
+    resolution: {directory: ../../tamanomi-schemas, type: directory}
+    name: '@hv-development/schemas'
+    engines: {node: 22.x}
+    dependencies:
+      zod: 3.25.76
     dev: false

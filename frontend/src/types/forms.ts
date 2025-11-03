@@ -13,6 +13,7 @@ export interface SignupFormData {
   address: string
   birthDate: string
   gender: string
+  phone?: string
   saitamaAppId: string
 }
 
@@ -25,6 +26,7 @@ export interface ProfileEditFormData {
   address: string
   birthDate: string
   gender: string
+  phone?: string
   saitamaAppId: string
 }
 

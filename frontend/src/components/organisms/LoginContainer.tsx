@@ -44,7 +44,7 @@ export function LoginContainer({
         onLogoClick={onLogoClick}
         showBackButton={loginStep === "otp"} // OTP画面のみ戻るボタンを表示
         onBackClick={onBack}
-        showHomeButton={true} // homeボタンを常に表示
+        showHomeButton={loginStep !== "otp"} // OTP画面ではhomeボタンを非表示
         onHomeClick={onHomeClick}
       />
 

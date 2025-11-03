@@ -363,7 +363,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       {/* 電話番号 */}
       <Input
         type="tel"
-        label="電話番号（任意）"
+        label="電話番号"
         placeholder="09012345678（ハイフンなし）"
         value={formData.phone || ""}
         onChange={(value) => updateFormData("phone", value)}
