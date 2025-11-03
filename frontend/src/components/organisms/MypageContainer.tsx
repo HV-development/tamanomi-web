@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import Image from "next/image"
-import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut } from "lucide-react"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
@@ -251,12 +251,16 @@ const MenuButtons = React.memo(({
   onViewPlan,
   onChangeEmail,
   onChangePassword,
+  onViewUsageHistory,
+  onViewPaymentHistory,
   onLogout
 }: {
   onEditProfile: () => void
   onViewPlan: () => void
   onChangeEmail: () => void
   onChangePassword: () => void
+  onViewUsageHistory: () => void
+  onViewPaymentHistory: () => void
   onLogout: () => void
 }) => (
   <div className="space-y-3">
@@ -272,13 +276,12 @@ const MenuButtons = React.memo(({
     {appConfig.myPageSettings.showPasswordChange && (
       <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
     )}
-    {/* ★一時的にコメントアウト：正式リリースまで利用履歴と決済履歴を非表示 */}
-    {/* {appConfig.myPageSettings.showUsageHistory && (
+    {appConfig.myPageSettings.showUsageHistory && (
       <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
     )}
     {appConfig.myPageSettings.showPaymentHistory && (
       <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
-    )} */}
+    )}
     <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
   </div>
 ))
