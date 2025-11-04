@@ -16,7 +16,7 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
   const menuItems: MenuItem[] = [
     ...(isAuthenticated ? [] : [{
       id: "login",
-      label: "ログイン",
+      label: "ログイン・新規登録",
       onClick: () => {
         window.location.href = "/login"
         onMenuItemClick("login")

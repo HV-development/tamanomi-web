@@ -86,18 +86,25 @@ export function useAuth() {
         setPaymentHistory(payment);
     };
 
-    const logout = () => {
+    const logout = async () => {
         // セッション関連データをクリア
         if (typeof window !== 'undefined') {
             sessionStorage.clear();
+            // localStorageのトークンも削除
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
         }
         
         // Cookieからトークンをクリア（APIエンドポイント経由）
-        fetch('/api/auth/logout', {
-            method: 'POST',
-        }).catch(() => {
-            // エラーは無視
-        });
+        try {
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include', // Cookieを送信
+            });
+        } catch (error) {
+            console.error('ログアウトAPIエラー:', error);
+            // エラーが発生してもローカル状態はクリアする
+        }
         
         setIsAuthenticated(false);
         setUser(undefined);

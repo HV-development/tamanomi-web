@@ -85,18 +85,24 @@ export const usePaymentReturn = () => {
         setIsPaymentMethodChangeOnly(isPaymentMethodChange)
         
         if (selectedPlanId) {
+          // Cookieからもトークンを取得できるようにする
+          // localStorageとCookieの両方からトークンを取得できるようにする
           const accessToken = localStorage.getItem('accessToken')
           
-          if (!accessToken) {
-            throw new Error('認証情報が見つかりません。ログインしてください。')
+          // ヘッダーを設定（localStorageのトークンがある場合のみ）
+          const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+          }
+          if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`
           }
 
+          // Cookieからトークンを取得できるようにcredentials: 'include'を使用
+          // localStorageにトークンがなくても、Cookieから取得できるため、エラーは発生しない
           const createPlanResponse = await fetch('/api/user-plans/create', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
-            },
+            headers,
+            credentials: 'include', // Cookieを送信
             body: JSON.stringify({
               planId: selectedPlanId,
             }),
@@ -104,10 +110,27 @@ export const usePaymentReturn = () => {
 
           if (!createPlanResponse.ok) {
             const errorData = await createPlanResponse.json().catch(() => ({}))
-            throw new Error(errorData.message || 'プラン登録に失敗しました')
+            console.error('❌ [usePaymentReturn] Plan creation failed:', {
+              status: createPlanResponse.status,
+              errorData,
+            })
+            
+            let errorMessage = 'プラン登録に失敗しました'
+            if (errorData.message) {
+              errorMessage = errorData.message
+            } else if (createPlanResponse.status === 401) {
+              errorMessage = '認証エラー: ログインしてください'
+            } else if (createPlanResponse.status === 404) {
+              errorMessage = '指定されたプランが見つかりません'
+            } else if (createPlanResponse.status === 409) {
+              errorMessage = 'このプランは既に登録されています'
+            }
+            
+            throw new Error(errorMessage)
           }
 
-          await createPlanResponse.json()
+          const planData = await createPlanResponse.json()
+          console.log('✅ [usePaymentReturn] Plan created successfully:', planData)
         }
 
         // PaymentSessionをクリーンアップ（成功時のみ）

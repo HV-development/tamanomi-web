@@ -1,12 +1,13 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { Input } from "@/components/atoms/Input"
 import { Button } from "@/components/atoms/Button"
 import { RadioButton } from "@/components/atoms/RadioButton"
 import { DateSelect } from "@/components/atoms/DateSelect"
 import { UseRregistrationCompleteSchema, type UserRegistrationComplete } from "@hv-development/schemas"
+import { calculateAge } from "@/utils/age-calculator"
 
 interface RegisterFormProps {
   email?: string
@@ -41,9 +42,30 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const [touchedFields, setTouchedFields] = useState<Set<keyof UserRegistrationComplete>>(new Set())
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [termsError, setTermsError] = useState("")
+  const [agreedToAlcoholRestriction, setAgreedToAlcoholRestriction] = useState(false)
+  const [alcoholRestrictionError, setAlcoholRestrictionError] = useState("")
 
   // 住所フィールドへの参照を追加
   const addressInputRef = useRef<HTMLInputElement>(null)
+
+  // 生年月日から年齢を計算し、20歳未満かどうかを判定
+  const isUnder20 = useMemo(() => {
+    if (!formData.birthDate) return false
+    try {
+      const age = calculateAge(formData.birthDate)
+      return age < 20
+    } catch {
+      return false
+    }
+  }, [formData.birthDate])
+
+  // 生年月日が変更されて20歳以上になった場合、チェックボックスの状態をリセット
+  useEffect(() => {
+    if (!isUnder20) {
+      setAgreedToAlcoholRestriction(false)
+      setAlcoholRestrictionError("")
+    }
+  }, [isUnder20])
 
   // initialFormDataが変更された時にフォームデータを設定
   useEffect(() => {
@@ -137,6 +159,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     }
     setTermsError("")
 
+    // 20歳未満の場合のアルコール制限チェック
+    if (isUnder20 && !agreedToAlcoholRestriction) {
+      setAlcoholRestrictionError("20歳未満の方はアルコールは飲めませんに同意してください")
+      return
+    }
+    setAlcoholRestrictionError("")
+
     const isValid = validateForm()
 
     if (isValid) {
@@ -171,6 +200,34 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       const response = await fetch(apiUrl)
+      
+      // レスポンスのステータスコードをチェック
+      if (!response.ok) {
+        // エラーレスポンスの場合
+        let errorMessage = '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。'
+        try {
+          const errorData = await response.json()
+          if (errorData.message) {
+            errorMessage = errorData.message
+          }
+        } catch {
+          // JSONパースに失敗した場合はデフォルトメッセージを使用
+        }
+        
+        setErrors(prev => ({
+          ...prev,
+          postalCode: errorMessage
+        }))
+        
+        // 住所フィールドにフォーカス
+        setTimeout(() => {
+          if (addressInputRef.current) {
+            addressInputRef.current.focus()
+          }
+        }, 100)
+        return
+      }
+
       const data = await response.json()
 
       if (data.success && data.address) {
@@ -188,9 +245,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }))
       } else {
         // 住所が見つからない場合はエラーメッセージを表示
+        const errorMessage = data.message || '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。'
         setErrors(prev => ({
           ...prev,
-          postalCode: '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。'
+          postalCode: errorMessage
         }))
 
         // 住所フィールドにフォーカスを移す
@@ -201,8 +259,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }, 100)
       }
 
-    } catch {
-      // ネットワークエラーなどの場合
+    } catch (error) {
+      // ネットワークエラーやJSONパースエラーなどの場合
+      console.error('住所検索エラー:', error)
       setErrors(prev => ({
         ...prev,
         postalCode: '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。'
@@ -317,6 +376,33 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         onChange={(value) => updateFormData("birthDate", value)}
         error={errors.birthDate}
       />
+
+      {/* 20歳未満の場合のアルコール制限チェックボックス */}
+      {isUnder20 && (
+        <div className="space-y-2">
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="alcoholRestriction"
+              checked={agreedToAlcoholRestriction}
+              onChange={(e) => {
+                setAgreedToAlcoholRestriction(e.target.checked)
+                if (e.target.checked) {
+                  setAlcoholRestrictionError("")
+                }
+              }}
+              className="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
+            />
+            <label htmlFor="alcoholRestriction" className="ml-2 text-sm text-gray-700 cursor-pointer">
+              20歳未満の方はアルコールは飲めません
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+          </div>
+          {alcoholRestrictionError && (
+            <p className="text-sm text-red-600 ml-6">{alcoholRestrictionError}</p>
+          )}
+        </div>
+      )}
 
       {/* 電話番号 */}
       <Input

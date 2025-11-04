@@ -138,7 +138,12 @@ export default function RegisterConfirmationPage() {
         } else {
           // ポイント付与がない場合は直接プラン登録画面に遷移（セッションストレージにメールアドレスを保存）
           sessionStorage.setItem('userEmail', email)
-          router.push('/plan-registration')
+          // window.location.hrefを使用して強制的に遷移
+          if (typeof window !== 'undefined') {
+            window.location.href = '/plan-registration'
+          } else {
+            router.push('/plan-registration')
+          }
         }
       } else {
         // エラーハンドリング
@@ -173,7 +178,12 @@ export default function RegisterConfirmationPage() {
     setShowSuccessModal(false)
     // モーダルを閉じた後、プラン登録画面に遷移（セッションストレージにメールアドレスを保存）
     sessionStorage.setItem('userEmail', email)
-    router.push('/plan-registration?saitamaAppLinked=true')
+    // window.location.hrefを使用して強制的に遷移
+    if (typeof window !== 'undefined') {
+      window.location.href = '/plan-registration?saitamaAppLinked=true'
+    } else {
+      router.push('/plan-registration?saitamaAppLinked=true')
+    }
   }
 
   // クライアントサイドでの初期化が完了するまでローディング表示

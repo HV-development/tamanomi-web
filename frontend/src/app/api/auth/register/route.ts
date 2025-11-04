@@ -85,7 +85,50 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json()
-      return NextResponse.json(data, { status: response.status })
+      
+      // トークンをCookieに保存（ログイン時と同様に）
+      const nextResponse = NextResponse.json(data, { status: response.status })
+      const isSecure = (() => {
+        try { return new URL(request.url).protocol === 'https:' } catch { return process.env.NODE_ENV === 'production' }
+      })()
+      
+      nextResponse.headers.set('Cache-Control', 'no-store')
+      nextResponse.headers.set('Pragma', 'no-cache')
+      
+      if (data.accessToken) {
+        nextResponse.cookies.set('accessToken', data.accessToken, {
+          httpOnly: true,
+          secure: isSecure,
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 15, // 15分
+        })
+        nextResponse.cookies.set('__Host-accessToken', data.accessToken, {
+          httpOnly: true,
+          secure: isSecure,
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 15,
+        })
+      }
+      if (data.refreshToken) {
+        nextResponse.cookies.set('refreshToken', data.refreshToken, {
+          httpOnly: true,
+          secure: isSecure,
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 30, // 30日
+        })
+        nextResponse.cookies.set('__Host-refreshToken', data.refreshToken, {
+          httpOnly: true,
+          secure: isSecure,
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 30,
+        })
+      }
+      
+      return nextResponse
     } catch (fetchError) {
       clearTimeout(timeoutId)
       throw fetchError;

@@ -723,23 +723,23 @@ export const useAppHandlers = (
         navigation.navigateToMyPage("profile-edit")
     }, [navigation])
 
-    const handleWithdrawComplete = useCallback(() => {
-        // まず認証状態をクリア
-        auth.logout()
+    const handleWithdrawComplete = useCallback(async () => {
+        // まず認証状態をクリア（cookieの削除も含む）
+        await auth.logout()
         navigation.resetNavigation()
         
-        // 即座にログイン画面に遷移（home画面を表示しない）
+        // ログアウト完了後にログイン画面に遷移（home画面を表示しない）
         if (typeof window !== 'undefined') {
             window.location.href = '/'
         }
     }, [auth, navigation])
 
-    const handleLogout = useCallback(() => {
-        // まず認証状態をクリア
-        auth.logout()
+    const handleLogout = useCallback(async () => {
+        // まず認証状態をクリア（cookieの削除も含む）
+        await auth.logout()
         navigation.resetNavigation()
         
-        // 即座にログイン画面に遷移（home画面を表示しない）
+        // ログアウト完了後にログイン画面に遷移（home画面を表示しない）
         if (typeof window !== 'undefined') {
             window.location.href = '/'
         }

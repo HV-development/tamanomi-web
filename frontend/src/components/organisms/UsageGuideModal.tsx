@@ -42,7 +42,9 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
   ]
 
   const importantNotes = [
-    "クーポンは1日1回まで利用可能です",
+    "クーポンは1日1件につき1回まで利用可能です",
+    "クーポンは翌日の0:00にリセットされます",
+    "20歳未満の方はアルコールは飲めません",
     "一度使用したクーポンはキャンセルできません",
     "他のクーポンとの併用はできません",
     "有効期限内にご利用ください",

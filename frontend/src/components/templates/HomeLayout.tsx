@@ -398,9 +398,10 @@ export function HomeLayout() {
     // @ts-expect-error - isEmailChangeSuccessModalOpen is not yet in the type definition
     const isEmailChangeSuccessModalOpen = state.isEmailChangeSuccessModalOpen || false
     
-    // ユーザー情報とプラン情報が読み込まれていない場合はローディング表示
+    // ユーザー情報が読み込まれていない場合はローディング表示
+    // プラン情報はnullの場合もあるため、チェックしない
     // ただし、メールアドレス変更成功モーダルが表示されている場合は無視
-    if ((!user || !plan) && !isEmailChangeSuccessModalOpen) {
+    if (!user && !isEmailChangeSuccessModalOpen) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
           <div className="text-center">

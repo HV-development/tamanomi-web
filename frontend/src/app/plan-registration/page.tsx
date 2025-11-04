@@ -21,21 +21,24 @@ export default function PlanRegistrationPage() {
 
   const fetchUserInfo = useCallback(async () => {
     try {
+      // Cookieからもトークンを取得できるようにする（credentials: 'include'を使用）
+      // localStorageとCookieの両方からトークンを取得できるようにする
       const accessToken = localStorage.getItem('accessToken')
       
-      if (!accessToken) {
-        console.log('🔍 [fetchUserInfo] No access token found')
-        setSaitamaAppLinked(false)
-        return
+      console.log('🔍 [fetchUserInfo] Calling /api/user/me')
+
+      // Cookieからトークンを取得できるようにcredentials: 'include'を使用
+      // localStorageのトークンがない場合でも、Cookieから取得できる
+      const headers: HeadersInit = {}
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`
       }
 
-      console.log('🔍 [fetchUserInfo] Access token found, calling /api/user/me')
-
+      // Cookieからもトークンを取得できるようにcredentials: 'include'を使用
       const response = await fetch('/api/user/me', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
+        headers,
         cache: 'no-store',
+        credentials: 'include', // Cookieを送信
       })
 
       console.log('🔍 [fetchUserInfo] Response status:', response.status)
@@ -101,7 +104,7 @@ export default function PlanRegistrationPage() {
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
       
-      // セッションストレージからメールアドレスを取得
+      // セッションストレージからメールアドレスを取得（一時的に使用）
       const sessionEmail = sessionStorage.getItem('userEmail')
       if (sessionEmail) {
         console.log('🔍 [useEffect] Setting email from session storage:', sessionEmail)
@@ -123,13 +126,10 @@ export default function PlanRegistrationPage() {
         console.log('🔍 [useEffect] Refresh parameter found, fetching user info')
         fetchUserInfo()
       } else {
-        // メールアドレスが取得できない場合はユーザー情報を取得
-        if (!sessionEmail) {
-          console.log('🔍 [useEffect] No email in session storage, fetching user info')
-          fetchUserInfo()
-        } else {
-          console.log('🔍 [useEffect] Email found in session storage, skipping user info fetch')
-        }
+        // 常にユーザー情報を取得してメールアドレスを確実に取得する
+        // （sessionStorageは一時的なものなので、APIから取得した方が確実）
+        console.log('🔍 [useEffect] Fetching user info to get email')
+        fetchUserInfo()
       }
     }
   }, [fetchUserInfo])
@@ -207,18 +207,55 @@ export default function PlanRegistrationPage() {
       
       const isPaymentMethodChangeOnly = !planId || planId === ""
       
-      // メールアドレスの検証
-      if (!email || email.trim() === '') {
-        // メールアドレスが取得できていない場合、再度ユーザー情報を取得を試行
-        console.log('🔍 [handlePaymentMethodRegister] Email not found, retrying fetchUserInfo');
-        await fetchUserInfo();
+      // メールアドレスの取得（常に最新のメールアドレスをAPIから取得）
+      let userEmail = email
+      
+      // emailステートが空の場合は、APIから直接取得
+      if (!userEmail || userEmail.trim() === '') {
+        console.log('🔍 [handlePaymentMethodRegister] Email not found, fetching from API');
         
-        // 再試行後もメールアドレスが取得できない場合はエラー
-        if (!email || email.trim() === '') {
-          setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+        try {
+          const accessToken = localStorage.getItem('accessToken')
+          const headers: HeadersInit = {}
+          if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`
+          }
+          
+          const response = await fetch('/api/user/me', {
+            headers,
+            cache: 'no-store',
+            credentials: 'include',
+          })
+          
+          if (response.ok) {
+            const userData = await response.json()
+            if (userData.email) {
+              userEmail = userData.email
+              setEmail(userData.email) // ステートも更新
+              console.log('✅ [handlePaymentMethodRegister] Email fetched from API:', userEmail)
+            } else {
+              setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+              setIsLoading(false)
+              return
+            }
+          } else {
+            setError('ユーザー情報の取得に失敗しました。再度お試しください。')
+            setIsLoading(false)
+            return
+          }
+        } catch (error) {
+          console.error('❌ [handlePaymentMethodRegister] Failed to fetch user info:', error)
+          setError('ユーザー情報の取得に失敗しました。再度お試しください。')
           setIsLoading(false)
           return
         }
+      }
+      
+      // メールアドレスが取得できていることを確認
+      if (!userEmail || userEmail.trim() === '') {
+        setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
+        setIsLoading(false)
+        return
       }
       
       // カード登録APIを呼び出し
@@ -237,12 +274,12 @@ export default function PlanRegistrationPage() {
         return `cust_${hashStr}`
       }
       
-      const customerId = generateCustomerId(email)
+      const customerId = generateCustomerId(userEmail)
       
       // 支払い方法変更のみの場合はplanIdを送信しない
       const requestBody: Record<string, string> = {
         customerId: customerId,
-        userEmail: email, // セッション管理用
+        userEmail: userEmail, // セッション管理用
       }
       
       if (!isPaymentMethodChangeOnly) {
