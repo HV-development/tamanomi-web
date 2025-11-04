@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && pnpm build",
-  "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && pnpm install"
+  "buildCommand": "pnpm build",
+  "outputDirectory": ".next",
+  "installCommand": "echo '@hv-development:registry=https://npm.pkg.github.com' > .npmrc && echo \"//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}\" >> .npmrc && echo \"//npm.pkg.github.com/:always-auth=true\" >> .npmrc && pnpm install"
 }
