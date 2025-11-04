@@ -360,7 +360,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         <input
           ref={addressInputRef}
           type="text"
-          placeholder="住所を入力するか、上記の住所検索ボタンをご利用ください"
+          placeholder="住所を入力してください"
           value={formData.address}
           onChange={(e) => updateFormData("address", e.target.value)}
           onBlur={() => handleFieldBlur("address")}
@@ -370,12 +370,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       </div>
 
       {/* 生年月日 */}
-      <DateSelect
-        label="生年月日"
-        value={formData.birthDate}
-        onChange={(value) => updateFormData("birthDate", value)}
-        error={errors.birthDate}
-      />
+      <div className="w-full">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          生年月日
+          <span className="ml-2 text-xs text-gray-500 font-normal">※登録後の変更はできません</span>
+        </label>
+        <DateSelect
+          value={formData.birthDate}
+          onChange={(value) => updateFormData("birthDate", value)}
+          error={errors.birthDate}
+        />
+      </div>
 
       {/* 20歳未満の場合のアルコール制限チェックボックス */}
       {isUnder20 && (
