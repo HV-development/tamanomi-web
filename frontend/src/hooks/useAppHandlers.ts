@@ -810,17 +810,34 @@ export const useAppHandlers = (
             })
 
             if (!response.ok) {
-                const error = await response.json()
-                alert(error.error?.message || 'クーポンの使用に失敗しました')
+                let errorMessage = 'クーポンの使用に失敗しました'
+                try {
+                    const error = await response.json()
+                    
+                    // エラーレスポンスの構造に応じてメッセージを取得
+                    if (error.error?.message) {
+                        errorMessage = error.error.message
+                    } else if (error.message) {
+                        errorMessage = error.message
+                    } else if (error.error) {
+                        errorMessage = error.error
+                    }
+                } catch (parseError) {
+                    errorMessage = `クーポンの使用に失敗しました (HTTP ${response.status})`
+                }
+                
+                alert(errorMessage)
                 return
             }
+
+            await response.json()
 
             // 成功時
             dispatch({ type: 'SET_SUCCESS_MODAL_OPEN', payload: true })
             navigation.navigateToView("home")
         } catch (error) {
             console.error('クーポン使用エラー:', error)
-            alert('クーポンの使用中にエラーが発生しました')
+            alert(error instanceof Error ? error.message : 'クーポンの使用中にエラーが発生しました')
         }
     }, [navigation, dispatch, state.selectedCoupon, state.selectedStore])
 
