@@ -16,7 +16,7 @@ if (!GITHUB_TOKEN) {
   process.exit(1);
 }
 
-// rootDirectoryがfrontendに設定されているため、現在のディレクトリから.npmrcを作成
+// 現在のディレクトリ（frontend）に.npmrcを作成
 const npmrcPath = path.join(process.cwd(), '.npmrc');
 const npmrcContent = `@hv-development:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
