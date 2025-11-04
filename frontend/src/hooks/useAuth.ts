@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { User, Plan, UsageHistory, PaymentHistory } from '@/types/user';
 
 export function useAuth() {
@@ -9,6 +9,31 @@ export function useAuth() {
     const [usageHistory, setUsageHistory] = useState<UsageHistory[]>([]);
     const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
     const hasInitialized = useRef(false);
+
+    // 利用履歴を取得する関数
+    const fetchUsageHistory = useCallback(async () => {
+        try {
+            const response = await fetch('/api/user/usage-history', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                cache: 'no-store',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setUsageHistory(data.history || []);
+            } else {
+                console.error('利用履歴の取得に失敗しました:', response.status);
+                setUsageHistory([]);
+            }
+        } catch (error) {
+            console.error('利用履歴の取得中にエラーが発生しました:', error);
+            setUsageHistory([]);
+        }
+    }, []);
 
     // 自動ログイン処理とトークンチェック
     useEffect(() => {
@@ -38,7 +63,8 @@ export function useAuth() {
                         setIsAuthenticated(true);
                         setUser(userData);
                         setPlan(userData.plan);
-                        setUsageHistory(userData.usageHistory || []);
+                        // 利用履歴は別途APIから取得
+                        fetchUsageHistory();
                         setPaymentHistory(userData.paymentHistory || []);
                     })
                     .catch(() => {
@@ -50,7 +76,7 @@ export function useAuth() {
                     });
             }
         }
-    }, []);
+    }, [fetchUsageHistory]);
 
     const login = (userData: User, planData: Plan | undefined, usage: UsageHistory[], payment: PaymentHistory[]) => {
         setIsAuthenticated(true);
