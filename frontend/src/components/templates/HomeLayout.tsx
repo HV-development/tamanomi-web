@@ -566,6 +566,54 @@ export function HomeLayout() {
     )
   }
 
+  // 店舗データの初回ロード中はローディング表示
+  if (isStoresLoading && items.length === 0) {
+    return (
+      <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
+        {/* ヘッダー部分のみ */}
+        <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+          <div className="flex items-center justify-between px-4 py-3">
+            {/* 左側: ハンバーガーメニューとランク */}
+            <div className="flex items-center gap-3 w-20">
+              <HamburgerMenu onMenuItemClick={onMenuItemClick} isAuthenticated={isAuthenticated} />
+            </div>
+
+            {/* 中央: ロゴ */}
+            <div className="flex-1 flex justify-center">
+              <Logo size="lg" onClick={onLogoClick} />
+            </div>
+
+            {/* 右側: ユーザーメニュー（ログイン時のみ） */}
+            <div className="flex items-center justify-end w-20">
+              {isAuthenticated ? (
+                user && currentUserRank && (
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
+                    <div className="relative w-5 h-5">
+                      <Image
+                        src={`/${currentUserRank}.svg`}
+                        alt={`${currentUserRank}ランク`}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+                )
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        {/* ローディング表示 */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <p className="text-green-600 font-medium">店舗情報を読み込み中...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
       {/* ヘッダー部分のみ */}
