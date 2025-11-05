@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
       address: body.address,
       birthDate: body.birthDate,
       gender: body.gender,
+      phone: body.phone,
       ...(body.saitamaAppId && body.saitamaAppId.trim() !== '' ? { saitamaAppId: body.saitamaAppId.trim() } : {}),
       token: body.token
     };

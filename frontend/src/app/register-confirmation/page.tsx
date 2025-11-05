@@ -111,6 +111,7 @@ export default function RegisterConfirmationPage() {
           address: formData.address,
           birthDate: formData.birthDate,
           gender: formData.gender,
+          phone: formData.phone,
           // 空文字列の場合はundefinedとして送信しない
           saitamaAppId: saitamaAppIdValue,
           token: token,
