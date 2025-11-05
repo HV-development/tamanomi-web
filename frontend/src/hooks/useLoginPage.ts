@@ -49,9 +49,9 @@ export const useLoginPage = () => {
           if (!hasPlan) {
             // プラン未登録の場合はプラン登録画面へ（セッションストレージにメールアドレスを保存）
             sessionStorage.setItem('userEmail', userData.email)
-            router.push('/plan-registration')
+            router.replace('/plan-registration')
           } else {
-            router.push('/home')
+            router.replace('/home')
           }
         } else {
           setIsCheckingAuth(false)
@@ -169,17 +169,17 @@ export const useLoginPage = () => {
         // エラー処理
       }
 
-      // リダイレクト
+      // リダイレクト（router.replaceでブラウザ履歴を置き換えて、ログイン画面を経由しないようにする）
       const redirectPath = sessionStorage.getItem('redirectAfterLogin')
       
       if (redirectPath) {
         sessionStorage.removeItem('redirectAfterLogin')
-        router.push(redirectPath)
+        router.replace(redirectPath)
       } else {
         if (!hasPlan) {
-          router.push('/plan-registration')
+          router.replace('/plan-registration')
         } else {
-          router.push('/home')
+          router.replace('/home')
         }
       }
       

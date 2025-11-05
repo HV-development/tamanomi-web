@@ -52,7 +52,10 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
     {
       id: "contact",
       label: "お問い合わせ",
-      onClick: () => onMenuItemClick("contact"),
+      onClick: () => {
+        window.location.href = "/lp/contact"
+        onMenuItemClick("contact")
+      },
     },
     ...(isAuthenticated ? [{
       id: "logout",

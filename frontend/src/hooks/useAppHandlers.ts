@@ -178,13 +178,13 @@ export const useAppHandlers = (
             return
         }
 
-            // プラン登録状況によって遷移先を変更
+            // プラン登録状況によって遷移先を変更（router.replaceでブラウザ履歴を置き換えて、ログイン画面を経由しないようにする）
             if (!hasPlan) {
                 // プラン未登録の場合はプラン登録画面へ（独立したページ）
-                router.push('/plan-registration')
+                router.replace('/plan-registration')
             } else {
                 // プラン登録済みの場合はhome画面へ遷移
-                router.push('/home')
+                router.replace('/home')
             }
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
