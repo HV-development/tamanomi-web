@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useEffect } from "react"
+import { useMemo, useEffect, useState } from "react"
 import Image from "next/image"
 import { Ticket, X } from "lucide-react"
 import type { Coupon } from "@/types/coupon"
@@ -19,6 +19,9 @@ interface CouponListPopupProps {
 }
 
 export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userAge, isUsedToday, isCheckingUsage = false }: CouponListPopupProps) {
+  // 各クーポンの画像エラー状態を管理
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
+
   // フィルタリングされたクーポンリスト
   const filteredCoupons = useMemo(() => {
     let filtered = coupons
@@ -35,6 +38,10 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
     if (!isOpen) return
     console.log('🔍 [CouponListPopup] coupons prop:', coupons.length, coupons)
   }, [coupons, isOpen])
+
+  const handleImageError = (couponId: string) => {
+    setImageErrors(prev => ({ ...prev, [couponId]: true }))
+  }
 
   if (!isOpen) return null
 
@@ -96,54 +103,67 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredCoupons.map((coupon) => (
-                  <div
-                    key={coupon.id}
-                    className={`bg-white rounded-2xl border-2 shadow-sm transition-shadow overflow-hidden ${isUsedToday ? 'opacity-50 border-gray-300' : 'border-gray-200 hover:shadow-md'}`}
-                  >
-                    {/* クーポン画像 */}
-                    <div className="w-full h-48 overflow-hidden relative">
-                      <Image
-                        src={coupon.imageUrl || "/placeholder.svg"}
-                        alt={coupon.name}
-                        fill
-                        className="object-cover object-center"
-                      />
-                    </div>
-                    
-                    {/* クーポン情報 */}
-                    <div className="p-4">
-                      <h4 className="font-bold text-lg text-gray-900 mb-2 text-center">
-                        {coupon.name}
-                      </h4>
-                      <p className="text-sm text-gray-600 leading-relaxed mb-4 text-center">
-                        {coupon.description}
-                      </p>
-                      
-                      {/* 利用条件 */}
-                      {coupon.conditions && (
-                        <div className="mb-4 pt-3 border-t border-gray-200">
-                          <p className="text-xs text-gray-600 text-center">
-                            利用条件：{coupon.conditions}
-                          </p>
+                {filteredCoupons.map((coupon) => {
+                  const hasImage = Boolean(coupon.imageUrl)
+                  const isImageError = imageErrors[coupon.id] || false
+                  const shouldShowPlaceholder = !hasImage || isImageError
+
+                  return (
+                    <div
+                      key={coupon.id}
+                      className={`bg-white rounded-2xl border-2 shadow-sm transition-shadow overflow-hidden ${isUsedToday ? 'opacity-50 border-gray-300' : 'border-gray-200 hover:shadow-md'}`}
+                    >
+                      {/* クーポン画像 */}
+                      {shouldShowPlaceholder ? (
+                        <div className="w-full h-48 bg-gray-200 flex items-center justify-center border border-gray-300">
+                          <span className="text-black text-sm">no image</span>
+                        </div>
+                      ) : (
+                        <div className="w-full h-48 overflow-hidden relative">
+                          <Image
+                            src={coupon.imageUrl!}
+                            alt={coupon.name}
+                            fill
+                            className="object-cover object-center"
+                            onError={() => handleImageError(coupon.id)}
+                          />
                         </div>
                       )}
-                      
-                      {/* 利用ボタン */}
-                      <button
-                        onClick={() => onUseCoupon(coupon.id)}
-                        disabled={isUsedToday}
-                        className={`w-full text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md ${
-                          isUsedToday
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-[1.02]'
-                        }`}
-                      >
-                        このクーポンで乾杯！
-                      </button>
+                    
+                      {/* クーポン情報 */}
+                      <div className="p-4">
+                        <h4 className="font-bold text-lg text-gray-900 mb-2 text-center">
+                          {coupon.name}
+                        </h4>
+                        <p className="text-sm text-gray-600 leading-relaxed mb-4 text-center">
+                          {coupon.description}
+                        </p>
+                        
+                        {/* 利用条件 */}
+                        {coupon.conditions && (
+                          <div className="mb-4 pt-3 border-t border-gray-200">
+                            <p className="text-xs text-gray-600 text-center">
+                              利用条件：{coupon.conditions}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {/* 利用ボタン */}
+                        <button
+                          onClick={() => onUseCoupon(coupon.id)}
+                          disabled={isUsedToday}
+                          className={`w-full text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md ${
+                            isUsedToday
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-[1.02]'
+                          }`}
+                        >
+                          このクーポンで乾杯！
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
