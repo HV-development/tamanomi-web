@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Limelight, Plaster } from 'next/font/google'
 import './globals.css'
+import { Toaster } from 'sonner'
 
 const limelight = Limelight({
   weight: '400',
@@ -37,6 +38,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className={`${limelight.variable} ${plaster.variable}`}>
         {children}
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   )
