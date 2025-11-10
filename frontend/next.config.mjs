@@ -24,31 +24,40 @@ const nextConfig = {
   },
   // Google Maps API用の外部ドメイン許可
   async headers() {
+    const securityHeaders = [
+      {
+        key: 'Content-Security-Policy',
+        value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://api.mapbox.com https://vercel.live; object-src 'none'; worker-src 'self' blob:; child-src 'self' blob:; connect-src 'self' ws: wss: *.webcontainer-api.io https://api.mapbox.com https://events.mapbox.com https://zipcloud.ibsnet.co.jp http://localhost:3001 http://localhost:3002 https://tamanomi-api-develop.up.railway.app http://localhost:9000 http://127.0.0.1:9000; img-src 'self' data: blob: https: http: http://localhost:9000 http://127.0.0.1:9000 http://minio:9000 https://images.pexels.com *.webcontainer-api.io;"
+      },
+      {
+        key: 'X-Frame-Options',
+        value: 'DENY'
+      },
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff'
+      },
+      {
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin'
+      },
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=(self)'
+      },
+    ]
+
+    if (process.env.VERCEL_ENV === 'preview') {
+      securityHeaders.push({
+        key: 'X-Robots-Tag',
+        value: 'noindex, nofollow, noarchive'
+      })
+    }
+
     return [
       {
         source: '/(.*)',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://api.mapbox.com https://vercel.live; object-src 'none'; worker-src 'self' blob:; child-src 'self' blob:; connect-src 'self' ws: wss: *.webcontainer-api.io https://api.mapbox.com https://events.mapbox.com https://zipcloud.ibsnet.co.jp http://localhost:3001 http://localhost:3002 https://tamanomi-api-develop.up.railway.app http://localhost:9000 http://127.0.0.1:9000; img-src 'self' data: blob: https: http: http://localhost:9000 http://127.0.0.1:9000 http://minio:9000 https://images.pexels.com *.webcontainer-api.io;"
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(self)'
-          }
-        ],
+        headers: securityHeaders,
       },
     ]
   },
