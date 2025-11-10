@@ -53,17 +53,12 @@ export function useFavorites(isOpen: boolean, isAuthenticated: boolean, options?
     setError(null)
 
     try {
-      const accessToken = localStorage.getItem('accessToken')
-      if (!accessToken) {
-        throw new Error('認証情報が見つかりません。ログインしてください。')
-      }
-
       const response = await fetch('/api/favorites', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
         },
+        credentials: 'include',
         cache: 'no-store',
       })
 
