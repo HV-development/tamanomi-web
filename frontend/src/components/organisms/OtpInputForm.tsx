@@ -164,7 +164,7 @@ export function OtpInputForm({
         <div className="text-gray-600 space-y-2">
           <p>以下のメールアドレスに6桁のワンタイムパスワードを送信しました。</p>
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-            <p className="font-mono text-green-800 font-medium">{email}</p>
+            <p className="font-mono text-green-800 font-medium break-words">{email}</p>
           </div>
         </div>
       </div>
