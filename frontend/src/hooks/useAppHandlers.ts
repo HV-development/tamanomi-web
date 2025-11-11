@@ -8,6 +8,7 @@ import type { useNavigation } from './useNavigation'
 import type { useFilters } from './useFilters'
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { getCurrentPosition } from '@/utils/location'
+import { toast } from 'sonner'
 
 // ハンドラー作成フック
 export const useAppHandlers = (
@@ -337,6 +338,21 @@ export const useAppHandlers = (
             dispatch({ type: 'SET_PASSWORD_RESET_STEP', payload: "complete" })
             auth.setIsLoading(false)
         }, 1500)
+        try {
+            const response = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            })
+            if (!response.ok) {
+                throw new Error('パスワードリセットに失敗しました')
+            }
+        } catch (error) {
+            console.error('パスワードリセットエラー:', error)
+            toast.error(error instanceof Error ? error.message : 'パスワードリセットに失敗しました')
+        }
     }, [auth, dispatch])
 
     const handlePasswordResetCancel = useCallback(() => {
@@ -950,6 +966,9 @@ export const useAppHandlers = (
                 // エラー処理
             }
             
+            // トースターで成功メッセージを表示
+            toast.success('プロフィールを更新しました')
+            
             // マイページに戻る
             navigation.navigateToView("mypage", "mypage")
             navigation.navigateToMyPage("main")
@@ -958,7 +977,7 @@ export const useAppHandlers = (
         } catch (error) {
             auth.setIsLoading(false)
             // エラー表示（必要に応じてトーストやモーダルで通知）
-            alert(error instanceof Error ? error.message : 'プロフィールの更新に失敗しました')
+            toast.error(error instanceof Error ? error.message : 'プロフィールの更新に失敗しました')
         }
     }, [auth, dispatch, navigation])
 
@@ -1101,9 +1120,9 @@ export const useAppHandlers = (
         // ログイン状態をリセット（パスワード入力画面に戻す）
         dispatch({ type: 'RESET_LOGIN_STATE' })
 
-        // ルートURL（ログイン画面）に遷移
-        router.push('/')
-    }, [auth, dispatch, router])
+        // ログイン画面に遷移（ビューを切り替える）
+        navigation.navigateToView("login")
+    }, [auth, dispatch, navigation])
 
     return {
         handleCurrentLocationClick,

@@ -59,7 +59,7 @@ function VerifyEmailChangeContent() {
   }, [searchParams])
 
   const handleLoginRedirect = () => {
-    router.push('/')
+    router.push('/?view=login')
   }
 
   return (
