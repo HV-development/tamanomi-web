@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, Suspense, useReducer } from "react"
+import { useMemo, Suspense, useReducer, useEffect, useRef } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useFilters } from "@/hooks/useFilters"
@@ -20,6 +20,29 @@ export default function HomePage() {
   const navigation = useNavigation();
   const filters = useFilters();
   const router = useRouter()
+  
+  // 初期化フラグ（初回のみ実行するため）
+  const isInitialized = useRef(false)
+
+  // URLパラメータに応じたビュー遷移処理
+  useEffect(() => {
+    // 初回のみ実行
+    if (isInitialized.current) {
+      return
+    }
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const view = urlParams.get('view')
+      
+      if (view === 'login') {
+        // ログイン画面に遷移
+        navigation.navigateToView("login")
+      }
+      
+      // 初期化完了フラグを立てる
+      isInitialized.current = true
+    }
+  }, [navigation, router])
 
   // useReducerで状態管理を統合
   const [state, dispatch] = useReducer(appReducer, initialState)
@@ -28,12 +51,12 @@ export default function HomePage() {
   // state.stores は HomeLayout 内の無限スクロールで更新
 
   // 計算値をカスタムフックで分離
-  const computedValues = useComputedValues(
-    state.stores || [],
-    state.notifications || [],
-    auth || { isAuthenticated: false, user: undefined },
-    filters || { isFavoritesFilter: false }
-  )
+  const computedValues = useComputedValues({
+    stores: state.stores,
+    notifications: state.notifications,
+    auth,
+    filters
+  })
 
   // ハンドラーを作成
   const handlers = useAppHandlers(dispatch, auth, navigation, filters, router, state)

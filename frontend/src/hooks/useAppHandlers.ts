@@ -1105,9 +1105,9 @@ export const useAppHandlers = (
         // ログイン状態をリセット（パスワード入力画面に戻す）
         dispatch({ type: 'RESET_LOGIN_STATE' })
 
-        // ルートURL（ログイン画面）に遷移
-        router.push('/')
-    }, [auth, dispatch, router])
+        // ログイン画面に遷移（ビューを切り替える）
+        navigation.navigateToView("login")
+    }, [auth, dispatch, navigation])
 
     return {
         handleCurrentLocationClick,
