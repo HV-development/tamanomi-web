@@ -338,6 +338,21 @@ export const useAppHandlers = (
             dispatch({ type: 'SET_PASSWORD_RESET_STEP', payload: "complete" })
             auth.setIsLoading(false)
         }, 1500)
+        try {
+            const response = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            })
+            if (!response.ok) {
+                throw new Error('パスワードリセットに失敗しました')
+            }
+        } catch (error) {
+            console.error('パスワードリセットエラー:', error)
+            toast.error(error instanceof Error ? error.message : 'パスワードリセットに失敗しました')
+        }
     }, [auth, dispatch])
 
     const handlePasswordResetCancel = useCallback(() => {
