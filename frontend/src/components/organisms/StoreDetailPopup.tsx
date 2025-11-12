@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { X } from "lucide-react"
@@ -23,7 +24,7 @@ export function StoreDetailPopup({
   const getSmokingPolicyText = (policy: string) => {
     switch (policy) {
       case 'NON_SMOKING':
-        return 'NON_SMOKING（禁煙席）'
+        return '禁煙席'
       case 'SMOKING':
         return '喫煙席'
       case 'SEPARATED':
@@ -37,9 +38,17 @@ export function StoreDetailPopup({
     }
   }
 
-  // 予算のフォーマット
-  const formatBudget = (budget: { min: number; max: number }) => {
-    return `¥${budget.min.toLocaleString()} 〜 ¥${budget.max.toLocaleString()}`
+  // 住所クリックでGoogleマップに遷移
+  const handleAddressClick = () => {
+    // 座標が登録されている場合は座標で検索、ない場合は住所で検索
+    if (store.latitude && store.longitude) {
+      const googleMapsUrl = `https://www.google.com/maps?q=${store.latitude},${store.longitude}`
+      window.open(googleMapsUrl, '_blank')
+    } else {
+      const query = encodeURIComponent(`${store.name} ${store.address}`)
+      const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`
+      window.open(googleMapsUrl, '_blank')
+    }
   }
 
   return (
@@ -75,42 +84,64 @@ export function StoreDetailPopup({
           {/* コンテンツ */}
           <div className="flex-1 overflow-y-auto p-4">
             <div className="space-y-4">
-              {/* 営業時間 */}
-              {store.businessHours && (
+              {/* 住所 */}
+              {store.address && (
                 <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">営業時間</div>
-                  <div className="text-base text-gray-700">{store.businessHours}</div>
+                  <div className="text-base font-bold text-gray-900">住所</div>
+                  <button
+                    onClick={handleAddressClick}
+                    className="text-base text-green-700 hover:text-green-800 underline text-left"
+                  >
+                    {store.address}
+                  </button>
+                </div>
+              )}
+
+              {/* 電話番号 */}
+              {store.phone && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">電話番号</div>
+                  <a
+                    href={`tel:${store.phone}`}
+                    className="text-base text-green-700 hover:text-green-800 underline"
+                  >
+                    {store.phone}
+                  </a>
+                </div>
+              )}
+
+              {/* ホームページURL */}
+              {(store.homepageUrl || store.website) && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">ホームページURL</div>
+                  <a
+                    href={store.homepageUrl || store.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-base text-green-700 hover:text-green-800 underline break-all"
+                  >
+                    {store.homepageUrl || store.website}
+                  </a>
+                </div>
+              )}
+
+              {/* 詳細情報 */}
+              {store.details && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">詳細情報</div>
+                  <div className="text-base text-gray-700 whitespace-pre-line">{store.details}</div>
                 </div>
               )}
 
               {/* 定休日 */}
-              {store.closedDays && (
+              {(store.closedDays || store.holidays) && (
                 <div className="space-y-2">
                   <div className="text-base font-bold text-gray-900">定休日</div>
-                  <div className="text-base text-gray-700">{store.closedDays}</div>
+                  <div className="text-base text-gray-700">{store.closedDays || store.holidays}</div>
                 </div>
               )}
 
-              {/* 予算 */}
-              {store.budget && (
-                <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">予算</div>
-                  <div className="space-y-1">
-                    {store.budget.dinner && (
-                      <div className="text-base text-gray-700">
-                        夜：{formatBudget(store.budget.dinner)}
-                      </div>
-                    )}
-                    {store.budget.lunch && (
-                      <div className="text-base text-gray-700">
-                        昼：{formatBudget(store.budget.lunch)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* 禁煙・喫煙 */}
+              {/* 禁煙・分煙 */}
               {store.smokingPolicy && (
                 <div className="space-y-2">
                   <div className="text-base font-bold text-gray-900">禁煙・分煙</div>
@@ -121,33 +152,45 @@ export function StoreDetailPopup({
               {/* 支払い方法 */}
               {store.paymentMethods && (
                 <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">支払い方法</div>
+                  <div className="text-base font-bold text-gray-900">支払方法</div>
                   <div className="space-y-1">
                     {/* さいコイン */}
                     <div className="text-base text-gray-700">
-                      さいコイン：不可
+                      さいコイン：{store.paymentMethods.saicoin ? '可' : '不可'}
                     </div>
                     
                     {/* たまポン */}
                     <div className="text-base text-gray-700">
-                      たまポン：可
+                      たまポン：{store.paymentMethods.tamapon ? '可' : '不可'}
                     </div>
                     
                     {/* 現金 */}
                     <div className="text-base text-gray-700">
-                      現金：可
+                      現金：{store.paymentMethods.cash ? '可' : '不可'}
                     </div>
                     
                     {/* クレジットカード */}
-                    <div className="text-base text-gray-700">
-                      クレジットカード：可　{store.paymentMethods.creditCards.join('、')}
-                    </div>
+                    {store.paymentMethods.creditCards && store.paymentMethods.creditCards.length > 0 && (
+                      <div className="text-base text-gray-700">
+                        クレジットカード：可　{store.paymentMethods.creditCards.join('、')}
+                      </div>
+                    )}
                     
                     {/* コード決済 */}
-                    <div className="text-base text-gray-700">
-                      コード決済：可　{store.paymentMethods.digitalPayments.join('、')}
-                    </div>
+                    {store.paymentMethods.digitalPayments && store.paymentMethods.digitalPayments.length > 0 && (
+                      <div className="text-base text-gray-700">
+                        コード決済：可　{store.paymentMethods.digitalPayments.join('、')}
+                      </div>
+                    )}
                   </div>
+                </div>
+              )}
+
+              {/* 利用時間 */}
+              {store.couponUsageStart && store.couponUsageEnd && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">利用時間</div>
+                  <div className="text-base text-gray-700">{`${store.couponUsageStart}〜${store.couponUsageEnd}`}</div>
                 </div>
               )}
 

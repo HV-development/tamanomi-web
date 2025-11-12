@@ -42,9 +42,9 @@ export function LoginContainer({
       {/* ヘッダー */}
       <HeaderLogo
         onLogoClick={onLogoClick}
-        showBackButton={loginStep === "otp"} // OTP画面のみ戻るボタンを表示
+        showBackButton={true} // 常に戻るボタンを表示
         onBackClick={onBack}
-        showHomeButton={true} // homeボタンを常に表示
+        showHomeButton={false} // homeボタンを非表示
         onHomeClick={onHomeClick}
       />
 

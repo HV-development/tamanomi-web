@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthHeader } from '@/lib/auth-header'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 認証トークンを取得
-    const authHeader = request.headers.get('authorization')
+    const authHeader = getAuthHeader(request)
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { error: { message: '認証トークンが必要です' } },

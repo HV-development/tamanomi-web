@@ -275,14 +275,23 @@ export function PlanRegistrationForm({
               placeholder="ユーザーIDを入力してください"
               disabled={isLinking}
             />
-            <Button
+            <button 
               onClick={handleLinkSaitamaApp}
               disabled={isLinking || !saitamaAppId}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white p-3 text-sm font-bold flex items-center justify-center gap-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
-              <LinkIcon className="w-4 h-4" />
-              {isLinking ? "連携処理中..." : "アプリと連携して500円OFFで利用する"}
-            </Button>
+              {isLinking ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  連携処理中...
+                </>
+              ) : (
+                <>
+                  <span>🔗</span>
+                  アプリと連携して500円OFFで利用する
+                </>
+              )}
+            </button>
             <p className="text-xs text-center text-gray-600">
               ※ 連携後、すぐに割引価格が適用されます
             </p>

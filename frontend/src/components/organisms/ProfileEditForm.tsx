@@ -6,7 +6,6 @@ import { useState, useEffect, useRef } from "react"
 import { Input } from "@/components/atoms/Input"
 import { Button } from "@/components/atoms/Button"
 import { RadioButton } from "@/components/atoms/RadioButton"
-import { DateSelect } from "@/components/atoms/DateSelect"
 import { ProfileEditConfirmModal } from "./ProfileEditConfirmModal"
 import type { User } from "@/types/user"
 import {
@@ -14,7 +13,7 @@ import {
   type ProfileEditInput,
   validateNicknameRealtime,
   validatePostalCodeRealtime,
-  validateBirthDateRealtime,
+  validatePhoneRealtime,
 } from "@hv-development/schemas"
 
 interface ProfileEditFormProps {
@@ -32,6 +31,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
     address: "",
     birthDate: "",
     gender: "male",
+    phone: "",
     saitamaAppId: "",
   })
 
@@ -41,6 +41,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
     address: "",
     birthDate: "",
     gender: "male",
+    phone: "",
     saitamaAppId: "",
   })
 
@@ -66,6 +67,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       address: user.address || "",
       birthDate: formatBirthDate(user.birthDate),
       gender: (user.gender as "male" | "female" | "other") || "male",
+      phone: user.phone || "",
       saitamaAppId: (user as User & { saitamaAppId?: string }).saitamaAppId || "",
     }
     setFormData(initialData)
@@ -84,6 +86,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
     address: "住所",
     birthDate: "生年月日",
     gender: "性別",
+    phone: "電話番号",
     saitamaAppId: "さいたま市みんなのアプリID",
   } as const
 
@@ -146,6 +149,11 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
     
     Object.keys(formData).forEach((key) => {
       const fieldKey = key as keyof ProfileEditInput
+      // 生年月日と住所は編集不可なので除外
+      if (fieldKey === 'birthDate' || fieldKey === 'address') {
+        return
+      }
+      
       if (formData[fieldKey] !== originalData[fieldKey]) {
         if (fieldKey in fieldLabels) {
           let displayValue = String(formData[fieldKey] || "")
@@ -254,15 +262,15 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       } else if (postalCodeValidation.errors.length > 0) {
         setErrors({ ...errors, postalCode: postalCodeValidation.errors[0] })
       }
-    } else if (field === 'birthDate') {
-      const birthDateValidation = validateBirthDateRealtime(value)
-      if (birthDateValidation.isValid) {
-        setErrors({ ...errors, birthDate: undefined })
-      } else if (birthDateValidation.errors.length > 0) {
-        setErrors({ ...errors, birthDate: birthDateValidation.errors[0] })
+    } else if (field === 'phone') {
+      const phoneValidation = validatePhoneRealtime(value)
+      if (phoneValidation.isValid) {
+        setErrors({ ...errors, phone: undefined })
+      } else if (phoneValidation.errors.length > 0) {
+        setErrors({ ...errors, phone: phoneValidation.errors[0] })
       }
-    } else if (field !== 'address' && errors[field]) {
-      // 住所フィールドは編集不可なので、住所以外のフィールドのエラーをクリア
+    } else if (field !== 'address' && field !== 'birthDate' && errors[field]) {
+      // 住所と生年月日は編集不可なので、エラーをクリア
       setErrors({ ...errors, [field]: undefined })
     }
   }
@@ -280,7 +288,10 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
       } else if (field === 'address') {
         profileEditSchema.pick({ address: true }).parse({ address: value })
       } else if (field === 'birthDate') {
-        profileEditSchema.pick({ birthDate: true }).parse({ birthDate: value })
+        // 生年月日は編集不可なのでバリデーションをスキップ
+        return
+      } else if (field === 'phone') {
+        profileEditSchema.pick({ phone: true }).parse({ phone: value })
       } else if (field === 'gender') {
         profileEditSchema.pick({ gender: true }).parse({ gender: value })
       } else if (field === 'saitamaAppId') {
@@ -349,13 +360,26 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
         {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
       </div>
 
-      {/* 生年月日 */}
-      <DateSelect
-        label="生年月日"
-        value={formData.birthDate}
-        onChange={(value) => updateFormData("birthDate", value)}
-        onBlur={() => handleBlur("birthDate")}
-        error={errors.birthDate}
+      {/* 生年月日表示（表示のみ・更新対象外） */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          生年月日
+        </label>
+        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 min-h-[48px] flex items-center">
+          {formData.birthDate || "生年月日は登録できません"}
+        </div>
+      </div>
+
+      {/* 電話番号 */}
+      <Input
+        type="tel"
+        label="電話番号"
+        placeholder="09012345678（ハイフンなし）"
+        value={formData.phone || ""}
+        onChange={(value) => updateFormData("phone", value)}
+        onBlur={() => handleBlur("phone")}
+        error={errors.phone}
+        required={true}
       />
 
       {/* 性別 */}

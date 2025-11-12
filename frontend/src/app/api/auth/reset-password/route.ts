@@ -7,33 +7,11 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // バリデーション
-    if (!body.token) {
-      return NextResponse.json(
-        { success: false, message: 'リセットトークンが必要です' },
-        { status: 400 }
-      );
-    }
-
-    if (!body.newPassword) {
-      return NextResponse.json(
-        { success: false, message: '新しいパスワードが必要です' },
-        { status: 400 }
-      );
-    }
-
-    if (body.newPassword.length < 8) {
-      return NextResponse.json(
-        { success: false, message: 'パスワードは8文字以上である必要があります' },
-        { status: 400 }
-      );
-    }
-
     // タイムアウト設定付きのfetch
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
-    const fullUrl = buildApiUrl('/auth/password/reset/confirm');
+    const fullUrl = buildApiUrl('/password/reset/request');
 
     try {
       const response = await fetch(fullUrl, {
@@ -42,9 +20,7 @@ export async function POST(request: NextRequest) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token: body.token,
-          newPassword: body.newPassword,
-          password: body.newPassword, // スキーマの互換性のため
+          email: body.email,
         }),
         signal: controller.signal,
       });
@@ -61,7 +37,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             {
               success: false,
-              message: errorData.message || '無効なリセットトークンです。リンクの有効期限が切れている可能性があります。',
+              message: errorData.message || 'メールアドレスが見つかりません。',
               error: errorData,
             },
             { status: 400 }

@@ -19,8 +19,22 @@ export default function RegisterCompletePage() {
     router.push('/home')
   }
 
-  const handleGoToLogin = () => {
-    router.push('/?view=login')
+  const handleGoToPlanRegistration = () => {
+    // プラン登録画面に遷移（セッションストレージからメールアドレスを取得）
+    const userEmail = sessionStorage.getItem('userEmail')
+    if (userEmail) {
+      sessionStorage.setItem('userEmail', userEmail)
+    }
+    
+    // URLパラメータからさいたま市アプリ連携フラグを取得
+    const urlParams = new URLSearchParams(window.location.search)
+    const saitamaAppLinked = urlParams.get('saitamaAppLinked') === 'true'
+    
+    if (saitamaAppLinked) {
+      router.push('/plan-registration?saitamaAppLinked=true')
+    } else {
+      router.push('/plan-registration')
+    }
   }
 
   const handleLogoClick = () => {
@@ -79,7 +93,7 @@ export default function RegisterCompletePage() {
               <div className="text-sm text-blue-800 space-y-2">
                 <div className="flex items-start gap-2">
                   <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-bold flex-shrink-0 mt-0.5">1</span>
-                  <span>ログインしてプランを選択</span>
+                  <span>プランを選択</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-bold flex-shrink-0 mt-0.5">2</span>
@@ -95,11 +109,11 @@ export default function RegisterCompletePage() {
             {/* ボタン */}
             <div className="space-y-3">
               <button
-                onClick={handleGoToLogin}
+                onClick={handleGoToPlanRegistration}
                 className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
               >
                 <User className="w-5 h-5" />
-                ログインしてプランを選択
+                プランを選択する
               </button>
 
               <button

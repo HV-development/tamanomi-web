@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { User, Plan, UsageHistory, PaymentHistory } from '@/types/user';
 
 export function useAuth() {
@@ -8,10 +8,37 @@ export function useAuth() {
     const [plan, setPlan] = useState<Plan | undefined>(undefined);
     const [usageHistory, setUsageHistory] = useState<UsageHistory[]>([]);
     const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
+    const hasInitialized = useRef(false);
+
+    // 利用履歴を取得する関数
+    const fetchUsageHistory = useCallback(async () => {
+        try {
+            const response = await fetch('/api/user/usage-history', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                cache: 'no-store',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setUsageHistory(data.history || []);
+            } else {
+                console.error('利用履歴の取得に失敗しました:', response.status);
+                setUsageHistory([]);
+            }
+        } catch (error) {
+            console.error('利用履歴の取得中にエラーが発生しました:', error);
+            setUsageHistory([]);
+        }
+    }, []);
 
     // 自動ログイン処理とトークンチェック
     useEffect(() => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && !hasInitialized.current) {
+            hasInitialized.current = true;
             const urlParams = new URLSearchParams(window.location.search);
             const autoLogin = urlParams.get('auto-login');
             const loginEmail = urlParams.get('email');
@@ -22,17 +49,34 @@ export function useAuth() {
                 // URLパラメータをクリア
                 window.history.replaceState({}, '', '/');
             } else {
-                // localStorage にアクセストークンがある場合は認証済みとする
-                const accessToken = localStorage.getItem('accessToken');
-                
-                if (accessToken) {
-                    setIsAuthenticated(true);
-                } else {
-                    setIsAuthenticated(false);
-                }
+                // Cookieにアクセストークンがある場合は認証済みとする
+                // Cookieは自動的に送信されるため、Authorizationヘッダーは不要
+                setIsLoading(true);
+                fetch('/api/user/me')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch user data');
+                        }
+                        return response.json();
+                    })
+                    .then(userData => {
+                        setIsAuthenticated(true);
+                        setUser(userData);
+                        setPlan(userData.plan);
+                        // 利用履歴は別途APIから取得
+                        fetchUsageHistory();
+                        setPaymentHistory(userData.paymentHistory || []);
+                    })
+                    .catch(() => {
+                        // トークンが無効な場合は未認証とする
+                        setIsAuthenticated(false);
+                    })
+                    .finally(() => {
+                        setIsLoading(false);
+                    });
             }
         }
-    }, []);
+    }, [fetchUsageHistory]);
 
     const login = (userData: User, planData: Plan | undefined, usage: UsageHistory[], payment: PaymentHistory[]) => {
         setIsAuthenticated(true);
@@ -42,13 +86,24 @@ export function useAuth() {
         setPaymentHistory(payment);
     };
 
-    const logout = () => {
-        // localStorageからトークンをクリア
+    const logout = async () => {
+        // セッション関連データをクリア
         if (typeof window !== 'undefined') {
+            sessionStorage.clear();
+            // localStorageのトークンも削除
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            // その他のセッション関連データもクリア
-            sessionStorage.clear();
+        }
+        
+        // Cookieからトークンをクリア（APIエンドポイント経由）
+        try {
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include', // Cookieを送信
+            });
+        } catch (error) {
+            console.error('ログアウトAPIエラー:', error);
+            // エラーが発生してもローカル状態はクリアする
         }
         
         setIsAuthenticated(false);

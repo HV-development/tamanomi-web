@@ -37,8 +37,14 @@ export function LoginLayout({
     // OTP画面の場合はパスワード画面に戻る
     if (loginStep === "otp") {
       onBackToPassword()
+    } else {
+      // パスワード画面の場合はhome画面に遷移
+      if (onHomeClick) {
+        onHomeClick()
+      } else {
+        window.location.href = "/"
+      }
     }
-    // パスワード画面の場合は何もしない
   }
 
   const handleLogoClick = () => {

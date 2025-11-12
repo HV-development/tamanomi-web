@@ -38,19 +38,9 @@ export const useLoginPage = () => {
         return
       }
       
-      const accessToken = localStorage.getItem('accessToken')
-      
-      if (!accessToken) {
-        setIsCheckingAuth(false)
-        return
-      }
-
+      // Cookieから自動的に認証チェック
       try {
-        const response = await fetch('/api/user/me', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        })
+        const response = await fetch('/api/user/me')
 
         if (response.ok) {
           const userData = await response.json()
@@ -59,13 +49,11 @@ export const useLoginPage = () => {
           if (!hasPlan) {
             // プラン未登録の場合はプラン登録画面へ（セッションストレージにメールアドレスを保存）
             sessionStorage.setItem('userEmail', userData.email)
-            router.push('/plan-registration')
+            router.replace('/plan-registration')
           } else {
-            router.push('/home')
+            router.replace('/home')
           }
         } else {
-          localStorage.removeItem('accessToken')
-          localStorage.removeItem('refreshToken')
           setIsCheckingAuth(false)
         }
       } catch {
@@ -168,28 +156,10 @@ export const useLoginPage = () => {
         throw new Error(errorMessage)
       }
 
-      // トークンを保存
-      if (data.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken)
-      }
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken)
-      }
-
-      // トークンが存在しない場合は遷移を停止（メールアドレス変更成功時のログアウト処理のため）
-      const currentToken = localStorage.getItem('accessToken')
-      if (!currentToken) {
-        return
-      }
-
-      // プラン登録状況を確認
+      // トークンはCookieに保存されているため、プラン登録状況を確認
       let hasPlan = false
       try {
-        const userResponse = await fetch('/api/user/me', {
-          headers: {
-            'Authorization': `Bearer ${data.accessToken}`,
-          },
-        })
+        const userResponse = await fetch('/api/user/me')
         
         if (userResponse.ok) {
           const userData = await userResponse.json()
@@ -199,24 +169,27 @@ export const useLoginPage = () => {
         // エラー処理
       }
 
-      // リダイレクト
+      // リダイレクト（router.replaceでブラウザ履歴を置き換えて、ログイン画面を経由しないようにする）
       const redirectPath = sessionStorage.getItem('redirectAfterLogin')
       
       if (redirectPath) {
         sessionStorage.removeItem('redirectAfterLogin')
-        router.push(redirectPath)
+        router.replace(redirectPath)
       } else {
         if (!hasPlan) {
-          router.push('/plan-registration')
+          router.replace('/plan-registration')
         } else {
-          router.push('/home')
+          router.replace('/home')
         }
       }
+      
+      // 成功時はsetIsLoading(false)を呼ばない（リダイレクト後に自動的にアンマウントされるため）
+      // ローディング表示を維持して、home画面の読み込み完了まで表示し続ける
+      return
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました'
       console.error('OTP verification error:', errorMessage) // デバッグログ
       setError(errorMessage)
-    } finally {
       setIsLoading(false)
     }
   }, [email, requestId, router])

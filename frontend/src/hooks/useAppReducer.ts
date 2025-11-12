@@ -1,4 +1,4 @@
-import type { AppState, AppAction } from '../../tamanomi-schemas/src/frontend/types'
+import type { AppState, AppAction } from '@hv-development/schemas'
 
 // 初期状態
 export const initialState: AppState = {
@@ -8,13 +8,15 @@ export const initialState: AppState = {
     isCouponListOpen: false,
     selectedStore: null,
     selectedCoupon: null,
+    storeCoupons: [],
     isSuccessModalOpen: false,
     isLoginRequiredModalOpen: false,
+    isPlanRequiredModalOpen: false,
     isStoreDetailPopupOpen: false,
     isFavoritesOpen: false,
     loginStep: "password",
     loginEmail: "",
-    loginError: "",
+    loginError: null,
     signupData: null,
     emailChangeStep: "form",
     newEmail: "",
@@ -28,6 +30,9 @@ export const initialState: AppState = {
     emailConfirmationEmail: "",
     historyStores: [],
     isHistoryOpen: false,
+    currentLocation: null,
+    isLocationLoading: false,
+    locationError: null,
 }
 
 // リデューサー（簡略化）
@@ -45,10 +50,14 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, selectedStore: action.payload }
         case 'SET_SELECTED_COUPON':
             return { ...state, selectedCoupon: action.payload }
+        case 'SET_STORE_COUPONS':
+            return { ...state, storeCoupons: action.payload }
         case 'SET_SUCCESS_MODAL_OPEN':
             return { ...state, isSuccessModalOpen: action.payload }
         case 'SET_LOGIN_REQUIRED_MODAL_OPEN':
             return { ...state, isLoginRequiredModalOpen: action.payload }
+        case 'SET_PLAN_REQUIRED_MODAL_OPEN':
+            return { ...state, isPlanRequiredModalOpen: action.payload }
         case 'SET_STORE_DETAIL_POPUP_OPEN':
             return { ...state, isStoreDetailPopupOpen: action.payload }
         case 'SET_FAVORITES_OPEN':
@@ -61,6 +70,18 @@ export function appReducer(state: AppState, action: AppAction): AppState {
                 ),
                 selectedStore: state.selectedStore?.id === action.payload
                     ? { ...state.selectedStore, isFavorite: !state.selectedStore.isFavorite }
+                    : state.selectedStore
+            }
+        case 'SYNC_FAVORITES':
+            const favoriteIds = new Set(action.payload)
+            return {
+                ...state,
+                stores: state.stores.map(store => ({
+                    ...store,
+                    isFavorite: favoriteIds.has(store.id)
+                })),
+                selectedStore: state.selectedStore
+                    ? { ...state.selectedStore, isFavorite: favoriteIds.has(state.selectedStore.id) }
                     : state.selectedStore
             }
         case 'MARK_NOTIFICATION_READ':
@@ -76,7 +97,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
                 notifications: state.notifications.map(n => ({ ...n, isRead: true }))
             }
         case 'RESET_LOGIN_STATE':
-            return { ...state, loginStep: "password", loginEmail: "", loginError: "" }
+            return { ...state, loginStep: "password", loginEmail: "" }
         case 'RESET_SIGNUP_STATE':
             return { ...state, signupData: null }
         case 'RESET_COUPON_STATE':
@@ -120,6 +141,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, historyStores: action.payload }
         case 'SET_HISTORY_OPEN':
             return { ...state, isHistoryOpen: action.payload }
+        case 'SET_CURRENT_LOCATION':
+            return { ...state, currentLocation: action.payload }
+        case 'SET_LOCATION_LOADING':
+            return { ...state, isLocationLoading: action.payload }
+        case 'SET_LOCATION_ERROR':
+            return { ...state, locationError: action.payload }
         default:
             return state
     }

@@ -38,7 +38,7 @@ export function FooterNavigation({
     },
     {
       id: "mypage",
-      label: isAuthenticated ? "マイページ" : "ログイン",
+      label: isAuthenticated ? "マイページ" : "ログイン・新規登録",
       icon: isAuthenticated ? User : LogIn,
     },
   ]

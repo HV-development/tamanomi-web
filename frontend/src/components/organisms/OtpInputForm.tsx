@@ -21,6 +21,7 @@ export function OtpInputForm({
   onVerifyOtp,
   onResendOtp,
   onBack,
+  isLoading,
   error: externalError,
 }: OtpInputFormProps) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
@@ -163,7 +164,7 @@ export function OtpInputForm({
         <div className="text-gray-600 space-y-2">
           <p>以下のメールアドレスに6桁のワンタイムパスワードを送信しました。</p>
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-            <p className="font-mono text-green-800 font-medium">{email}</p>
+            <p className="font-mono text-green-800 font-medium break-words">{email}</p>
           </div>
         </div>
       </div>
@@ -186,15 +187,26 @@ export function OtpInputForm({
               onChange={(e) => handleInputChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={index === 0 ? handlePaste : undefined}
+              disabled={isLoading}
               className={`w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-bold border-2 rounded-lg transition-all duration-200 ${digit
                 ? "border-green-500 bg-green-50 text-green-900"
                 : "border-gray-300 bg-white text-gray-900"
-                } focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500`}
+                } focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
               maxLength={1}
               autoComplete="off"
             />
           ))}
         </div>
+
+        {/* ローディング表示 */}
+        {isLoading && (
+          <div className="text-center mb-4">
+            <div className="inline-flex items-center gap-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
+              <p className="text-green-600 font-medium">認証中...</p>
+            </div>
+          </div>
+        )}
 
         {/* エラーメッセージ */}
         {error && <p className="text-sm text-red-500 text-center mb-4">{error}</p>}
@@ -204,7 +216,8 @@ export function OtpInputForm({
           <button
             type="button"
             onClick={handleClear}
-            className="text-sm text-gray-500 hover:text-gray-700 underline"
+            disabled={isLoading}
+            className="text-sm text-gray-500 hover:text-gray-700 underline disabled:opacity-50 disabled:cursor-not-allowed"
           >
             クリア
           </button>
@@ -228,6 +241,7 @@ export function OtpInputForm({
           onClick={onResendOtp}
           variant="secondary"
           className="w-full py-3 text-base font-medium"
+          disabled={isLoading}
         >
           ワンタイムパスワードを再送信
         </Button>
@@ -236,6 +250,7 @@ export function OtpInputForm({
           onClick={onBack}
           variant="secondary"
           className="w-full py-3 text-base font-medium"
+          disabled={isLoading}
         >
           メールアドレス入力に戻る
         </Button>

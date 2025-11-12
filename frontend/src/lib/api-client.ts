@@ -17,7 +17,8 @@ interface ApiOptions extends RequestInit {
 }
 
 export class ApiClient {
-  private static baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  // NEXT_PUBLIC_API_BASE_URL は廃止。フロントからは Next API への相対パスを利用する。
+  private static baseUrl = '';
 
   /**
    * API呼び出しの共通処理
@@ -236,5 +237,74 @@ export async function preRegister(
       throw error
     }
     throw new Error('認証メールの送信中にエラーが発生しました')
+  }
+}
+
+/**
+ * パスワードリセット確認APIのレスポンス型
+ */
+export interface ConfirmPasswordResetResponse {
+  success: boolean
+  message?: string
+}
+
+/**
+ * パスワードリセットを確認し、新しいパスワードを設定する
+ * リセットトークンと新しいパスワードを使用してパスワードをリセットする
+ */
+export async function confirmPasswordReset(
+  token: string,
+  newPassword: string
+): Promise<ConfirmPasswordResetResponse> {
+  try {
+    const response = await fetch('/api/auth/reset-password/confirm', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        newPassword,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      
+      // 400エラー（無効なトークンなど）の場合は特別なメッセージ
+      if (response.status === 400) {
+        const message = errorData.message || errorData.error?.message || '無効なリセットトークンです。リンクの有効期限が切れている可能性があります。'
+        throw new Error(message)
+      }
+      
+      // 408エラー（タイムアウト）の場合は特別なメッセージ
+      if (response.status === 408) {
+        const message = errorData.message || errorData.error?.message || 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。'
+        throw new Error(message)
+      }
+      
+      // 503エラー（サーバー接続エラー）の場合は特別なメッセージ
+      if (response.status === 503) {
+        const message = errorData.message || errorData.error?.message || 'サーバーに接続できません。ネットワーク接続を確認してください。'
+        throw new Error(message)
+      }
+      
+      // 500エラー（サーバーエラー）の場合は一般的なメッセージを表示
+      if (response.status === 500) {
+        const message = errorData.message || errorData.error?.message || 'システムエラーが発生しました。しばらく時間をおいてから再度お試しください。'
+        throw new Error(message)
+      }
+      
+      const message = errorData.message || errorData.error?.message || 'パスワードリセットに失敗しました'
+      throw new Error(message)
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('パスワードリセットの処理中にエラーが発生しました')
   }
 }

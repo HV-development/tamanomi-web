@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import Image from "next/image"
-import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut } from "lucide-react"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
@@ -68,6 +68,8 @@ interface MyPageContainerProps {
 }
 
 // ランク計算用のカスタムフック
+// TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const useRankCalculations = (user: UserType | undefined, currentUserRank: string | null | undefined) => {
   return useMemo(() => {
     if (!user) {
@@ -157,6 +159,8 @@ const RankImage = React.memo(({ rank, alt, className }: { rank: string, alt: str
 RankImage.displayName = 'RankImage'
 
 // ランクカードコンポーネント
+// TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const RankCard = React.memo(({ rankCalculations }: { rankCalculations: ReturnType<typeof useRankCalculations> }) => {
   const { nextRank, monthsToNext, currentRankInfo } = rankCalculations
 
@@ -216,6 +220,7 @@ const RankCard = React.memo(({ rankCalculations }: { rankCalculations: ReturnTyp
     </div>
   )
 })
+/* eslint-enable @typescript-eslint/no-unused-vars */
 RankCard.displayName = 'RankCard'
 
 // メニューボタンコンポーネント
@@ -251,12 +256,16 @@ const MenuButtons = React.memo(({
   onViewPlan,
   onChangeEmail,
   onChangePassword,
+  onViewUsageHistory,
+  onViewPaymentHistory,
   onLogout
 }: {
   onEditProfile: () => void
   onViewPlan: () => void
   onChangeEmail: () => void
   onChangePassword: () => void
+  onViewUsageHistory: () => void
+  onViewPaymentHistory: () => void
   onLogout: () => void
 }) => (
   <div className="space-y-3">
@@ -272,13 +281,12 @@ const MenuButtons = React.memo(({
     {appConfig.myPageSettings.showPasswordChange && (
       <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
     )}
-    {/* ★一時的にコメントアウト：正式リリースまで利用履歴と決済履歴を非表示 */}
-    {/* {appConfig.myPageSettings.showUsageHistory && (
+    {appConfig.myPageSettings.showUsageHistory && (
       <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
     )}
     {appConfig.myPageSettings.showPaymentHistory && (
       <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
-    )} */}
+    )}
     <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
   </div>
 ))
@@ -286,7 +294,7 @@ MenuButtons.displayName = 'MenuButtons'
 
 export const MyPageContainer = React.memo(function MyPageContainer({
   user,
-  plan,
+  plan: _plan, // eslint-disable-line @typescript-eslint/no-unused-vars
   usageHistory,
   paymentHistory,
   currentView,
@@ -325,11 +333,13 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   )
 
   // ランク計算をメモ化（プリロードデータを使用）
-  const rankCalculations = useRankCalculations(user, currentUserRank)
+  // TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト
+  // const rankCalculations = useRankCalculations(user, currentUserRank)
 
-  // 防御的チェック：userとplanが存在しない場合はスケルトンを表示
+  // 防御的チェック：userが存在しない場合はスケルトンを表示
+  // プラン情報はnullの場合もあるため、チェックしない
   // ただし、メールアドレス変更成功モーダルが表示されている場合は無視
-  if ((!user || !plan) && !isEmailChangeSuccessModalOpen) {
+  if (!user && !isEmailChangeSuccessModalOpen) {
     return <SkeletonMyPage />
   }
 
@@ -406,27 +416,8 @@ export const MyPageContainer = React.memo(function MyPageContainer({
     />
   }
 
-  // ランクが計算されていない場合はローディング表示
-  if (!rankCalculations.currentRankInfo) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-        <div className="bg-white border-b border-gray-200 px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
-            {/* <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
-              ← 戻る
-            </button> */}
-            <div className="w-12"></div>
-            <Logo size="lg" onClick={onLogoClick} />
-            <div className="w-12"></div>
-          </div>
-        </div>
-        <div className="p-4 flex items-center justify-center">
-          <div className="text-gray-500">読み込み中...</div>
-        </div>
-      </div>
-    )
-  }
+  // ランク情報がない場合でもマイページを表示できるようにする
+  // （ランク情報はオプショナルなため、チェックを削除）
 
   return (
     <div className={`min-h-screen ${backgroundColorClass}`}>
@@ -434,11 +425,9 @@ export const MyPageContainer = React.memo(function MyPageContainer({
       <FadeInComponent delay={0}>
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
-            {/* <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
+            <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
               ← 戻る
-            </button> */}
-            <div className="w-12"></div>
+            </button>
             <Logo size="lg" onClick={onLogoClick} />
             <div className="w-12"></div>
           </div>
@@ -452,9 +441,10 @@ export const MyPageContainer = React.memo(function MyPageContainer({
             <ProfileCard user={user} onEditProfile={onEditProfile} />
           </FadeInComponent>
 
-          <FadeInComponent delay={300}>
+          {/* TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト */}
+          {/* <FadeInComponent delay={300}>
             <RankCard rankCalculations={rankCalculations} />
-          </FadeInComponent>
+          </FadeInComponent> */}
 
           <FadeInComponent delay={400}>
             <MenuButtons
