@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlanRegistrationContainer } from '@/components/organisms/PlanRegistrationContainer'
-import { 
+import {
   PlanListResponse,
   PlanListResponseSchema
 } from '@hv-development/schemas'
@@ -22,7 +22,7 @@ export default function PlanRegistrationPage() {
   const fetchUserInfo = useCallback(async () => {
     try {
       const accessToken = localStorage.getItem('accessToken')
-      
+
       if (!accessToken) {
         console.log('🔍 [fetchUserInfo] No access token found')
         setSaitamaAppLinked(false)
@@ -43,14 +43,14 @@ export default function PlanRegistrationPage() {
       if (response.ok) {
         const userData = await response.json()
         console.log('🔍 [fetchUserInfo] User data received:', userData)
-        
+
         // メールアドレスをユーザーデータから取得（常に更新）
         if (userData.email) {
           console.log('🔍 [fetchUserInfo] Setting email from user data:', userData.email)
           setEmail(userData.email)
         } else {
           console.error('❌ [fetchUserInfo] No email found in user data')
-          
+
           // JWTトークンから直接メールアドレスを取得するフォールバック処理
           try {
             const token = localStorage.getItem('accessToken')
@@ -70,10 +70,10 @@ export default function PlanRegistrationPage() {
             setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
           }
         }
-        
+
         const newLinkedState = userData.saitamaAppLinked === true
         setSaitamaAppLinked(newLinkedState)
-        
+
         // カード登録状態を確認（sessionStorageにpaygentCustomerCardIdがあれば登録済み）
         const hasCard = !!sessionStorage.getItem('paygentCustomerCardId')
         setHasPaymentMethod(hasCard)
@@ -100,24 +100,24 @@ export default function PlanRegistrationPage() {
       const saitamaAppLinkedParam = urlParams.get('saitamaAppLinked')
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
-      
+
       // セッションストレージからメールアドレスを取得
       const sessionEmail = sessionStorage.getItem('userEmail')
       if (sessionEmail) {
         console.log('🔍 [useEffect] Setting email from session storage:', sessionEmail)
         setEmail(sessionEmail)
       }
-      
+
       // 支払い方法変更のみの場合はフラグを設定
       if (paymentMethodChangeParam === 'true') {
         setIsPaymentMethodChangeOnly(true)
       }
-      
+
       // URLパラメータでsaitamaAppLinked=trueが指定されている場合（ポイント付与後）
       if (saitamaAppLinkedParam === 'true') {
         setSaitamaAppLinked(true)
       }
-      
+
       // refreshパラメータがある場合、ユーザー情報を再取得（ガイドページからの戻り）
       if (refreshParam) {
         console.log('🔍 [useEffect] Refresh parameter found, fetching user info')
@@ -151,30 +151,30 @@ export default function PlanRegistrationPage() {
   const fetchPlans = useCallback(async (explicitLinkedState?: boolean | null) => {
     try {
       setIsLoading(true)
-      
+
       // 明示的に渡された状態を優先、なければ現在の状態を使用
       const linkedState = explicitLinkedState !== undefined ? explicitLinkedState : saitamaAppLinked
-      
+
       // さいたま市アプリ連携状態に応じてクエリパラメータを構築
       const queryParams = new URLSearchParams({
         status: 'active',
         limit: '50',
       })
-      
+
       if (linkedState !== null) {
         queryParams.append('saitamaAppLinked', String(linkedState))
       }
-      
+
       const apiUrl = `/api/plans?${queryParams.toString()}`
       const response = await fetch(apiUrl)
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
       }
-      
+
       const data = await response.json()
-      
+
       // バリデーションを有効化
       const validatedData = PlanListResponseSchema.parse(data)
       setPlans(validatedData.plans)
@@ -204,15 +204,34 @@ export default function PlanRegistrationPage() {
     try {
       setIsLoading(true)
       setError('')
-      
+
       const isPaymentMethodChangeOnly = !planId || planId === ""
-      
+
+      // プラン選択時は決済金額を確認
+      if (!isPaymentMethodChangeOnly) {
+        const selectedPlan = plans.find(p => p.id === planId)
+        if (selectedPlan) {
+          const isLinked = saitamaAppLinked === true
+          const discountPrice = (selectedPlan as any).discountPrice ?? null
+          const rawAmount = isLinked && discountPrice != null
+            ? discountPrice
+            : selectedPlan.price
+          const paymentAmount = Number(rawAmount)
+          const confirmed = window.confirm(
+            `プラン「${selectedPlan.name}」\n` +
+            `決済金額: ¥${paymentAmount.toLocaleString()}\n\n` +
+            `カード登録と同時に初回決済を行います。よろしいですか？`
+          )
+          if (!confirmed) {
+            setIsLoading(false)
+            return
+          }
+        }
+      }
+
       // メールアドレスの検証
       if (!email || email.trim() === '') {
-        // メールアドレスが取得できていない場合、再度ユーザー情報を取得を試行
-        console.log('🔍 [handlePaymentMethodRegister] Email not found, retrying fetchUserInfo');
         await fetchUserInfo();
-        
         // 再試行後もメールアドレスが取得できない場合はエラー
         if (!email || email.trim() === '') {
           setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
@@ -220,7 +239,6 @@ export default function PlanRegistrationPage() {
           return
         }
       }
-      
       // カード登録APIを呼び出し
       // customerId: メールアドレスのハッシュ値を使用して25文字以内に収める
       const generateCustomerId = (email: string): string => {
@@ -236,19 +254,19 @@ export default function PlanRegistrationPage() {
         // "cust_" + ハッシュ値 = 最大13文字
         return `cust_${hashStr}`
       }
-      
+
       const customerId = generateCustomerId(email)
-      
+
       // 支払い方法変更のみの場合はplanIdを送信しない
       const requestBody: Record<string, string> = {
         customerId: customerId,
         userEmail: email, // セッション管理用
       }
-      
+
       if (!isPaymentMethodChangeOnly) {
         requestBody.planId = planId // セッション管理用（これがPaymentSessionに保存される）
       }
-      
+
       const response = await fetch('/api/payment/register', {
         method: 'POST',
         headers: {
@@ -256,52 +274,110 @@ export default function PlanRegistrationPage() {
         },
         body: JSON.stringify(requestBody)
       })
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         throw new Error(errorData.error || 'カード登録の準備に失敗しました')
       }
-      
-      const data = await response.json()
-      
-      // PaymentSessionにplanIdが保存されたので、sessionStorageには保存しない
-      // （Paygentへのリダイレクト時にsessionStorageが消える可能性があるため）
-      // 代わりにPaymentSessionから取得する方式に統一
-      
+
+      let data
+      try {
+        data = await response.json()
+        console.log('★11 [fetch] response.json()成功')
+      } catch (jsonError) {
+        console.error('▲[fetch] response.json()エラー:', jsonError)
+        throw jsonError
+      }
+
+      console.log('★11.5 Payment register response data:', {
+        redirectUrl: data.redirectUrl,
+        params: data.params,
+        paramsKeys: Object.keys(data.params || {}),
+        hasPaymentAmount: !!data.params?.payment_amount,
+        hasWebhookUrl: !!data.params?.webhook_url,
+        fullData: JSON.stringify(data, null, 2)
+      })
+
       // ペイジェントのカード登録画面にリダイレクト
       // リンクタイプ方式では、redirectUrlにGETパラメータを付与してリダイレクト
       const { redirectUrl, params } = data
-      
+
+      // ★1 PAY-GENTに送信するパラメータをログ出力
+      console.log('★12 PAY-GENT送信パラメータ:', {
+        redirectUrl,
+        params: JSON.parse(JSON.stringify(params)), // オブジェクトをコピーして出力
+        paramsCount: Object.keys(params || {}).length,
+        paramKeys: Object.keys(params || {}),
+        hasPaymentParams: {
+          payment_amount: !!params?.payment_amount,
+          payment_type: !!params?.payment_type,
+          order_number: !!params?.order_number,
+          webhook_url: !!params?.webhook_url
+        },
+        operation_type: params?.operation_type,
+        inform_url: params?.inform_url,
+        customer_id: params?.customer_id
+      })
+
       // プラン登録成功後、セッションストレージからメールアドレスをクリア
       sessionStorage.removeItem('userEmail')
-      
       // モック環境の場合はGETパラメータとしてリダイレクト
       if (redirectUrl.includes('/payment-mock')) {
         const url = new URL(redirectUrl)
         Object.entries(params).forEach(([key, value]) => {
           url.searchParams.set(key, String(value))
         })
+        console.log('★2 モック環境: リダイレクトURL:', url.toString())
         window.location.href = url.toString()
       } else {
         // 実際のペイジェント環境ではPOSTフォームでリダイレクト
         const form = document.createElement('form')
         form.method = 'POST'
         form.action = redirectUrl
-        
-        // パラメータをhidden inputとして追加
+
+        // ★3 POSTフォームに追加されるパラメータをログ出力
+        const formParams: Record<string, string> = {}
         Object.entries(params).forEach(([key, value]) => {
           const input = document.createElement('input')
           input.type = 'hidden'
           input.name = key
           input.value = String(value)
+          formParams[key] = String(value)
           form.appendChild(input)
         })
-        
+
+        console.log('★13 POSTフォームパラメータ:', {
+          action: redirectUrl,
+          method: 'POST',
+          params: formParams,
+          paramsCount: Object.keys(formParams).length,
+          paramKeys: Object.keys(formParams),
+          hasCustomerCardId: !!formParams.customer_card_id,
+          operation_type: formParams.operation_type,
+          customer_id: formParams.customer_id,
+          paymentParamsDetail: {
+            payment_amount: formParams.payment_amount,
+            payment_type: formParams.payment_type,
+            order_number: formParams.order_number,
+            webhook_url: formParams.webhook_url,
+            hc: formParams.hc ? formParams.hc.substring(0, 20) + '...' : undefined
+          },
+          fullParams: JSON.stringify(formParams, null, 2)
+        })
+
         document.body.appendChild(form)
+        console.log('★13.5 PAY-GENTにリダイレクト開始')
         form.submit()
       }
-    } catch {
-      setError('プランの登録に失敗しました')
+    } catch (error) {
+      console.error('▲ERROR [handlePaymentMethodRegister] エラー発生:', error)
+      console.error('▲ERROR [handlePaymentMethodRegister] エラー詳細:', {
+        errorType: typeof error,
+        errorName: error instanceof Error ? error.name : 'Unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : 'No stack trace'
+      })
+      setError(error instanceof Error ? error.message : 'プランの登録に失敗しました')
     } finally {
       setIsLoading(false)
     }
@@ -310,7 +386,7 @@ export default function PlanRegistrationPage() {
   const handleSaitamaAppLinked = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken')
-      
+
       if (!accessToken) {
         return
       }
@@ -325,10 +401,10 @@ export default function PlanRegistrationPage() {
       if (response.ok) {
         const userData = await response.json()
         const newLinkedState = userData.saitamaAppLinked === true
-        
+
         // 状態を更新
         setSaitamaAppLinked(newLinkedState)
-        
+
         // 状態更新を待たずに、明示的に新しい状態でプランを再取得
         await fetchPlans(newLinkedState)
       }
@@ -344,7 +420,7 @@ export default function PlanRegistrationPage() {
     setSaitamaAppLinked(null)
     setHasPaymentMethod(false)
     setIsPaymentMethodChangeOnly(false)
-    
+
     // トップページに遷移
     router.push('/')
   }

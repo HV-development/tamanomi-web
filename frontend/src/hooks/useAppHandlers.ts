@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useCallback, useState, useRef, useEffect } from "react"
-import type { AppAction, AppState, AppHandlers, Store } from '../../tamanomi-schemas/src/frontend/types'
+import type { AppAction, AppState, AppHandlers, Store } from '@hv-development/schemas'
 import { appConfig } from '@/config/appConfig'
 import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
@@ -150,7 +150,7 @@ export const useAppHandlers = (
                 if (userResponse.ok) {
                     const userData = await userResponse.json()
                     hasPlan = userData.plan !== null && userData.plan !== undefined
-                    
+
                     // auth状態を更新
                     auth.login(userData, userData.plan, [], [])
                 }
@@ -158,11 +158,11 @@ export const useAppHandlers = (
                 // エラー処理
             }
 
-        // メールアドレス変更成功モーダルが表示されている場合は遷移を停止
-        if (state.isEmailChangeSuccessModalOpen) {
-            dispatch({ type: 'RESET_LOGIN_STATE' })
-            return
-        }
+            // メールアドレス変更成功モーダルが表示されている場合は遷移を停止
+            if (state.isEmailChangeSuccessModalOpen) {
+                dispatch({ type: 'RESET_LOGIN_STATE' })
+                return
+            }
 
             // プラン登録状況によって遷移先を変更
             if (!hasPlan) {
@@ -424,7 +424,7 @@ export const useAppHandlers = (
     const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
         try {
             auth.setIsLoading(true)
-            
+
             // アクセストークンを取得
             const accessToken = localStorage.getItem('accessToken')
             if (!accessToken) {
@@ -460,7 +460,7 @@ export const useAppHandlers = (
 
                 if (userResponse.ok) {
                     const updatedUserData = await userResponse.json()
-                    
+
                     // auth状態を更新
                     auth.login(updatedUserData, updatedUserData.plan, updatedUserData.usageHistory || [], updatedUserData.paymentHistory || [])
                 }
@@ -477,7 +477,7 @@ export const useAppHandlers = (
                 // 成功時はマイページに戻る
                 navigation.navigateToMyPage("main")
             }
-            
+
         } catch {
             // エラー時もマイページに戻る（エラーメッセージは別途表示）
             navigation.navigateToMyPage("main")
@@ -506,9 +506,111 @@ export const useAppHandlers = (
         navigation.navigateToMyPage("withdrawal")
     }, [navigation])
 
-    const handleWithdrawConfirm = useCallback(() => {
-        navigation.navigateToMyPage("withdrawal-complete")
-    }, [navigation])
+    const handleWithdrawConfirm = useCallback(async () => {
+        try {
+            auth.setIsLoading(true)
+
+            // アクセストークンを取得
+            const accessToken = localStorage.getItem('accessToken')
+            if (!accessToken) {
+                throw new Error('認証情報が見つかりません。ログインしてください。')
+            }
+
+            // ユーザー情報とプラン情報を取得
+            const user = auth.user
+            const plan = auth.plan
+
+            if (!user || !plan) {
+                throw new Error('ユーザー情報が見つかりません')
+            }
+
+            // プラン情報からrunningIdとnextBillingDateを取得
+            // 最新のユーザー情報を取得（planにpaygentRunningIdとnextBillingDateが含まれているか確認）
+            const userMeResponse = await fetch('/api/user/me', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            })
+
+            if (!userMeResponse.ok) {
+                throw new Error('ユーザー情報の取得に失敗しました')
+            }
+
+            const userData = await userMeResponse.json()
+
+            // デバッグログ
+            console.log('🔍 [handleWithdrawConfirm] userData:', userData)
+            console.log('🔍 [handleWithdrawConfirm] userData.plan:', userData.plan)
+            console.log('🔍 [handleWithdrawConfirm] userData.plan keys:', userData.plan ? Object.keys(userData.plan) : 'plan is null')
+            console.log('🔍 [handleWithdrawConfirm] userData.plan.paygentRunningId:', userData.plan?.paygentRunningId)
+            console.log('🔍 [handleWithdrawConfirm] userData.userPlan:', userData.userPlan)
+
+            // userPlanまたはplanからrunningIdを取得（userPlanを優先）
+            const runningId = userData.userPlan?.paygentRunningId || userData.plan?.paygentRunningId
+
+            console.log('🔍 [handleWithdrawConfirm] runningId:', runningId)
+
+            if (!runningId) {
+                console.error('❌ [handleWithdrawConfirm] runningId not found:', {
+                    plan: userData.plan,
+                    userPlan: userData.userPlan,
+                    planPaygentRunningId: userData.plan?.paygentRunningId,
+                    userPlanPaygentRunningId: userData.userPlan?.paygentRunningId,
+                })
+                throw new Error('プラン情報が見つかりません。プランが登録されていない可能性があります。')
+            }
+
+            // 次回課金日を取得（userPlanまたはplanから、userPlanを優先）
+            const nextBillingDate = userData.userPlan?.nextBillingDate || userData.plan?.nextBillingDate || plan.nextBillingDate
+
+            if (!nextBillingDate) {
+                throw new Error('次回課金日が見つかりません')
+            }
+
+            // 日付をYYYYMMDD形式に変換
+            const formatDate = (date: Date | string): string => {
+                const d = typeof date === 'string' ? new Date(date) : date
+                const year = d.getFullYear()
+                const month = String(d.getMonth() + 1).padStart(2, '0')
+                const day = String(d.getDate()).padStart(2, '0')
+                return `${year}${month}${day}`
+            }
+
+            const endScheduled = formatDate(nextBillingDate)
+
+            // 退会処理APIを呼び出し
+            const response = await fetch('/api/payment/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    customerId: user.paymentCard?.paygentCustomerId,
+                    customerCardId: user.paymentCard?.paygentCustomerCardId,
+                    userEmail: user.email,
+                    runningId: runningId,
+                    endScheduled: endScheduled,
+                    description: '退会処理',
+                }),
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.error || errorData.message || '退会処理に失敗しました')
+            }
+
+            await response.json()
+
+            // 成功時は退会完了画面へ
+            navigation.navigateToMyPage("withdrawal-complete")
+        } catch (error) {
+            console.error('退会処理エラー:', error)
+            // エラーメッセージを表示（必要に応じてモーダルなどで表示）
+            alert(error instanceof Error ? error.message : '退会処理に失敗しました')
+        } finally {
+            auth.setIsLoading(false)
+        }
+    }, [auth, navigation])
 
     const handleWithdrawCancel = useCallback(() => {
         navigation.navigateToMyPage("profile-edit")
@@ -518,7 +620,7 @@ export const useAppHandlers = (
         // まず認証状態をクリア
         auth.logout()
         navigation.resetNavigation()
-        
+
         // 即座にログイン画面に遷移（home画面を表示しない）
         if (typeof window !== 'undefined') {
             window.location.href = '/'
@@ -529,7 +631,7 @@ export const useAppHandlers = (
         // まず認証状態をクリア
         auth.logout()
         navigation.resetNavigation()
-        
+
         // 即座にログイン画面に遷移（home画面を表示しない）
         if (typeof window !== 'undefined') {
             window.location.href = '/'
@@ -627,7 +729,7 @@ export const useAppHandlers = (
 
     const handleProfileEditSubmit = useCallback(async (data: Record<string, string>) => {
         auth.setIsLoading(true)
-        
+
         try {
             // 開発環境での認証バイパス機能
             const isDevelopment = process.env.NODE_ENV === 'development'
@@ -655,7 +757,7 @@ export const useAppHandlers = (
                 ...restData,
                 birthDate: restData.birthDate ? restData.birthDate.replace(/\//g, '-') : restData.birthDate
             }
-            
+
             const response = await fetch('/api/user/update', {
                 method: 'PUT',
                 headers,
@@ -674,7 +776,7 @@ export const useAppHandlers = (
 
                 throw new Error(result.message || 'プロフィールの更新に失敗しました')
             }
-            
+
             // 成功時はユーザー情報を再取得
             try {
                 const token = localStorage.getItem('accessToken')
@@ -685,7 +787,7 @@ export const useAppHandlers = (
                         },
                         cache: 'no-store',
                     })
-                    
+
                     if (userResponse.ok) {
                         const userData = await userResponse.json()
                         // authの状態を更新
@@ -695,11 +797,11 @@ export const useAppHandlers = (
             } catch {
                 // エラー処理
             }
-            
+
             // マイページに戻る
             navigation.navigateToView("mypage", "mypage")
             navigation.navigateToMyPage("main")
-            
+
             auth.setIsLoading(false)
         } catch (error) {
             auth.setIsLoading(false)
@@ -764,7 +866,7 @@ export const useAppHandlers = (
             dispatch({ type: 'SET_NEW_EMAIL', payload: data.newEmail })
             dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "complete" })
             dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: true })
-            
+
             // 少し待ってからログアウト処理を実行（モーダルが表示されるまで待つ）
             setTimeout(() => {
                 auth.logout()
@@ -786,21 +888,21 @@ export const useAppHandlers = (
 
     const handleEmailChangeSuccessModalClose = useCallback(() => {
         dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: false })
-        
+
         // 確実にトークンを削除
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
         sessionStorage.clear()
-        
+
         // ログイン状態をリセット
         dispatch({ type: 'RESET_LOGIN_STATE' })
-        
+
         // authのログアウトも実行
         auth.logout()
-        
+
         // ブラウザのタブを閉じる
         window.close()
-        
+
         // window.close()が失敗する場合（ユーザーが開いたタブでない場合）は、ログイン画面に遷移
         // タブが閉じられた場合、以下のコードは実行されない
         setTimeout(() => {
