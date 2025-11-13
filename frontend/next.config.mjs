@@ -18,10 +18,6 @@ const nextConfig = {
   // 静的ファイル配信の設定
   assetPrefix: '',
   trailingSlash: false,
-  // publicディレクトリの明示的な設定
-  publicRuntimeConfig: {
-    staticFolder: '/public',
-  },
   // Google Maps API用の外部ドメイン許可
   async headers() {
     const securityHeaders = [
