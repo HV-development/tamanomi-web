@@ -838,7 +838,7 @@ export const useAppHandlers = (
                     } else if (error.error) {
                         errorMessage = error.error
                     }
-                } catch (parseError) {
+                } catch {
                     errorMessage = `クーポンの使用に失敗しました (HTTP ${response.status})`
                 }
                 

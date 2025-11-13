@@ -13,12 +13,13 @@ interface UsageHistoryListProps {
   className?: string
 }
 
-export function UsageHistoryList({
-  history,
-  onBackToMyPage, 
-  onBackToTop, //無料キャンペーン中は未使用（将来のために型定義のみ保持）
-  className = ""
-}: UsageHistoryListProps) {
+export function UsageHistoryList(props: UsageHistoryListProps) {
+  const {
+    history,
+    onBackToMyPage,
+    className = "",
+  } = props
+  // props.onBackToTop は無料キャンペーン終了後に利用予定
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   const formatDate = (date: Date) => {

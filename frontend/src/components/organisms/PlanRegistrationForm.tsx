@@ -1,6 +1,6 @@
 "use client"
 
-import { CreditCard, AlertCircle, Link as LinkIcon, CheckCircle } from "lucide-react"
+import { CreditCard, AlertCircle, CheckCircle } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import { PlanCard } from "@/components/molecules/PlanCard"
