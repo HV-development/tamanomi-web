@@ -55,6 +55,7 @@ export default function PlanRegistrationPage() {
         if (userData.email) {
           console.log('🔍 [fetchUserInfo] Setting email from user data:', userData.email)
           setEmail(userData.email)
+          sessionStorage.setItem('userEmail', userData.email)
         } else {
           console.error('❌ [fetchUserInfo] No email found in user data')
 
@@ -66,6 +67,7 @@ export default function PlanRegistrationPage() {
               if (payload.email) {
                 console.log('🔍 [fetchUserInfo] Fallback: Setting email from JWT token:', payload.email)
                 setEmail(payload.email)
+                sessionStorage.setItem('userEmail', payload.email)
               } else {
                 setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
               }
@@ -233,23 +235,29 @@ export default function PlanRegistrationPage() {
         }
       }
 
-      // メールアドレスの検証
-      if (!email || email.trim() === '') {
-        await fetchUserInfo();
-        // 再試行後もメールアドレスが取得できない場合はエラー
-        if (!email || email.trim() === '') {
-          setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
-          setIsLoading(false)
-          return
-        }
+      const getEmailFromSession = () => {
+        const storedEmail = sessionStorage.getItem('userEmail')
+        return storedEmail ? storedEmail.trim() : ''
       }
-      
-      // メールアドレスが取得できていることを確認
-      if (!userEmail || userEmail.trim() === '') {
+
+      let currentEmail = email?.trim() ?? ''
+      if (!currentEmail) {
+        currentEmail = getEmailFromSession()
+      }
+
+      // メールアドレスの検証
+      if (!currentEmail) {
+        await fetchUserInfo()
+        currentEmail = getEmailFromSession() || email?.trim() || ''
+      }
+
+      if (!currentEmail) {
         setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
         setIsLoading(false)
         return
       }
+
+      sessionStorage.setItem('userEmail', currentEmail)
       
       // カード登録APIを呼び出し
       // customerId: メールアドレスのハッシュ値を使用して25文字以内に収める
@@ -267,12 +275,12 @@ export default function PlanRegistrationPage() {
         return `cust_${hashStr}`
       }
       
-      const customerId = generateCustomerId(userEmail)
+      const customerId = generateCustomerId(currentEmail)
       
       // 支払い方法変更のみの場合はplanIdを送信しない
       const requestBody: Record<string, string> = {
         customerId: customerId,
-        userEmail: userEmail, // セッション管理用
+        userEmail: currentEmail, // セッション管理用
       }
 
       if (!isPaymentMethodChangeOnly) {
