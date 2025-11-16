@@ -1,6 +1,6 @@
 "use client"
 
-import { CreditCard, AlertCircle, CheckCircle } from "lucide-react"
+import { CreditCard, AlertCircle, CheckCircle, Smartphone, QrCode } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 import { PlanCard } from "@/components/molecules/PlanCard"
@@ -8,10 +8,11 @@ import { Button } from "@/components/atoms/Button"
 import { Input } from "@/components/atoms/Input"
 import { Modal } from "@/components/atoms/Modal"
 import { PlanListResponse } from '@hv-development/schemas'
+import type { PaymentMethodType } from '@/types/payment'
 import { ApiClient } from '@/lib/api-client';
 
 interface PlanRegistrationFormProps {
-  onPaymentMethodRegister: (planId: string) => void
+  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType) => void
   onCancel: () => void
   isLoading?: boolean
   plans: PlanListResponse['plans']
@@ -39,14 +40,26 @@ export function PlanRegistrationForm({
   const [isLinking, setIsLinking] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [modalMessage, setModalMessage] = useState<string>("")
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodType>('CreditCard')
 
   const handlePlanSelect = (planId: string) => {
     setSelectedPlan(planId)
   }
 
   const handlePaymentRegister = () => {
-    if (selectedPlan) {
-      onPaymentMethodRegister(selectedPlan)
+    if (!selectedPlan && !isPaymentMethodChangeOnly) {
+      return
+    }
+
+    // 現時点では単発プランかどうかに関わらず、支払い方法選択はフロント側で制御する
+    // AeonPayは準備中のため、選択されていても処理は行わない
+    if (selectedPaymentMethod === 'AeonPay') {
+      alert('イオンペイは現在準備中です。クレジットカードまたはPayPayを選択してください。')
+      return
+    }
+
+    if (selectedPlan || isPaymentMethodChangeOnly) {
+      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod)
     }
   }
 
@@ -299,6 +312,73 @@ export function PlanRegistrationForm({
         </div>
       )}
 
+      {/* 支払い方法選択（単発プランのみ有効） */}
+      {!isPaymentMethodChangeOnly && plans.some(plan => !plan.is_subscription) && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-gray-900">支払い方法</h3>
+          <div className="grid grid-cols-1 gap-3">
+            {/* クレジットカード */}
+            <button
+              type="button"
+              onClick={() => setSelectedPaymentMethod('CreditCard')}
+              className={`flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
+                selectedPaymentMethod === 'CreditCard'
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-gray-200 bg-white hover:border-green-300'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <CreditCard className="w-5 h-5 text-green-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">クレジットカード</p>
+                  <p className="text-xs text-gray-600">既存のカード決済フローで支払います</p>
+                </div>
+              </div>
+            </button>
+
+            {/* イオンペイ（準備中） */}
+            <button
+              type="button"
+              onClick={() => setSelectedPaymentMethod('AeonPay')}
+              className={`flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
+                selectedPaymentMethod === 'AeonPay'
+                  ? 'border-gray-400 bg-gray-50'
+                  : 'border-gray-200 bg-white hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <QrCode className="w-5 h-5 text-gray-500" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">イオンペイ（準備中）</p>
+                  <p className="text-xs text-gray-600">現在準備中です。クレジットカードまたはPayPayをご利用ください。</p>
+                </div>
+              </div>
+              <span className="text-xs font-medium text-gray-500">準備中</span>
+            </button>
+
+            {/* PayPay */}
+            <button
+              type="button"
+              onClick={() => setSelectedPaymentMethod('PayPay')}
+              className={`flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
+                selectedPaymentMethod === 'PayPay'
+                  ? 'border-red-500 bg-red-50'
+                  : 'border-gray-200 bg-white hover:border-red-300'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Smartphone className="w-5 h-5 text-red-500" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">PayPay</p>
+                  <p className="text-xs text-gray-600">スマホのPayPayアプリで支払います</p>
+                </div>
+              </div>
+              <span className="text-xs font-medium text-red-500">QRコード決済</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 支払い方法登録・変更ボタン */}
       <div className="space-y-3">
         <Button
@@ -315,7 +395,7 @@ export function PlanRegistrationForm({
           <Button
             onClick={() => {
               // 既存プランを選択せず、支払い方法のみ変更
-              onPaymentMethodRegister("")
+            onPaymentMethodRegister("", 'CreditCard')
             }}
             disabled={isLoading}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"

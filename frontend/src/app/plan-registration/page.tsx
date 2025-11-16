@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlanRegistrationContainer } from '@/components/organisms/PlanRegistrationContainer'
+import type { PaymentMethodType } from '@/types/payment'
 import {
   PlanListResponse,
   PlanListResponseSchema
@@ -206,7 +207,7 @@ export default function PlanRegistrationPage() {
     }
   }, [isClient, saitamaAppLinked, fetchPlans])
 
-  const handlePaymentMethodRegister = async (planId: string) => {
+  const handlePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType = 'CreditCard') => {
     try {
       setIsLoading(true)
       setError('')
@@ -259,7 +260,19 @@ export default function PlanRegistrationPage() {
 
       sessionStorage.setItem('userEmail', currentEmail)
       
-      // カード登録APIを呼び出し
+      // 現時点では支払い方法選択は以下の通り:
+      // - CreditCard: 既存のカード登録 + 決済フロー
+      // - PayPay: 後続のタスクで実装するPayPay申込フローへ分岐
+      // - AeonPay: 準備中のため何もしない（PlanRegistrationForm側でブロック）
+
+      if (paymentMethod === 'PayPay') {
+        // TODO: PayPay決済申込フローを実装（次のタスクで実装）
+        alert('PayPay決済フローはこのあと実装します（バックエンドAPI連携が前提です）。')
+        setIsLoading(false)
+        return
+      }
+
+      // クレジットカード: カード登録APIを呼び出し
       // customerId: メールアドレスのハッシュ値を使用して25文字以内に収める
       const generateCustomerId = (email: string): string => {
         // メールアドレスのハッシュ値を生成（簡易版）

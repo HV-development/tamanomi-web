@@ -1,3 +1,8 @@
+import type {
+  PayPayPaymentStartResponse,
+  PayPayTransactionStatusResponse,
+} from '@/types/payment'
+
 /**
  * API呼び出しの共通処理
  * トークン期限切れ時の自動リフレッシュとログイン画面遷移を処理
@@ -169,6 +174,31 @@ export class ApiClient {
   static async delete<T = unknown>(endpoint: string, options: Omit<ApiOptions, 'method'> = {}): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
+}
+
+/**
+ * PayPay決済申込API
+ * - Next API `/api/payment/paypay/pay` を経由してバックエンドのPayPay決済申込エンドポイントを呼び出す
+ */
+export async function requestPayPayPayment(
+  body: { planId: string }
+): Promise<ApiResponse<PayPayPaymentStartResponse>> {
+  return ApiClient.post<PayPayPaymentStartResponse>('/api/payment/paypay/pay', body, {
+    requireAuth: true,
+  })
+}
+
+/**
+ * PayPay取引情報取得API
+ * - Next API `/api/payment/paypay/transactions/:transactionId` を経由してバックエンドの取引情報取得エンドポイントを呼び出す
+ */
+export async function getPayPayTransactionStatus(
+  transactionId: string
+): Promise<ApiResponse<PayPayTransactionStatusResponse>> {
+  return ApiClient.get<PayPayTransactionStatusResponse>(
+    `/api/payment/paypay/transactions/${encodeURIComponent(transactionId)}`,
+    { requireAuth: true },
+  )
 }
 
 /**
