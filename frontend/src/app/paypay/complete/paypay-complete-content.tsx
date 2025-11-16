@@ -1,6 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getPayPayTransactionStatus } from '@/lib/api-client'
 
@@ -59,12 +60,12 @@ export function PayPayCompleteContent() {
           {statusMessage}
         </p>
         <div className="pt-4">
-          <a
+          <Link
             href="/"
             className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium"
           >
             トップページに戻る
-          </a>
+          </Link>
         </div>
       </div>
     </div>
