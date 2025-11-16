@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlanRegistrationContainer } from '@/components/organisms/PlanRegistrationContainer'
 import type { PaymentMethodType } from '@/types/payment'
+import { requestPayPayPayment } from '@/lib/api-client'
 import {
   PlanListResponse,
   PlanListResponseSchema
@@ -260,14 +261,33 @@ export default function PlanRegistrationPage() {
 
       sessionStorage.setItem('userEmail', currentEmail)
       
-      // 現時点では支払い方法選択は以下の通り:
-      // - CreditCard: 既存のカード登録 + 決済フロー
-      // - PayPay: 後続のタスクで実装するPayPay申込フローへ分岐
-      // - AeonPay: 準備中のため何もしない（PlanRegistrationForm側でブロック）
+      // 支払い方法ごとの分岐
 
       if (paymentMethod === 'PayPay') {
-        // TODO: PayPay決済申込フローを実装（次のタスクで実装）
-        alert('PayPay決済フローはこのあと実装します（バックエンドAPI連携が前提です）。')
+        if (!planId) {
+          setError('PayPay決済ではプランを選択してください。')
+          setIsLoading(false)
+          return
+        }
+
+        // PayPay決済申込API呼び出し
+        const { data, error } = await requestPayPayPayment({ planId })
+
+        if (error || !data) {
+          setError(error?.message || 'PayPay決済の申込に失敗しました')
+          setIsLoading(false)
+          return
+        }
+
+        // redirectHtml をセッションに保存し、チェックアウト画面へ遷移
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('paypayRedirectHtml', data.redirectHtml)
+          const query = new URLSearchParams({
+            redirectHtml: encodeURIComponent(data.redirectHtml),
+          })
+          router.push(`/paypay/checkout?${query.toString()}`)
+        }
+
         setIsLoading(false)
         return
       }
