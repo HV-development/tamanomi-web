@@ -2,6 +2,7 @@ import type {
   PayPayPaymentStartResponse,
   PayPayTransactionStatusResponse,
 } from '@/types/payment'
+import type { PayPayPaymentRequest } from '@hv-development/schemas'
 
 /**
  * API呼び出しの共通処理
@@ -181,7 +182,7 @@ export class ApiClient {
  * - Next API `/api/payment/paypay/pay` を経由してバックエンドのPayPay決済申込エンドポイントを呼び出す
  */
 export async function requestPayPayPayment(
-  body: { planId: string }
+  body: PayPayPaymentRequest
 ): Promise<ApiResponse<PayPayPaymentStartResponse>> {
   return ApiClient.post<PayPayPaymentStartResponse>('/api/payment/paypay/pay', body, {
     requireAuth: true,

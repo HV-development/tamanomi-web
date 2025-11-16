@@ -9,11 +9,13 @@ import {
   PlanListResponse,
   PlanListResponseSchema
 } from '@hv-development/schemas'
+import type { PayPayPaymentRequest } from '@hv-development/schemas'
 
 export default function PlanRegistrationPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [plans, setPlans] = useState<PlanListResponse['plans']>([])
   const [email, setEmail] = useState<string>('')
+  const [userId, setUserId] = useState<string>('')
   const [isClient, setIsClient] = useState(false)
   const [error, setError] = useState<string>('')
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
@@ -52,6 +54,11 @@ export default function PlanRegistrationPage() {
       if (response.ok) {
         const userData = await response.json()
         console.log('🔍 [fetchUserInfo] User data received:', userData)
+
+        if (userData.id) {
+          setUserId(userData.id)
+          sessionStorage.setItem('userId', userData.id)
+        }
 
         // メールアドレスをユーザーデータから取得（常に更新）
         if (userData.email) {
@@ -281,11 +288,57 @@ export default function PlanRegistrationPage() {
           return
         }
 
+        if (!userId) {
+          const storedUserId = sessionStorage.getItem('userId') || ''
+          if (storedUserId) {
+            setUserId(storedUserId)
+          } else {
+            setError('ユーザー情報が取得できませんでした。ログインし直してからお試しください。')
+            setIsLoading(false)
+            return
+          }
+        }
+
+        const selectedPlan = plans.find((p) => p.id === planId)
+        if (!selectedPlan) {
+          setError('選択されたプランが見つかりません。')
+          setIsLoading(false)
+          return
+        }
+
+        const isLinked = saitamaAppLinked === true
+        const discountPrice = (selectedPlan as any).discountPrice ?? null
+        const rawAmount = isLinked && discountPrice != null ? discountPrice : selectedPlan.price
+        const paymentAmount = Number(rawAmount)
+
+        const payPayRequest: PayPayPaymentRequest = {
+          userId: userId || sessionStorage.getItem('userId') || '',
+          // 現時点ではショップIDは未使用のため省略
+          requestId: `paypay_${Date.now()}`,
+          amount: {
+            currencyCode: 'JPY',
+            value: paymentAmount,
+          },
+          requestProperty: {
+            planId,
+            planName: selectedPlan.name,
+          },
+          metadata: {
+            planId,
+          },
+        }
+
         // PayPay決済申込API呼び出し
-        const { data, error } = await requestPayPayPayment({ planId })
+        const { data, error } = await requestPayPayPayment(payPayRequest)
 
         if (error || !data) {
           setError(error?.message || 'PayPay決済の申込に失敗しました')
+          setIsLoading(false)
+          return
+        }
+
+        if (!data.redirectHtml) {
+          setError('PayPayの支払い画面情報の取得に失敗しました')
           setIsLoading(false)
           return
         }
