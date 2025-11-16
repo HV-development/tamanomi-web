@@ -29,20 +29,15 @@ export default function PlanRegistrationPage() {
       // localStorageとCookieの両方からトークンを取得できるようにする
       const accessToken = localStorage.getItem('accessToken')
 
-      if (!accessToken) {
-        console.log('🔍 [fetchUserInfo] No access token found')
-        setSaitamaAppLinked(false)
-        return
-      }
-
-      // Cookieからトークンを取得できるようにcredentials: 'include'を使用
-      // localStorageのトークンがない場合でも、Cookieから取得できる
+      // localStorageにトークンがない場合でも、Cookieから認証できるため、APIを呼び出す
+      // Cookieベースの認証を使用する場合、localStorageにトークンがなくても問題ない
       const headers: HeadersInit = {}
       if (accessToken) {
         headers['Authorization'] = `Bearer ${accessToken}`
       }
 
       // Cookieからもトークンを取得できるようにcredentials: 'include'を使用
+      // localStorageにトークンがなくても、Cookieから認証できる
       const response = await fetch('/api/user/me', {
         headers,
         cache: 'no-store',
@@ -99,8 +94,18 @@ export default function PlanRegistrationPage() {
         const errorData = await response.json().catch(() => ({}))
         console.error('❌ [fetchUserInfo] API error:', response.status, errorData)
         setSaitamaAppLinked(false)
+        
+        // 認証失敗時（401/403）はログイン画面にリダイレクト
+        if (response.status === 401 || response.status === 403) {
+          console.log('🔍 [fetchUserInfo] Authentication failed, redirecting to login')
+          router.push('/login?redirect=/plan-registration')
+          return
+        }
+        
         if (response.status === 404) {
           setError('ユーザー情報が見つかりません。新規登録画面からやり直してください。')
+        } else {
+          setError('ユーザー情報の取得に失敗しました。再度お試しください。')
         }
       }
     } catch (error) {
@@ -108,7 +113,7 @@ export default function PlanRegistrationPage() {
       setSaitamaAppLinked(false)
       setError('ユーザー情報の取得中にエラーが発生しました。')
     }
-  }, [])
+  }, [router])
 
   // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
