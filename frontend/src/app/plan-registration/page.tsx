@@ -215,21 +215,32 @@ export default function PlanRegistrationPage() {
 
       const isPaymentMethodChangeOnly = !planId || planId === ""
 
-      // プラン選択時は決済金額を確認
+      // プラン選択時は決済金額と支払い方法を確認
       if (!isPaymentMethodChangeOnly) {
-        const selectedPlan = plans.find(p => p.id === planId)
+        const selectedPlan = plans.find((p) => p.id === planId)
         if (selectedPlan) {
           const isLinked = saitamaAppLinked === true
           const discountPrice = (selectedPlan as any).discountPrice ?? null
-          const rawAmount = isLinked && discountPrice != null
-            ? discountPrice
-            : selectedPlan.price
+          const rawAmount = isLinked && discountPrice != null ? discountPrice : selectedPlan.price
           const paymentAmount = Number(rawAmount)
+
+          const paymentMethodLabel =
+            paymentMethod === 'PayPay'
+              ? 'PayPay（QRコード決済）'
+              : 'クレジットカード'
+
+          const actionDescription =
+            paymentMethod === 'PayPay'
+              ? '選択したプランの初回決済を、PayPayアプリで行います。よろしいですか？'
+              : 'カード登録と同時に初回決済を行います。よろしいですか？'
+
           const confirmed = window.confirm(
             `プラン「${selectedPlan.name}」\n` +
-            `決済金額: ¥${paymentAmount.toLocaleString()}\n\n` +
-            `カード登録と同時に初回決済を行います。よろしいですか？`
+            `決済金額: ¥${paymentAmount.toLocaleString()}\n` +
+            `支払い方法: ${paymentMethodLabel}\n\n` +
+            actionDescription
           )
+
           if (!confirmed) {
             setIsLoading(false)
             return
