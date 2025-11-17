@@ -585,7 +585,8 @@ export function HomeLayout() {
 
             {/* 右側: ユーザーメニュー（ログイン時のみ） */}
             <div className="flex items-center justify-end w-20">
-              {isAuthenticated ? (
+              {/* TODO: 将来的に解放予定 - ランク表示 */}
+              {/* {isAuthenticated ? (
                 user && currentUserRank && (
                   <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
                     <div className="relative w-5 h-5">
@@ -598,7 +599,7 @@ export function HomeLayout() {
                     </div>
                   </div>
                 )
-              ) : null}
+              ) : null} */}
             </div>
           </div>
         </div>
@@ -631,7 +632,8 @@ export function HomeLayout() {
 
           {/* 右側: ユーザーメニュー（ログイン時のみ） */}
           <div className="flex items-center justify-end w-20">
-            {isAuthenticated ? (
+            {/* TODO: 将来的に解放予定 - ランク表示 */}
+            {/* {isAuthenticated ? (
               user && currentUserRank && (
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
                   <div className="relative w-5 h-5">
@@ -644,7 +646,7 @@ export function HomeLayout() {
                   </div>
                 </div>
               )
-            ) : null}
+            ) : null} */}
           </div>
         </div>
       </div>
@@ -695,6 +697,17 @@ export function HomeLayout() {
               </span>
             )}
           </button>
+        </div>
+        {/* 特定商取引法についてのリンク */}
+        <div className="px-2 pb-2 text-center">
+          <a
+            href="/特定商取引法.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-gray-600 hover:text-gray-800 underline"
+          >
+            特定商取引法について
+          </a>
         </div>
       </div>
 
