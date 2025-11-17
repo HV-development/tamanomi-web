@@ -701,9 +701,7 @@ export function HomeLayout() {
         {/* 特定商取引法についてのリンク */}
         <div className="px-2 pb-2 text-center">
           <a
-            href="/特定商取引法.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/lp/commercial-law"
             className="text-xs text-gray-600 hover:text-gray-800 underline"
           >
             特定商取引法について
