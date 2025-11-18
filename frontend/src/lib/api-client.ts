@@ -40,13 +40,8 @@ export class ApiClient {
       ...fetchOptions
     } = options;
 
-    // 認証が必要な場合、トークンを追加
-    if (requireAuth) {
-      const accessToken = localStorage.getItem('accessToken');
-      if (accessToken) {
-        (headers as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
-      }
-    }
+    // 認証が必要な場合、Cookieベースの認証を使用（localStorageは廃止）
+    // credentials: 'include'でCookieから自動的に認証される
 
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
@@ -54,32 +49,13 @@ export class ApiClient {
           'Content-Type': 'application/json',
           ...headers,
         },
+        credentials: 'include', // Cookieを送信
         ...fetchOptions,
       });
 
-      // トークン期限切れの場合
-      if (response.status === 403 && requireAuth && autoRefresh) {
-        const refreshResult = await this.refreshToken();
-        if (refreshResult.success) {
-          // リフレッシュ成功時、元のリクエストを再実行
-          const newAccessToken = localStorage.getItem('accessToken');
-          if (newAccessToken) {
-            (headers as Record<string, string>)['Authorization'] = `Bearer ${newAccessToken}`;
-            const retryResponse = await fetch(`${this.baseUrl}${endpoint}`, {
-              headers: {
-                'Content-Type': 'application/json',
-                ...headers,
-              },
-              ...fetchOptions,
-            });
-            
-            if (retryResponse.ok) {
-              return { data: await retryResponse.json() };
-            }
-          }
-        }
-        
-        // リフレッシュ失敗時、ログイン画面に遷移
+      // トークン期限切れの場合（Cookieベースの認証ではリフレッシュは不要）
+      if (response.status === 403 && requireAuth) {
+        // Cookieベースの認証では、403エラー時はログイン画面に遷移
         this.redirectToLogin();
         return { error: { code: 'AUTHENTICATION_FAILED', message: '認証に失敗しました' } };
       }
@@ -96,44 +72,10 @@ export class ApiClient {
   }
 
   /**
-   * リフレッシュトークンを使用してアクセストークンを更新
-   */
-  private static async refreshToken(): Promise<{ success: boolean }> {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        return { success: false };
-      }
-
-      const response = await fetch(`${this.baseUrl}/api/v1/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        return { success: true };
-      }
-
-      return { success: false };
-    } catch {
-      return { success: false };
-    }
-  }
-
-  /**
    * ログイン画面に遷移
+   * Cookieベースの認証では、トークンのクリアは不要（サーバー側でCookieを削除）
    */
   private static redirectToLogin(): void {
-    // トークンをクリア
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    
     // ログイン画面に遷移
     if (typeof window !== 'undefined') {
       window.location.href = '/';

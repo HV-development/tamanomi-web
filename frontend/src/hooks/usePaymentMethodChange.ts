@@ -19,13 +19,7 @@ export const usePaymentMethodChange = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const accessToken = localStorage.getItem('accessToken')
-        
-        if (!accessToken) {
-          setError('認証情報が見つかりません。ログインしてください。')
-          return
-        }
-
+        // Cookieベースの認証のみを使用（localStorageは廃止）
         // モックモード状態を取得
         const mockStatusResponse = await fetch('/api/payment/mock-status', {
           cache: 'no-store',
@@ -37,10 +31,8 @@ export const usePaymentMethodChange = () => {
         }
 
         const response = await fetch('/api/user/me', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
           cache: 'no-store',
+          credentials: 'include', // Cookieを送信
         })
 
         if (response.ok) {

@@ -169,16 +169,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
   const fetchPage = useCallback(
     async (targetPage: number) => {
       try {
-        // 認証トークンを取得（存在する場合）
-        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-        
+        // Cookieベースの認証のみを使用（localStorageは廃止）
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
-        }
-        
-        // 認証トークンが存在する場合はAuthorizationヘッダーに含める
-        if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`
         }
         
         // フィルターパラメータを構築
@@ -217,6 +210,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         const res = await fetch(url, {
           method: 'GET',
           headers,
+          credentials: 'include', // Cookieを送信
         })
 
         console.log('[useInfiniteStores] Response status:', res.status)

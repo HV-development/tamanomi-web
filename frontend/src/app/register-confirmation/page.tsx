@@ -121,13 +121,8 @@ export default function RegisterConfirmationPage() {
       const result = await response.json()
 
       if (response.ok) {
-        // トークンをlocalStorageに保存
-        if (result.accessToken) {
-          localStorage.setItem('accessToken', result.accessToken)
-        }
-        if (result.refreshToken) {
-          localStorage.setItem('refreshToken', result.refreshToken)
-        }
+        // Cookieベースの認証のみを使用（localStorageは廃止）
+        // トークンはサーバー側でCookieに設定されるため、フロントエンドでの保存は不要
 
         // 登録成功後はセッションストレージをクリア
         sessionStorage.removeItem('registerFormData')

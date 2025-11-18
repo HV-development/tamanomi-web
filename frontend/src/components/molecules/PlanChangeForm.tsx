@@ -45,18 +45,10 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
 
   const fetchUserInfo = useCallback(async () => {
     try {
-      const accessToken = localStorage.getItem('accessToken')
-      
-      if (!accessToken) {
-        setSaitamaAppLinked(false)
-        return
-      }
-
+      // Cookieベースの認証のみを使用（localStorageは廃止）
       const response = await fetch('/api/user/me', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
         cache: 'no-store',
+        credentials: 'include', // Cookieを送信
       })
 
       if (response.ok) {

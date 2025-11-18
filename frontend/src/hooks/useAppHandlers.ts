@@ -735,11 +735,7 @@ export const useAppHandlers = (
         try {
             auth.setIsLoading(true)
 
-            // アクセストークンを取得
-            const accessToken = localStorage.getItem('accessToken')
-            if (!accessToken) {
-                throw new Error('認証情報が見つかりません。ログインしてください。')
-            }
+            // Cookieベースの認証のみを使用（localStorageは廃止）
 
             // ユーザー情報とプラン情報を取得
             const user = auth.user
@@ -751,10 +747,9 @@ export const useAppHandlers = (
 
             // プラン情報からrunningIdとnextBillingDateを取得
             // 最新のユーザー情報を取得（planにpaygentRunningIdとnextBillingDateが含まれているか確認）
+            // Cookieベースの認証のみを使用（localStorageは廃止）
             const userMeResponse = await fetch('/api/user/me', {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                },
+                credentials: 'include', // Cookieを送信
             })
 
             if (!userMeResponse.ok) {

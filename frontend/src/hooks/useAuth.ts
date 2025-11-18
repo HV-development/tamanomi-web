@@ -90,9 +90,7 @@ export function useAuth() {
         // セッション関連データをクリア
         if (typeof window !== 'undefined') {
             sessionStorage.clear();
-            // localStorageのトークンも削除
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
+            // Cookieベースの認証のみを使用（localStorageは廃止）
         }
         
         // Cookieからトークンをクリア（APIエンドポイント経由）

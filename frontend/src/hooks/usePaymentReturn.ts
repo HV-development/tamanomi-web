@@ -85,23 +85,12 @@ export const usePaymentReturn = () => {
         setIsPaymentMethodChangeOnly(isPaymentMethodChange)
         
         if (selectedPlanId) {
-          // Cookieからもトークンを取得できるようにする
-          // localStorageとCookieの両方からトークンを取得できるようにする
-          const accessToken = localStorage.getItem('accessToken')
-          
-          // ヘッダーを設定（localStorageのトークンがある場合のみ）
-          const headers: HeadersInit = {
-            'Content-Type': 'application/json',
-          }
-          if (accessToken) {
-            headers['Authorization'] = `Bearer ${accessToken}`
-          }
-
-          // Cookieからトークンを取得できるようにcredentials: 'include'を使用
-          // localStorageにトークンがなくても、Cookieから取得できるため、エラーは発生しない
+          // Cookieベースの認証のみを使用（localStorageは廃止）
           const createPlanResponse = await fetch('/api/user-plans/create', {
             method: 'POST',
-            headers,
+            headers: {
+              'Content-Type': 'application/json',
+            },
             credentials: 'include', // Cookieを送信
             body: JSON.stringify({
               planId: selectedPlanId,
