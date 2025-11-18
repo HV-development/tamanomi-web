@@ -428,12 +428,10 @@ export function HomeLayout() {
 
     // プラン管理画面の場合
     if (myPageView === "plan-management") {
-      // カード登録状態を確認（sessionStorageとlocalStorageの両方をチェック）
+      // カード登録状態を確認（sessionStorageのみを使用、localStorageは廃止）
       const hasPaymentMethod = typeof window !== 'undefined' && (
         !!sessionStorage.getItem('paygentCustomerCardId') || 
-        !!localStorage.getItem('paygentCustomerCardId') ||
-        !!sessionStorage.getItem('paygentCustomerId') ||
-        !!localStorage.getItem('paygentCustomerId')
+        !!sessionStorage.getItem('paygentCustomerId')
       )
       
       return (
