@@ -19,12 +19,19 @@ export default function RegisterPage() {
       const urlParams = new URLSearchParams(window.location.search)
       const email = urlParams.get('email') || undefined
       const token = urlParams.get('token') || undefined
+      const ref = urlParams.get('ref') // 紹介者IDを取得
       const isEdit = urlParams.get('edit') === 'true'
 
       // トークンが存在しない場合はメール登録画面にリダイレクト
       if (!token || token.trim() === '') {
         router.push('/email-registration')
         return
+      }
+
+      // URLパラメータから紹介者IDを取得してセッションストレージに保存
+      if (ref) {
+        sessionStorage.setItem('referrerUserId', ref)
+        console.log('🔍 [register] referrerUserId saved to sessionStorage from URL:', ref)
       }
 
       setSearchParams({

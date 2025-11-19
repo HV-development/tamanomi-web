@@ -6,10 +6,10 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { customer_id: string } }
+  { params }: { params: Promise<{ customer_id: string }> }
 ) {
   try {
-    const customerId = params.customer_id
+    const { customer_id: customerId } = await params
     
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const fullUrl = buildApiUrl(`/payment/session/${customerId}`)

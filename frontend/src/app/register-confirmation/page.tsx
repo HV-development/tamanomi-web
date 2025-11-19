@@ -95,6 +95,13 @@ export default function RegisterConfirmationPage() {
 
     try {
       const saitamaAppIdValue = formData.saitamaAppId && formData.saitamaAppId.trim() !== '' ? formData.saitamaAppId.trim() : undefined;
+      
+      // セッションストレージから紹介者IDを取得
+      const referrerUserId = typeof window !== 'undefined' 
+        ? sessionStorage.getItem('referrerUserId') 
+        : null;
+      
+      console.log('🔍 [register-confirmation] referrerUserId from sessionStorage:', referrerUserId);
 
       // バックエンドAPIに登録リクエストを送信
       const response = await fetch('/api/auth/register', {
@@ -114,6 +121,8 @@ export default function RegisterConfirmationPage() {
           phone: formData.phone,
           // 空文字列の場合はundefinedとして送信しない
           saitamaAppId: saitamaAppIdValue,
+          // 紹介者IDを追加
+          referrerUserId: referrerUserId && referrerUserId.trim() !== '' ? referrerUserId.trim() : undefined,
           token: token,
         }),
       })
@@ -126,6 +135,7 @@ export default function RegisterConfirmationPage() {
 
         // 登録成功後はセッションストレージをクリア
         sessionStorage.removeItem('registerFormData')
+        sessionStorage.removeItem('referrerUserId')
 
         // さいたま市アプリ連携でポイント付与があった場合はモーダルを表示
         if (result.pointsGranted) {

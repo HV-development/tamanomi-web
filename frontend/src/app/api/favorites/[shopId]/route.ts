@@ -7,11 +7,11 @@ export const dynamic = 'force-dynamic'
 // お気に入り登録/削除（トグル）
 export async function POST(
   request: NextRequest,
-  { params }: { params: { shopId: string } }
+  { params }: { params: Promise<{ shopId: string }> }
 ) {
   try {
     const authHeader = getAuthHeader(request)
-    const { shopId } = params
+    const { shopId } = await params
     
     if (!authHeader) {
       console.log('❌ [favorites] No authorization header')
@@ -79,11 +79,11 @@ export async function POST(
 // お気に入り削除
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { shopId: string } }
+  { params }: { params: Promise<{ shopId: string }> }
 ) {
   try {
     const authHeader = getAuthHeader(request)
-    const { shopId } = params
+    const { shopId } = await params
     
     if (!authHeader) {
       console.log('❌ [favorites] No authorization header')

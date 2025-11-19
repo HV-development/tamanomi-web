@@ -35,7 +35,7 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     const {
       requireAuth = true,
-      autoRefresh = true,
+      autoRefresh: _autoRefresh = true,
       headers = {},
       ...fetchOptions
     } = options;
@@ -164,18 +164,30 @@ export interface PreRegisterResponse {
  */
 export async function preRegister(
   email: string,
-  campaignCode?: string
+  campaignCode?: string,
+  referrerUserId?: string
 ): Promise<PreRegisterResponse> {
   try {
+    const requestBody = {
+      email,
+      campaignCode,
+      ...(referrerUserId && referrerUserId.trim() !== '' ? { referrerUserId: referrerUserId.trim() } : {}),
+    };
+
+    console.log('🔍 [api-client] preRegister called with:', {
+      email,
+      campaignCode,
+      referrerUserId,
+      hasReferrerUserId: !!referrerUserId,
+      requestBody,
+    });
+
     const response = await fetch('/api/auth/pre-register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        email,
-        campaignCode,
-      }),
+      body: JSON.stringify(requestBody),
     })
 
     if (!response.ok) {
