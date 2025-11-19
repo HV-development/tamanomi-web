@@ -216,9 +216,28 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         console.log('[useInfiniteStores] Response status:', res.status)
         
         if (!res.ok) {
-          const data = await res.json().catch(() => ({}))
-          const message = data?.error?.message || '店舗情報の取得に失敗しました'
-          console.error('[useInfiniteStores] Response error:', data)
+          let data: any = {}
+          try {
+            const contentType = res.headers.get('content-type')
+            if (contentType && contentType.includes('application/json')) {
+              data = await res.json()
+            } else {
+              const text = await res.text()
+              console.error('[useInfiniteStores] Response is not JSON:', text.substring(0, 200))
+              data = { message: text.substring(0, 200) }
+            }
+          } catch (parseError) {
+            console.error('[useInfiniteStores] Failed to parse error response:', parseError)
+            data = { message: 'エラーレスポンスの解析に失敗しました' }
+          }
+          
+          const message = data?.error?.message || data?.message || `店舗情報の取得に失敗しました (${res.status})`
+          console.error('[useInfiniteStores] Response error:', {
+            status: res.status,
+            statusText: res.statusText,
+            data,
+            message,
+          })
           throw new Error(message)
         }
 

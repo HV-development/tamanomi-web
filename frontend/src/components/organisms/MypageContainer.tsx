@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import Image from "next/image"
-import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard } from "lucide-react"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard, Share2, Copy, Check } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
@@ -142,6 +142,76 @@ const ProfileCard = React.memo(({ user, onEditProfile }: { user?: UserType, onEd
   );
 })
 ProfileCard.displayName = 'ProfileCard'
+
+// 紹介用URLカードコンポーネント
+const ReferrerUrlCard = React.memo(({ user }: { user?: UserType }) => {
+  const [copied, setCopied] = React.useState(false)
+  
+  if (!user) {
+    return null
+  }
+
+  // 紹介用URLを生成（APIから取得できない場合はフロントエンドで生成）
+  const referrerUrl = user.referrerUrl || (typeof window !== 'undefined' 
+    ? `${window.location.origin}/email-registration?ref=${user.id}` 
+    : null)
+
+  const handleCopy = async () => {
+    if (!referrerUrl) return
+
+    try {
+      await navigator.clipboard.writeText(referrerUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error('コピーに失敗しました:', error)
+    }
+  }
+
+  if (!referrerUrl) {
+    return null
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-green-200 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+          <Share2 className="w-5 h-5 text-green-600" />
+        </div>
+        <span className="text-lg font-bold text-gray-500">友達紹介</span>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="text-sm text-gray-600 mb-2 block">紹介用URL</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={referrerUrl}
+              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none"
+            />
+            <button
+              onClick={handleCopy}
+              className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center"
+              title={copied ? 'コピーしました' : 'クリップボードにコピー'}
+            >
+              {copied ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                <Copy className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500">
+          このURLを友達に共有すると、友達が登録した際に紹介として記録されます。
+        </p>
+      </div>
+    </div>
+  );
+})
+ReferrerUrlCard.displayName = 'ReferrerUrlCard'
 
 // ランク画像コンポーネント
 const RankImage = React.memo(({ rank, alt, className }: { rank: string, alt: string, className: string }) => (
@@ -439,6 +509,10 @@ export const MyPageContainer = React.memo(function MyPageContainer({
         <StaggeredContainer staggerDelay={100}>
           <FadeInComponent delay={200}>
             <ProfileCard user={user} onEditProfile={onEditProfile} />
+          </FadeInComponent>
+
+          <FadeInComponent delay={250}>
+            <ReferrerUrlCard user={user} />
           </FadeInComponent>
 
           {/* TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト */}

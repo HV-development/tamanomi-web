@@ -53,7 +53,31 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
     setErrorMessage('')
 
     try {
-      await preRegister(data.email, data.campaignCode)
+      // セッションストレージから紹介者IDを取得
+      const referrerUserId = typeof window !== 'undefined'
+        ? sessionStorage.getItem('referrerUserId')
+        : null;
+      
+      console.log('🔍 [useEmailRegistration] referrerUserId from sessionStorage:', referrerUserId);
+      console.log('🔍 [useEmailRegistration] sessionStorage keys:', typeof window !== 'undefined' ? Object.keys(sessionStorage) : []);
+      console.log('🔍 [useEmailRegistration] Current URL:', typeof window !== 'undefined' ? window.location.href : 'N/A');
+      console.log('🔍 [useEmailRegistration] URL search params:', typeof window !== 'undefined' ? new URLSearchParams(window.location.search).toString() : 'N/A');
+
+      // 紹介者IDを含めてpreRegisterを呼び出し
+      const registrationData: UserRegistrationRequest = {
+        email: data.email,
+        campaignCode: data.campaignCode,
+        ...(referrerUserId && referrerUserId.trim() !== '' ? { referrerUserId: referrerUserId.trim() } : {}),
+      };
+
+      console.log('🔍 [useEmailRegistration] registrationData:', {
+        email: registrationData.email,
+        campaignCode: registrationData.campaignCode,
+        referrerUserId: referrerUserId || undefined,
+        hasReferrerUserId: !!referrerUserId,
+      });
+
+      await preRegister(registrationData.email, registrationData.campaignCode, referrerUserId || undefined)
       // メールアドレスを保存
       setLastEmail(data.email)
       // 送信完了画面に遷移
@@ -84,7 +108,12 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
     setSuccessMessage('')
 
     try {
-      await preRegister(lastEmail)
+      // セッションストレージから紹介者IDを取得
+      const referrerUserId = typeof window !== 'undefined'
+        ? sessionStorage.getItem('referrerUserId')
+        : null;
+
+      await preRegister(lastEmail, undefined, referrerUserId || undefined)
       // 成功メッセージを表示（画面は complete のまま）
       setSuccessMessage('認証メールを再送信しました')
       
