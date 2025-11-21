@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { EmailRegistrationContainer } from '@/components/organisms/EmailRegistrationContainer'
 import { useEmailRegistration } from '@/hooks/useEmailRegistration'
@@ -16,6 +16,31 @@ function EmailRegistrationContent() {
     handleEmailSubmit,
     handleResend,
   } = useEmailRegistration()
+
+  // URLパラメータから紹介者IDを取得してセッションストレージに保存
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const ref = urlParams.get('ref')
+      console.log('🔍 [email-registration] URL params:', {
+        search: window.location.search,
+        ref,
+        allParams: Object.fromEntries(urlParams.entries()),
+      })
+      if (ref) {
+        sessionStorage.setItem('referrerUserId', ref)
+        console.log('🔍 [email-registration] referrerUserId saved to sessionStorage:', ref)
+        // 保存後に確認
+        const saved = sessionStorage.getItem('referrerUserId')
+        console.log('🔍 [email-registration] Verified saved referrerUserId:', saved)
+      } else {
+        console.log('🔍 [email-registration] No ref parameter found in URL')
+        // 既存の値を確認
+        const existing = sessionStorage.getItem('referrerUserId')
+        console.log('🔍 [email-registration] Existing referrerUserId in sessionStorage:', existing)
+      }
+    }
+  }, [])
 
   const handleBack = () => router.push('/')
   const handleLogoClick = () => router.push('/')

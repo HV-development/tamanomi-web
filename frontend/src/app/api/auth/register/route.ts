@@ -16,10 +16,13 @@ export async function POST(request: NextRequest) {
       saitamaAppIdType: typeof body.saitamaAppId,
       saitamaAppIdLength: body.saitamaAppId?.length,
       saitamaAppIdValue: `"${body.saitamaAppId}"`,
+      referrerUserId: body.referrerUserId,
+      referrerUserIdType: typeof body.referrerUserId,
+      referrerUserIdLength: body.referrerUserId?.length,
     })
 
     // バックエンドが期待するデータ構造に変換
-    // 空文字列のsaitamaAppIdは除外
+    // 空文字列のsaitamaAppIdとreferrerUserIdは除外
     const validatedData = {
       email: body.email,
       password: body.password,
@@ -31,8 +34,8 @@ export async function POST(request: NextRequest) {
       gender: body.gender,
       phone: body.phone,
       ...(body.saitamaAppId && body.saitamaAppId.trim() !== '' ? { saitamaAppId: body.saitamaAppId.trim() } : {}),
-      token: body.token,
-      shopId: body.shopId
+      ...(body.referrerUserId && body.referrerUserId.trim() !== '' ? { referrerUserId: body.referrerUserId.trim() } : {}),
+      token: body.token
     };
 
     console.log('🔍 [register/route] Validated data:', {
@@ -41,6 +44,8 @@ export async function POST(request: NextRequest) {
       shopId: validatedData.shopId,
       hasSaitamaAppId: 'saitamaAppId' in validatedData,
       saitamaAppId: 'saitamaAppId' in validatedData ? validatedData.saitamaAppId : undefined,
+      hasReferrerUserId: 'referrerUserId' in validatedData,
+      referrerUserId: 'referrerUserId' in validatedData ? validatedData.referrerUserId : undefined,
     })
 
     // タイムアウト設定付きのfetch

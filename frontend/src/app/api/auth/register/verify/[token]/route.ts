@@ -30,6 +30,12 @@ export async function GET(
             const registerUrl = new URL('/register', request.url)
             registerUrl.searchParams.set('email', tokenData.email)
             registerUrl.searchParams.set('token', token)
+            
+            // URLパラメータから紹介者IDを取得して含める
+            const ref = request.nextUrl.searchParams.get('ref')
+            if (ref) {
+              registerUrl.searchParams.set('ref', ref)
+            }
 
             // shop_idがURLパラメータまたはトークンデータに含まれている場合は追加
             const shopIdFromQuery = request.nextUrl.searchParams.get('shop_id')

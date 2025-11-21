@@ -53,22 +53,41 @@ export async function GET(request: NextRequest) {
 
     console.log('[api/shops] backend status:', response.status)
 
-    const data = await response.json().catch(() => ({}))
+    let data: any = {}
+    try {
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json()
+      } else {
+        const text = await response.text()
+        console.error('[api/shops] backend returned non-JSON response:', text.substring(0, 200))
+        data = { message: text.substring(0, 200) }
+      }
+    } catch (parseError) {
+      console.error('[api/shops] failed to parse response:', parseError)
+      data = { message: 'レスポンスの解析に失敗しました' }
+    }
+
     if (process.env.NODE_ENV !== 'production') {
       console.log('[api/shops] backend payload sample:', {
-        shopsCount: Array.isArray((data as any)?.shops) ? (data as any).shops.length : 'n/a',
-        pagination: (data as any)?.pagination || null,
+        shopsCount: Array.isArray(data?.shops) ? data.shops.length : 'n/a',
+        pagination: data?.pagination || null,
+        hasError: !!data?.error,
       })
     }
 
     if (!response.ok) {
       // 500系は文言を統一
       if (response.status >= 500) {
+        console.error('[api/shops] backend 5xx error:', {
+          status: response.status,
+          data,
+        })
         return NextResponse.json(
           {
             error: {
               code: 'INTERNAL_SERVER_ERROR',
-              message: '店舗情報の取得に失敗しました。時間を置いて再度お試しください。',
+              message: data?.error?.message || data?.message || '店舗情報の取得に失敗しました。時間を置いて再度お試しください。',
             },
           },
           { status: 500 }
@@ -76,11 +95,15 @@ export async function GET(request: NextRequest) {
       }
 
       // 4xx などはバックエンドのエラーをそのまま返す
+      console.error('[api/shops] backend 4xx error:', {
+        status: response.status,
+        data,
+      })
       return NextResponse.json(
         {
           error: data?.error || {
             code: 'API_ERROR',
-            message: data?.message || '店舗情報の取得に失敗しました',
+            message: data?.message || data?.error?.message || '店舗情報の取得に失敗しました',
           },
         },
         { status: response.status }

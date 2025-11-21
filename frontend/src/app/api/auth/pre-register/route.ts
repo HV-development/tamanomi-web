@@ -21,19 +21,44 @@ export async function POST(request: NextRequest) {
 
     const fullUrl = buildApiUrl('/pre-register');
     
-    console.log('🔍 [pre-register] Request:', { url: fullUrl, email: body.email, campaignCode: body.campaignCode, shop_id: body.shop_id });
+    console.log('🔍 [pre-register] Request:', { 
+      url: fullUrl, 
+      email: body.email, 
+      campaignCode: body.campaignCode,
+      referrerUserId: body.referrerUserId,
+      hasReferrerUserId: !!body.referrerUserId,
+      referrerUserIdType: typeof body.referrerUserId,
+      referrerUserIdLength: body.referrerUserId?.length,
+      allBodyKeys: Object.keys(body),
+    });
 
     try {
+      const requestBody: any = {
+        email: body.email,
+        campaignCode: body.campaignCode,
+      };
+      
+      // 紹介者IDがある場合は追加
+      if (body.referrerUserId && body.referrerUserId.trim() !== '') {
+        requestBody.referrerUserId = body.referrerUserId.trim();
+        console.log('🔍 [pre-register] Added referrerUserId to requestBody:', requestBody.referrerUserId);
+      } else {
+        console.log('🔍 [pre-register] No referrerUserId in body, skipping');
+      }
+      
+      console.log('🔍 [pre-register] Final requestBody:', {
+        email: requestBody.email,
+        campaignCode: requestBody.campaignCode,
+        hasReferrerUserId: 'referrerUserId' in requestBody,
+        referrerUserId: requestBody.referrerUserId,
+      });
+
       const response = await fetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: body.email,
-          campaignCode: body.campaignCode,
-          shopId: body.shop_id
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       });
 
