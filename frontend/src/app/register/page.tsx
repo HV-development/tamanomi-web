@@ -7,7 +7,7 @@ import { UserRegistrationComplete } from "@hv-development/schemas"
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [searchParams, setSearchParams] = useState<{ email?: string; token?: string }>({})
+  const [searchParams, setSearchParams] = useState<{ email?: string; token?: string; shop_id?: string }>({})
   const [isClient, setIsClient] = useState(false)
   const [initialFormData, setInitialFormData] = useState<UserRegistrationComplete | null>(null)
   const router = useRouter()
@@ -19,6 +19,7 @@ export default function RegisterPage() {
       const urlParams = new URLSearchParams(window.location.search)
       const email = urlParams.get('email') || undefined
       const token = urlParams.get('token') || undefined
+      const shop_id = urlParams.get('shop_id') || undefined
       const isEdit = urlParams.get('edit') === 'true'
 
       // トークンが存在しない場合はメール登録画面にリダイレクト
@@ -30,6 +31,7 @@ export default function RegisterPage() {
       setSearchParams({
         email,
         token,
+        shop_id,
       })
 
       // 編集モードの場合、保存されたフォームデータを取得
@@ -51,11 +53,22 @@ export default function RegisterPage() {
   const handleRegisterSubmit = async (data: UserRegistrationComplete) => {
     setIsLoading(true)
 
-    // フォームデータをセッションストレージに保存
-    sessionStorage.setItem('registerFormData', JSON.stringify(data))
+    // shop_idをURLパラメータから取得してデータに追加
+    const dataWithShopId = {
+      ...data,
+      shop_id: searchParams.shop_id || undefined,
+    }
 
-    // 確認画面に遷移
-    router.push(`/register-confirmation?email=${encodeURIComponent(searchParams.email || '')}&token=${encodeURIComponent(searchParams.token || '')}`)
+    // フォームデータをセッションストレージに保存
+    sessionStorage.setItem('registerFormData', JSON.stringify(dataWithShopId))
+
+    // 確認画面に遷移（shop_idも含める）
+    const shopIdParam = searchParams.shop_id ? `&shop_id=${encodeURIComponent(searchParams.shop_id)}` : ''
+    router.push(
+      `/register-confirmation?email=${encodeURIComponent(searchParams.email || '')}&token=${encodeURIComponent(
+        searchParams.token || ''
+      )}${shopIdParam}`
+    )
     setIsLoading(false)
   }
 

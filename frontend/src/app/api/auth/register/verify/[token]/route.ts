@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { token: string } }
+    { params }: { params: Promise<{ token: string }> }
 ) {
     try {
-        const { token } = params
+        const { token } = await params
 
         if (!token) {
             return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
@@ -30,6 +30,14 @@ export async function GET(
             const registerUrl = new URL('/register', request.url)
             registerUrl.searchParams.set('email', tokenData.email)
             registerUrl.searchParams.set('token', token)
+
+            // shop_idがURLパラメータまたはトークンデータに含まれている場合は追加
+            const shopIdFromQuery = request.nextUrl.searchParams.get('shop_id')
+            const shopIdFromToken = tokenData.shopId
+            const shopId = shopIdFromQuery || shopIdFromToken
+            if (shopId) {
+              registerUrl.searchParams.set('shop_id', shopId)
+            }
 
             return NextResponse.redirect(registerUrl)
         } catch {

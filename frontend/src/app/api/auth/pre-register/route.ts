@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     const fullUrl = buildApiUrl('/pre-register');
     
-    console.log('🔍 [pre-register] Request:', { url: fullUrl, email: body.email, campaignCode: body.campaignCode });
+    console.log('🔍 [pre-register] Request:', { url: fullUrl, email: body.email, campaignCode: body.campaignCode, shop_id: body.shop_id });
 
     try {
       const response = await fetch(fullUrl, {
@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           email: body.email,
           campaignCode: body.campaignCode,
+          shopId: body.shop_id
         }),
         signal: controller.signal,
       });
