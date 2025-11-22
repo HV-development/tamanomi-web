@@ -25,20 +25,33 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [successMessage, setSuccessMessage] = useState<string>('')
   const [lastEmail, setLastEmail] = useState<string>('')
-  
+  const [shopId, setShopId] = useState<string | undefined>(undefined)
+
   const searchParams = useSearchParams()
+
+  // URLパラメータからshop_idを取得
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const shopIdParam = urlParams.get('shop_id');
+      console.log('🔍 [useEffect] shopIdParam:', shopIdParam)
+      if (shopIdParam) {
+        setShopId(shopIdParam);
+      }
+    }
+  }, []);
 
   // URLパラメータからエラーメッセージを取得
   useEffect(() => {
     const error = searchParams.get('error')
-    
+
     if (error) {
       const errorMessages: Record<string, string> = {
         invalid_token: '無効な確認リンクです。再度メール登録を行ってください。',
         token_expired: '確認リンクの有効期限が切れています。再度メール登録を行ってください。',
         verification_failed: '確認処理に失敗しました。再度メール登録を行ってください。',
       }
-      
+
       setErrorMessage(
         errorMessages[error] || 'エラーが発生しました。再度メール登録を行ってください。'
       )

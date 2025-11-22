@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     console.log('🔍 [register/route] Received body:', {
       email: body.email,
       nickname: body.nickname,
+      shopId: body.shopId,
       saitamaAppId: body.saitamaAppId,
       saitamaAppIdType: typeof body.saitamaAppId,
       saitamaAppIdLength: body.saitamaAppId?.length,
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
     console.log('🔍 [register/route] Validated data:', {
       email: validatedData.email,
       nickname: validatedData.nickname,
+      shopId: validatedData.shopId,
       hasSaitamaAppId: 'saitamaAppId' in validatedData,
       saitamaAppId: 'saitamaAppId' in validatedData ? validatedData.saitamaAppId : undefined,
       hasReferrerUserId: 'referrerUserId' in validatedData,

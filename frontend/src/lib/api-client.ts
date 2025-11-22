@@ -180,6 +180,7 @@ export async function getQrTransaction(
 export interface PreRegisterRequest {
   email: string
   campaignCode?: string
+  shop_id?: string
 }
 
 export interface PreRegisterResponse {
@@ -221,25 +222,25 @@ export async function preRegister(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      
+
       // 409エラー（メールアドレス重複）の場合は特別なメッセージ
       if (response.status === 409) {
         const message = errorData.error?.message || errorData.message || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
         throw new Error(message)
       }
-      
+
       // 400エラー（バリデーションエラー）の場合は詳細なメッセージを表示
       if (response.status === 400) {
         const message = errorData.error?.message || errorData.message || '入力内容に問題があります。確認してから再度お試しください。'
         throw new Error(message)
       }
-      
+
       // 500エラー（サーバーエラー）の場合は一般的なメッセージを表示
       if (response.status === 500) {
         const message = errorData.error?.message || errorData.message || 'システムエラーが発生しました。しばらく時間をおいてから再度お試しください。'
         throw new Error(message)
       }
-      
+
       const message = errorData.error?.message || errorData.message || '認証メールの送信に失敗しました'
       throw new Error(message)
     }
@@ -284,31 +285,31 @@ export async function confirmPasswordReset(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      
+
       // 400エラー（無効なトークンなど）の場合は特別なメッセージ
       if (response.status === 400) {
         const message = errorData.message || errorData.error?.message || '無効なリセットトークンです。リンクの有効期限が切れている可能性があります。'
         throw new Error(message)
       }
-      
+
       // 408エラー（タイムアウト）の場合は特別なメッセージ
       if (response.status === 408) {
         const message = errorData.message || errorData.error?.message || 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。'
         throw new Error(message)
       }
-      
+
       // 503エラー（サーバー接続エラー）の場合は特別なメッセージ
       if (response.status === 503) {
         const message = errorData.message || errorData.error?.message || 'サーバーに接続できません。ネットワーク接続を確認してください。'
         throw new Error(message)
       }
-      
+
       // 500エラー（サーバーエラー）の場合は一般的なメッセージを表示
       if (response.status === 500) {
         const message = errorData.message || errorData.error?.message || 'システムエラーが発生しました。しばらく時間をおいてから再度お試しください。'
         throw new Error(message)
       }
-      
+
       const message = errorData.message || errorData.error?.message || 'パスワードリセットに失敗しました'
       throw new Error(message)
     }
