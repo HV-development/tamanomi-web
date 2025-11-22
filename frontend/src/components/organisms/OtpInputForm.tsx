@@ -198,7 +198,6 @@ export function OtpInputForm({
           ))}
         </div>
 
-        {/* ローディング表示は全画面で表示されるため、ここでは表示しない */}
 
         {/* エラーメッセージ */}
         {error && <p className="text-sm text-red-500 text-center mb-4">{error}</p>}
