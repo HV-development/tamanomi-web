@@ -32,7 +32,7 @@ describe('PlanRegistrationForm - 支払い方法選択', () => {
     )
 
     expect(screen.getByText('クレジットカード')).toBeInTheDocument()
-    expect(screen.getByText('イオンペイ（準備中）')).toBeInTheDocument()
+    expect(screen.getByText('イオンペイ')).toBeInTheDocument()
     expect(screen.getByText('PayPay')).toBeInTheDocument()
   })
 

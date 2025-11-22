@@ -2,7 +2,7 @@ import type {
   PayPayPaymentStartResponse,
   PayPayTransactionStatusResponse,
 } from '@/types/payment'
-import type { PayPayPaymentRequest } from '@hv-development/schemas'
+import type { PayPayPaymentRequest, QrPaymentRequest, QrPaymentResponse, QrGetTransactionResponse } from '@hv-development/schemas'
 
 /**
  * API呼び出しの共通処理
@@ -141,6 +141,35 @@ export async function getPayPayTransactionStatus(
   return ApiClient.get<PayPayTransactionStatusResponse>(
     `/api/payment/paypay/transactions/${encodeURIComponent(transactionId)}`,
     { requireAuth: true },
+  )
+}
+
+/**
+ * イオンペイ決済申込API
+ * - Next API `/api/payment/qr/pay` を経由してバックエンドのQRコード決済申込エンドポイントを呼び出す
+ */
+export async function requestQrPayment(
+  body: QrPaymentRequest
+): Promise<ApiResponse<QrPaymentResponse>> {
+  return ApiClient.post<QrPaymentResponse>('/api/payment/qr/pay', body, {
+    requireAuth: true,
+  })
+}
+
+/**
+ * QRコード決済 取引情報取得API
+ * - Next API `/api/payment/qr/transactions/:transactionId` を経由してバックエンドの取引情報取得エンドポイントを呼び出す
+ */
+export async function getQrTransaction(
+  transactionId: string,
+  recursive?: boolean
+): Promise<ApiResponse<QrGetTransactionResponse & { paymentTransactionId?: string; applicationId?: string }>> {
+  const queryParams = recursive ? '?recursive=true' : ''
+  return ApiClient.get<QrGetTransactionResponse & { paymentTransactionId?: string; applicationId?: string }>(
+    `/api/payment/qr/transactions/${transactionId}${queryParams}`,
+    {
+      requireAuth: true,
+    }
   )
 }
 

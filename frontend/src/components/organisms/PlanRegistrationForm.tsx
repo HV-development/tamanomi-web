@@ -51,13 +51,6 @@ export function PlanRegistrationForm({
       return
     }
 
-    // 現時点では単発プランかどうかに関わらず、支払い方法選択はフロント側で制御する
-    // AeonPayは準備中のため、選択されていても処理は行わない
-    if (selectedPaymentMethod === 'AeonPay') {
-      alert('イオンペイは現在準備中です。クレジットカードまたはPayPayを選択してください。')
-      return
-    }
-
     if (selectedPlan || isPaymentMethodChangeOnly) {
       onPaymentMethodRegister(selectedPlan, selectedPaymentMethod)
     }
@@ -336,24 +329,24 @@ export function PlanRegistrationForm({
               </div>
             </button>
 
-            {/* イオンペイ（準備中） */}
+            {/* イオンペイ */}
             <button
               type="button"
               onClick={() => setSelectedPaymentMethod('AeonPay')}
               className={`flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
                 selectedPaymentMethod === 'AeonPay'
-                  ? 'border-gray-400 bg-gray-50'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 bg-white hover:border-blue-300'
               }`}
             >
               <div className="flex items-center gap-3">
-                <QrCode className="w-5 h-5 text-gray-500" />
+                <QrCode className="w-5 h-5 text-blue-600" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">イオンペイ（準備中）</p>
-                  <p className="text-xs text-gray-600">現在準備中です。クレジットカードまたはPayPayをご利用ください。</p>
+                  <p className="text-sm font-medium text-gray-900">イオンペイ</p>
+                  <p className="text-xs text-gray-600">QRコードで支払います</p>
                 </div>
               </div>
-              <span className="text-xs font-medium text-gray-500">準備中</span>
+              <span className="text-xs font-medium text-blue-500">QRコード決済</span>
             </button>
 
             {/* PayPay */}

@@ -5,8 +5,9 @@ import type {
 
 /**
  * 支払い方法種別
- * - 現時点で有効なのは CreditCard と PayPay
- * - AeonPay はUI上のみ表示し、「準備中」として扱う
+ * - CreditCard: クレジットカード決済
+ * - AeonPay: イオンペイ（QRコード決済）
+ * - PayPay: PayPay（QRコード決済）
  */
 export type PaymentMethodType = 'CreditCard' | 'AeonPay' | 'PayPay'
 
