@@ -25,21 +25,8 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [successMessage, setSuccessMessage] = useState<string>('')
   const [lastEmail, setLastEmail] = useState<string>('')
-  const [shopId, setShopId] = useState<string | undefined>(undefined)
 
   const searchParams = useSearchParams()
-
-  // URLパラメータからshop_idを取得
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const shopIdParam = urlParams.get('shop_id');
-      console.log('🔍 [useEffect] shopIdParam:', shopIdParam)
-      if (shopIdParam) {
-        setShopId(shopIdParam);
-      }
-    }
-  }, []);
 
   // URLパラメータからエラーメッセージを取得
   useEffect(() => {

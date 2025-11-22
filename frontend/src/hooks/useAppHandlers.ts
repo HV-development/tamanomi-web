@@ -180,13 +180,22 @@ export const useAppHandlers = (
             }
 
             // プラン登録状況によって遷移先を変更（router.replaceでブラウザ履歴を置き換えて、ログイン画面を経由しないようにする）
+            let targetPath: string
             if (!hasPlan) {
                 // プラン未登録の場合はプラン登録画面へ（独立したページ）
-                router.replace('/plan-registration')
+                targetPath = '/plan-registration'
             } else {
                 // プラン登録済みの場合はhome画面へ遷移
-                router.replace('/home')
+                targetPath = '/home'
             }
+
+            // ローディング継続フラグをセッションストレージに設定
+            // 遷移先のページで完全に表示されたらクリアされる
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('loginRedirecting', targetPath)
+            }
+
+            router.replace(targetPath)
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
         } catch (error) {

@@ -19,6 +19,7 @@ export default function RegisterPage() {
       const urlParams = new URLSearchParams(window.location.search)
       const email = urlParams.get('email') || undefined
       const token = urlParams.get('token') || undefined
+      const shop_id = urlParams.get('shop_id') || undefined
       const ref = urlParams.get('ref') // 紹介者IDを取得
       const isEdit = urlParams.get('edit') === 'true'
 
