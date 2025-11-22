@@ -13,6 +13,7 @@ export const useLoginPage = () => {
   const [email, setEmail] = useState<string>("")
   const [requestId, setRequestId] = useState<string>("")
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   // URLパラメータをメモ化
   const urlParams = useMemo(() => ({
@@ -21,6 +22,24 @@ export const useLoginPage = () => {
     error: searchParams.get('error'),
     email: searchParams.get('email')
   }), [searchParams])
+
+  // ログイン後のリダイレクトフラグをチェック（ページ遷移中もローディングを継続）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkRedirecting = () => {
+        const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+        setIsRedirecting(!!loginRedirecting)
+      }
+      
+      // 初回チェック
+      checkRedirecting()
+      
+      // 定期的にチェック（遷移先のページでフラグがクリアされるまで）
+      const interval = setInterval(checkRedirecting, 100)
+      
+      return () => clearInterval(interval)
+    }
+  }, [])
 
   // 認証状態チェック
   useEffect(() => {
@@ -46,13 +65,21 @@ export const useLoginPage = () => {
           const userData = await response.json()
           const hasPlan = userData.plan !== null && userData.plan !== undefined
           
+          let targetPath: string
           if (!hasPlan) {
             // プラン未登録の場合はプラン登録画面へ（セッションストレージにメールアドレスを保存）
             sessionStorage.setItem('userEmail', userData.email)
-            router.replace('/plan-registration')
+            targetPath = '/plan-registration'
           } else {
-            router.replace('/home')
+            targetPath = '/home'
           }
+
+          // ローディング継続フラグをセッションストレージに設定
+          // 遷移先のページで完全に表示されたらクリアされる
+          sessionStorage.setItem('loginRedirecting', targetPath)
+          setIsRedirecting(true)
+          
+          router.replace(targetPath)
         } else {
           setIsCheckingAuth(false)
         }
@@ -172,19 +199,27 @@ export const useLoginPage = () => {
       // リダイレクト（router.replaceでブラウザ履歴を置き換えて、ログイン画面を経由しないようにする）
       const redirectPath = sessionStorage.getItem('redirectAfterLogin')
       
+      let targetPath: string
       if (redirectPath) {
         sessionStorage.removeItem('redirectAfterLogin')
-        router.replace(redirectPath)
+        targetPath = redirectPath
       } else {
         if (!hasPlan) {
-          router.replace('/plan-registration')
+          targetPath = '/plan-registration'
         } else {
-          router.replace('/home')
+          targetPath = '/home'
         }
       }
       
+      // ローディング継続フラグをセッションストレージに設定
+      // 遷移先のページで完全に表示されたらクリアされる
+      sessionStorage.setItem('loginRedirecting', targetPath)
+      setIsRedirecting(true)
+      
+      router.replace(targetPath)
+      
       // 成功時はsetIsLoading(false)を呼ばない（リダイレクト後に自動的にアンマウントされるため）
-      // ローディング表示を維持して、home画面の読み込み完了まで表示し続ける
+      // ローディング表示を維持して、遷移先画面の読み込み完了まで表示し続ける
       return
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました'
@@ -238,7 +273,7 @@ export const useLoginPage = () => {
   }, [router])
 
   return {
-    isLoading,
+    isLoading: isLoading || isRedirecting,
     error,
     loginStep,
     email,

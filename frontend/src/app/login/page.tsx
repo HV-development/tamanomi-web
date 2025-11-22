@@ -20,6 +20,7 @@ function LoginPageContent() {
   } = useLoginPage()
 
   // 認証チェック中またはローディング中はローディング表示
+  // ワンタイムパスワード入力後のローディングも全画面表示
   if (isCheckingAuth || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">

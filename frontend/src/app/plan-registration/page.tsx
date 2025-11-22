@@ -200,6 +200,31 @@ export default function PlanRegistrationPage() {
     }
   }, [isClient, saitamaAppLinked, fetchPlans])
 
+  // ログイン後のリダイレクトフラグをチェック
+  const [isLoginRedirecting, setIsLoginRedirecting] = useState(false)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      setIsLoginRedirecting(loginRedirecting === '/plan-registration' || loginRedirecting?.startsWith('/plan-registration') || false)
+    }
+  }, [])
+
+  // ログイン後のリダイレクトフラグをクリア（ページが完全に表示されたら）
+  useEffect(() => {
+    if (isClient && saitamaAppLinked !== null && plans.length > 0 && typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      if (loginRedirecting === '/plan-registration' || loginRedirecting?.startsWith('/plan-registration')) {
+        // レンダリングが完了するのを待つため、次のフレームでフラグをクリア
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            sessionStorage.removeItem('loginRedirecting')
+            setIsLoginRedirecting(false)
+          })
+        })
+      }
+    }
+  }, [isClient, saitamaAppLinked, plans.length])
+
   const executePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType = 'CreditCard') => {
     try {
       setIsLoading(true)
@@ -276,9 +301,6 @@ export default function PlanRegistrationPage() {
         const successUrl = `${baseUrl}/aeonpay/qr-code?status=SUCCESS&paymentTransactionId=${requestId}`
         const failureUrl = `${baseUrl}/aeonpay/qr-code?status=FAILED&paymentTransactionId=${requestId}`
         const cancelUrl = `${baseUrl}/aeonpay/qr-code?status=CANCEL&paymentTransactionId=${requestId}`
-
-        // orderNumberを生成（requestIdをベースに）
-        const orderNumber = `ORD-${requestId}`
 
         // イオンペイ固有のrequestPropertyを設定
         // 注意: イオンペイはPayPayと仕様が異なるため、イオンペイ固有の形式を使用
@@ -674,8 +696,8 @@ export default function PlanRegistrationPage() {
     setConfirmModalData(null)
   }
 
-  // クライアントサイドでの初期化が完了するまでローディング表示
-  if (!isClient) {
+  // クライアントサイドでの初期化が完了するまで、またはログイン後のリダイレクト中はローディング表示
+  if (!isClient || isLoginRedirecting) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
         <div className="text-center">

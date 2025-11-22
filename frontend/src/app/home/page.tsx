@@ -5,7 +5,7 @@
  * ログイン後にアクセスする画面
  */
 
-import { useEffect, useMemo, Suspense, useReducer, useRef } from "react"
+import { useEffect, useMemo, Suspense, useReducer, useRef, useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useFilters } from "@/hooks/useFilters"
@@ -104,13 +104,40 @@ export default function HomePage() {
     return "bg-gradient-to-br from-green-50 to-green-100"
   }, [])
 
-  // データが読み込まれるまでローディング表示
-  if (!state.isDataLoaded) {
+  // ログイン後のリダイレクトフラグをチェック
+  const [isLoginRedirecting, setIsLoginRedirecting] = useState(false)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      setIsLoginRedirecting(loginRedirecting === '/home' || loginRedirecting?.startsWith('/home') || false)
+    }
+  }, [])
+
+  // ログイン後のリダイレクトフラグをクリア（ページが完全に表示されたら）
+  useEffect(() => {
+    if (state.isDataLoaded && typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      if (loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')) {
+        // レンダリングが完了するのを待つため、次のフレームでフラグをクリア
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            sessionStorage.removeItem('loginRedirecting')
+            setIsLoginRedirecting(false)
+          })
+        })
+      }
+    }
+  }, [state.isDataLoaded])
+
+  // データが読み込まれるまで、またはログイン後のリダイレクト中はローディング表示
+  if (!state.isDataLoaded || isLoginRedirecting) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-green-600 font-medium">データを読み込み中...</p>
+          <p className="text-green-600 font-medium">
+            {isLoginRedirecting ? '読み込み中...' : 'データを読み込み中...'}
+          </p>
         </div>
       </div>
     )
