@@ -28,14 +28,16 @@ export const useLoginPage = () => {
     if (typeof window !== 'undefined') {
       const checkRedirecting = () => {
         const loginRedirecting = sessionStorage.getItem('loginRedirecting')
-        setIsRedirecting(!!loginRedirecting)
+        const shouldRedirect = !!loginRedirecting
+        setIsRedirecting(shouldRedirect)
       }
       
       // 初回チェック
       checkRedirecting()
       
       // 定期的にチェック（遷移先のページでフラグがクリアされるまで）
-      const interval = setInterval(checkRedirecting, 100)
+      // ページ遷移が始まっても、ログインページがアンマウントされるまでチェックを継続
+      const interval = setInterval(checkRedirecting, 50) // より頻繁にチェック
       
       return () => clearInterval(interval)
     }
@@ -214,9 +216,14 @@ export const useLoginPage = () => {
       // ローディング継続フラグをセッションストレージに設定
       // 遷移先のページで完全に表示されたらクリアされる
       sessionStorage.setItem('loginRedirecting', targetPath)
+      
+      // 遷移前にisRedirectingをtrueに設定（ページ遷移が始まってもローディングを継続）
       setIsRedirecting(true)
       
-      router.replace(targetPath)
+      // 少し待ってから遷移（状態が確実に反映されるように）
+      requestAnimationFrame(() => {
+        router.replace(targetPath)
+      })
       
       // 成功時はsetIsLoading(false)を呼ばない（リダイレクト後に自動的にアンマウントされるため）
       // ローディング表示を維持して、遷移先画面の読み込み完了まで表示し続ける

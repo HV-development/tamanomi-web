@@ -37,9 +37,14 @@ import { calculateAge } from "@/utils/age-calculator"
 import { checkTodayUsage } from "@/utils/coupon-usage-check"
 
 
-export function HomeLayout() {
+interface HomeLayoutProps {
+  onMount?: () => void
+}
+
+export function HomeLayout({ onMount }: HomeLayoutProps) {
   // Context から必要な値を取得
   const { state, dispatch, handlers, auth, navigation, filters, computedValues } = useAppContext()
+
 
   // ポップアップとモーダルの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
@@ -289,6 +294,31 @@ export function HomeLayout() {
       dispatch({ type: 'SET_DATA_LOADED', payload: true })
     }
   }, [items, isStoresLoading, dispatch, state.stores])
+
+  // データが完全に読み込まれたら、ログイン後のリダイレクトフラグをクリア
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      const shouldClearFlag = loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')
+      
+      if (shouldClearFlag && state.isDataLoaded && !isStoresLoading) {
+        // レンダリングが完了するのを待つため、複数のフレームでフラグをクリア
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              sessionStorage.removeItem('loginRedirecting')
+              if (onMount) {
+                onMount()
+              }
+            })
+          })
+        })
+      } else if (!shouldClearFlag && onMount) {
+        // フラグがない場合でもマウント通知を送る
+        onMount()
+      }
+    }
+  }, [state.isDataLoaded, isStoresLoading, onMount])
 
   // 追加ロード時の stores 追記（セントリネル交差で loadNext 実行済み）
   // 追加ロードはフック内部の items 更新で反映されるため、ここでの明示的処理は不要

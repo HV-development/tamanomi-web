@@ -113,21 +113,56 @@ export default function HomePage() {
     }
   }, [])
 
-  // ログイン後のリダイレクトフラグをクリア（ページが完全に表示されたら）
+  // ログイン後のリダイレクトフラグを定期的にチェック（HomeLayoutでクリアされるまで）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkRedirecting = () => {
+        const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+        setIsLoginRedirecting(loginRedirecting === '/home' || loginRedirecting?.startsWith('/home') || false)
+      }
+      
+      // 初回チェック
+      checkRedirecting()
+      
+      // 定期的にチェック（HomeLayoutでフラグがクリアされるまで）
+      const interval = setInterval(checkRedirecting, 100)
+      
+      return () => clearInterval(interval)
+    }
+  }, [])
+
+  // データが読み込まれたら、ログイン後のリダイレクトフラグをクリア（フォールバック）
   useEffect(() => {
     if (state.isDataLoaded && typeof window !== 'undefined') {
       const loginRedirecting = sessionStorage.getItem('loginRedirecting')
       if (loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')) {
-        // レンダリングが完了するのを待つため、次のフレームでフラグをクリア
+        // レンダリングが完了するのを待つため、複数のフレームでフラグをクリア
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            sessionStorage.removeItem('loginRedirecting')
-            setIsLoginRedirecting(false)
+            requestAnimationFrame(() => {
+              sessionStorage.removeItem('loginRedirecting')
+              setIsLoginRedirecting(false)
+            })
           })
         })
       }
     }
   }, [state.isDataLoaded])
+
+  // タイムアウト: 10秒経過後に強制的にフラグをクリア（セーフティネット）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      if (loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')) {
+        const timeout = setTimeout(() => {
+          sessionStorage.removeItem('loginRedirecting')
+          setIsLoginRedirecting(false)
+        }, 10000) // 10秒後に強制的にクリア
+        
+        return () => clearTimeout(timeout)
+      }
+    }
+  }, [])
 
   // データが読み込まれるまで、またはログイン後のリダイレクト中はローディング表示
   if (!state.isDataLoaded || isLoginRedirecting) {
@@ -154,7 +189,7 @@ export default function HomePage() {
             </div>
           </div>
         }>
-          <HomeLayout />
+          <HomeLayout onMount={() => setIsLoginRedirecting(false)} />
         </Suspense>
       </div>
     </AppContext.Provider>
