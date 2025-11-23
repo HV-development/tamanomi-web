@@ -36,8 +36,9 @@ export interface PayPayPaymentStartResponse {
   /**
    * PayPay支払い画面を表示するためのHTML
    * - `dangerouslySetInnerHTML` で描画する想定
+   * - 決済ステータスが`PROCESSING`または`REQUIRES_ACTION`の場合に存在する可能性がある
    */
-  redirectHtml: string
+  redirectHtml?: string
 }
 
 /**

@@ -5,6 +5,15 @@ import { getAuthHeader } from '@/lib/auth-header'
 // サーバーサイドなので NEXT_PUBLIC_ なしの環境変数を使用
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
 
+// タイムアウト用のAbortControllerを作成するヘルパー関数
+function createTimeoutSignal(timeoutMs: number): AbortSignal {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+  // タイムアウトが完了したらクリーンアップ
+  controller.signal.addEventListener('abort', () => clearTimeout(timeoutId))
+  return controller.signal
+}
+
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url)
@@ -13,6 +22,12 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') || '5'
     const city = searchParams.get('city')
     const genreId = searchParams.get('genreId')
+    
+    console.log('[api/shops] Configuration:', {
+      API_BASE_URL,
+      NODE_ENV: process.env.NODE_ENV,
+      hasInternalSecret: !!process.env.INTERNAL_API_SECRET,
+    })
 
     // クエリパラメータを構築
     const backendParams = new URLSearchParams({
@@ -37,21 +52,80 @@ export async function GET(request: NextRequest) {
 
     const hasInternalSecret = Boolean(process.env.INTERNAL_API_SECRET)
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[api/shops] has INTERNAL_API_SECRET:', hasInternalSecret)
+      console.log('[api/shops] Request headers:', {
+        hasAuth: !!authorization,
+        hasInternalSecret,
+      })
     }
 
-    const response = await fetch(backendUrl, {
-      method: 'GET',
-      headers: {
+    let response: Response
+    try {
+      const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-      ...(authorization ? { Authorization: authorization } : {}),
-      ...(process.env.INTERNAL_API_SECRET
-        ? { 'X-Internal-Api-Secret': process.env.INTERNAL_API_SECRET }
-        : {}),
-      },
-    })
-
-    console.log('[api/shops] backend status:', response.status)
+      }
+      
+      if (authorization) {
+        headers.Authorization = authorization
+      }
+      
+      if (process.env.INTERNAL_API_SECRET) {
+        headers['X-Internal-Api-Secret'] = process.env.INTERNAL_API_SECRET
+      }
+      
+      console.log('[api/shops] Fetching from backend:', {
+        url: backendUrl,
+        method: 'GET',
+        headers: Object.keys(headers),
+      })
+      
+      // タイムアウト設定（30秒）- AbortSignal.timeout()のフォールバック
+      const timeoutSignal = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+        ? AbortSignal.timeout(30000)
+        : createTimeoutSignal(30000)
+      
+      response = await fetch(backendUrl, {
+        method: 'GET',
+        headers,
+        signal: timeoutSignal,
+      })
+      
+      console.log('[api/shops] backend status:', response.status, response.statusText)
+    } catch (fetchError: unknown) {
+      const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError)
+      const errorName = fetchError instanceof Error ? fetchError.name : 'Unknown'
+      const errorCause = fetchError instanceof Error && 'cause' in fetchError 
+        ? (fetchError as any).cause 
+        : undefined
+      
+      console.error('[api/shops] Fetch failed:', {
+        error: errorMessage,
+        errorName,
+        errorCause,
+        backendUrl,
+        API_BASE_URL,
+        timestamp: new Date().toISOString(),
+      })
+      
+      // より詳細なエラーメッセージを提供
+      let userMessage = 'バックエンドAPIへの接続に失敗しました'
+      if (errorName === 'TypeError' && errorMessage.includes('fetch failed')) {
+        userMessage = 'バックエンドAPIサーバーに接続できません。APIサーバーが起動しているか確認してください。'
+      } else if (errorName === 'AbortError') {
+        userMessage = 'リクエストがタイムアウトしました。しばらく待ってから再度お試しください。'
+      }
+      
+      return NextResponse.json(
+        {
+          error: {
+            code: 'NETWORK_ERROR',
+            message: userMessage,
+            detail: errorMessage,
+            backendUrl,
+          },
+        },
+        { status: 500 }
+      )
+    }
 
     let data: any = {}
     try {

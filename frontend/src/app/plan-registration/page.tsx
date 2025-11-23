@@ -417,7 +417,7 @@ export default function PlanRegistrationPage() {
         const payPayRequest: PayPayPaymentRequest = {
           userId: userId || sessionStorage.getItem('userId') || '',
           // 現時点ではショップIDは未使用のため省略
-          requestId: `paypay_${Date.now()}`,
+          requestId: `${Date.now()}`,  // PayPay APIは数値のみを期待するため、プレフィックスなし
           amount: {
             currencyCode: 'JPY',
             value: paymentAmount,
@@ -440,19 +440,38 @@ export default function PlanRegistrationPage() {
           return
         }
 
-        if (!data.redirectHtml) {
-          setError('PayPayの支払い画面情報の取得に失敗しました')
+        // 決済ステータスに応じた処理
+        if (data.status === 'SUCCESS') {
+          // 決済成功時はプラン登録完了画面に遷移
+          router.push(`/plan-registration/success?planId=${planId}&paymentMethod=PayPay`)
           setIsLoading(false)
           return
-        }
-
-        // redirectHtml をセッションに保存し、チェックアウト画面へ遷移
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('paypayRedirectHtml', data.redirectHtml)
-          const query = new URLSearchParams({
-            redirectHtml: encodeURIComponent(data.redirectHtml),
-          })
-          router.push(`/paypay/checkout?${query.toString()}`)
+        } else if (data.status === 'PROCESSING' || data.status === 'REQUIRES_ACTION') {
+          // QRコード表示が必要な場合（redirectHtmlが存在する場合）
+          if (data.redirectHtml) {
+            // redirectHtml をセッションに保存し、チェックアウト画面へ遷移
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('paypayRedirectHtml', data.redirectHtml)
+              const query = new URLSearchParams({
+                redirectHtml: encodeURIComponent(data.redirectHtml),
+              })
+              router.push(`/paypay/checkout?${query.toString()}`)
+            }
+          } else {
+            // redirectHtmlが存在しない場合は、取引IDを使って完了画面に遷移
+            if (data.transactionId) {
+              router.push(`/paypay/complete?payment_id=${data.transactionId}`)
+            } else {
+              setError('PayPayの支払い画面情報の取得に失敗しました')
+              setIsLoading(false)
+              return
+            }
+          }
+        } else {
+          // 決済失敗
+          setError(data.resultDescription || 'PayPay決済に失敗しました')
+          setIsLoading(false)
+          return
         }
 
         setIsLoading(false)
