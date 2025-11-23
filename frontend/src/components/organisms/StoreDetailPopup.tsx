@@ -194,6 +194,16 @@ export function StoreDetailPopup({
                 </div>
               )}
 
+              {/* クーポン利用可能曜日 */}
+              {store.couponUsageDays && store.couponUsageDays.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">利用可能曜日</div>
+                  <div className="text-base text-gray-700">
+                    {store.couponUsageDays.split(',').map(d => `${d}曜日`).join('、')}
+                  </div>
+                </div>
+              )}
+
               {/* 利用シーン */}
               {store.usageScenes && store.usageScenes.length > 0 && (
                 <div className="space-y-2">

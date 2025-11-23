@@ -126,6 +126,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       longitude: shop.longitude ? Number(shop.longitude) : undefined,
       couponUsageStart: shop.couponUsageStart || undefined,
       couponUsageEnd: shop.couponUsageEnd || undefined,
+      couponUsageDays: shop.couponUsageDays || undefined,
       homepageUrl: shop.homepageUrl || undefined,
       details: shop.details || undefined,
       businessHours: shop.businessHours || undefined,

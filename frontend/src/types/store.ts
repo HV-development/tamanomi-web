@@ -33,6 +33,7 @@ export interface Store {
   distance?: number // 現在位置からの距離（メートル）
   couponUsageStart?: string
   couponUsageEnd?: string
+  couponUsageDays?: string
 
   // 詳細情報（任意）
   website?: string
