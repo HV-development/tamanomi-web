@@ -25,12 +25,20 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [successMessage, setSuccessMessage] = useState<string>('')
   const [lastEmail, setLastEmail] = useState<string>('')
+  const [shopId, setShopId] = useState<string | undefined>(undefined)
 
   const searchParams = useSearchParams()
 
-  // URLパラメータからエラーメッセージを取得
+  // URLパラメータからエラーメッセージとshopIdを取得
   useEffect(() => {
     const error = searchParams.get('error')
+    const shop_id = searchParams.get('shop_id')
+
+    // shopIdを状態に保存
+    if (shop_id) {
+      setShopId(shop_id)
+      console.log('🔍 [useEmailRegistration] shop_id from URL:', shop_id)
+    }
 
     if (error) {
       const errorMessages: Record<string, string> = {
@@ -59,6 +67,7 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
         : null;
       
       console.log('🔍 [useEmailRegistration] referrerUserId from sessionStorage:', referrerUserId);
+      console.log('🔍 [useEmailRegistration] shopId from state:', shopId);
       console.log('🔍 [useEmailRegistration] sessionStorage keys:', typeof window !== 'undefined' ? Object.keys(sessionStorage) : []);
       console.log('🔍 [useEmailRegistration] Current URL:', typeof window !== 'undefined' ? window.location.href : 'N/A');
       console.log('🔍 [useEmailRegistration] URL search params:', typeof window !== 'undefined' ? new URLSearchParams(window.location.search).toString() : 'N/A');
@@ -75,9 +84,11 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
         campaignCode: registrationData.campaignCode,
         referrerUserId: referrerUserId || undefined,
         hasReferrerUserId: !!referrerUserId,
+        shopId: shopId,
+        hasShopId: !!shopId,
       });
 
-      await preRegister(registrationData.email, registrationData.campaignCode, referrerUserId || undefined)
+      await preRegister(registrationData.email, registrationData.campaignCode, referrerUserId || undefined, shopId)
       // メールアドレスを保存
       setLastEmail(data.email)
       // 送信完了画面に遷移
@@ -113,7 +124,7 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
         ? sessionStorage.getItem('referrerUserId')
         : null;
 
-      await preRegister(lastEmail, undefined, referrerUserId || undefined)
+      await preRegister(lastEmail, undefined, referrerUserId || undefined, shopId)
       // 成功メッセージを表示（画面は complete のまま）
       setSuccessMessage('認証メールを再送信しました')
       

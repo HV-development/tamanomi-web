@@ -195,20 +195,24 @@ export interface PreRegisterResponse {
 export async function preRegister(
   email: string,
   campaignCode?: string,
-  referrerUserId?: string
+  referrerUserId?: string,
+  shopId?: string
 ): Promise<PreRegisterResponse> {
   try {
     const requestBody = {
       email,
       campaignCode,
       ...(referrerUserId && referrerUserId.trim() !== '' ? { referrerUserId: referrerUserId.trim() } : {}),
+      ...(shopId && shopId.trim() !== '' ? { shopId: shopId.trim() } : {}),
     };
 
     console.log('🔍 [api-client] preRegister called with:', {
       email,
       campaignCode,
       referrerUserId,
+      shopId,
       hasReferrerUserId: !!referrerUserId,
+      hasShopId: !!shopId,
       requestBody,
     });
 

@@ -29,6 +29,8 @@ export async function POST(request: NextRequest) {
       hasReferrerUserId: !!body.referrerUserId,
       referrerUserIdType: typeof body.referrerUserId,
       referrerUserIdLength: body.referrerUserId?.length,
+      shopId: body.shopId,
+      hasShopId: !!body.shopId,
       allBodyKeys: Object.keys(body),
     });
 
@@ -45,12 +47,22 @@ export async function POST(request: NextRequest) {
       } else {
         console.log('🔍 [pre-register] No referrerUserId in body, skipping');
       }
+
+      // shopIdがある場合は追加
+      if (body.shopId && body.shopId.trim() !== '') {
+        requestBody.shopId = body.shopId.trim();
+        console.log('🔍 [pre-register] Added shopId to requestBody:', requestBody.shopId);
+      } else {
+        console.log('🔍 [pre-register] No shopId in body, skipping');
+      }
       
       console.log('🔍 [pre-register] Final requestBody:', {
         email: requestBody.email,
         campaignCode: requestBody.campaignCode,
         hasReferrerUserId: 'referrerUserId' in requestBody,
         referrerUserId: requestBody.referrerUserId,
+        hasShopId: 'shopId' in requestBody,
+        shopId: requestBody.shopId,
       });
 
       const response = await fetch(fullUrl, {
