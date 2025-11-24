@@ -65,10 +65,19 @@ cd /app/tamanomi-schemas
 if [ -f /app/.npmrc ]; then
   cp /app/.npmrc /app/tamanomi-schemas/.npmrc
 fi
-if [ ! -d "node_modules" ]; then
-  pnpm install --prefer-offline
+# node_modulesの中身を確認（空または不完全な場合は再インストール）
+if [ ! -d "node_modules" ] || [ ! -d "node_modules/typescript" ]; then
+  echo "📦 Installing tamanomi-schemas dependencies..."
+  pnpm install --prefer-offline || pnpm install || {
+    echo "❌ Failed to install tamanomi-schemas dependencies"
+    exit 1
+  }
+  echo "✅ tamanomi-schemas dependencies installed"
 fi
-pnpm run build
+pnpm run build || {
+  echo "❌ Failed to build tamanomi-schemas"
+  exit 1
+}
 
 echo "📋 Copying schemas to node_modules..."
 cd /app

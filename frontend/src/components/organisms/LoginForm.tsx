@@ -74,14 +74,44 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
     validateField('password', value)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // バリデーションを実行してエラーを表示
     const isValid = validateForm()
 
     if (isValid) {
-      onLogin(formData)
+      // Fast Refresh対策: 直接APIを呼び出してページ遷移
+      try {
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        })
+        const loginData = await loginResponse.json()
+
+        if (!loginResponse.ok) {
+          throw new Error(loginData.error || 'ログインに失敗しました')
+        }
+
+        const otpResponse = await fetch('/api/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email }),
+        })
+        const otpData = await otpResponse.json()
+
+        if (!otpResponse.ok) {
+          throw new Error('OTPの送信に失敗しました')
+        }
+
+        // ページ遷移
+        const targetUrl = `/login/verify-otp?email=${encodeURIComponent(formData.email)}&requestId=${encodeURIComponent(otpData.requestId)}`
+        window.location.href = targetUrl
+      } catch {
+        // エラーは親コンポーネントに渡す
+        onLogin(formData)
+      }
     } else {
       // バリデーションエラーがある場合は、すべてのフィールドを再検証
       validateField('email', formData.email)

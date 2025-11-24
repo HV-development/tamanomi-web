@@ -8,10 +8,6 @@ export const useLoginPage = () => {
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>("")
-  
-  const [loginStep, setLoginStep] = useState<"password" | "otp">("password")
-  const [email, setEmail] = useState<string>("")
-  const [requestId, setRequestId] = useState<string>("")
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [isRedirecting, setIsRedirecting] = useState(false)
 
@@ -148,125 +144,17 @@ export const useLoginPage = () => {
       }
 
       const otpData = await otpResponse.json()
-
-      setEmail(loginData.email)
-      setRequestId(otpData.requestId)
-      setLoginStep("otp")
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'ログインに失敗しました'
-        setError(errorMessage)
-      } finally {
-        setIsLoading(false)
-      }
-  }, [])
-
-  // OTP認証
-  const handleOtpVerify = useCallback(async (otp: string) => {
-    setIsLoading(true)
-    setError("")
-
-    try {
-      const response = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, otp, requestId }),
-      })
-
-      const data = await response.json()
       
-      console.log('🔍 [useLoginPage] OTP response data:', data)
-      console.log('🔍 [useLoginPage] Response ok:', response.ok)
-
-      if (!response.ok) {
-        const errorMessage = data.error || data.message || 'ワンタイムパスワードの認証に失敗しました'
-        console.log('🔍 [useLoginPage] Error message:', errorMessage)
-        throw new Error(errorMessage)
-      }
-
-      // トークンはCookieに保存されているため、プラン登録状況を確認
-      let hasPlan = false
-      try {
-        const userResponse = await fetch('/api/user/me')
-        
-        if (userResponse.ok) {
-          const userData = await userResponse.json()
-          hasPlan = userData.plan !== null && userData.plan !== undefined
-        }
-      } catch {
-        // エラー処理
-      }
-
-      // リダイレクト（router.replaceでブラウザ履歴を置き換えて、ログイン画面を経由しないようにする）
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin')
+      // OTP入力ページへ遷移
+      const targetUrl = `/login/verify-otp?email=${encodeURIComponent(loginData.email)}&requestId=${encodeURIComponent(otpData.requestId)}`
       
-      let targetPath: string
-      if (redirectPath) {
-        sessionStorage.removeItem('redirectAfterLogin')
-        targetPath = redirectPath
-      } else {
-        if (!hasPlan) {
-          targetPath = '/plan-registration'
-        } else {
-          targetPath = '/home'
-        }
-      }
-      
-      // ローディング継続フラグをセッションストレージに設定
-      // 遷移先のページで完全に表示されたらクリアされる
-      sessionStorage.setItem('loginRedirecting', targetPath)
-      
-      // 遷移前にisRedirectingをtrueに設定（ページ遷移が始まってもローディングを継続）
-      setIsRedirecting(true)
-      
-      // 少し待ってから遷移（状態が確実に反映されるように）
-      requestAnimationFrame(() => {
-        router.replace(targetPath)
-      })
-      
-      // 成功時はsetIsLoading(false)を呼ばない（リダイレクト後に自動的にアンマウントされるため）
-      // ローディング表示を維持して、遷移先画面の読み込み完了まで表示し続ける
-      return
+      // window.location.hrefを使って強制的にページ遷移
+      window.location.href = targetUrl
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました'
-      console.error('OTP verification error:', errorMessage) // デバッグログ
+      const errorMessage = err instanceof Error ? err.message : 'ログインに失敗しました'
       setError(errorMessage)
       setIsLoading(false)
     }
-  }, [email, requestId, router])
-
-  // OTP再送信
-  const handleResendOtp = useCallback(async () => {
-    setIsLoading(true)
-    setError("")
-
-    try {
-      const response = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      })
-
-      if (!response.ok) {
-        throw new Error('ワンタイムパスワードの再送信に失敗しました')
-      }
-
-      const otpData = await response.json()
-      setRequestId(otpData.requestId)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'ワンタイムパスワードの再送信に失敗しました')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [email])
-
-  // パスワード入力画面に戻る
-  const handleBackToPassword = useCallback(() => {
-    setLoginStep("password")
-    setError("")
   }, [])
 
   // 新規登録画面へ
@@ -282,15 +170,9 @@ export const useLoginPage = () => {
   return {
     isLoading: isLoading || isRedirecting,
     error,
-    loginStep,
-    email,
     isCheckingAuth,
     handlePasswordLogin,
-    handleOtpVerify,
-    handleResendOtp,
-    handleBackToPassword,
     handleSignup,
     handleForgotPassword,
   }
 }
-

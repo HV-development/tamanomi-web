@@ -221,7 +221,6 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onWithdrawComplete = handlers.handleWithdrawComplete
   const onLogout = handlers.handleLogout
   const onLogin = handlers.handleLogin
-  const onVerifyOtp = handlers.handleVerifyOtp
   const onSignup = handlers.handleSignup
   const onForgotPassword = handlers.handleForgotPassword
   const onBackToHome = handlers.handleBackToHome
@@ -241,10 +240,6 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onPlanChangeBack = handlers.handlePlanChangeBack
   const onLogoClick = handlers.handleLogoClick
   const onStoreClick = handlers.handleStoreClick
-  const loginStep = state.loginStep
-  const loginEmail = state.loginEmail
-  const onResendOtp = handlers.handleResendOtp
-  const onBackToEmailLogin = handlers.handleBackToEmailLogin
   const onCouponListClose = handlers.handleCouponListClose
   const onCouponListBack = handlers.handleCouponListBack
   const onUseCoupon = handlers.handleUseCoupon
@@ -541,15 +536,11 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     return (
       <LoginLayout
         onLogin={onLogin}
-        onVerifyOtp={onVerifyOtp}
         onSignup={onSignup}
         onForgotPassword={onForgotPassword}
-        onResendOtp={onResendOtp}
-        onBackToPassword={onBackToEmailLogin}
+        onHomeClick={onBackToHome}
         isLoading={isLoading}
         error={state.loginError}
-        loginStep={loginStep}
-        email={loginEmail}
       />
     )
   }
