@@ -1209,6 +1209,48 @@ export const useAppHandlers = (
         }
     }, [auth, dispatch, router])
 
+    // 店舗紹介画面に遷移
+    const handleStoreIntroduction = useCallback(() => {
+        navigation.navigateToMyPage("store-introduction")
+    }, [navigation])
+
+    // 店舗紹介登録
+    const handleStoreIntroductionSubmit = useCallback(async (data: {
+        storeName1: string
+        recommendedMenu1: string
+        storeName2: string
+        recommendedMenu2: string
+        storeName3: string
+        recommendedMenu3: string
+    }) => {
+        try {
+            const response = await fetch('/api/store-introductions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Cookieを含める
+                body: JSON.stringify(data),
+            })
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                toast.error(result.error?.message || '店舗紹介の登録に失敗しました')
+                return
+            }
+
+            toast.success('店舗紹介を登録しました')
+            // 登録状態を更新
+            dispatch({ type: 'SET_HAS_STORE_INTRODUCTION', payload: true })
+            // マイページのメイン画面に戻る
+            navigation.navigateToMyPage("main")
+        } catch (error) {
+            console.error('店舗紹介登録エラー:', error)
+            toast.error('店舗紹介の登録に失敗しました')
+        }
+    }, [dispatch, navigation])
+
     const handlePasswordChangeComplete = useCallback(() => {
         // ログアウト処理
         auth.logout()
@@ -1294,5 +1336,7 @@ export const useAppHandlers = (
         handleEmailChangeSuccessModalClose,
         handlePasswordChangeSubmit,
         handlePasswordChangeComplete,
-    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void }
+        handleStoreIntroduction,
+        handleStoreIntroductionSubmit,
+    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: any) => Promise<void> }
 }

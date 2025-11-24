@@ -13,6 +13,7 @@ import { HistoryPopup } from "../molecules/HistoryPopup"
 import { MyPageLayout } from "./MypageLayout"
 import { PlanManagementContainer } from "../organisms/PlanManagementContainer"
 import { PlanChangeContainer } from "../organisms/PlanChangeContainer"
+import { StoreIntroductionForm } from "../organisms/StoreIntroductionForm"
 import { CouponListPopup } from "../molecules/CouponListPopup"
 import { CouponUsedSuccessModal } from "../molecules/CouponUsedSuccessModal"
 import { LoginRequiredModal } from "../molecules/LoginRequiredModal"
@@ -52,6 +53,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
   const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
   const [isCheckingUsage, setIsCheckingUsage] = useState(false)
+  const [hasStoreIntroduction, setHasStoreIntroduction] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres
@@ -109,6 +111,44 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     // 初回ロード時とログイン時に同期
     syncFavorites()
   }, [isAuthenticated, stores.length, dispatch])
+
+  // 店舗紹介登録状態を取得（マイページ表示時のみ）
+  useEffect(() => {
+    const checkStoreIntroduction = async () => {
+      // マイページ表示中かつ認証済みの場合のみチェック
+      if (!isAuthenticated || currentView !== 'mypage') {
+        setHasStoreIntroduction(false)
+        return
+      }
+
+      try {
+        // /api/store-introductionsのGETエンドポイントを使用
+        const response = await fetch('/api/store-introductions', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store',
+          credentials: 'include',
+        })
+
+        // 200ならデータがあるかチェック、404なら未登録
+        if (response.ok) {
+          const data = await response.json()
+          // データがオブジェクトで、idが存在すれば登録済み
+          setHasStoreIntroduction(data && typeof data === 'object' && 'id' in data)
+        } else {
+          // 401, 404などのエラーは未登録として扱う
+          setHasStoreIntroduction(false)
+        }
+      } catch (error) {
+        // ネットワークエラーなども未登録として扱う
+        setHasStoreIntroduction(false)
+      }
+    }
+
+    checkStoreIntroduction()
+  }, [isAuthenticated, currentView])
 
   // storesが変更されたときにも同期する（店舗データが読み込まれた後）
   useEffect(() => {
@@ -219,6 +259,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onWithdrawConfirm = handlers.handleWithdrawConfirm
   const onWithdrawCancel = handlers.handleWithdrawCancel
   const onWithdrawComplete = handlers.handleWithdrawComplete
+  const onStoreIntroduction = (handlers as any).handleStoreIntroduction
+  const onStoreIntroductionSubmit = (handlers as any).handleStoreIntroductionSubmit
   const onLogout = handlers.handleLogout
   const onLogin = handlers.handleLogin
   const onSignup = handlers.handleSignup
@@ -475,6 +517,17 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       )
     }
 
+    // 店舗紹介画面の場合
+    if (myPageView === "store-introduction") {
+      return (
+        <StoreIntroductionForm
+          onSubmit={onStoreIntroductionSubmit}
+          onBack={() => onMyPageViewChange("main")}
+          isLoading={isLoading}
+        />
+      )
+    }
+
     return (
       <MyPageLayout
         user={user}
@@ -489,6 +542,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         onViewPlan={onViewPlan}
         onViewUsageHistory={onViewUsageHistory}
         onViewPaymentHistory={onViewPaymentHistory}
+        onStoreIntroduction={onStoreIntroduction}
+        hasStoreIntroduction={hasStoreIntroduction}
         onCancelSubscription={onCancelSubscription}
         onWithdraw={onWithdraw}
         onWithdrawConfirm={onWithdrawConfirm}
