@@ -59,7 +59,6 @@ export default function RegisterConfirmationPage() {
 
       // sessionStorageがない場合、トークンからemailを復元
       try {
-        console.log('🔄 sessionStorageが空のため、トークンからemailを復元します')
 
         // Base64URLデコード（ブラウザ環境用）
         const paddedToken = tokenParam + '='.repeat((4 - tokenParam.length % 4) % 4)
@@ -69,7 +68,6 @@ export default function RegisterConfirmationPage() {
         const decodedString = atob(base64)
         const tokenData = JSON.parse(decodedString)
 
-        console.log('✅ トークンからemailを復元:', tokenData.email)
 
         // 有効期限チェック
         if (tokenData.expiresAt && Date.now() > tokenData.expiresAt) {
@@ -112,7 +110,6 @@ export default function RegisterConfirmationPage() {
         ? sessionStorage.getItem('referrerUserId') 
         : null;
       
-      console.log('🔍 [register-confirmation] referrerUserId from sessionStorage:', referrerUserId);
 
       // バックエンドAPIに登録リクエストを送信
       const response = await fetch('/api/auth/register', {

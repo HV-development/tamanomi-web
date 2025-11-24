@@ -36,7 +36,6 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
 
   useEffect(() => {
     if (!isOpen) return
-    console.log('🔍 [CouponListPopup] coupons prop:', coupons.length, coupons)
   }, [coupons, isOpen])
 
   const handleImageError = (couponId: string) => {

@@ -10,15 +10,6 @@ import {
   type UserContactFormData,
   type MerchantContactFormData,
 } from '@hv-development/schemas'
-
-// デバッグ: インポートされた値を確認
-console.log('🔍 インポート確認:', {
-  userContactFormSchema,
-  merchantContactFormSchema,
-  userType: typeof userContactFormSchema,
-  merchantType: typeof merchantContactFormSchema,
-})
-
 type ContactFormData = UserContactFormData | MerchantContactFormData
 
 function ContactFormContent() {
@@ -56,22 +47,17 @@ function ContactFormContent() {
   const validateForm = (): boolean => {
     try {
       const schema = formData.inquiryType === 'merchant' ? merchantContactFormSchema : userContactFormSchema
-      console.log('🔍 使用するスキーマ:', formData.inquiryType === 'merchant' ? 'merchantContactFormSchema' : 'userContactFormSchema')
-      console.log('🔍 バリデーション前のデータ:', formData)
       
       schema.parse(formData)
       setErrors({})
-      console.log('✅ バリデーション成功')
       return true
     } catch (error: unknown) {
       console.error('❌ バリデーション失敗:', error)
       if (error && typeof error === 'object' && 'errors' in error) {
         const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> }
         const newErrors: Partial<Record<keyof ContactFormData, string>> = {}
-        console.log('🔍 Zodエラー詳細:', zodError.errors)
         zodError.errors.forEach((err) => {
           const fieldName = err.path?.[0] as keyof ContactFormData
-          console.log(`  - フィールド: ${fieldName}, メッセージ: ${err.message}`)
           if (fieldName) {
             newErrors[fieldName] = err.message
           }
@@ -86,18 +72,7 @@ function ContactFormContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    console.log('📝 フォーム送信開始:', formData)
-    console.log('📝 現在のフォームデータ:', {
-      name: formData.name,
-      email: formData.email,
-      message: formData.message,
-      inquiryType: formData.inquiryType,
-      messageLength: formData.message?.length || 0,
-    })
-
     if (!validateForm()) {
-      console.log('❌ バリデーションエラー:', errors)
-      console.log('❌ エラー詳細:', JSON.stringify(errors, null, 2))
       // エラーをアラートで表示（デバッグ用）
       const errorMessages = Object.entries(errors).map(([key, value]) => `${key}: ${value}`).join('\n')
       if (errorMessages) {
@@ -110,7 +85,6 @@ function ContactFormContent() {
     setSubmitError('')
 
     try {
-      console.log('📤 APIリクエスト送信中...')
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
@@ -119,12 +93,9 @@ function ContactFormContent() {
         body: JSON.stringify(formData),
       })
 
-      console.log('📥 APIレスポンス受信:', response.status)
       const data = await response.json()
-      console.log('📥 レスポンスデータ:', data)
 
       if (response.ok) {
-        console.log('✅ 送信成功')
         setSubmitSuccess(true)
         setFormData({
           name: '',
@@ -133,7 +104,6 @@ function ContactFormContent() {
           inquiryType: formData.inquiryType,
         })
       } else {
-        console.log('❌ 送信失敗:', data)
         setSubmitError(data.message || 'お問い合わせの送信に失敗しました')
       }
     } catch (error: unknown) {

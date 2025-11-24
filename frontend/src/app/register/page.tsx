@@ -32,7 +32,6 @@ export default function RegisterPage() {
       // URLパラメータから紹介者IDを取得してセッションストレージに保存
       if (ref) {
         sessionStorage.setItem('referrerUserId', ref)
-        console.log('🔍 [register] referrerUserId saved to sessionStorage from URL:', ref)
       }
 
       setSearchParams({

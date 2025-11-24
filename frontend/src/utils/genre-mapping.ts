@@ -41,7 +41,6 @@ let genreNameToIdCache: Map<string, string> | null = null
  */
 async function buildGenreMapping(): Promise<Map<string, string>> {
   if (genreNameToIdCache) {
-    console.log('[genre-mapping] Using cached mapping')
     return genreNameToIdCache
   }
 
@@ -51,7 +50,6 @@ async function buildGenreMapping(): Promise<Map<string, string>> {
       ? '/api/genres'
       : `${process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || 'http://localhost:3002'}/api/v1/public/genres`
     
-    console.log('[genre-mapping] Fetching genres from:', apiUrl)
     
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -60,7 +58,6 @@ async function buildGenreMapping(): Promise<Map<string, string>> {
       },
     })
 
-    console.log('[genre-mapping] Response status:', response.status)
 
     if (!response.ok) {
       console.warn('[genre-mapping] Failed to fetch genres:', response.status)
@@ -68,17 +65,14 @@ async function buildGenreMapping(): Promise<Map<string, string>> {
     }
 
     const data = await response.json()
-    console.log('[genre-mapping] Fetched genres:', data)
     
     const genres: Genre[] = data.genres || []
 
     const mapping = new Map<string, string>()
     for (const genre of genres) {
       mapping.set(genre.name, genre.id)
-      console.log('[genre-mapping] Mapped:', genre.name, '→', genre.id)
     }
 
-    console.log('[genre-mapping] Built mapping:', Array.from(mapping.entries()))
     genreNameToIdCache = mapping
     return mapping
   } catch (error) {

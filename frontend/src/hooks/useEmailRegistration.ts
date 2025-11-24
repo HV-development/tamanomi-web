@@ -37,7 +37,6 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
     // shopIdを状態に保存
     if (shop_id) {
       setShopId(shop_id)
-      console.log('🔍 [useEmailRegistration] shop_id from URL:', shop_id)
     }
 
     if (error) {
@@ -66,11 +65,6 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
         ? sessionStorage.getItem('referrerUserId')
         : null;
       
-      console.log('🔍 [useEmailRegistration] referrerUserId from sessionStorage:', referrerUserId);
-      console.log('🔍 [useEmailRegistration] shopId from state:', shopId);
-      console.log('🔍 [useEmailRegistration] sessionStorage keys:', typeof window !== 'undefined' ? Object.keys(sessionStorage) : []);
-      console.log('🔍 [useEmailRegistration] Current URL:', typeof window !== 'undefined' ? window.location.href : 'N/A');
-      console.log('🔍 [useEmailRegistration] URL search params:', typeof window !== 'undefined' ? new URLSearchParams(window.location.search).toString() : 'N/A');
 
       // 紹介者IDを含めてpreRegisterを呼び出し
       const registrationData: UserRegistrationRequest = {
@@ -78,15 +72,6 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
         campaignCode: data.campaignCode,
         ...(referrerUserId && referrerUserId.trim() !== '' ? { referrerUserId: referrerUserId.trim() } : {}),
       };
-
-      console.log('🔍 [useEmailRegistration] registrationData:', {
-        email: registrationData.email,
-        campaignCode: registrationData.campaignCode,
-        referrerUserId: referrerUserId || undefined,
-        hasReferrerUserId: !!referrerUserId,
-        shopId: shopId,
-        hasShopId: !!shopId,
-      });
 
       await preRegister(registrationData.email, registrationData.campaignCode, referrerUserId || undefined, shopId)
       // メールアドレスを保存

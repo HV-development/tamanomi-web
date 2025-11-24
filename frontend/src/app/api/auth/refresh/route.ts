@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
     }
 
     const fullUrl = buildApiUrl('/auth/refresh')
-    console.log('🔍 [refresh] Calling backend API:', fullUrl)
 
     const response = await fetch(fullUrl, {
       method: 'POST',
@@ -28,7 +27,6 @@ export async function POST(request: NextRequest) {
       cache: 'no-store',
     })
 
-    console.log('🔍 [refresh] Backend response status:', response.status)
 
     const data = await response.json()
 
@@ -40,7 +38,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ [refresh] Backend response success')
 
     // トークンをhttpOnly Cookieに保存し、ボディでは返却しない
     const res = NextResponse.json({ message: 'Token refresh successful' })

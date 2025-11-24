@@ -20,19 +20,6 @@ export async function POST(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/pre-register');
-    
-    console.log('🔍 [pre-register] Request:', { 
-      url: fullUrl, 
-      email: body.email, 
-      campaignCode: body.campaignCode,
-      referrerUserId: body.referrerUserId,
-      hasReferrerUserId: !!body.referrerUserId,
-      referrerUserIdType: typeof body.referrerUserId,
-      referrerUserIdLength: body.referrerUserId?.length,
-      shopId: body.shopId,
-      hasShopId: !!body.shopId,
-      allBodyKeys: Object.keys(body),
-    });
 
     try {
       const requestBody: any = {
@@ -43,27 +30,14 @@ export async function POST(request: NextRequest) {
       // 紹介者IDがある場合は追加
       if (body.referrerUserId && body.referrerUserId.trim() !== '') {
         requestBody.referrerUserId = body.referrerUserId.trim();
-        console.log('🔍 [pre-register] Added referrerUserId to requestBody:', requestBody.referrerUserId);
       } else {
-        console.log('🔍 [pre-register] No referrerUserId in body, skipping');
       }
 
       // shopIdがある場合は追加
       if (body.shopId && body.shopId.trim() !== '') {
         requestBody.shopId = body.shopId.trim();
-        console.log('🔍 [pre-register] Added shopId to requestBody:', requestBody.shopId);
       } else {
-        console.log('🔍 [pre-register] No shopId in body, skipping');
       }
-      
-      console.log('🔍 [pre-register] Final requestBody:', {
-        email: requestBody.email,
-        campaignCode: requestBody.campaignCode,
-        hasReferrerUserId: 'referrerUserId' in requestBody,
-        referrerUserId: requestBody.referrerUserId,
-        hasShopId: 'shopId' in requestBody,
-        shopId: requestBody.shopId,
-      });
 
       const response = await fetch(fullUrl, {
         method: 'POST',
@@ -76,13 +50,10 @@ export async function POST(request: NextRequest) {
 
       clearTimeout(timeoutId);
 
-      console.log('🔍 [pre-register] Response status:', response.status);
-      console.log('🔍 [pre-register] Response ok:', response.ok);
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.log('🔍 [pre-register] Error data:', errorData);
 
         // 409エラー（メールアドレス重複）の場合は特別な処理
         if (response.status === 409) {

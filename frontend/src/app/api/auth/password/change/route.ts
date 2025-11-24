@@ -24,7 +24,6 @@ export async function POST(request: NextRequest) {
     }
 
     const fullUrl = buildApiUrl('/password/change')
-    console.log('🔍 [password/change] Calling backend API:', fullUrl)
 
     const response = await fetch(fullUrl, {
       method: 'POST',
@@ -39,7 +38,6 @@ export async function POST(request: NextRequest) {
       cache: 'no-store',
     })
 
-    console.log('🔍 [password/change] Backend response status:', response.status)
 
     const data = await response.json()
 
@@ -51,7 +49,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ [password/change] Backend response success')
     return NextResponse.json(data)
 
   } catch (error) {

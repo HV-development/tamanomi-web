@@ -7,7 +7,6 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const authHeader = getAuthHeader(request)
-    console.log('🚪 API Route: Logout request received')
     
     const headers: HeadersInit = {}
     if (authHeader) {
@@ -63,7 +62,6 @@ export async function POST(request: NextRequest) {
       path: '/',
     })
     
-    console.log('🍪 API Route: Session cookies cleared')
     return nextResponse
   } catch (error: unknown) {
     console.error('❌ API Route: Logout error', error)

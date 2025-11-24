@@ -14,22 +14,11 @@ export async function GET(
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const fullUrl = buildApiUrl(`/payment/session/${customerId}`)
     
-    console.log('Payment session API request:', {
-      method: 'GET',
-      url: fullUrl,
-      customerId
-    })
-    
     const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-    })
-    
-    console.log('Payment session API response:', {
-      status: response.status,
-      ok: response.ok
     })
     
     if (!response.ok) {
@@ -42,14 +31,6 @@ export async function GET(
     }
     
     const data = await response.json()
-    console.log('🔍 [payment-session] Payment session API data:', {
-      customerId: data.customerId,
-      userEmail: data.userEmail,
-      planId: data.planId,
-      hasPlanId: !!data.planId,
-      planIdType: typeof data.planId,
-      applicationId: data.applicationId
-    })
     
     return NextResponse.json(data)
   } catch (error) {

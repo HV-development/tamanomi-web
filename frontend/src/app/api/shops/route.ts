@@ -22,12 +22,6 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') || '5'
     const city = searchParams.get('city')
     const genreId = searchParams.get('genreId')
-    
-    console.log('[api/shops] Configuration:', {
-      API_BASE_URL,
-      NODE_ENV: process.env.NODE_ENV,
-      hasInternalSecret: !!process.env.INTERNAL_API_SECRET,
-    })
 
     // クエリパラメータを構築
     const backendParams = new URLSearchParams({
@@ -45,18 +39,11 @@ export async function GET(request: NextRequest) {
 
     // 公開エンドポイントに切替（未ログインでも取得可能）
     const backendUrl = `${API_BASE_URL}/api/v1/public/shops?${backendParams.toString()}`
-    console.log('[api/shops] → backend:', backendUrl)
 
     // クライアントの Authorization ヘッダを転送（未ログイン時は未設定のまま）
     const authorization = getAuthHeader(request) || undefined
 
     const hasInternalSecret = Boolean(process.env.INTERNAL_API_SECRET)
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[api/shops] Request headers:', {
-        hasAuth: !!authorization,
-        hasInternalSecret,
-      })
-    }
 
     let response: Response
     try {
@@ -72,12 +59,6 @@ export async function GET(request: NextRequest) {
         headers['X-Internal-Api-Secret'] = process.env.INTERNAL_API_SECRET
       }
       
-      console.log('[api/shops] Fetching from backend:', {
-        url: backendUrl,
-        method: 'GET',
-        headers: Object.keys(headers),
-      })
-      
       // タイムアウト設定（30秒）- AbortSignal.timeout()のフォールバック
       const timeoutSignal = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
         ? AbortSignal.timeout(30000)
@@ -89,7 +70,6 @@ export async function GET(request: NextRequest) {
         signal: timeoutSignal,
       })
       
-      console.log('[api/shops] backend status:', response.status, response.statusText)
     } catch (fetchError: unknown) {
       const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError)
       const errorName = fetchError instanceof Error ? fetchError.name : 'Unknown'
@@ -140,14 +120,6 @@ export async function GET(request: NextRequest) {
     } catch (parseError) {
       console.error('[api/shops] failed to parse response:', parseError)
       data = { message: 'レスポンスの解析に失敗しました' }
-    }
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[api/shops] backend payload sample:', {
-        shopsCount: Array.isArray(data?.shops) ? data.shops.length : 'n/a',
-        pagination: data?.pagination || null,
-        hasError: !!data?.error,
-      })
     }
 
     if (!response.ok) {

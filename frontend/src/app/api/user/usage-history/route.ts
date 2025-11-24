@@ -9,17 +9,14 @@ export async function GET(request: NextRequest) {
     const authHeader = getAuthHeader(request)
     
     if (!authHeader) {
-      console.log('❌ [usage-history] No authorization header');
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
       )
     }
 
-    console.log('🔍 [usage-history] Calling backend API');
 
     const fullUrl = buildApiUrl('/users/me/usage-history')
-    console.log('🔍 [usage-history] Backend URL:', fullUrl);
 
     const response = await fetch(fullUrl, {
       method: 'GET',
@@ -30,7 +27,6 @@ export async function GET(request: NextRequest) {
       cache: 'no-store',
     })
 
-    console.log('🔍 [usage-history] Backend response status:', response.status);
 
     const data = await response.json()
 
@@ -42,7 +38,6 @@ export async function GET(request: NextRequest) {
         const refreshToken = getRefreshToken(request)
         
         if (refreshToken) {
-          console.log('🔄 [usage-history] Attempting token refresh...')
           
           // リフレッシュトークンでトークン更新
           const refreshUrl = buildApiUrl('/auth/refresh')
@@ -57,7 +52,6 @@ export async function GET(request: NextRequest) {
           
           if (refreshResponse.ok) {
             const refreshData = await refreshResponse.json()
-            console.log('✅ [usage-history] Token refresh successful')
             
             // リフレッシュ成功、新しいトークンで元のリクエストを再試行
             const newAuthHeader = `Bearer ${refreshData.accessToken}`
@@ -124,7 +118,6 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    console.log('🔍 [usage-history] Backend response data:', data);
     return NextResponse.json(data)
 
   } catch (error) {

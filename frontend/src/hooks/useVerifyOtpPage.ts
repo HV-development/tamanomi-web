@@ -79,13 +79,9 @@ export const useVerifyOtpPage = () => {
       })
 
       const data = await response.json()
-      
-      console.log('🔍 [useVerifyOtpPage] OTP response data:', data)
-      console.log('🔍 [useVerifyOtpPage] Response ok:', response.ok)
 
       if (!response.ok) {
         const errorMessage = data.error || data.message || 'ワンタイムパスワードの認証に失敗しました'
-        console.log('🔍 [useVerifyOtpPage] Error message:', errorMessage)
         throw new Error(errorMessage)
       }
 

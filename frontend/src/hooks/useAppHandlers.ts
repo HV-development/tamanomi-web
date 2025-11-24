@@ -562,9 +562,7 @@ export const useAppHandlers = (
     }, [auth, dispatch, state.stores])
 
     const handleCouponsClick = useCallback(async (storeId: string) => {
-        console.log('🔍 [handleCouponsClick] Called with storeId:', storeId)
         const store = state.stores.find((s: { id: string }) => s.id === storeId)
-        console.log('🔍 [handleCouponsClick] Found store:', store?.name)
         
         if (store) {
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
@@ -573,7 +571,6 @@ export const useAppHandlers = (
             // クーポンを取得
             try {
                 const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
-                console.log('🔍 [handleCouponsClick] Fetching from:', url)
                 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -584,7 +581,6 @@ export const useAppHandlers = (
                     credentials: 'include', // Cookieを送信
                 })
 
-                console.log('🔍 [handleCouponsClick] Response status:', response.status)
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}))
@@ -594,10 +590,6 @@ export const useAppHandlers = (
                 }
 
                 const data = await response.json()
-                console.log('🔍 [handleCouponsClick] Response data:', {
-                    couponsCount: data.coupons?.length || 0,
-                    pagination: data.pagination
-                })
                 
                 if (data.coupons && data.coupons.length > 0) {
                     // APIからのクーポンをfrontend用の形式に変換
@@ -627,10 +619,8 @@ export const useAppHandlers = (
                         createdAt: coupon.createdAt,
                         updatedAt: coupon.updatedAt,
                     }))
-                    console.log('✅ Loaded coupons from API:', storeCoupons.length, storeCoupons)
                     dispatch({ type: 'SET_STORE_COUPONS', payload: storeCoupons })
                 } else {
-                    console.log('⚠️ No coupons found')
                     dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
                 }
             } catch (error) {
@@ -768,16 +758,10 @@ export const useAppHandlers = (
             const userData = await userMeResponse.json()
 
             // デバッグログ
-            console.log('🔍 [handleWithdrawConfirm] userData:', userData)
-            console.log('🔍 [handleWithdrawConfirm] userData.plan:', userData.plan)
-            console.log('🔍 [handleWithdrawConfirm] userData.plan keys:', userData.plan ? Object.keys(userData.plan) : 'plan is null')
-            console.log('🔍 [handleWithdrawConfirm] userData.plan.paygentRunningId:', userData.plan?.paygentRunningId)
-            console.log('🔍 [handleWithdrawConfirm] userData.userPlan:', userData.userPlan)
 
             // userPlanまたはplanからrunningIdを取得（userPlanを優先）
             const runningId = userData.userPlan?.paygentRunningId || userData.plan?.paygentRunningId
 
-            console.log('🔍 [handleWithdrawConfirm] runningId:', runningId)
 
             if (!runningId) {
                 console.error('❌ [handleWithdrawConfirm] runningId not found:', {

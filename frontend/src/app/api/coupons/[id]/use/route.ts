@@ -12,7 +12,6 @@ export async function POST(
     const authHeader = getAuthHeader(request)
     
     if (!authHeader) {
-      console.log('❌ [coupons/[id]/use] No authorization header');
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -30,10 +29,8 @@ export async function POST(
       )
     }
 
-    console.log('🔍 [coupons/[id]/use] Calling backend API with couponId:', id, 'shopId:', shopId);
 
     const fullUrl = buildApiUrl(`/coupons/${id}/use`)
-    console.log('🔍 [coupons/[id]/use] Backend URL:', fullUrl);
 
     const response = await fetch(fullUrl, {
       method: 'POST',
@@ -45,7 +42,6 @@ export async function POST(
       cache: 'no-store',
     })
 
-    console.log('🔍 [coupons/[id]/use] Backend response status:', response.status);
 
     const data = await response.json()
 
@@ -57,7 +53,6 @@ export async function POST(
       )
     }
     
-    console.log('✅ [coupons/[id]/use] Backend response success:', data);
     return NextResponse.json(data)
 
   } catch (error) {

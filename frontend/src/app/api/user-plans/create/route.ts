@@ -4,7 +4,6 @@ import { getAuthHeader } from '@/lib/auth-header';
 
 export const dynamic = 'force-dynamic';
 
-console.log('🔍 [user-plans/create] Route loaded');
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,14 +27,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🔍 [user-plans/create] Creating user plan:', { planId, validUntil });
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/plans/user-plans');
-    console.log('🔍 [user-plans/create] Request URL:', fullUrl);
 
     try {
       const response = await fetch(fullUrl, {
@@ -53,12 +50,10 @@ export async function POST(request: NextRequest) {
 
       clearTimeout(timeoutId);
 
-      console.log('🔍 [user-plans/create] Response status:', response.status);
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.log('🔍 [user-plans/create] Error data:', errorData);
 
         // エラーメッセージを返す
         let errorMessage = 'プラン登録に失敗しました';
@@ -82,7 +77,6 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      console.log('🔍 [user-plans/create] Success:', data);
       return NextResponse.json(data, { status: response.status });
     } catch (fetchError) {
       clearTimeout(timeoutId);

@@ -206,16 +206,6 @@ export async function preRegister(
       ...(shopId && shopId.trim() !== '' ? { shopId: shopId.trim() } : {}),
     };
 
-    console.log('🔍 [api-client] preRegister called with:', {
-      email,
-      campaignCode,
-      referrerUserId,
-      shopId,
-      hasReferrerUserId: !!referrerUserId,
-      hasShopId: !!shopId,
-      requestBody,
-    });
-
     const response = await fetch('/api/auth/pre-register', {
       method: 'POST',
       headers: {

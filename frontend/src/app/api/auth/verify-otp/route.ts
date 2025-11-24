@@ -22,8 +22,6 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       
-      console.log('🔍 [verify-otp] Error data:', errorData)
-      console.log('🔍 [verify-otp] Response status:', response.status)
 
       return NextResponse.json(
         { error: errorData.error?.message || errorData.message || 'OTP検証に失敗しました' },

@@ -25,14 +25,12 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    console.log('🔍 [user/update] Updating user profile:', body)
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/users/me')
-    console.log('🔍 [user/update] Request URL:', fullUrl)
 
     try {
       const response = await fetch(fullUrl, {
@@ -47,12 +45,10 @@ export async function PUT(request: NextRequest) {
 
       clearTimeout(timeoutId)
 
-      console.log('🔍 [user/update] Response status:', response.status)
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.log('🔍 [user/update] Error data:', errorData)
 
         // エラーメッセージを返す
         let errorMessage = 'プロフィール更新に失敗しました'
@@ -76,7 +72,6 @@ export async function PUT(request: NextRequest) {
       }
 
       const data = await response.json()
-      console.log('🔍 [user/update] Success:', data)
       return NextResponse.json({ success: true, data }, { status: response.status })
     } catch (fetchError) {
       clearTimeout(timeoutId)

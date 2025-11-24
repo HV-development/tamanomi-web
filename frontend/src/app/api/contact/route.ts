@@ -7,12 +7,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    console.log('📧 お問い合わせAPI呼び出し:', {
-      name: body.name,
-      email: body.email,
-      inquiryType: body.inquiryType,
-    });
-
     // tamanomi-apiにプロキシ
     const response = await fetch(`${API_BASE_URL}/api/v1/contact`, {
       method: 'POST',
@@ -36,7 +30,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ お問い合わせ送信成功:', data);
     return NextResponse.json(data);
   } catch (error: unknown) {
     console.error('❌ お問い合わせAPI 例外エラー:', error);
