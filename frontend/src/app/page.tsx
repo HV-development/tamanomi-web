@@ -77,17 +77,8 @@ export default function HomePage() {
     return "bg-gradient-to-br from-green-50 to-green-100"
   }, [])
 
-  // データが読み込まれるまでローディング表示
-  if (!state.isDataLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-green-600 font-medium">データを読み込み中...</p>
-        </div>
-      </div>
-    )
-  }
+  // データ読み込みはHomeLayout内で部分的に表示するため、ここでのローディング表示は不要
+  // （店舗一覧部分のみローディング表示）
 
   return (
     <AppContext.Provider value={contextValue}>

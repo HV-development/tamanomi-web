@@ -23,6 +23,8 @@ interface HomeContainerProps {
   isLoadingMore?: boolean
   bottomError?: string | null
   currentLocation?: { latitude: number; longitude: number } | null
+  // 初期ローディング状態
+  isInitialLoading?: boolean
 }
 
 export function HomeContainer({ 
@@ -39,7 +41,8 @@ export function HomeContainer({
   loadMoreRef, 
   isLoadingMore = false, 
   bottomError = null, 
-  currentLocation 
+  currentLocation,
+  isInitialLoading = false
 }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = useMemo(() => {
@@ -131,39 +134,51 @@ export function HomeContainer({
     <div className={`flex-1 relative ${backgroundColorClass}`}>
       {/* 店舗リスト */}
       <div className="h-full overflow-y-auto p-4">
-        <StoreList
-          stores={filteredStores}
-          onFavoriteToggle={onFavoriteToggle}
-          onCouponsClick={onCouponsClick || (() => { })}
-          onStoreClick={onStoreClick}
-          showDistance={isNearbyFilter}
-          emptyMessage="条件に合う店舗が見つかりませんでした"
-          emptyEmoji="🔍"
-        />
-
-        {/* ロード中インジケータ */}
-        {isLoadingMore && (
-          <div className="flex items-center justify-center py-6">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600" />
+        {/* 初期ローディング表示 */}
+        {isInitialLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600 mx-auto mb-3"></div>
+              <p className="text-green-600 font-medium text-sm">店舗情報を読み込み中...</p>
+            </div>
           </div>
-        )}
+        ) : (
+          <>
+            <StoreList
+              stores={filteredStores}
+              onFavoriteToggle={onFavoriteToggle}
+              onCouponsClick={onCouponsClick || (() => { })}
+              onStoreClick={onStoreClick}
+              showDistance={isNearbyFilter}
+              emptyMessage="条件に合う店舗が見つかりませんでした"
+              emptyEmoji="🔍"
+            />
 
-        {/* 追加ロード時のエラー表示 */}
-        {bottomError && (
-          <div className="mt-4 mx-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-            {bottomError}
-          </div>
-        )}
+            {/* ロード中インジケータ */}
+            {isLoadingMore && (
+              <div className="flex items-center justify-center py-6">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600" />
+              </div>
+            )}
 
-        {/* 無限スクロール用セントリネル */}
-        <div
-          ref={(el) => {
-            if (loadMoreRef) {
-              loadMoreRef(el)
-            }
-          }}
-          className="h-1 w-full"
-        />
+            {/* 追加ロード時のエラー表示 */}
+            {bottomError && (
+              <div className="mt-4 mx-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                {bottomError}
+              </div>
+            )}
+
+            {/* 無限スクロール用セントリネル */}
+            <div
+              ref={(el) => {
+                if (loadMoreRef) {
+                  loadMoreRef(el)
+                }
+              }}
+              className="h-1 w-full"
+            />
+          </>
+        )}
       </div>
     </div>
   )
