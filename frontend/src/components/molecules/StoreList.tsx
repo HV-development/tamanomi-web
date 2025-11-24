@@ -1,6 +1,7 @@
 "use client"
 
 import { StoreCard } from "./StoreCard"
+import { FadeInComponent } from "@/components/atoms/ProgressiveLoader"
 import type { Store } from "@/types/store"
 
 interface StoreListProps {
@@ -12,6 +13,8 @@ interface StoreListProps {
   emptyMessage?: string
   emptyEmoji?: string
   className?: string
+  showEmptyMessage?: boolean
+  isLoading?: boolean
 }
 
 export function StoreList({
@@ -23,8 +26,15 @@ export function StoreList({
   emptyMessage = "店舗が見つかりませんでした",
   emptyEmoji = "🔍",
   className = "",
+  showEmptyMessage = true,
+  isLoading = false,
 }: StoreListProps) {
-  if (stores.length === 0) {
+  // ローディング中は何も表示しない
+  if (isLoading) {
+    return null
+  }
+  
+  if (stores.length === 0 && showEmptyMessage) {
     return (
       <div className={`text-center py-12 ${className}`}>
         <div className="text-5xl mb-4">{emptyEmoji}</div>
@@ -33,15 +43,15 @@ export function StoreList({
       </div>
     )
   }
+  
+  if (stores.length === 0) {
+    return null
+  }
 
   return (
     <div className={`space-y-5 ${className}`}>
       {stores.map((store, index) => (
-        <div
-          key={store.id}
-          className="animate-in slide-in-from-bottom-4 duration-300"
-          style={{ animationDelay: `${index * 100}ms` }}
-        >
+        <FadeInComponent key={store.id} delay={index * 100}>
           <StoreCard
             store={store}
             onFavoriteToggle={onFavoriteToggle}
@@ -49,7 +59,7 @@ export function StoreList({
             onStoreClick={onStoreClick ?? (() => { })}
             showDistance={showDistance}
           />
-        </div>
+        </FadeInComponent>
       ))}
     </div>
   )

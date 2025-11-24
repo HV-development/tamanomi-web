@@ -1,12 +1,13 @@
 "use client"
 
 import { CreditCard, AlertCircle, CheckCircle, Smartphone, QrCode } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { PlanCard } from "@/components/molecules/PlanCard"
 import { Button } from "@/components/atoms/Button"
 import { Input } from "@/components/atoms/Input"
 import { Modal } from "@/components/atoms/Modal"
+import { FadeInComponent } from "@/components/atoms/ProgressiveLoader"
 import { PlanListResponse } from '@hv-development/schemas'
 import type { PaymentMethodType } from '@/types/payment'
 import { ApiClient } from '@/lib/api-client';
@@ -21,6 +22,40 @@ interface PlanRegistrationFormProps {
   onSaitamaAppLinked?: () => void
   hasPaymentMethod?: boolean
   isPaymentMethodChangeOnly?: boolean
+}
+
+// プラン表示完了を検知するコンポーネント
+const PlanFadeIn = ({ children, delay, onDisplayed }: { 
+  children: React.ReactNode
+  delay: number
+  onDisplayed: () => void 
+}) => {
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true)
+    }, delay)
+    return () => clearTimeout(timer)
+  }, [delay])
+
+  useEffect(() => {
+    if (isVisible) {
+      // フェードインアニメーション完了後に通知（500ms + 少しのマージン）
+      const timer = setTimeout(() => {
+        onDisplayed()
+      }, 550)
+      return () => clearTimeout(timer)
+    }
+  }, [isVisible, onDisplayed])
+
+  return (
+    <div
+      className={`transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      {children}
+    </div>
+  )
 }
 
 export function PlanRegistrationForm({ 
@@ -41,9 +76,34 @@ export function PlanRegistrationForm({
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [modalMessage, setModalMessage] = useState<string>("")
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodType>('CreditCard')
+  const [allPlansDisplayed, setAllPlansDisplayed] = useState(false)
+  const displayedPlansCount = useRef(0)
+
+  // 選択中のプランがサブスクリプションプランかを判定
+  const selectedPlanData = plans.find(p => p.id === selectedPlan)
+  const isSubscriptionPlan = selectedPlanData?.is_subscription ?? false
+
+  // プラン数が変わったら表示カウントをリセット
+  useEffect(() => {
+    displayedPlansCount.current = 0
+    setAllPlansDisplayed(false)
+  }, [plans.length])
+
+  // プランが表示完了したことを記録
+  const handlePlanDisplayed = () => {
+    displayedPlansCount.current += 1
+    if (displayedPlansCount.current >= plans.length && plans.length > 0) {
+      setAllPlansDisplayed(true)
+    }
+  }
 
   const handlePlanSelect = (planId: string) => {
     setSelectedPlan(planId)
+    // サブスクリプションプランを選択した場合、支払い方法をクレジットカードに自動切り替え
+    const plan = plans.find(p => p.id === planId)
+    if (plan?.is_subscription && (selectedPaymentMethod === 'AeonPay' || selectedPaymentMethod === 'PayPay')) {
+      setSelectedPaymentMethod('CreditCard')
+    }
   }
 
   const handlePaymentRegister = () => {
@@ -124,58 +184,6 @@ export function PlanRegistrationForm({
         </div>
       )}
 
-      {/* プラン選択（支払い方法変更のみの場合は非表示） */}
-      {!isPaymentMethodChangeOnly && (
-        <div className="space-y-4">
-          {plans.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500">利用可能なプランがありません</p>
-            </div>
-          ) : (
-          plans.map((plan) => {
-            // 割引価格は現在のスキーマでは未対応のため、通常価格のみ表示
-            const displayPrice = plan.price;
-            const hasDiscount = false;
-            
-            // さいたま市アプリ連携済みの場合の価格表示
-            const isSaitamaLinked = saitamaAppLinked || linkedSaitamaAppId;
-            const saitamaDiscountPrice = 480; // さいたま市アプリ連携時の価格
-            
-            // さいたま市アプリ連携済みで、通常価格が980円の場合
-            if (isSaitamaLinked && plan.price === 980) {
-              return (
-                <PlanCard
-                  key={plan.id}
-                  title={plan.name}
-                  description={plan.description || ''}
-                  features={plan.plan_content?.features || []}
-                  price={`¥${saitamaDiscountPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
-                  originalPrice={`¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
-                  badge={plan.status === 'active' ? 'さいたま市アプリ連携でお得' : undefined}
-                  isSelected={selectedPlan === plan.id}
-                  onSelect={() => handlePlanSelect(plan.id)}
-                />
-              );
-            }
-            
-            return (
-              <PlanCard
-                key={plan.id}
-                title={plan.name}
-                description={plan.description || ''}
-                features={plan.plan_content?.features || []}
-                price={`¥${displayPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
-                originalPrice={hasDiscount ? `¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}` : undefined}
-                badge={plan.status === 'active' ? '利用可能' : undefined}
-                isSelected={selectedPlan === plan.id}
-                onSelect={() => handlePlanSelect(plan.id)}
-              />
-            );
-          })
-        )}
-        </div>
-      )}
-
       {/* 連携完了表示（連携済みまたは連携したIDがある場合、支払い方法変更のみの場合は非表示） */}
       {!isPaymentMethodChangeOnly && (saitamaAppLinked || linkedSaitamaAppId) && (
         <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
@@ -194,31 +202,86 @@ export function PlanRegistrationForm({
         </div>
       )}
 
-      {/* さいたま市みんなのアプリ連携フォーム（未連携の場合のみ表示、支払い方法変更のみの場合は非表示） */}
-      {!isPaymentMethodChangeOnly && !saitamaAppLinked && !linkedSaitamaAppId && (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5 space-y-4">
-          {/* 割引強調セクション */}
-          <div className="text-center bg-white rounded-lg p-4 shadow-sm">
-            <div className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full mb-3">
-              <p className="text-sm font-bold">さらにお得に！</p>
+      {/* プラン選択（支払い方法変更のみの場合は非表示） */}
+      {!isPaymentMethodChangeOnly && (
+        <div className="space-y-4">
+          {plans.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">利用可能なプランがありません</p>
             </div>
-            <div className="mb-3">
-              <div className="flex flex-col items-center">
-                <span className="text-sm line-through text-gray-500 mb-1">
-                  ¥980/月
-                </span>
-                <p className="text-3xl font-bold text-blue-600 mb-1">
-                  ¥480/月
-                </p>
-                <p className="text-gray-700 text-sm font-medium">
-                  さいたま市みんなのアプリ連携で
-                </p>
-                <p className="text-sm font-bold text-indigo-700">
-                  月額480円でご利用いただけます
-                </p>
+          ) : (
+          plans.map((plan, index) => {
+            // 割引価格は現在のスキーマでは未対応のため、通常価格のみ表示
+            const displayPrice = plan.price;
+            const hasDiscount = false;
+            
+            // さいたま市アプリ連携済みの場合の価格表示
+            const isSaitamaLinked = saitamaAppLinked || linkedSaitamaAppId;
+            const saitamaDiscountPrice = 480; // さいたま市アプリ連携時の価格
+            
+            // さいたま市アプリ連携済みで、通常価格が980円の場合
+            if (isSaitamaLinked && plan.price === 980) {
+              return (
+                <PlanFadeIn key={plan.id} delay={index * 100} onDisplayed={handlePlanDisplayed}>
+                  <PlanCard
+                    title={plan.name}
+                    description={plan.description || ''}
+                    features={plan.plan_content?.features || []}
+                    price={`¥${saitamaDiscountPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
+                    originalPrice={`¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
+                    badge={plan.status === 'active' ? 'さいたま市アプリ連携でお得' : undefined}
+                    isSelected={selectedPlan === plan.id}
+                    onSelect={() => handlePlanSelect(plan.id)}
+                  />
+                </PlanFadeIn>
+              );
+            }
+            
+            return (
+              <PlanFadeIn key={plan.id} delay={index * 100} onDisplayed={handlePlanDisplayed}>
+                <PlanCard
+                  title={plan.name}
+                  description={plan.description || ''}
+                  features={plan.plan_content?.features || []}
+                  price={`¥${displayPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
+                  originalPrice={hasDiscount ? `¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}` : undefined}
+                  badge={plan.status === 'active' ? '利用可能' : undefined}
+                  isSelected={selectedPlan === plan.id}
+                  onSelect={() => handlePlanSelect(plan.id)}
+                />
+              </PlanFadeIn>
+            );
+          })
+        )}
+        </div>
+      )}
+
+      {/* さいたま市みんなのアプリ連携フォーム（未連携の場合のみ表示、支払い方法変更のみの場合は非表示） */}
+      {!isPaymentMethodChangeOnly && !saitamaAppLinked && !linkedSaitamaAppId && allPlansDisplayed && (
+        <FadeInComponent delay={0}>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5 space-y-4">
+            {/* 割引強調セクション */}
+            <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+              <div className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-full mb-3">
+                <p className="text-sm font-bold">さらにお得に！</p>
+              </div>
+              <div className="mb-3">
+                <div className="flex flex-col items-center">
+                  <span className="text-sm line-through text-gray-500 mb-1">
+                    ¥980/月
+                  </span>
+                  <p className="text-3xl font-bold text-blue-600 mb-1">
+                    ¥480/月
+                  </p>
+                  <p className="text-gray-700 text-sm font-medium">
+                    さいたま市みんなのアプリ連携で
+                  </p>
+                  <p className="text-sm font-bold text-indigo-700">
+                    月額480円でご利用いただけます
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
           {/* アプリ説明とダウンロードリンク */}
           <div className="bg-white rounded-lg p-4 space-y-3">
@@ -309,7 +372,8 @@ export function PlanRegistrationForm({
               ※ 連携後すぐに割引価格が適用されます
             </p>
           </div>
-        </div>
+          </div>
+        </FadeInComponent>
       )}
 
       {/* 支払い方法選択（単発プランのみ有効） */}
@@ -338,17 +402,23 @@ export function PlanRegistrationForm({
             {/* イオンペイ */}
             <button
               type="button"
-              onClick={() => setSelectedPaymentMethod('AeonPay')}
+              onClick={() => !isSubscriptionPlan && setSelectedPaymentMethod('AeonPay')}
+              disabled={isSubscriptionPlan}
               className={`flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
-                selectedPaymentMethod === 'AeonPay'
+                isSubscriptionPlan
+                  ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
+                  : selectedPaymentMethod === 'AeonPay'
                   ? 'border-blue-500 bg-blue-50'
                   : 'border-gray-200 bg-white hover:border-blue-300'
               }`}
             >
               <div className="flex items-center gap-3">
-                <QrCode className="w-5 h-5 text-blue-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">イオンペイ</p>
+                <QrCode className={`w-5 h-5 ${isSubscriptionPlan ? 'text-gray-400' : 'text-blue-600'}`} />
+                <div className="flex-1">
+                  <p className={`text-sm font-medium ${isSubscriptionPlan ? 'text-gray-500' : 'text-gray-900'}`}>イオンペイ</p>
+                  {isSubscriptionPlan && (
+                    <p className="text-xs text-gray-500 mt-1">利用できません</p>
+                  )}
                 </div>
               </div>
             </button>
@@ -356,17 +426,23 @@ export function PlanRegistrationForm({
             {/* PayPay */}
             <button
               type="button"
-              onClick={() => setSelectedPaymentMethod('PayPay')}
+              onClick={() => !isSubscriptionPlan && setSelectedPaymentMethod('PayPay')}
+              disabled={isSubscriptionPlan}
               className={`flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
-                selectedPaymentMethod === 'PayPay'
+                isSubscriptionPlan
+                  ? 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-60'
+                  : selectedPaymentMethod === 'PayPay'
                   ? 'border-red-500 bg-red-50'
                   : 'border-gray-200 bg-white hover:border-red-300'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Smartphone className="w-5 h-5 text-red-500" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">PayPay</p>
+                <Smartphone className={`w-5 h-5 ${isSubscriptionPlan ? 'text-gray-400' : 'text-red-500'}`} />
+                <div className="flex-1">
+                  <p className={`text-sm font-medium ${isSubscriptionPlan ? 'text-gray-500' : 'text-gray-900'}`}>PayPay</p>
+                  {isSubscriptionPlan && (
+                    <p className="text-xs text-gray-500 mt-1">利用できません</p>
+                  )}
                 </div>
               </div>
             </button>

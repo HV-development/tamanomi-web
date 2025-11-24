@@ -621,12 +621,27 @@ export default function PlanRegistrationPage() {
             ? 'イオンペイ（QRコード決済）'
             : 'クレジットカード'
 
-        const actionDescription =
-          paymentMethod === 'PayPay'
-            ? '選択したプランの初回決済を、PayPayアプリで行います。よろしいですか？'
-            : paymentMethod === 'AeonPay'
-            ? '選択したプランの初回決済を、イオンペイで行います。よろしいですか？'
-            : 'カード登録と同時に初回決済を行います。よろしいですか？'
+        // サブスクリプションプランかどうかで表示メッセージを切り替え
+        const isSubscriptionPlan = selectedPlan.is_subscription
+        let actionDescription = ''
+        
+        if (isSubscriptionPlan) {
+          // サブスクリプションプランの場合
+          actionDescription =
+            paymentMethod === 'PayPay'
+              ? '選択したプランの初回決済を、PayPayアプリで行います。'
+              : paymentMethod === 'AeonPay'
+              ? '選択したプランの初回決済を、イオンペイで行います。'
+              : 'カード登録と同時に初回決済を行います。'
+        } else {
+          // 非サブスクリプションプランの場合
+          actionDescription =
+            paymentMethod === 'PayPay'
+              ? 'PayPayで決済を実行します'
+              : paymentMethod === 'AeonPay'
+              ? 'イオンペイで決済を実行します'
+              : 'クレジットカードで決済を実行します'
+        }
 
         // 確認モーダルを表示
         setConfirmModalData({
@@ -708,19 +723,19 @@ export default function PlanRegistrationPage() {
             <p className="text-gray-800 font-medium">
               {confirmModalData.actionDescription}
             </p>
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col gap-3 pt-6">
+              <Button
+                onClick={handleConfirmModalConfirm}
+                className="w-full py-4"
+              >
+                はい
+              </Button>
               <Button
                 onClick={handleConfirmModalCancel}
                 variant="secondary"
-                className="flex-1"
+                className="w-full py-3"
               >
                 キャンセル
-              </Button>
-              <Button
-                onClick={handleConfirmModalConfirm}
-                className="flex-1"
-              >
-                はい
               </Button>
             </div>
           </div>
