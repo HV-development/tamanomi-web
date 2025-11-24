@@ -328,7 +328,8 @@ const MenuButtons = React.memo(({
   onChangePassword,
   onViewUsageHistory,
   onViewPaymentHistory,
-  onLogout
+  onLogout,
+  plan
 }: {
   onEditProfile: () => void
   onViewPlan: () => void
@@ -337,29 +338,35 @@ const MenuButtons = React.memo(({
   onViewUsageHistory: () => void
   onViewPaymentHistory: () => void
   onLogout: () => void
-}) => (
-  <div className="space-y-3">
-    {appConfig.myPageSettings.showProfile && (
-      <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
-    )}
-    {appConfig.myPageSettings.showPlanManagement && (
-      <MenuButton onClick={onViewPlan} icon={RefreshCw} label="プランの変更" />
-    )}
-    {appConfig.myPageSettings.showEmailChange && (
-      <MenuButton onClick={onChangeEmail} icon={Mail} label="メールアドレスの変更" />
-    )}
-    {appConfig.myPageSettings.showPasswordChange && (
-      <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
-    )}
-    {appConfig.myPageSettings.showUsageHistory && (
-      <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
-    )}
-    {appConfig.myPageSettings.showPaymentHistory && (
-      <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
-    )}
-    <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
-  </div>
-))
+  plan?: Plan
+}) => {
+  // プラン有無に応じてラベルを決定
+  const planMenuLabel = plan ? "プランの変更" : "プラン登録"
+  
+  return (
+    <div className="space-y-3">
+      {appConfig.myPageSettings.showProfile && (
+        <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
+      )}
+      {appConfig.myPageSettings.showPlanManagement && (
+        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={planMenuLabel} />
+      )}
+      {appConfig.myPageSettings.showEmailChange && (
+        <MenuButton onClick={onChangeEmail} icon={Mail} label="メールアドレスの変更" />
+      )}
+      {appConfig.myPageSettings.showPasswordChange && (
+        <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
+      )}
+      {appConfig.myPageSettings.showUsageHistory && (
+        <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
+      )}
+      {appConfig.myPageSettings.showPaymentHistory && (
+        <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
+      )}
+      <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
+    </div>
+  )
+})
 MenuButtons.displayName = 'MenuButtons'
 
 export const MyPageContainer = React.memo(function MyPageContainer({
@@ -529,6 +536,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
               onViewUsageHistory={onViewUsageHistory}
               onViewPaymentHistory={onViewPaymentHistory}
               onLogout={onLogout}
+              plan={_plan}
             />
           </FadeInComponent>
         </StaggeredContainer>

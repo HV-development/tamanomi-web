@@ -646,8 +646,17 @@ export const useAppHandlers = (
     }, [navigation, dispatch])
 
     const handleViewPlan = useCallback(() => {
-        navigation.navigateToMyPage("plan-management")
-    }, [navigation])
+        // プラン有無に応じて遷移先を分岐
+        const hasPlan = latestState.current.plan !== null && latestState.current.plan !== undefined
+        
+        if (!hasPlan) {
+            // プラン未登録の場合は独立したプラン登録ページへ遷移
+            router.push('/plan-registration')
+        } else {
+            // プラン登録済みの場合は既存のプラン管理画面へ
+            navigation.navigateToMyPage("plan-management")
+        }
+    }, [navigation, router])
 
     const handleChangePlan = useCallback(() => {
         navigation.navigateToMyPage("plan-change")
