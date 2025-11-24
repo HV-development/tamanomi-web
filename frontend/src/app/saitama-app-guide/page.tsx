@@ -161,7 +161,7 @@ export default function SaitamaAppGuidePage() {
                   setSaitamaAppId(e.target.value)
                   setLinkError("")
                 }}
-                placeholder="ユーザーIDを入力してください"
+                placeholder="saitamacity_xxxxxx"
                 disabled={isLinking}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />

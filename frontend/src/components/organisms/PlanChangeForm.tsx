@@ -476,7 +476,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
           {/* アプリ説明とダウンロードリンク */}
           <div className="bg-white rounded-lg p-4 space-y-3">
             <div>
-              <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリについて</h4>
+              <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリ</h4>
               <p className="text-xs text-gray-700 leading-relaxed">
                 さいたま市が提供する公式アプリです。<br />
                 アプリと連携することで、特別な割引価格でご利用いただけます。
@@ -508,7 +508,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
                   href="/saitama-app-guide"
                   className="text-xs text-blue-600 hover:text-blue-800 underline"
                 >
-                  アプリの使い方とユーザーID取得手順はこちら
+                  ユーザーID取得手順はこちら
                 </a>
               </div>
             </div>

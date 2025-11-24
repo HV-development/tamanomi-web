@@ -223,7 +223,7 @@ export function PlanRegistrationForm({
           {/* アプリ説明とダウンロードリンク */}
           <div className="bg-white rounded-lg p-4 space-y-3">
             <div>
-              <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリについて</h4>
+              <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリ</h4>
               <p className="text-xs text-gray-700 leading-relaxed">
                 さいたま市が提供する公式アプリです。<br />
                 アプリと連携することで、特別な割引価格でご利用いただけます。
@@ -255,7 +255,7 @@ export function PlanRegistrationForm({
                   href="/saitama-app-guide"
                   className="text-xs text-blue-600 hover:text-blue-800 underline"
                 >
-                  アプリの使い方とユーザーID取得手順はこちら
+                  ユーザーID取得手順はこちら
                 </a>
               </div>
             </div>
@@ -272,13 +272,19 @@ export function PlanRegistrationForm({
           {/* 入力フォーム */}
           <div className="space-y-3 bg-white rounded-lg p-4">
             <Input
-              label="さいたま市みんなのアプリ ユーザーID"
+              label={
+                <>
+                  さいたま市みんなのアプリ
+                  <br />
+                  ユーザーID
+                </>
+              }
               value={saitamaAppId}
               onChange={(value) => {
                 setSaitamaAppId(value)
                 setLinkError("")
               }}
-              placeholder="ユーザーIDを入力してください"
+              placeholder="saitamacity_xxxxxx"
               disabled={isLinking}
             />
             <button 
@@ -292,14 +298,15 @@ export function PlanRegistrationForm({
                   連携処理中...
                 </>
               ) : (
-                <>
-                  <span>🔗</span>
-                  アプリと連携して500円OFFで利用する
-                </>
+                <span className="text-center">
+                  アプリと連携して
+                  <br />
+                  500円OFFで利用する
+                </span>
               )}
             </button>
             <p className="text-xs text-center text-gray-600">
-              ※ 連携後、すぐに割引価格が適用されます
+              ※ 連携後すぐに割引価格が適用されます
             </p>
           </div>
         </div>
@@ -324,7 +331,6 @@ export function PlanRegistrationForm({
                 <CreditCard className="w-5 h-5 text-green-600" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">クレジットカード</p>
-                  <p className="text-xs text-gray-600">既存のカード決済フローで支払います</p>
                 </div>
               </div>
             </button>
@@ -343,10 +349,8 @@ export function PlanRegistrationForm({
                 <QrCode className="w-5 h-5 text-blue-600" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">イオンペイ</p>
-                  <p className="text-xs text-gray-600">QRコードで支払います</p>
                 </div>
               </div>
-              <span className="text-xs font-medium text-blue-500">QRコード決済</span>
             </button>
 
             {/* PayPay */}
@@ -363,10 +367,8 @@ export function PlanRegistrationForm({
                 <Smartphone className="w-5 h-5 text-red-500" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">PayPay</p>
-                  <p className="text-xs text-gray-600">スマホのPayPayアプリで支払います</p>
                 </div>
               </div>
-              <span className="text-xs font-medium text-red-500">QRコード決済</span>
             </button>
           </div>
         </div>

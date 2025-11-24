@@ -156,14 +156,19 @@ export const useVerifyOtpPage = () => {
         throw new Error('ワンタイムパスワードの再送信に失敗しました')
       }
 
-      // 再送信成功（requestIdは変わる可能性があるが、URLパラメータは更新しない）
-      // サーバー側で同じemailに対して新しいOTPを送信
+      const data = await response.json()
+      
+      // 新しいrequestIdでURLパラメータを更新
+      if (data.requestId) {
+        const newUrl = `/login/verify-otp?email=${encodeURIComponent(email as string)}&requestId=${encodeURIComponent(data.requestId)}`
+        router.replace(newUrl)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ワンタイムパスワードの再送信に失敗しました')
     } finally {
       setIsLoading(false)
     }
-  }, [email])
+  }, [email, router])
 
   // ログイン画面に戻る
   const handleBackToLogin = useCallback(() => {
