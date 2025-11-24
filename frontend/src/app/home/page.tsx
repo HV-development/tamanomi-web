@@ -164,15 +164,13 @@ export default function HomePage() {
     }
   }, [])
 
-  // データが読み込まれるまで、またはログイン後のリダイレクト中はローディング表示
-  if (!state.isDataLoaded || isLoginRedirecting) {
+  // ログイン後のリダイレクト中のみローディング表示（データ読み込みはHomeLayout内で部分的に表示）
+  if (isLoginRedirecting) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-green-600 font-medium">
-            {isLoginRedirecting ? '読み込み中...' : 'データを読み込み中...'}
-          </p>
+          <p className="text-green-600 font-medium">読み込み中...</p>
         </div>
       </div>
     )
