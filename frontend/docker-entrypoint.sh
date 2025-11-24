@@ -26,8 +26,16 @@ else
   env | grep -i github || echo "No GITHUB_TOKEN found in environment"
 fi
 
-# node_modulesが空の場合のみインストール
-if [ ! -d "node_modules/next" ]; then
+# package.jsonの変更を検出して必要に応じて再インストール
+PACKAGE_JSON_HASH=""
+HASH_FILE="/tmp/package_json_hash.txt"
+
+if [ -f "package.json" ]; then
+  PACKAGE_JSON_HASH=$(md5sum package.json | cut -d' ' -f1)
+fi
+
+# node_modulesが存在しない、またはpackage.jsonが変更された場合にインストール
+if [ ! -d "node_modules/next" ] || [ ! -f "$HASH_FILE" ] || [ "$(cat $HASH_FILE 2>/dev/null)" != "$PACKAGE_JSON_HASH" ]; then
   echo "📦 Installing dependencies..."
   cd /app
   # @hv-development/schemasはローカルでビルドされるため、一時的にpackage.jsonとpnpm-lock.yamlから除外
@@ -53,6 +61,7 @@ if [ ! -d "node_modules/next" ]; then
   if [ -f "pnpm-lock.yaml.backup" ]; then
     mv pnpm-lock.yaml.backup pnpm-lock.yaml
   fi
+  echo "$PACKAGE_JSON_HASH" > "$HASH_FILE"
   echo "✅ Dependencies installed"
 else
   echo "✅ Dependencies already installed (skipping)"
