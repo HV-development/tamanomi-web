@@ -15,6 +15,7 @@ export default function RegisterConfirmationPage() {
   const [token, setToken] = useState<string>('')
   const [isClient, setIsClient] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showSaitamaFailedModal, setShowSaitamaFailedModal] = useState(false)
   const [pointsGranted, setPointsGranted] = useState<number | null>(null)
   const [shopId, setShopId] = useState<string | undefined>(undefined)
   const [error, setError] = useState<string | null>(null)
@@ -170,6 +171,12 @@ export default function RegisterConfirmationPage() {
         sessionStorage.removeItem('referrerUserId')
         sessionStorage.removeItem('registerEmail')
 
+        // さいたま市アプリ連携が失敗した場合（ポイント付与API失敗）
+        if (result.saitamaAppLinkFailed) {
+          setShowSaitamaFailedModal(true)
+          return
+        }
+
         // さいたま市アプリ連携でポイント付与があった場合はモーダルを表示
         if (result.pointsGranted) {
           setPointsGranted(result.pointsGranted)
@@ -226,6 +233,17 @@ export default function RegisterConfirmationPage() {
     }
   }
 
+  const handleSaitamaFailedModalClose = () => {
+    setShowSaitamaFailedModal(false)
+    // さいたま市アプリ連携なしでプラン登録画面に遷移
+    sessionStorage.setItem('userEmail', email)
+    if (typeof window !== 'undefined') {
+      window.location.href = '/plan-registration'
+    } else {
+      router.push('/plan-registration')
+    }
+  }
+
   // クライアントサイドでの初期化が完了するまでローディング表示
   if (!isClient || isLoadingEmail || !formData) {
     return (
@@ -277,6 +295,25 @@ export default function RegisterConfirmationPage() {
             className="w-full bg-green-600 hover:bg-green-700 text-white py-3"
           >
             確認
+          </Button>
+        </div>
+      </Modal>
+
+      {/* さいたま市アプリ連携失敗モーダル */}
+      <Modal
+        isOpen={showSaitamaFailedModal}
+        onClose={handleSaitamaFailedModalClose}
+        title="⚠️ 登録完了（連携エラー）"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-700 whitespace-pre-line">
+            {`会員登録は完了しましたが、さいたま市みんなのアプリとの連携に失敗しました。\n\nプラン登録画面で再度連携をお試しください。`}
+          </p>
+          <Button
+            onClick={handleSaitamaFailedModalClose}
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-3"
+          >
+            連携なしで続行
           </Button>
         </div>
       </Modal>
