@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Limelight, Plaster } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
+import { ErrorHandlerProvider } from '@/components/providers/ErrorHandlerProvider'
 
 const limelight = Limelight({
   weight: '400',
@@ -37,8 +38,10 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`${limelight.variable} ${plaster.variable}`}>
-        {children}
-        <Toaster position="top-right" richColors />
+        <ErrorHandlerProvider>
+          {children}
+          <Toaster position="top-right" richColors />
+        </ErrorHandlerProvider>
       </body>
     </html>
   )

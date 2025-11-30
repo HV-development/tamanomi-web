@@ -20,24 +20,6 @@ export async function POST(request: NextRequest) {
 
     const fullUrl = buildApiUrl('/payment/update')
 
-    console.log('Payment update API request:', {
-      method: 'POST',
-      url: fullUrl,
-      body: {
-        customerId,
-        customerCardId,
-        userEmail,
-        planId,
-        runningId,
-        tradingId,
-        amount,
-        endScheduled,
-        description,
-      }
-    })
-
-
-
     // amountもendScheduledも指定されていない場合はエラー
     if (amount === undefined && endScheduled === undefined) {
       return NextResponse.json(
@@ -72,12 +54,6 @@ export async function POST(request: NextRequest) {
       }),
     })
 
-    console.log('Payment update API response:', {
-      status: response.status,
-      ok: response.ok,
-      statusText: response.statusText
-    })
-
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('Payment update API error:', errorData)
@@ -88,7 +64,6 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json()
-    console.log('Payment update data received:', data)
 
     return NextResponse.json(data)
   } catch (error) {

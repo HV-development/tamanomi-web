@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
 
     const fullUrl = `${buildApiUrl('/plans')}?${queryParams.toString()}`
 
-    console.log('🔍 [plans] Request:', { url: fullUrl, status, limit, saitamaAppLinked })
 
     const response = await fetch(fullUrl, {
       method: 'GET',
@@ -30,12 +29,6 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       cache: 'no-store',  // キャッシュを無効化
-    })
-
-    console.log('Plans API response:', {
-      status: response.status,
-      ok: response.ok,
-      statusText: response.statusText
     })
 
     if (!response.ok) {
@@ -48,11 +41,6 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json()
-    console.log('🔍 [plans/route] Plans data received:', {
-      planCount: data.plans?.length,
-      planIds: data.plans?.map((p: { id: string }) => p.id),
-      fullPlans: data.plans?.map((p: { id: string; name: string; options: unknown }) => ({ id: p.id, name: p.name, options: p.options })),
-    })
 
     return NextResponse.json(data)
   } catch (error) {

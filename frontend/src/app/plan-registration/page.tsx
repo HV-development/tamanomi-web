@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlanRegistrationContainer } from '@/components/organisms/PlanRegistrationContainer'
+import { Modal } from '@/components/atoms/Modal'
+import { Button } from '@/components/atoms/Button'
 import type { PaymentMethodType } from '@/types/payment'
-import { requestPayPayPayment } from '@/lib/api-client'
+import { requestPayPayPayment, requestQrPayment } from '@/lib/api-client'
 import {
   PlanListResponse,
   PlanListResponseSchema
@@ -21,6 +23,15 @@ export default function PlanRegistrationPage() {
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const [hasPaymentMethod, setHasPaymentMethod] = useState<boolean>(false)
   const [isPaymentMethodChangeOnly, setIsPaymentMethodChangeOnly] = useState<boolean>(false)
+  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
+  const [confirmModalData, setConfirmModalData] = useState<{
+    planName: string
+    paymentAmount: number
+    paymentMethodLabel: string
+    actionDescription: string
+    planId: string
+    paymentMethod: PaymentMethodType
+  } | null>(null)
   const router = useRouter()
 
   const fetchUserInfo = useCallback(async () => {
@@ -32,11 +43,9 @@ export default function PlanRegistrationPage() {
         credentials: 'include', // Cookieを送信
       })
 
-      console.log('🔍 [fetchUserInfo] Response status:', response.status)
 
       if (response.ok) {
         const userData = await response.json()
-        console.log('🔍 [fetchUserInfo] User data received:', userData)
 
         if (userData.id) {
           setUserId(userData.id)
@@ -45,7 +54,6 @@ export default function PlanRegistrationPage() {
 
         // メールアドレスをユーザーデータから取得（常に更新）
         if (userData.email) {
-          console.log('🔍 [fetchUserInfo] Setting email from user data:', userData.email)
           setEmail(userData.email)
           sessionStorage.setItem('userEmail', userData.email)
         } else {
@@ -66,7 +74,6 @@ export default function PlanRegistrationPage() {
         
         // 認証失敗時（401/403）はログイン画面にリダイレクト
         if (response.status === 401 || response.status === 403) {
-          console.log('🔍 [fetchUserInfo] Authentication failed, redirecting to login')
           router.push('/login?redirect=/plan-registration')
           return
         }
@@ -96,7 +103,6 @@ export default function PlanRegistrationPage() {
       // セッションストレージからメールアドレスを取得（一時的に使用）
       const sessionEmail = sessionStorage.getItem('userEmail')
       if (sessionEmail) {
-        console.log('🔍 [useEffect] Setting email from session storage:', sessionEmail)
         setEmail(sessionEmail)
       }
 
@@ -112,12 +118,10 @@ export default function PlanRegistrationPage() {
 
       // refreshパラメータがある場合、ユーザー情報を再取得（ガイドページからの戻り）
       if (refreshParam) {
-        console.log('🔍 [useEffect] Refresh parameter found, fetching user info')
         fetchUserInfo()
       } else {
         // 常にユーザー情報を取得してメールアドレスを確実に取得する
         // （sessionStorageは一時的なものなので、APIから取得した方が確実）
-        console.log('🔍 [useEffect] Fetching user info to get email')
         fetchUserInfo()
       }
     }
@@ -128,7 +132,6 @@ export default function PlanRegistrationPage() {
     const handleFocus = () => {
       // メールアドレスが設定されていない場合のみ再取得
       if (!email) {
-        console.log('🔍 [handleFocus] Page focused, refetching user info')
         fetchUserInfo()
       }
     }
@@ -189,45 +192,35 @@ export default function PlanRegistrationPage() {
     }
   }, [isClient, saitamaAppLinked, fetchPlans])
 
-  const handlePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType = 'CreditCard') => {
+  // ログイン後のリダイレクトフラグをチェック
+  const [isLoginRedirecting, setIsLoginRedirecting] = useState(false)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      setIsLoginRedirecting(loginRedirecting === '/plan-registration' || loginRedirecting?.startsWith('/plan-registration') || false)
+    }
+  }, [])
+
+  // ログイン後のリダイレクトフラグをクリア（ページが完全に表示されたら）
+  useEffect(() => {
+    if (isClient && saitamaAppLinked !== null && plans.length > 0 && typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      if (loginRedirecting === '/plan-registration' || loginRedirecting?.startsWith('/plan-registration')) {
+        // レンダリングが完了するのを待つため、次のフレームでフラグをクリア
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            sessionStorage.removeItem('loginRedirecting')
+            setIsLoginRedirecting(false)
+          })
+        })
+      }
+    }
+  }, [isClient, saitamaAppLinked, plans.length])
+
+  const executePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType = 'CreditCard') => {
     try {
       setIsLoading(true)
       setError('')
-
-      const isPaymentMethodChangeOnly = !planId || planId === ""
-
-      // プラン選択時は決済金額と支払い方法を確認
-      if (!isPaymentMethodChangeOnly) {
-        const selectedPlan = plans.find((p) => p.id === planId)
-        if (selectedPlan) {
-          const isLinked = saitamaAppLinked === true
-          const discountPrice = (selectedPlan as any).discountPrice ?? null
-          const rawAmount = isLinked && discountPrice != null ? discountPrice : selectedPlan.price
-          const paymentAmount = Number(rawAmount)
-
-          const paymentMethodLabel =
-            paymentMethod === 'PayPay'
-              ? 'PayPay（QRコード決済）'
-              : 'クレジットカード'
-
-          const actionDescription =
-            paymentMethod === 'PayPay'
-              ? '選択したプランの初回決済を、PayPayアプリで行います。よろしいですか？'
-              : 'カード登録と同時に初回決済を行います。よろしいですか？'
-
-          const confirmed = window.confirm(
-            `プラン「${selectedPlan.name}」\n` +
-            `決済金額: ¥${paymentAmount.toLocaleString()}\n` +
-            `支払い方法: ${paymentMethodLabel}\n\n` +
-            actionDescription
-          )
-
-          if (!confirmed) {
-            setIsLoading(false)
-            return
-          }
-        }
-      }
 
       const getEmailFromSession = () => {
         const storedEmail = sessionStorage.getItem('userEmail')
@@ -254,6 +247,134 @@ export default function PlanRegistrationPage() {
       sessionStorage.setItem('userEmail', currentEmail)
       
       // 支払い方法ごとの分岐
+
+      if (paymentMethod === 'AeonPay') {
+        if (!planId) {
+          setError('イオンペイ決済ではプランを選択してください。')
+          setIsLoading(false)
+          return
+        }
+
+        if (!userId) {
+          const storedUserId = sessionStorage.getItem('userId') || ''
+          if (storedUserId) {
+            setUserId(storedUserId)
+          } else {
+            setError('ユーザー情報が取得できませんでした。ログインし直してからお試しください。')
+            setIsLoading(false)
+            return
+          }
+        }
+
+        const selectedPlan = plans.find((p) => p.id === planId)
+        if (!selectedPlan) {
+          setError('選択されたプランが見つかりません。')
+          setIsLoading(false)
+          return
+        }
+
+        const isLinked = saitamaAppLinked === true
+        const discountPrice = (selectedPlan as any).discountPrice ?? null
+        const rawAmount = isLinked && discountPrice != null ? discountPrice : selectedPlan.price
+        const paymentAmount = Number(rawAmount)
+
+        // イオンペイのrequestIdは20文字以内の制約がある
+        const requestId = `aeon_${Date.now()}`.substring(0, 20)
+
+        // planIdをセッションストレージに保存（URLを短くするため）
+        // I002エラー（successUrlが1000文字以上）を防ぐため、planIdをURLパラメータから削除
+        sessionStorage.setItem(`planId_${requestId}`, planId)
+
+        // イオンペイ固有のURLを設定（決済完了後のリダイレクト先）
+        // PDF「導入補足資料（イオンペイ）」3.4.API一覧に基づき、PCブラウザ/スマホブラウザではスネークケースを使用
+        // URLを短くするため、planIdはURLパラメータに含めず、セッションストレージから取得する
+        // I002エラー（successUrlが1000文字以上）を防ぐため、URLを可能な限り短くする
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+        const successUrl = `${baseUrl}/aeonpay/qr-code?status=SUCCESS&paymentTransactionId=${requestId}`
+        const failureUrl = `${baseUrl}/aeonpay/qr-code?status=FAILED&paymentTransactionId=${requestId}`
+        const cancelUrl = `${baseUrl}/aeonpay/qr-code?status=CANCEL&paymentTransactionId=${requestId}`
+
+        // イオンペイ固有のrequestPropertyを設定
+        // 注意: イオンペイはPayPayと仕様が異なるため、イオンペイ固有の形式を使用
+        // PDF「導入補足資料（イオンペイ）」3.4.API一覧に基づき、PCブラウザ/スマホブラウザでは以下が必須:
+        // - success_url (成功時URL)
+        // - failure_url (失敗時URL)
+        // - cancel_url (キャンセル時URL)
+        const qrPaymentRequest = {
+          userId: userId || sessionStorage.getItem('userId') || '',
+          paymentMethodId: 'AeonPay' as const,
+          requestId,
+          amount: {
+            currencyCode: 'JPY' as const,
+            value: paymentAmount,
+          },
+          requestProperty: {
+            // イオンペイ固有の必須フィールド
+            // APIドキュメントによると、フィールド名はcamelCase形式（successUrl, failureUrl, cancelUrl）を使用します
+            // PDF「導入補足資料（イオンペイ）」ではsnake_case（success_url）と記載されていますが、
+            // APIドキュメントではcamelCase（successUrl）が正しい形式です
+            // エラーコード一覧ドキュメントによると、以下が必須で1000桁以下に制限されています
+            successUrl: successUrl, // 決済完了後のリダイレクト先URL（必須、1000桁以下）
+            failureUrl: failureUrl, // 決済失敗時のリダイレクト先URL（必須、1000桁以下）
+            cancelUrl: cancelUrl, // 決済キャンセル時のリダイレクト先URL（必須、1000桁以下）
+            // 注意: orderNumberとdescriptionはイオンペイAPIではサポートされていない可能性があります
+            // エラーコードI002が発生するため、これらを削除して必須フィールドのみを送信します
+          },
+          metadata: {
+            planId,
+            planName: selectedPlan.name,
+          },
+        }
+
+        // イオンペイ決済申込API呼び出し
+        const { data, error } = await requestQrPayment(qrPaymentRequest)
+
+        if (error || !data) {
+          setError(error?.message || 'イオンペイ決済の申込に失敗しました')
+          setIsLoading(false)
+          return
+        }
+
+        // イオンペイ決済の結果を確認
+        if (data.status === 'SUCCESS') {
+          // 決済成功時はプラン登録完了画面に遷移
+          router.push(`/plan-registration/success?planId=${planId}&paymentMethod=AeonPay`)
+        } else if (data.status === 'PROCESSING' || data.status === 'REQUIRES_ACTION') {
+          // QRコード表示が必要な場合（resultProperty.qrCodeUrlが存在する場合）
+          const qrCodeUrl = data.resultProperty?.qrCodeUrl as string | undefined
+          const transactionId = data.transactionId
+          
+          if (qrCodeUrl) {
+            // QRコードURLとtransactionIdをセッションストレージに保存
+            if (typeof window !== 'undefined' && data.paymentTransactionId) {
+              sessionStorage.setItem(`qrCodeUrl_${data.paymentTransactionId}`, qrCodeUrl)
+              if (transactionId) {
+                sessionStorage.setItem(`transactionId_${data.paymentTransactionId}`, transactionId)
+              }
+            }
+            
+            // QRコード画面に遷移（transactionIdも渡す）
+            const queryParams = new URLSearchParams({
+              qrCodeUrl,
+              paymentTransactionId: data.paymentTransactionId || requestId,
+            })
+            if (transactionId) {
+              queryParams.set('transactionId', transactionId)
+            }
+            router.push(`/aeonpay/qr-code?${queryParams.toString()}`)
+          } else {
+            setError('QRコード情報が取得できませんでした。')
+            setIsLoading(false)
+          }
+        } else {
+          setError(data.resultDescription || 'イオンペイ決済に失敗しました')
+          setIsLoading(false)
+          return
+        }
+
+        setIsLoading(false)
+        return
+      }
 
       if (paymentMethod === 'PayPay') {
         if (!planId) {
@@ -288,7 +409,7 @@ export default function PlanRegistrationPage() {
         const payPayRequest: PayPayPaymentRequest = {
           userId: userId || sessionStorage.getItem('userId') || '',
           // 現時点ではショップIDは未使用のため省略
-          requestId: `paypay_${Date.now()}`,
+          requestId: `${Date.now()}`,  // PayPay APIは数値のみを期待するため、プレフィックスなし
           amount: {
             currencyCode: 'JPY',
             value: paymentAmount,
@@ -311,19 +432,38 @@ export default function PlanRegistrationPage() {
           return
         }
 
-        if (!data.redirectHtml) {
-          setError('PayPayの支払い画面情報の取得に失敗しました')
+        // 決済ステータスに応じた処理
+        if (data.status === 'SUCCESS') {
+          // 決済成功時はプラン登録完了画面に遷移
+          router.push(`/plan-registration/success?planId=${planId}&paymentMethod=PayPay`)
           setIsLoading(false)
           return
-        }
-
-        // redirectHtml をセッションに保存し、チェックアウト画面へ遷移
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('paypayRedirectHtml', data.redirectHtml)
-          const query = new URLSearchParams({
-            redirectHtml: encodeURIComponent(data.redirectHtml),
-          })
-          router.push(`/paypay/checkout?${query.toString()}`)
+        } else if (data.status === 'PROCESSING' || data.status === 'REQUIRES_ACTION') {
+          // QRコード表示が必要な場合（redirectHtmlが存在する場合）
+          if (data.redirectHtml) {
+            // redirectHtml をセッションに保存し、チェックアウト画面へ遷移
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('paypayRedirectHtml', data.redirectHtml)
+              const query = new URLSearchParams({
+                redirectHtml: encodeURIComponent(data.redirectHtml),
+              })
+              router.push(`/paypay/checkout?${query.toString()}`)
+            }
+          } else {
+            // redirectHtmlが存在しない場合は、取引IDを使って完了画面に遷移
+            if (data.transactionId) {
+              router.push(`/paypay/complete?payment_id=${data.transactionId}`)
+            } else {
+              setError('PayPayの支払い画面情報の取得に失敗しました')
+              setIsLoading(false)
+              return
+            }
+          }
+        } else {
+          // 決済失敗
+          setError(data.resultDescription || 'PayPay決済に失敗しました')
+          setIsLoading(false)
+          return
         }
 
         setIsLoading(false)
@@ -374,41 +514,14 @@ export default function PlanRegistrationPage() {
       let data
       try {
         data = await response.json()
-        console.log('★11 [fetch] response.json()成功')
       } catch (jsonError) {
         console.error('▲[fetch] response.json()エラー:', jsonError)
         throw jsonError
       }
 
-      console.log('★11.5 Payment register response data:', {
-        redirectUrl: data.redirectUrl,
-        params: data.params,
-        paramsKeys: Object.keys(data.params || {}),
-        hasPaymentAmount: !!data.params?.payment_amount,
-        hasWebhookUrl: !!data.params?.webhook_url,
-        fullData: JSON.stringify(data, null, 2)
-      })
-
       // ペイジェントのカード登録画面にリダイレクト
       // リンクタイプ方式では、redirectUrlにGETパラメータを付与してリダイレクト
       const { redirectUrl, params } = data
-
-      // ★1 PAY-GENTに送信するパラメータをログ出力
-      console.log('★12 PAY-GENT送信パラメータ:', {
-        redirectUrl,
-        params: JSON.parse(JSON.stringify(params)), // オブジェクトをコピーして出力
-        paramsCount: Object.keys(params || {}).length,
-        paramKeys: Object.keys(params || {}),
-        hasPaymentParams: {
-          payment_amount: !!params?.payment_amount,
-          payment_type: !!params?.payment_type,
-          order_number: !!params?.order_number,
-          webhook_url: !!params?.webhook_url
-        },
-        operation_type: params?.operation_type,
-        inform_url: params?.inform_url,
-        customer_id: params?.customer_id
-      })
 
       // プラン登録成功後、セッションストレージからメールアドレスをクリア
       sessionStorage.removeItem('userEmail')
@@ -418,7 +531,6 @@ export default function PlanRegistrationPage() {
         Object.entries(params).forEach(([key, value]) => {
           url.searchParams.set(key, String(value))
         })
-        console.log('★2 モック環境: リダイレクトURL:', url.toString())
         window.location.href = url.toString()
       } else {
         // 実際のペイジェント環境ではPOSTフォームでリダイレクト
@@ -437,27 +549,7 @@ export default function PlanRegistrationPage() {
           form.appendChild(input)
         })
 
-        console.log('★13 POSTフォームパラメータ:', {
-          action: redirectUrl,
-          method: 'POST',
-          params: formParams,
-          paramsCount: Object.keys(formParams).length,
-          paramKeys: Object.keys(formParams),
-          hasCustomerCardId: !!formParams.customer_card_id,
-          operation_type: formParams.operation_type,
-          customer_id: formParams.customer_id,
-          paymentParamsDetail: {
-            payment_amount: formParams.payment_amount,
-            payment_type: formParams.payment_type,
-            order_number: formParams.order_number,
-            webhook_url: formParams.webhook_url,
-            hc: formParams.hc ? formParams.hc.substring(0, 20) + '...' : undefined
-          },
-          fullParams: JSON.stringify(formParams, null, 2)
-        })
-
         document.body.appendChild(form)
-        console.log('★13.5 PAY-GENTにリダイレクト開始')
         form.submit()
       }
     } catch (error) {
@@ -510,8 +602,80 @@ export default function PlanRegistrationPage() {
   }
   const handleLogoClick = () => router.push('/')
 
-  // クライアントサイドでの初期化が完了するまでローディング表示
-  if (!isClient) {
+  const handlePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType = 'CreditCard') => {
+    const isPaymentMethodChangeOnly = !planId || planId === ""
+
+    // プラン選択時は確認モーダルを表示
+    if (!isPaymentMethodChangeOnly) {
+      const selectedPlan = plans.find((p) => p.id === planId)
+      if (selectedPlan) {
+        const isLinked = saitamaAppLinked === true
+        const discountPrice = (selectedPlan as any).discountPrice ?? null
+        const rawAmount = isLinked && discountPrice != null ? discountPrice : selectedPlan.price
+        const paymentAmount = Number(rawAmount)
+
+        const paymentMethodLabel =
+          paymentMethod === 'PayPay'
+            ? 'PayPay（QRコード決済）'
+            : paymentMethod === 'AeonPay'
+            ? 'イオンペイ（QRコード決済）'
+            : 'クレジットカード'
+
+        // サブスクリプションプランかどうかで表示メッセージを切り替え
+        const isSubscriptionPlan = selectedPlan.is_subscription
+        let actionDescription = ''
+        
+        if (isSubscriptionPlan) {
+          // サブスクリプションプランの場合
+          actionDescription =
+            paymentMethod === 'PayPay'
+              ? '選択したプランの初回決済を、PayPayアプリで行います。'
+              : paymentMethod === 'AeonPay'
+              ? '選択したプランの初回決済を、イオンペイで行います。'
+              : 'カード登録と同時に初回決済を行います。'
+        } else {
+          // 非サブスクリプションプランの場合
+          actionDescription =
+            paymentMethod === 'PayPay'
+              ? 'PayPayで決済を実行します'
+              : paymentMethod === 'AeonPay'
+              ? 'イオンペイで決済を実行します'
+              : 'クレジットカードで決済を実行します'
+        }
+
+        // 確認モーダルを表示
+        setConfirmModalData({
+          planName: selectedPlan.name,
+          paymentAmount,
+          paymentMethodLabel,
+          actionDescription,
+          planId,
+          paymentMethod,
+        })
+        setShowConfirmModal(true)
+        return
+      }
+    }
+
+    // プラン選択なしの場合は直接実行
+    await executePaymentMethodRegister(planId, paymentMethod)
+  }
+
+  const handleConfirmModalConfirm = async () => {
+    if (confirmModalData) {
+      setShowConfirmModal(false)
+      await executePaymentMethodRegister(confirmModalData.planId, confirmModalData.paymentMethod)
+      setConfirmModalData(null)
+    }
+  }
+
+  const handleConfirmModalCancel = () => {
+    setShowConfirmModal(false)
+    setConfirmModalData(null)
+  }
+
+  // クライアントサイドでの初期化が完了するまで、またはログイン後のリダイレクト中はローディング表示
+  if (!isClient || isLoginRedirecting) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
         <div className="text-center">
@@ -523,18 +687,60 @@ export default function PlanRegistrationPage() {
   }
 
   return (
-    <PlanRegistrationContainer
-      backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
-      onPaymentMethodRegister={handlePaymentMethodRegister}
-      onLogoClick={handleLogoClick}
-      onCancel={handleCancel}
-      isLoading={isLoading}
-      plans={plans}
-      error={error}
-      saitamaAppLinked={saitamaAppLinked || false}
-      onSaitamaAppLinked={handleSaitamaAppLinked}
-      hasPaymentMethod={hasPaymentMethod}
-      isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
-    />
+    <>
+      <PlanRegistrationContainer
+        backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
+        onPaymentMethodRegister={handlePaymentMethodRegister}
+        onLogoClick={handleLogoClick}
+        onCancel={handleCancel}
+        isLoading={isLoading}
+        plans={plans}
+        error={error}
+        saitamaAppLinked={saitamaAppLinked || false}
+        onSaitamaAppLinked={handleSaitamaAppLinked}
+        hasPaymentMethod={hasPaymentMethod}
+        isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
+      />
+      {confirmModalData && (
+        <Modal
+          isOpen={showConfirmModal}
+          onClose={handleConfirmModalCancel}
+          title="決済確認"
+          showCloseButton={true}
+        >
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <p className="text-gray-700">
+                <span className="font-semibold">プラン:</span> {confirmModalData.planName}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">決済金額:</span> ¥{confirmModalData.paymentAmount.toLocaleString()}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">支払い方法:</span> {confirmModalData.paymentMethodLabel}
+              </p>
+            </div>
+            <p className="text-gray-800 font-medium">
+              {confirmModalData.actionDescription}
+            </p>
+            <div className="flex flex-col gap-3 pt-6">
+              <Button
+                onClick={handleConfirmModalConfirm}
+                className="w-full py-4"
+              >
+                はい
+              </Button>
+              <Button
+                onClick={handleConfirmModalCancel}
+                variant="secondary"
+                className="w-full py-3"
+              >
+                キャンセル
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </>
   )
 }

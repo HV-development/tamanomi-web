@@ -26,14 +26,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('🔍 [user-plans/change] Changing plan:', { planId })
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/plans/user-plans/change')
-    console.log('🔍 [user-plans/change] Request URL:', fullUrl)
 
     try {
       const response = await fetch(fullUrl, {
@@ -50,12 +48,10 @@ export async function POST(request: NextRequest) {
 
       clearTimeout(timeoutId)
 
-      console.log('🔍 [user-plans/change] Response status:', response.status)
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.log('🔍 [user-plans/change] Error data:', errorData)
 
         // エラーメッセージを返す
         let errorMessage = 'プラン変更に失敗しました'
@@ -81,7 +77,6 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json()
-      console.log('🔍 [user-plans/change] Success:', data)
       return NextResponse.json(data, { status: response.status })
     } catch (fetchError) {
       clearTimeout(timeoutId)

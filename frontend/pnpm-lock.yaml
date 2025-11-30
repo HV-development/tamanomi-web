@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.10.0
     version: 3.10.0(react-hook-form@7.65.0)
   '@hv-development/schemas':
-    specifier: 1.62.0
-    version: 1.62.0
+    specifier: 1.64.0
+    version: 1.64.0
   '@radix-ui/react-accordion':
     specifier: 1.2.2
     version: 1.2.2(@types/react-dom@18.3.7)(@types/react@18.3.26)(react-dom@18.3.1)(react@18.3.1)
@@ -140,6 +140,9 @@ dependencies:
   react-hook-form:
     specifier: ^7.65.0
     version: 7.65.0(react@18.3.1)
+  react-qr-code:
+    specifier: ^2.0.18
+    version: 2.0.18(react@18.3.1)
   react-resizable-panels:
     specifier: ^2.1.9
     version: 2.1.9(react-dom@18.3.1)(react@18.3.1)
@@ -537,8 +540,8 @@ packages:
     deprecated: Use @eslint/object-schema instead
     dev: true
 
-  /@hv-development/schemas@1.62.0:
-    resolution: {integrity: sha512-djHMg3afPWJ0cGI6mKvb38e3VRTyZ+3aanZ8gpLyMSK94CzfGJZ00qzFZka43b2nhHuR9FttTS4ECowzqSp6XA==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.62.0/c9803f27e9e1e9ffd1a2c47975b40398c5f77fbd}
+  /@hv-development/schemas@1.64.0:
+    resolution: {integrity: sha512-5nYOIdZs32tA9iqI0pKqla3ZUHUE+hD0y9whCj+N/WMhxvRPUB292VzCmiFEWYQn9mt2DmFujU6e3iKMbjYXug==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.64.0/59be6a75059033e3968d30de856d68771d67a0b7}
     engines: {node: 22.x}
     dependencies:
       zod: 3.25.76
@@ -4735,6 +4738,10 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /qr.js@0.0.0:
+    resolution: {integrity: sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ==}
+    dev: false
+
   /queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
@@ -4772,6 +4779,16 @@ packages:
 
   /react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
+    dev: false
+
+  /react-qr-code@2.0.18(react@18.3.1):
+    resolution: {integrity: sha512-v1Jqz7urLMhkO6jkgJuBYhnqvXagzceg3qJUWayuCK/c6LTIonpWbwxR1f1APGd4xrW/QcQEovNrAojbUz65Tg==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      prop-types: 15.8.1
+      qr.js: 0.0.0
+      react: 18.3.1
     dev: false
 
   /react-remove-scroll-bar@2.3.8(@types/react@18.3.26)(react@18.3.1):

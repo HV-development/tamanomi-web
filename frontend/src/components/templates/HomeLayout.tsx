@@ -13,6 +13,7 @@ import { HistoryPopup } from "../molecules/HistoryPopup"
 import { MyPageLayout } from "./MypageLayout"
 import { PlanManagementContainer } from "../organisms/PlanManagementContainer"
 import { PlanChangeContainer } from "../organisms/PlanChangeContainer"
+import { StoreIntroductionForm } from "../organisms/StoreIntroductionForm"
 import { CouponListPopup } from "../molecules/CouponListPopup"
 import { CouponUsedSuccessModal } from "../molecules/CouponUsedSuccessModal"
 import { LoginRequiredModal } from "../molecules/LoginRequiredModal"
@@ -37,9 +38,14 @@ import { calculateAge } from "@/utils/age-calculator"
 import { checkTodayUsage } from "@/utils/coupon-usage-check"
 
 
-export function HomeLayout() {
+interface HomeLayoutProps {
+  onMount?: () => void
+}
+
+export function HomeLayout({ onMount }: HomeLayoutProps) {
   // Context から必要な値を取得
   const { state, dispatch, handlers, auth, navigation, filters, computedValues } = useAppContext()
+
 
   // ポップアップとモーダルの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
@@ -47,6 +53,7 @@ export function HomeLayout() {
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
   const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
   const [isCheckingUsage, setIsCheckingUsage] = useState(false)
+  const [hasStoreIntroduction, setHasStoreIntroduction] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres
@@ -104,6 +111,44 @@ export function HomeLayout() {
     // 初回ロード時とログイン時に同期
     syncFavorites()
   }, [isAuthenticated, stores.length, dispatch])
+
+  // 店舗紹介登録状態を取得（マイページ表示時のみ）
+  useEffect(() => {
+    const checkStoreIntroduction = async () => {
+      // マイページ表示中かつ認証済みの場合のみチェック
+      if (!isAuthenticated || currentView !== 'mypage') {
+        setHasStoreIntroduction(false)
+        return
+      }
+
+      try {
+        // /api/store-introductionsのGETエンドポイントを使用
+        const response = await fetch('/api/store-introductions', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store',
+          credentials: 'include',
+        })
+
+        // 200ならデータがあるかチェック、404なら未登録
+        if (response.ok) {
+          const data = await response.json()
+          // データがオブジェクトで、idが存在すれば登録済み
+          setHasStoreIntroduction(data && typeof data === 'object' && 'id' in data)
+        } else {
+          // 401, 404などのエラーは未登録として扱う
+          setHasStoreIntroduction(false)
+        }
+      } catch (error) {
+        // ネットワークエラーなども未登録として扱う
+        setHasStoreIntroduction(false)
+      }
+    }
+
+    checkStoreIntroduction()
+  }, [isAuthenticated, currentView])
 
   // storesが変更されたときにも同期する（店舗データが読み込まれた後）
   useEffect(() => {
@@ -214,9 +259,10 @@ export function HomeLayout() {
   const onWithdrawConfirm = handlers.handleWithdrawConfirm
   const onWithdrawCancel = handlers.handleWithdrawCancel
   const onWithdrawComplete = handlers.handleWithdrawComplete
+  const onStoreIntroduction = (handlers as any).handleStoreIntroduction
+  const onStoreIntroductionSubmit = (handlers as any).handleStoreIntroductionSubmit
   const onLogout = handlers.handleLogout
   const onLogin = handlers.handleLogin
-  const onVerifyOtp = handlers.handleVerifyOtp
   const onSignup = handlers.handleSignup
   const onForgotPassword = handlers.handleForgotPassword
   const onBackToHome = handlers.handleBackToHome
@@ -236,10 +282,6 @@ export function HomeLayout() {
   const onPlanChangeBack = handlers.handlePlanChangeBack
   const onLogoClick = handlers.handleLogoClick
   const onStoreClick = handlers.handleStoreClick
-  const loginStep = state.loginStep
-  const loginEmail = state.loginEmail
-  const onResendOtp = handlers.handleResendOtp
-  const onBackToEmailLogin = handlers.handleBackToEmailLogin
   const onCouponListClose = handlers.handleCouponListClose
   const onCouponListBack = handlers.handleCouponListBack
   const onUseCoupon = handlers.handleUseCoupon
@@ -289,6 +331,31 @@ export function HomeLayout() {
       dispatch({ type: 'SET_DATA_LOADED', payload: true })
     }
   }, [items, isStoresLoading, dispatch, state.stores])
+
+  // データが完全に読み込まれたら、ログイン後のリダイレクトフラグをクリア
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      const shouldClearFlag = loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')
+      
+      if (shouldClearFlag && state.isDataLoaded && !isStoresLoading) {
+        // レンダリングが完了するのを待つため、複数のフレームでフラグをクリア
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              sessionStorage.removeItem('loginRedirecting')
+              if (onMount) {
+                onMount()
+              }
+            })
+          })
+        })
+      } else if (!shouldClearFlag && onMount) {
+        // フラグがない場合でもマウント通知を送る
+        onMount()
+      }
+    }
+  }, [state.isDataLoaded, isStoresLoading, onMount])
 
   // 追加ロード時の stores 追記（セントリネル交差で loadNext 実行済み）
   // 追加ロードはフック内部の items 更新で反映されるため、ここでの明示的処理は不要
@@ -450,6 +517,17 @@ export function HomeLayout() {
       )
     }
 
+    // 店舗紹介画面の場合
+    if (myPageView === "store-introduction") {
+      return (
+        <StoreIntroductionForm
+          onSubmit={onStoreIntroductionSubmit}
+          onBack={() => onMyPageViewChange("main")}
+          isLoading={isLoading}
+        />
+      )
+    }
+
     return (
       <MyPageLayout
         user={user}
@@ -464,6 +542,8 @@ export function HomeLayout() {
         onViewPlan={onViewPlan}
         onViewUsageHistory={onViewUsageHistory}
         onViewPaymentHistory={onViewPaymentHistory}
+        onStoreIntroduction={onStoreIntroduction}
+        hasStoreIntroduction={hasStoreIntroduction}
         onCancelSubscription={onCancelSubscription}
         onWithdraw={onWithdraw}
         onWithdrawConfirm={onWithdrawConfirm}
@@ -511,15 +591,11 @@ export function HomeLayout() {
     return (
       <LoginLayout
         onLogin={onLogin}
-        onVerifyOtp={onVerifyOtp}
         onSignup={onSignup}
         onForgotPassword={onForgotPassword}
-        onResendOtp={onResendOtp}
-        onBackToPassword={onBackToEmailLogin}
+        onHomeClick={onBackToHome}
         isLoading={isLoading}
         error={state.loginError}
-        loginStep={loginStep}
-        email={loginEmail}
       />
     )
   }
@@ -563,54 +639,8 @@ export function HomeLayout() {
     )
   }
 
-  // 店舗データの初回ロード中はローディング表示
-  if (isStoresLoading && items.length === 0) {
-    return (
-      <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
-        {/* ヘッダー部分のみ */}
-        <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
-          <div className="flex items-center justify-between px-4 py-3">
-            {/* 左側: ハンバーガーメニューとランク */}
-            <div className="flex items-center gap-3 w-20">
-              <HamburgerMenu onMenuItemClick={onMenuItemClick} isAuthenticated={isAuthenticated} />
-            </div>
-
-            {/* 中央: ロゴ */}
-            <div className="flex-1 flex justify-center">
-              <Logo size="lg" onClick={onLogoClick} />
-            </div>
-
-            {/* 右側: ユーザーメニュー（ログイン時のみ） */}
-            <div className="flex items-center justify-end w-20">
-              {/* TODO: 将来的に解放予定 - ランク表示 */}
-              {/* {isAuthenticated ? (
-                user && currentUserRank && (
-                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
-                    <div className="relative w-5 h-5">
-                      <Image
-                        src={`/${currentUserRank}.svg`}
-                        alt={`${currentUserRank}ランク`}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                  </div>
-                )
-              ) : null} */}
-            </div>
-          </div>
-        </div>
-
-        {/* ローディング表示 */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-            <p className="text-green-600 font-medium">店舗情報を読み込み中...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // 店舗データの初回ロード中かどうか
+  const isInitialStoresLoading = isStoresLoading && items.length === 0
 
   return (
     <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
@@ -756,6 +786,7 @@ export function HomeLayout() {
           bottomError={error}
           backgroundColorClass={backgroundColorClass}
           currentLocation={state.currentLocation}
+          isInitialLoading={isInitialStoresLoading}
         />
       </div>
 

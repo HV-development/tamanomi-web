@@ -5,7 +5,7 @@
  * ログイン後にアクセスする画面
  */
 
-import { useEffect, useMemo, Suspense, useReducer, useRef } from "react"
+import { useEffect, useMemo, Suspense, useReducer, useRef, useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useFilters } from "@/hooks/useFilters"
@@ -104,13 +104,73 @@ export default function HomePage() {
     return "bg-gradient-to-br from-green-50 to-green-100"
   }, [])
 
-  // データが読み込まれるまでローディング表示
-  if (!state.isDataLoaded) {
+  // ログイン後のリダイレクトフラグをチェック
+  const [isLoginRedirecting, setIsLoginRedirecting] = useState(false)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      setIsLoginRedirecting(loginRedirecting === '/home' || loginRedirecting?.startsWith('/home') || false)
+    }
+  }, [])
+
+  // ログイン後のリダイレクトフラグを定期的にチェック（HomeLayoutでクリアされるまで）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkRedirecting = () => {
+        const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+        setIsLoginRedirecting(loginRedirecting === '/home' || loginRedirecting?.startsWith('/home') || false)
+      }
+      
+      // 初回チェック
+      checkRedirecting()
+      
+      // 定期的にチェック（HomeLayoutでフラグがクリアされるまで）
+      const interval = setInterval(checkRedirecting, 100)
+      
+      return () => clearInterval(interval)
+    }
+  }, [])
+
+  // データが読み込まれたら、ログイン後のリダイレクトフラグをクリア（フォールバック）
+  useEffect(() => {
+    if (state.isDataLoaded && typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      if (loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')) {
+        // レンダリングが完了するのを待つため、複数のフレームでフラグをクリア
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              sessionStorage.removeItem('loginRedirecting')
+              setIsLoginRedirecting(false)
+            })
+          })
+        })
+      }
+    }
+  }, [state.isDataLoaded])
+
+  // タイムアウト: 10秒経過後に強制的にフラグをクリア（セーフティネット）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
+      if (loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')) {
+        const timeout = setTimeout(() => {
+          sessionStorage.removeItem('loginRedirecting')
+          setIsLoginRedirecting(false)
+        }, 10000) // 10秒後に強制的にクリア
+        
+        return () => clearTimeout(timeout)
+      }
+    }
+  }, [])
+
+  // ログイン後のリダイレクト中のみローディング表示（データ読み込みはHomeLayout内で部分的に表示）
+  if (isLoginRedirecting) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-green-600 font-medium">データを読み込み中...</p>
+          <p className="text-green-600 font-medium">読み込み中...</p>
         </div>
       </div>
     )
@@ -127,7 +187,7 @@ export default function HomePage() {
             </div>
           </div>
         }>
-          <HomeLayout />
+          <HomeLayout onMount={() => setIsLoginRedirecting(false)} />
         </Suspense>
       </div>
     </AppContext.Provider>

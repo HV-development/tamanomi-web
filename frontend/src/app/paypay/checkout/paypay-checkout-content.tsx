@@ -23,6 +23,21 @@ export function PayPayCheckoutContent() {
     }
   }, [searchParams])
 
+  // フォームを自動的にサブミット（すべてのフックは条件分岐の前に呼び出す必要がある）
+  useEffect(() => {
+    if (redirectHtml) {
+      // DOMが更新された後にフォームを探してサブミット
+      const timer = setTimeout(() => {
+        const form = document.querySelector('form[name="form"]') as HTMLFormElement
+        if (form) {
+          form.submit()
+        }
+      }, 100)
+
+      return () => clearTimeout(timer)
+    }
+  }, [redirectHtml])
+
   if (!redirectHtml) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
@@ -43,7 +58,7 @@ export function PayPayCheckoutContent() {
         <div className="border-b border-gray-100 px-6 py-4">
           <h1 className="text-lg font-bold text-gray-900">PayPayでお支払い</h1>
           <p className="text-xs text-gray-600 mt-1">
-            この画面に表示されるPayPayの支払い画面から決済を完了してください。
+            PayPayの決済画面に自動的にリダイレクトします...
           </p>
         </div>
 
@@ -51,15 +66,21 @@ export function PayPayCheckoutContent() {
           決済が完了すると、自動的にPayPayの画面から戻ります。ブラウザを閉じたり、このタブを更新しないでください。
         </div>
 
-        <div className="p-4">
+        <div className="p-4" style={{ display: 'none' }}>
           <div
             dangerouslySetInnerHTML={{ __html: redirectHtml }}
           />
+        </div>
+
+        <div className="p-6 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
+          <p className="mt-4 text-sm text-gray-600">PayPayの決済画面に移動しています...</p>
         </div>
       </div>
     </div>
   )
 }
+
 
 
 

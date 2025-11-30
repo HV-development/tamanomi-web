@@ -5,8 +5,9 @@ import type {
 
 /**
  * 支払い方法種別
- * - 現時点で有効なのは CreditCard と PayPay
- * - AeonPay はUI上のみ表示し、「準備中」として扱う
+ * - CreditCard: クレジットカード決済
+ * - AeonPay: イオンペイ（QRコード決済）
+ * - PayPay: PayPay（QRコード決済）
  */
 export type PaymentMethodType = 'CreditCard' | 'AeonPay' | 'PayPay'
 
@@ -35,8 +36,9 @@ export interface PayPayPaymentStartResponse {
   /**
    * PayPay支払い画面を表示するためのHTML
    * - `dangerouslySetInnerHTML` で描画する想定
+   * - 決済ステータスが`PROCESSING`または`REQUIRES_ACTION`の場合に存在する可能性がある
    */
-  redirectHtml: string
+  redirectHtml?: string
 }
 
 /**

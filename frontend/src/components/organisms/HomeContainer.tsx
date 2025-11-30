@@ -23,6 +23,8 @@ interface HomeContainerProps {
   isLoadingMore?: boolean
   bottomError?: string | null
   currentLocation?: { latitude: number; longitude: number } | null
+  // 初期ローディング状態
+  isInitialLoading?: boolean
 }
 
 export function HomeContainer({ 
@@ -39,7 +41,8 @@ export function HomeContainer({
   loadMoreRef, 
   isLoadingMore = false, 
   bottomError = null, 
-  currentLocation 
+  currentLocation,
+  isInitialLoading = false
 }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = useMemo(() => {
@@ -139,14 +142,9 @@ export function HomeContainer({
           showDistance={isNearbyFilter}
           emptyMessage="条件に合う店舗が見つかりませんでした"
           emptyEmoji="🔍"
+          showEmptyMessage={!isInitialLoading && stores !== undefined && stores.length === 0}
+          isLoading={isInitialLoading}
         />
-
-        {/* ロード中インジケータ */}
-        {isLoadingMore && (
-          <div className="flex items-center justify-center py-6">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600" />
-          </div>
-        )}
 
         {/* 追加ロード時のエラー表示 */}
         {bottomError && (

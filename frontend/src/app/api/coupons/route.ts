@@ -28,13 +28,10 @@ export async function GET(request: NextRequest) {
       queryParams.append('isPublic', isPublic)
     }
 
-    console.log('🔍 [coupons] Query params:', { shopId, page, limit, status, isPublic })
-    console.log('🔍 [coupons] Query string:', queryParams.toString())
 
     const authHeader = getAuthHeader(request)
     
     const fullUrl = `${buildApiUrl('/coupons')}?${queryParams.toString()}`
-    console.log('🔍 [coupons] Calling backend API:', fullUrl)
 
     // 認証ヘッダーがある場合のみ追加
     const headers: Record<string, string> = {
@@ -50,7 +47,6 @@ export async function GET(request: NextRequest) {
       cache: 'no-store',
     })
 
-    console.log('🔍 [coupons] Backend response status:', response.status)
 
     const data = await response.json()
 
@@ -62,10 +58,6 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    console.log('✅ [coupons] Backend response success:', {
-      couponsCount: data.coupons?.length || 0,
-      pagination: data.pagination
-    })
     return NextResponse.json(data)
 
   } catch (error) {

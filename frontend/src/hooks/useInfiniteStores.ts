@@ -126,6 +126,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       longitude: shop.longitude ? Number(shop.longitude) : undefined,
       couponUsageStart: shop.couponUsageStart || undefined,
       couponUsageEnd: shop.couponUsageEnd || undefined,
+      couponUsageDays: shop.couponUsageDays || undefined,
       homepageUrl: shop.homepageUrl || undefined,
       details: shop.details || undefined,
       businessHours: shop.businessHours || undefined,
@@ -183,7 +184,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         // エリアフィルターを追加（複数エリアの場合はOR条件で処理）
         if (selectedAreas.length > 0) {
           const cities = mapAreasToCities(selectedAreas)
-          console.log('[useInfiniteStores] Map areas to cities:', { selectedAreas, cities })
           // 複数のエリアがある場合は、各エリアに対してクエリを実行する必要があるが、
           // バックエンドAPIが複数のcityパラメータをサポートしているか確認が必要
           // 暫定的には最初のエリアのみを使用
@@ -195,7 +195,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         // ジャンルフィルターを追加
         if (selectedGenres.length > 0) {
           const genreIds = await mapGenresToIds(selectedGenres)
-          console.log('[useInfiniteStores] Map genres to IDs:', { selectedGenres, genreIds })
           // 複数のジャンルがある場合は、各ジャンルに対してクエリを実行する必要があるが、
           // バックエンドAPIが複数のgenreIdパラメータをサポートしているか確認が必要
           // 暫定的には最初のジャンルのみを使用
@@ -205,53 +204,104 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         }
         
         const url = `/api/shops?${queryParams.toString()}`
-        console.log('[useInfiniteStores] Fetching:', url)
         
-        const res = await fetch(url, {
-          method: 'GET',
-          headers,
-          credentials: 'include', // Cookieを送信
-        })
+        let res: Response
+        try {
+          res = await fetch(url, {
+            method: 'GET',
+            headers,
+            credentials: 'include', // Cookieを送信
+          })
+        } catch (fetchError) {
+          console.error('[useInfiniteStores] Fetch error:', {
+            error: fetchError,
+            errorType: typeof fetchError,
+            errorName: fetchError instanceof Error ? fetchError.name : 'Unknown',
+            errorMessage: fetchError instanceof Error ? fetchError.message : String(fetchError),
+            errorStack: fetchError instanceof Error ? fetchError.stack : undefined,
+            url,
+          })
+          throw new Error(`ネットワークエラーが発生しました: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`)
+        }
 
-        console.log('[useInfiniteStores] Response status:', res.status)
+        
+        // レスポンスをテキストとして取得（成功・失敗どちらの場合でも使用）
+        let responseText = ''
+        try {
+          responseText = await res.text()
+        } catch (textError) {
+          console.error('[useInfiniteStores] Failed to read response text:', textError)
+          responseText = ''
+        }
         
         if (!res.ok) {
           let data: any = {}
-          try {
-            const contentType = res.headers.get('content-type')
-            if (contentType && contentType.includes('application/json')) {
-              data = await res.json()
-            } else {
-              const text = await res.text()
-              console.error('[useInfiniteStores] Response is not JSON:', text.substring(0, 200))
-              data = { message: text.substring(0, 200) }
+          let errorMessage = ''
+          
+          if (responseText.trim()) {
+            try {
+              data = JSON.parse(responseText)
+            } catch (jsonError) {
+              console.error('[useInfiniteStores] Failed to parse JSON:', jsonError)
+              console.error('[useInfiniteStores] Response text (first 500 chars):', responseText.substring(0, 500))
+              // JSON解析に失敗した場合は、テキストをメッセージとして使用
+              data = { message: responseText.substring(0, 200) || 'レスポンスの解析に失敗しました' }
             }
-          } catch (parseError) {
-            console.error('[useInfiniteStores] Failed to parse error response:', parseError)
-            data = { message: 'エラーレスポンスの解析に失敗しました' }
+          } else {
+            // レスポンスが空の場合
+            console.error('[useInfiniteStores] Empty response body')
+            data = { message: `レスポンスが空です (${res.status})` }
           }
           
-          const message = data?.error?.message || data?.message || `店舗情報の取得に失敗しました (${res.status})`
+          // エラーメッセージの抽出（複数の形式に対応）
+          if (data?.error?.message) {
+            errorMessage = data.error.message
+          } else if (data?.error?.code) {
+            errorMessage = data.error.code
+          } else if (data?.message) {
+            errorMessage = data.message
+          } else if (typeof data === 'string') {
+            errorMessage = data
+          } else if (typeof data === 'object' && data !== null && Object.keys(data).length === 0) {
+            // 空のオブジェクトの場合
+            errorMessage = `店舗情報の取得に失敗しました (${res.status} ${res.statusText})`
+          } else {
+            errorMessage = `店舗情報の取得に失敗しました (${res.status})`
+          }
+          
           console.error('[useInfiniteStores] Response error:', {
             status: res.status,
             statusText: res.statusText,
+            url: res.url,
+            requestUrl: url,
             data,
-            message,
+            dataStringified: JSON.stringify(data),
+            responseTextLength: responseText.length,
+            responseTextPreview: responseText.substring(0, 500),
+            errorMessage,
           })
-          throw new Error(message)
+          throw new Error(errorMessage)
         }
 
-        const data = await res.json()
-        console.log('[useInfiniteStores] Response data:', {
-          shopsCount: data?.shops?.length || 0,
-          pagination: data?.pagination,
-        })
+        // 成功時はJSONとして解析
+        let data: any = {}
+        if (responseText.trim()) {
+          try {
+            data = JSON.parse(responseText)
+          } catch (jsonError) {
+            console.error('[useInfiniteStores] Failed to parse success response as JSON:', jsonError)
+            console.error('[useInfiniteStores] Response text (first 500 chars):', responseText.substring(0, 500))
+            throw new Error('レスポンスの解析に失敗しました')
+          }
+        } else {
+          console.error('[useInfiniteStores] Empty success response body')
+          throw new Error('レスポンスが空です')
+        }
         
         const items: Store[] = (data?.shops || []).map(mapShopToStore)
         const pagination = data?.pagination || {}
         const totalPages = typeof pagination.totalPages === 'number' ? pagination.totalPages : targetPage
 
-        console.log('[useInfiniteStores] Mapped items:', items.length)
 
         return {
           items,
@@ -309,11 +359,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     filterKeyRef.current = currentFilterKey
     initialLoadInProgressRef.current = true
     
-    console.log('[useInfiniteStores] Initial load starting...', {
-      selectedAreas,
-      selectedGenres,
-    })
-    
     const fetchInitialData = async () => {
       setIsLoading(true)
       setError(null)
@@ -321,14 +366,8 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         const result = await fetchPage(1)
         // 初回ロードが完了しているかチェック
         if (initialLoadCompletedRef.current) {
-          console.log('[useInfiniteStores] Initial load already completed, skipping')
           return
         }
-        console.log('[useInfiniteStores] Initial load success:', {
-          itemsCount: result.items.length,
-          page: result.page,
-          hasMore: result.hasMore,
-        })
         setPage(result.page)
         setHasMore(result.hasMore)
         setItems(result.items)
@@ -337,7 +376,13 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       } catch (e) {
         if (initialLoadCompletedRef.current) return
         const message = e instanceof Error ? e.message : 'エラーが発生しました'
-        console.error('[useInfiniteStores] Initial load error:', message, e)
+        console.error('[useInfiniteStores] Initial load error:', {
+          message,
+          error: e,
+          errorType: typeof e,
+          errorName: e instanceof Error ? e.name : 'Unknown',
+          errorStack: e instanceof Error ? e.stack : undefined,
+        })
         setError(message)
       } finally {
         initialLoadInProgressRef.current = false
@@ -362,14 +407,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     
     const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}`
     
-    console.log('[useInfiniteStores] Filter effect:', {
-      currentFilterKey,
-      previousFilterKey: filterKeyRef.current,
-      willFetch: filterKeyRef.current !== currentFilterKey,
-      selectedAreas,
-      selectedGenres,
-    })
-    
     // フィルターが変更された場合のみ再取得
     if (filterKeyRef.current !== currentFilterKey) {
       filterKeyRef.current = currentFilterKey
@@ -382,11 +419,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       setItems([])
       isFirstLoadRef.current = true
       
-      console.log('[useInfiniteStores] Starting fetch...', {
-        selectedAreas,
-        selectedGenres,
-      })
-      
       // 再取得を実行
       let aborted = false
       ;(async () => {
@@ -394,14 +426,8 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           const currentFetchPage = fetchPageRef.current || fetchPage
           const result = await currentFetchPage(1)
           if (aborted) {
-            console.log('[useInfiniteStores] Fetch aborted')
             return
           }
-          console.log('[useInfiniteStores] Fetch success:', {
-            itemsCount: result.items.length,
-            page: result.page,
-            hasMore: result.hasMore,
-          })
           setPage(result.page)
           setHasMore(result.hasMore)
           setItems(result.items)
@@ -419,7 +445,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         aborted = true
       }
     } else {
-      console.log('[useInfiniteStores] Skip fetch (same filter key)')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAreas, selectedGenres])

@@ -180,13 +180,22 @@ export const useAppHandlers = (
             }
 
             // プラン登録状況によって遷移先を変更（router.replaceでブラウザ履歴を置き換えて、ログイン画面を経由しないようにする）
+            let targetPath: string
             if (!hasPlan) {
                 // プラン未登録の場合はプラン登録画面へ（独立したページ）
-                router.replace('/plan-registration')
+                targetPath = '/plan-registration'
             } else {
                 // プラン登録済みの場合はhome画面へ遷移
-                router.replace('/home')
+                targetPath = '/home'
             }
+
+            // ローディング継続フラグをセッションストレージに設定
+            // 遷移先のページで完全に表示されたらクリアされる
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('loginRedirecting', targetPath)
+            }
+
+            router.replace(targetPath)
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
         } catch (error) {
@@ -553,9 +562,7 @@ export const useAppHandlers = (
     }, [auth, dispatch, state.stores])
 
     const handleCouponsClick = useCallback(async (storeId: string) => {
-        console.log('🔍 [handleCouponsClick] Called with storeId:', storeId)
         const store = state.stores.find((s: { id: string }) => s.id === storeId)
-        console.log('🔍 [handleCouponsClick] Found store:', store?.name)
         
         if (store) {
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
@@ -564,7 +571,6 @@ export const useAppHandlers = (
             // クーポンを取得
             try {
                 const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
-                console.log('🔍 [handleCouponsClick] Fetching from:', url)
                 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -575,7 +581,6 @@ export const useAppHandlers = (
                     credentials: 'include', // Cookieを送信
                 })
 
-                console.log('🔍 [handleCouponsClick] Response status:', response.status)
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}))
@@ -585,10 +590,6 @@ export const useAppHandlers = (
                 }
 
                 const data = await response.json()
-                console.log('🔍 [handleCouponsClick] Response data:', {
-                    couponsCount: data.coupons?.length || 0,
-                    pagination: data.pagination
-                })
                 
                 if (data.coupons && data.coupons.length > 0) {
                     // APIからのクーポンをfrontend用の形式に変換
@@ -618,10 +619,8 @@ export const useAppHandlers = (
                         createdAt: coupon.createdAt,
                         updatedAt: coupon.updatedAt,
                     }))
-                    console.log('✅ Loaded coupons from API:', storeCoupons.length, storeCoupons)
                     dispatch({ type: 'SET_STORE_COUPONS', payload: storeCoupons })
                 } else {
-                    console.log('⚠️ No coupons found')
                     dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
                 }
             } catch (error) {
@@ -647,8 +646,17 @@ export const useAppHandlers = (
     }, [navigation, dispatch])
 
     const handleViewPlan = useCallback(() => {
-        navigation.navigateToMyPage("plan-management")
-    }, [navigation])
+        // プラン有無に応じて遷移先を分岐
+        const hasPlan = latestState.current.plan !== null && latestState.current.plan !== undefined
+        
+        if (!hasPlan) {
+            // プラン未登録の場合は独立したプラン登録ページへ遷移
+            router.push('/plan-registration')
+        } else {
+            // プラン登録済みの場合は既存のプラン管理画面へ
+            navigation.navigateToMyPage("plan-management")
+        }
+    }, [navigation, router])
 
     const handleChangePlan = useCallback(() => {
         navigation.navigateToMyPage("plan-change")
@@ -759,16 +767,10 @@ export const useAppHandlers = (
             const userData = await userMeResponse.json()
 
             // デバッグログ
-            console.log('🔍 [handleWithdrawConfirm] userData:', userData)
-            console.log('🔍 [handleWithdrawConfirm] userData.plan:', userData.plan)
-            console.log('🔍 [handleWithdrawConfirm] userData.plan keys:', userData.plan ? Object.keys(userData.plan) : 'plan is null')
-            console.log('🔍 [handleWithdrawConfirm] userData.plan.paygentRunningId:', userData.plan?.paygentRunningId)
-            console.log('🔍 [handleWithdrawConfirm] userData.userPlan:', userData.userPlan)
 
             // userPlanまたはplanからrunningIdを取得（userPlanを優先）
             const runningId = userData.userPlan?.paygentRunningId || userData.plan?.paygentRunningId
 
-            console.log('🔍 [handleWithdrawConfirm] runningId:', runningId)
 
             if (!runningId) {
                 console.error('❌ [handleWithdrawConfirm] runningId not found:', {
@@ -1207,6 +1209,48 @@ export const useAppHandlers = (
         }
     }, [auth, dispatch, router])
 
+    // 店舗紹介画面に遷移
+    const handleStoreIntroduction = useCallback(() => {
+        navigation.navigateToMyPage("store-introduction")
+    }, [navigation])
+
+    // 店舗紹介登録
+    const handleStoreIntroductionSubmit = useCallback(async (data: {
+        storeName1: string
+        recommendedMenu1: string
+        storeName2: string
+        recommendedMenu2: string
+        storeName3: string
+        recommendedMenu3: string
+    }) => {
+        try {
+            const response = await fetch('/api/store-introductions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Cookieを含める
+                body: JSON.stringify(data),
+            })
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                toast.error(result.error?.message || '店舗紹介の登録に失敗しました')
+                return
+            }
+
+            toast.success('店舗紹介を登録しました')
+            // 登録状態を更新
+            dispatch({ type: 'SET_HAS_STORE_INTRODUCTION', payload: true })
+            // マイページのメイン画面に戻る
+            navigation.navigateToMyPage("main")
+        } catch (error) {
+            console.error('店舗紹介登録エラー:', error)
+            toast.error('店舗紹介の登録に失敗しました')
+        }
+    }, [dispatch, navigation])
+
     const handlePasswordChangeComplete = useCallback(() => {
         // ログアウト処理
         auth.logout()
@@ -1292,5 +1336,7 @@ export const useAppHandlers = (
         handleEmailChangeSuccessModalClose,
         handlePasswordChangeSubmit,
         handlePasswordChangeComplete,
-    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void }
+        handleStoreIntroduction,
+        handleStoreIntroductionSubmit,
+    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: any) => Promise<void> }
 }

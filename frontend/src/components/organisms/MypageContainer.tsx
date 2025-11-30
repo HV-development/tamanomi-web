@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import Image from "next/image"
-import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard, Share2, Copy, Check } from "lucide-react"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard, Share2, Copy, Check, Store } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
@@ -37,6 +37,7 @@ interface MyPageContainerProps {
   | "plan-management"
   | "withdrawal"
   | "withdrawal-complete"
+  | "store-introduction"
   onViewChange: (view: string) => void
   onEditProfile: () => void
   onChangeEmail: () => void
@@ -44,6 +45,8 @@ interface MyPageContainerProps {
   onViewPlan: () => void
   onViewUsageHistory: () => void
   onViewPaymentHistory: () => void
+  onStoreIntroduction?: () => void
+  hasStoreIntroduction?: boolean
   onCancelSubscription: () => void
   onWithdraw: () => void
   onWithdrawConfirm: () => void
@@ -298,24 +301,33 @@ const MenuButton = React.memo(({
   onClick,
   icon: Icon,
   label,
-  isRed = false
+  isRed = false,
+  disabled = false
 }: {
-  onClick: () => void,
+  onClick?: () => void,
   icon: React.ComponentType<{ className?: string }>,
   label: string,
-  isRed?: boolean
+  isRed?: boolean,
+  disabled?: boolean
 }) => (
   <button
-    onClick={onClick}
-    className={`w-full bg-white rounded-2xl border ${isRed ? 'border-red-200 hover:bg-red-50' : 'border-green-200 hover:bg-green-50'} p-4 flex items-center justify-between transition-colors`}
+    onClick={disabled ? undefined : onClick}
+    disabled={disabled}
+    className={`w-full bg-white rounded-2xl border p-4 flex items-center justify-between transition-colors ${
+      disabled 
+        ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60' 
+        : isRed 
+          ? 'border-red-200 hover:bg-red-50' 
+          : 'border-green-200 hover:bg-green-50'
+    }`}
   >
     <div className="flex items-center gap-3">
-      <div className={`w-8 h-8 ${isRed ? 'bg-red-100' : 'bg-green-100'} rounded-lg flex items-center justify-center`}>
-        <Icon className={`w-5 h-5 ${isRed ? 'text-red-600' : 'text-green-600'}`} />
+      <div className={`w-8 h-8 ${disabled ? 'bg-gray-100' : isRed ? 'bg-red-100' : 'bg-green-100'} rounded-lg flex items-center justify-center`}>
+        <Icon className={`w-5 h-5 ${disabled ? 'text-gray-400' : isRed ? 'text-red-600' : 'text-green-600'}`} />
       </div>
-      <span className="text-lg font-medium text-gray-500">{label}</span>
+      <span className={`text-lg font-medium ${disabled ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
     </div>
-    <div className="text-gray-400">›</div>
+    <div className={disabled ? 'text-gray-300' : 'text-gray-400'}>›</div>
   </button>
 ))
 MenuButton.displayName = 'MenuButton'
@@ -328,7 +340,10 @@ const MenuButtons = React.memo(({
   onChangePassword,
   onViewUsageHistory,
   onViewPaymentHistory,
-  onLogout
+  onStoreIntroduction,
+  onLogout,
+  plan,
+  hasStoreIntroduction
 }: {
   onEditProfile: () => void
   onViewPlan: () => void
@@ -336,30 +351,46 @@ const MenuButtons = React.memo(({
   onChangePassword: () => void
   onViewUsageHistory: () => void
   onViewPaymentHistory: () => void
+  onStoreIntroduction?: () => void
   onLogout: () => void
-}) => (
-  <div className="space-y-3">
-    {appConfig.myPageSettings.showProfile && (
-      <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
-    )}
-    {appConfig.myPageSettings.showPlanManagement && (
-      <MenuButton onClick={onViewPlan} icon={RefreshCw} label="プランの変更" />
-    )}
-    {appConfig.myPageSettings.showEmailChange && (
-      <MenuButton onClick={onChangeEmail} icon={Mail} label="メールアドレスの変更" />
-    )}
-    {appConfig.myPageSettings.showPasswordChange && (
-      <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
-    )}
-    {appConfig.myPageSettings.showUsageHistory && (
-      <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
-    )}
-    {appConfig.myPageSettings.showPaymentHistory && (
-      <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
-    )}
-    <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
-  </div>
-))
+  plan?: Plan
+  hasStoreIntroduction?: boolean
+}) => {
+  // プラン有無に応じてラベルを決定
+  const planMenuLabel = plan ? "プランの変更" : "プラン登録"
+  
+  return (
+    <div className="space-y-3">
+      {onStoreIntroduction && (
+        <MenuButton 
+          onClick={hasStoreIntroduction ? undefined : onStoreIntroduction} 
+          icon={Store} 
+          label={hasStoreIntroduction ? "店舗紹介（紹介済み）" : "店舗紹介"} 
+          disabled={hasStoreIntroduction}
+        />
+      )}
+      {appConfig.myPageSettings.showProfile && (
+        <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
+      )}
+      {appConfig.myPageSettings.showPlanManagement && (
+        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={planMenuLabel} />
+      )}
+      {appConfig.myPageSettings.showEmailChange && (
+        <MenuButton onClick={onChangeEmail} icon={Mail} label="メールアドレスの変更" />
+      )}
+      {appConfig.myPageSettings.showPasswordChange && (
+        <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
+      )}
+      {appConfig.myPageSettings.showUsageHistory && (
+        <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
+      )}
+      {appConfig.myPageSettings.showPaymentHistory && (
+        <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
+      )}
+      <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
+    </div>
+  )
+})
 MenuButtons.displayName = 'MenuButtons'
 
 export const MyPageContainer = React.memo(function MyPageContainer({
@@ -375,6 +406,8 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   onViewPlan,
   onViewUsageHistory,
   onViewPaymentHistory,
+  onStoreIntroduction,
+  hasStoreIntroduction,
   onWithdraw,
   onWithdrawConfirm,
   onWithdrawCancel,
@@ -528,7 +561,10 @@ export const MyPageContainer = React.memo(function MyPageContainer({
               onChangePassword={onChangePassword}
               onViewUsageHistory={onViewUsageHistory}
               onViewPaymentHistory={onViewPaymentHistory}
+              onStoreIntroduction={onStoreIntroduction}
               onLogout={onLogout}
+              plan={_plan}
+              hasStoreIntroduction={hasStoreIntroduction}
             />
           </FadeInComponent>
         </StaggeredContainer>

@@ -119,7 +119,6 @@ export const usePaymentReturn = () => {
           }
 
           const planData = await createPlanResponse.json()
-          console.log('✅ [usePaymentReturn] Plan created successfully:', planData)
         }
 
         // PaymentSessionをクリーンアップ（成功時のみ）

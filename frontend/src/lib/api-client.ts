@@ -2,7 +2,7 @@ import type {
   PayPayPaymentStartResponse,
   PayPayTransactionStatusResponse,
 } from '@/types/payment'
-import type { PayPayPaymentRequest } from '@hv-development/schemas'
+import type { PayPayPaymentRequest, QrPaymentRequest, QrPaymentResponse, QrGetTransactionResponse } from '@hv-development/schemas'
 
 /**
  * API呼び出しの共通処理
@@ -145,12 +145,42 @@ export async function getPayPayTransactionStatus(
 }
 
 /**
+ * イオンペイ決済申込API
+ * - Next API `/api/payment/qr/pay` を経由してバックエンドのQRコード決済申込エンドポイントを呼び出す
+ */
+export async function requestQrPayment(
+  body: QrPaymentRequest
+): Promise<ApiResponse<QrPaymentResponse>> {
+  return ApiClient.post<QrPaymentResponse>('/api/payment/qr/pay', body, {
+    requireAuth: true,
+  })
+}
+
+/**
+ * QRコード決済 取引情報取得API
+ * - Next API `/api/payment/qr/transactions/:transactionId` を経由してバックエンドの取引情報取得エンドポイントを呼び出す
+ */
+export async function getQrTransaction(
+  transactionId: string,
+  recursive?: boolean
+): Promise<ApiResponse<QrGetTransactionResponse & { paymentTransactionId?: string; applicationId?: string }>> {
+  const queryParams = recursive ? '?recursive=true' : ''
+  return ApiClient.get<QrGetTransactionResponse & { paymentTransactionId?: string; applicationId?: string }>(
+    `/api/payment/qr/transactions/${transactionId}${queryParams}`,
+    {
+      requireAuth: true,
+    }
+  )
+}
+
+/**
  * 認証関連のAPI関数
  */
 
 export interface PreRegisterRequest {
   email: string
   campaignCode?: string
+  shop_id?: string
 }
 
 export interface PreRegisterResponse {
@@ -165,22 +195,16 @@ export interface PreRegisterResponse {
 export async function preRegister(
   email: string,
   campaignCode?: string,
-  referrerUserId?: string
+  referrerUserId?: string,
+  shopId?: string
 ): Promise<PreRegisterResponse> {
   try {
     const requestBody = {
       email,
       campaignCode,
       ...(referrerUserId && referrerUserId.trim() !== '' ? { referrerUserId: referrerUserId.trim() } : {}),
+      ...(shopId && shopId.trim() !== '' ? { shopId: shopId.trim() } : {}),
     };
-
-    console.log('🔍 [api-client] preRegister called with:', {
-      email,
-      campaignCode,
-      referrerUserId,
-      hasReferrerUserId: !!referrerUserId,
-      requestBody,
-    });
 
     const response = await fetch('/api/auth/pre-register', {
       method: 'POST',
@@ -192,25 +216,25 @@ export async function preRegister(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      
+
       // 409エラー（メールアドレス重複）の場合は特別なメッセージ
       if (response.status === 409) {
         const message = errorData.error?.message || errorData.message || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
         throw new Error(message)
       }
-      
+
       // 400エラー（バリデーションエラー）の場合は詳細なメッセージを表示
       if (response.status === 400) {
         const message = errorData.error?.message || errorData.message || '入力内容に問題があります。確認してから再度お試しください。'
         throw new Error(message)
       }
-      
+
       // 500エラー（サーバーエラー）の場合は一般的なメッセージを表示
       if (response.status === 500) {
         const message = errorData.error?.message || errorData.message || 'システムエラーが発生しました。しばらく時間をおいてから再度お試しください。'
         throw new Error(message)
       }
-      
+
       const message = errorData.error?.message || errorData.message || '認証メールの送信に失敗しました'
       throw new Error(message)
     }
@@ -255,31 +279,31 @@ export async function confirmPasswordReset(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      
+
       // 400エラー（無効なトークンなど）の場合は特別なメッセージ
       if (response.status === 400) {
         const message = errorData.message || errorData.error?.message || '無効なリセットトークンです。リンクの有効期限が切れている可能性があります。'
         throw new Error(message)
       }
-      
+
       // 408エラー（タイムアウト）の場合は特別なメッセージ
       if (response.status === 408) {
         const message = errorData.message || errorData.error?.message || 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。'
         throw new Error(message)
       }
-      
+
       // 503エラー（サーバー接続エラー）の場合は特別なメッセージ
       if (response.status === 503) {
         const message = errorData.message || errorData.error?.message || 'サーバーに接続できません。ネットワーク接続を確認してください。'
         throw new Error(message)
       }
-      
+
       // 500エラー（サーバーエラー）の場合は一般的なメッセージを表示
       if (response.status === 500) {
         const message = errorData.message || errorData.error?.message || 'システムエラーが発生しました。しばらく時間をおいてから再度お試しください。'
         throw new Error(message)
       }
-      
+
       const message = errorData.message || errorData.error?.message || 'パスワードリセットに失敗しました'
       throw new Error(message)
     }

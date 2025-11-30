@@ -54,7 +54,6 @@ export async function POST(request: NextRequest) {
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.log('🔍 [reset-password] Error data:', errorData);
 
         // 400エラー（無効なトークンなど）の場合は特別な処理
         if (response.status === 400) {

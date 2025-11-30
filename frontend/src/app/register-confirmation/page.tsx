@@ -15,6 +15,7 @@ export default function RegisterConfirmationPage() {
   const [isClient, setIsClient] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [pointsGranted, setPointsGranted] = useState<number | null>(null)
+  const [shopId, setShopId] = useState<string | undefined>(undefined)
   const router = useRouter()
 
   // クライアントサイドでのみ searchParams を取得
@@ -24,6 +25,10 @@ export default function RegisterConfirmationPage() {
       const urlParams = new URLSearchParams(window.location.search)
       const emailParam = urlParams.get('email') || ''
       const tokenParam = urlParams.get('token') || ''
+      const shopIdParam = urlParams.get('shop_id') || undefined
+
+      // shopIdをstateに保存
+      setShopId(shopIdParam)
 
       // トークンがない場合は登録画面にリダイレクト
       if (!tokenParam) {
@@ -38,6 +43,10 @@ export default function RegisterConfirmationPage() {
         // sessionStorageにデータがある場合（通常フロー）
         try {
           const parsedData = JSON.parse(storedData) as UserRegistrationComplete
+          // shop_idがURLパラメータにある場合は上書き
+          if (shopIdParam) {
+            parsedData.shopId = shopIdParam
+          }
           setFormData(parsedData)
           setEmail(emailParam)
           setToken(tokenParam)
@@ -50,36 +59,36 @@ export default function RegisterConfirmationPage() {
 
       // sessionStorageがない場合、トークンからemailを復元
       try {
-        console.log('🔄 sessionStorageが空のため、トークンからemailを復元します')
-        
+
         // Base64URLデコード（ブラウザ環境用）
         const paddedToken = tokenParam + '='.repeat((4 - tokenParam.length % 4) % 4)
         const base64 = paddedToken.replace(/-/g, '+').replace(/_/g, '/')
-        
+
         // ブラウザ環境でのデコード
         const decodedString = atob(base64)
         const tokenData = JSON.parse(decodedString)
-        
-        console.log('✅ トークンからemailを復元:', tokenData.email)
-        
+
+
         // 有効期限チェック
         if (tokenData.expiresAt && Date.now() > tokenData.expiresAt) {
           alert('トークンの有効期限が切れています。再度メール登録からやり直してください。')
           router.push('/email-registration')
           return
         }
-        
+
         // tokenDataから取得したemailまたはURLパラメータのemailを使用
         const recoveredEmail = tokenData.email || emailParam
-        
+
         if (!recoveredEmail) {
           throw new Error('メールアドレスを取得できませんでした')
         }
-        
+
         // ユーザーに情報を再入力してもらうため、登録画面に戻す
         alert('セッションが切れました。お手数ですが、再度情報を入力してください。')
-        router.push(`/register?email=${encodeURIComponent(recoveredEmail)}&token=${encodeURIComponent(tokenParam)}`)
-        
+        const shopIdParamForRedirect = shopIdParam ? `&shop_id=${encodeURIComponent(shopIdParam)}` : ''
+        router.push(
+          `/register?email=${encodeURIComponent(recoveredEmail)}&token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`
+        )
       } catch (error) {
         console.error('トークンデコードエラー:', error)
         alert('トークンの検証に失敗しました。再度メール登録からやり直してください。')
@@ -101,7 +110,6 @@ export default function RegisterConfirmationPage() {
         ? sessionStorage.getItem('referrerUserId') 
         : null;
       
-      console.log('🔍 [register-confirmation] referrerUserId from sessionStorage:', referrerUserId);
 
       // バックエンドAPIに登録リクエストを送信
       const response = await fetch('/api/auth/register', {
@@ -124,6 +132,7 @@ export default function RegisterConfirmationPage() {
           // 紹介者IDを追加
           referrerUserId: referrerUserId && referrerUserId.trim() !== '' ? referrerUserId.trim() : undefined,
           token: token,
+          shopId: shopId,
         }),
       })
 
@@ -175,7 +184,8 @@ export default function RegisterConfirmationPage() {
     if (formData) {
       sessionStorage.setItem('editFormData', JSON.stringify(formData))
     }
-    router.push(`/register?token=${encodeURIComponent(token)}&edit=true`)
+    const shopIdParam = formData?.shopId ? `&shop_id=${encodeURIComponent(formData?.shopId)}` : ''
+    router.push(`/register?token=${encodeURIComponent(token)}&edit=true${shopIdParam}`)
   }
 
   const handleLogoClick = () => router.push('/')
@@ -215,7 +225,7 @@ export default function RegisterConfirmationPage() {
         isLoading={isLoading}
         backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
       />
-      
+
       {/* ポイント付与成功モーダル */}
       <Modal
         isOpen={showSuccessModal}

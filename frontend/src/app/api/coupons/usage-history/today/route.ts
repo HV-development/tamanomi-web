@@ -9,7 +9,6 @@ export async function GET(request: NextRequest) {
     const authHeader = getAuthHeader(request)
     
     if (!authHeader) {
-      console.log('❌ [usage-history/today] No authorization header');
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -26,10 +25,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.log('🔍 [usage-history/today] Calling backend API with shopId:', shopId);
 
     const fullUrl = buildApiUrl(`/coupons/usage-history/today?shopId=${encodeURIComponent(shopId)}`)
-    console.log('🔍 [usage-history/today] Backend URL:', fullUrl);
 
     const response = await fetch(fullUrl, {
       method: 'GET',
@@ -40,7 +37,6 @@ export async function GET(request: NextRequest) {
       cache: 'no-store',
     })
 
-    console.log('🔍 [usage-history/today] Backend response status:', response.status);
 
     const data = await response.json()
 
@@ -52,7 +48,6 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    console.log('🔍 [usage-history/today] Backend response data:', data);
     return NextResponse.json(data)
 
   } catch (error) {

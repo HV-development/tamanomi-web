@@ -198,15 +198,6 @@ export function OtpInputForm({
           ))}
         </div>
 
-        {/* ローディング表示 */}
-        {isLoading && (
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center gap-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
-              <p className="text-green-600 font-medium">認証中...</p>
-            </div>
-          </div>
-        )}
 
         {/* エラーメッセージ */}
         {error && <p className="text-sm text-red-500 text-center mb-4">{error}</p>}

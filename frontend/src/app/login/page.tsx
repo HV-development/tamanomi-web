@@ -1,23 +1,23 @@
 "use client"
 
 import { LoginLayout } from "@/components/templates/LoginLayout"
-import { Suspense } from "react"
+import { Suspense, useCallback } from "react"
 import { useLoginPage } from "@/hooks/useLoginPage"
 
 function LoginPageContent() {
   const {
     isLoading,
     error,
-    loginStep,
-    email,
     isCheckingAuth,
     handlePasswordLogin,
-    handleOtpVerify,
-    handleResendOtp,
-    handleBackToPassword,
     handleSignup,
     handleForgotPassword,
   } = useLoginPage()
+
+  // Hooksは常に同じ順序で呼ばれる必要があるため、early returnの前に定義
+  const handleHomeClick = useCallback(() => {
+    window.location.href = '/'
+  }, [])
 
   // 認証チェック中またはローディング中はローディング表示
   if (isCheckingAuth || isLoading) {
@@ -33,24 +33,15 @@ function LoginPageContent() {
     )
   }
 
-  const handleHomeClick = () => {
-    window.location.href = '/'
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
       <LoginLayout
         onLogin={handlePasswordLogin}
-        onVerifyOtp={handleOtpVerify}
         onSignup={handleSignup}
         onForgotPassword={handleForgotPassword}
-        onResendOtp={handleResendOtp}
-        onBackToPassword={handleBackToPassword}
         onHomeClick={handleHomeClick}
         isLoading={isLoading}
         error={error}
-        loginStep={loginStep}
-        email={email}
       />
     </div>
   )

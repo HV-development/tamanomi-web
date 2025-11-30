@@ -37,6 +37,14 @@ export async function GET(
               registerUrl.searchParams.set('ref', ref)
             }
 
+            // shop_idがURLパラメータまたはトークンデータに含まれている場合は追加
+            const shopIdFromQuery = request.nextUrl.searchParams.get('shop_id')
+            const shopIdFromToken = tokenData.shopId
+            const shopId = shopIdFromQuery || shopIdFromToken
+            if (shopId) {
+              registerUrl.searchParams.set('shop_id', shopId)
+            }
+
             return NextResponse.redirect(registerUrl)
         } catch {
             return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))

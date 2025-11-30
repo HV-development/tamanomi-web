@@ -14,7 +14,6 @@ export async function POST(
     const { shopId } = await params
     
     if (!authHeader) {
-      console.log('❌ [favorites] No authorization header')
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -28,10 +27,8 @@ export async function POST(
       )
     }
 
-    console.log('🔍 [favorites] Toggling favorite for shop:', shopId)
 
     const fullUrl = buildApiUrl(`/users/favorites/${shopId}`)
-    console.log('🔍 [favorites] Backend URL:', fullUrl)
 
     const response = await fetch(fullUrl, {
       method: 'POST',
@@ -43,7 +40,6 @@ export async function POST(
       cache: 'no-store',
     })
 
-    console.log('🔍 [favorites] Backend response status:', response.status)
 
     const data = await response.json()
 
@@ -64,7 +60,6 @@ export async function POST(
       )
     }
     
-    console.log('🔍 [favorites] Backend response data:', data)
     return NextResponse.json(data)
 
   } catch (error) {
@@ -86,7 +81,6 @@ export async function DELETE(
     const { shopId } = await params
     
     if (!authHeader) {
-      console.log('❌ [favorites] No authorization header')
       return NextResponse.json(
         { error: '認証が必要です' },
         { status: 401 }
@@ -100,10 +94,8 @@ export async function DELETE(
       )
     }
 
-    console.log('🔍 [favorites] Deleting favorite for shop:', shopId)
 
     const fullUrl = buildApiUrl(`/users/favorites/${shopId}`)
-    console.log('🔍 [favorites] Backend URL:', fullUrl)
 
     const response = await fetch(fullUrl, {
       method: 'DELETE',
@@ -115,7 +107,6 @@ export async function DELETE(
       cache: 'no-store',
     })
 
-    console.log('🔍 [favorites] Backend response status:', response.status)
 
     const data = await response.json()
 
@@ -136,7 +127,6 @@ export async function DELETE(
       )
     }
     
-    console.log('🔍 [favorites] Backend response data:', data)
     return NextResponse.json(data)
 
   } catch (error) {

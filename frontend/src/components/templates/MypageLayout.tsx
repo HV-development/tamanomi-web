@@ -16,6 +16,7 @@ interface MyPageLayoutProps {
   | "plan-management"
   | "withdrawal"
   | "withdrawal-complete"
+  | "store-introduction"
   onViewChange: (view: string) => void
   onEditProfile: () => void
   onChangeEmail: () => void
@@ -23,6 +24,8 @@ interface MyPageLayoutProps {
   onViewPlan: () => void
   onViewUsageHistory: () => void
   onViewPaymentHistory: () => void
+  onStoreIntroduction?: () => void
+  hasStoreIntroduction?: boolean
   onCancelSubscription: () => void
   onWithdraw: () => void
   onWithdrawConfirm: () => void
@@ -59,6 +62,7 @@ export function MyPageLayout({
   onViewPlan,
   onViewUsageHistory,
   onViewPaymentHistory,
+  onStoreIntroduction,
   onCancelSubscription,
   onLogout,
   onBack,
@@ -80,6 +84,7 @@ export function MyPageLayout({
   newEmail,
   currentUserRank,
   isEmailChangeSuccessModalOpen,
+  hasStoreIntroduction,
 }: MyPageLayoutProps) {
   return (
     <MyPageContainer
@@ -95,6 +100,8 @@ export function MyPageLayout({
       onViewPlan={onViewPlan}
       onViewUsageHistory={onViewUsageHistory}
       onViewPaymentHistory={onViewPaymentHistory}
+      onStoreIntroduction={onStoreIntroduction}
+      hasStoreIntroduction={hasStoreIntroduction}
       onCancelSubscription={onCancelSubscription}
       onWithdraw={onWithdraw}
       onWithdrawConfirm={onWithdrawConfirm}

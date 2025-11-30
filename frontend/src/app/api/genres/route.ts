@@ -11,7 +11,6 @@ export async function GET() {
     // 公開エンドポイント（認証不要）
     // バックエンドのエンドポイントは /api/v1/genres（server.tsで登録されている）
     const backendUrl = `${API_BASE_URL}/api/v1/genres`
-    console.log('[api/genres] → backend:', backendUrl)
 
     const response = await fetch(backendUrl, {
       method: 'GET',
@@ -21,14 +20,8 @@ export async function GET() {
       cache: 'no-store',
     })
 
-    console.log('[api/genres] backend status:', response.status)
 
     const data = await response.json().catch(() => ({}))
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[api/genres] backend payload:', {
-        genresCount: Array.isArray((data as any)?.genres) ? (data as any).genres.length : 'n/a',
-      })
-    }
 
     if (!response.ok) {
       // 500系は文言を統一
