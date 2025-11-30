@@ -9,6 +9,7 @@ import { Button } from '@/components/atoms/Button'
 
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingEmail, setIsLoadingEmail] = useState(true)
   const [formData, setFormData] = useState<UserRegistrationComplete | null>(null)
   const [email, setEmail] = useState<string>('')
   const [token, setToken] = useState<string>('')
@@ -16,14 +17,17 @@ export default function RegisterConfirmationPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [pointsGranted, setPointsGranted] = useState<number | null>(null)
   const [shopId, setShopId] = useState<string | undefined>(undefined)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
     setIsClient(true)
-    if (typeof window !== 'undefined') {
+    
+    const initializePage = async () => {
+      if (typeof window === 'undefined') return
+
       const urlParams = new URLSearchParams(window.location.search)
-      const emailParam = urlParams.get('email') || ''
       const tokenParam = urlParams.get('token') || ''
       const shopIdParam = urlParams.get('shop_id') || undefined
 
@@ -36,7 +40,9 @@ export default function RegisterConfirmationPage() {
         return
       }
 
-      // まずsessionStorageから取得を試みる
+      setToken(tokenParam)
+
+      // まずsessionStorageからフォームデータを取得
       const storedData = sessionStorage.getItem('registerFormData')
 
       if (storedData) {
@@ -48,53 +54,70 @@ export default function RegisterConfirmationPage() {
             parsedData.shopId = shopIdParam
           }
           setFormData(parsedData)
-          setEmail(emailParam)
-          setToken(tokenParam)
+
+          // メールアドレスをセッションストレージから取得（セキュリティ改善：URLパラメータから削除）
+          const storedEmail = sessionStorage.getItem('registerEmail')
+          if (storedEmail) {
+            setEmail(storedEmail)
+            setIsLoadingEmail(false)
+            return
+          }
+
+          // セッションストレージにメールアドレスがない場合、APIから取得
+          try {
+            const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+            if (response.ok) {
+              const data = await response.json()
+              setEmail(data.email)
+              sessionStorage.setItem('registerEmail', data.email)
+            } else {
+              throw new Error('Failed to fetch email')
+            }
+          } catch {
+            // APIからも取得できない場合、登録画面に戻す
+            alert('セッションが切れました。お手数ですが、再度情報を入力してください。')
+            const shopIdParamForRedirect = shopIdParam ? `&shop_id=${encodeURIComponent(shopIdParam)}` : ''
+            router.push(`/register?token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`)
+            return
+          }
+          
+          setIsLoadingEmail(false)
           return
-        } catch (error) {
-          console.error('sessionStorage parse error:', error)
+        } catch (err) {
+          console.error('sessionStorage parse error:', err)
           // パースエラーの場合は次の処理へ
         }
       }
 
-      // sessionStorageがない場合、トークンからemailを復元
+      // sessionStorageがない場合、APIからメールアドレスを取得して登録画面に戻す
       try {
-
-        // Base64URLデコード（ブラウザ環境用）
-        const paddedToken = tokenParam + '='.repeat((4 - tokenParam.length % 4) % 4)
-        const base64 = paddedToken.replace(/-/g, '+').replace(/_/g, '/')
-
-        // ブラウザ環境でのデコード
-        const decodedString = atob(base64)
-        const tokenData = JSON.parse(decodedString)
-
-
-        // 有効期限チェック
-        if (tokenData.expiresAt && Date.now() > tokenData.expiresAt) {
-          alert('トークンの有効期限が切れています。再度メール登録からやり直してください。')
-          router.push('/email-registration')
+        const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
+            setError('トークンの有効期限が切れています。再度メール登録からやり直してください。')
+          } else {
+            setError('トークンが無効です。再度メール登録からやり直してください。')
+          }
+          setTimeout(() => router.push('/email-registration'), 3000)
+          setIsLoadingEmail(false)
           return
-        }
-
-        // tokenDataから取得したemailまたはURLパラメータのemailを使用
-        const recoveredEmail = tokenData.email || emailParam
-
-        if (!recoveredEmail) {
-          throw new Error('メールアドレスを取得できませんでした')
         }
 
         // ユーザーに情報を再入力してもらうため、登録画面に戻す
         alert('セッションが切れました。お手数ですが、再度情報を入力してください。')
         const shopIdParamForRedirect = shopIdParam ? `&shop_id=${encodeURIComponent(shopIdParam)}` : ''
-        router.push(
-          `/register?email=${encodeURIComponent(recoveredEmail)}&token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`
-        )
-      } catch (error) {
-        console.error('トークンデコードエラー:', error)
-        alert('トークンの検証に失敗しました。再度メール登録からやり直してください。')
-        router.push('/email-registration')
+        router.push(`/register?token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`)
+      } catch {
+        setError('エラーが発生しました。再度お試しください。')
+        setTimeout(() => router.push('/email-registration'), 3000)
+      } finally {
+        setIsLoadingEmail(false)
       }
     }
+
+    initializePage()
   }, [router])
 
   const handleRegister = async () => {
@@ -145,6 +168,7 @@ export default function RegisterConfirmationPage() {
         // 登録成功後はセッションストレージをクリア
         sessionStorage.removeItem('registerFormData')
         sessionStorage.removeItem('referrerUserId')
+        sessionStorage.removeItem('registerEmail')
 
         // さいたま市アプリ連携でポイント付与があった場合はモーダルを表示
         if (result.pointsGranted) {
@@ -180,7 +204,7 @@ export default function RegisterConfirmationPage() {
   }
 
   const handleEdit = () => {
-    // フォームデータをsessionStorageに保存してから登録画面に戻る
+    // フォームデータをsessionStorageに保存してから登録画面に戻る（emailパラメータは含めない - セキュリティ改善）
     if (formData) {
       sessionStorage.setItem('editFormData', JSON.stringify(formData))
     }
@@ -203,12 +227,24 @@ export default function RegisterConfirmationPage() {
   }
 
   // クライアントサイドでの初期化が完了するまでローディング表示
-  if (!isClient || !formData) {
+  if (!isClient || isLoadingEmail || !formData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">読み込み中...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // エラー表示
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-gray-600">メール登録画面にリダイレクトします...</p>
         </div>
       </div>
     )
