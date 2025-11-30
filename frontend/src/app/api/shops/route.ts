@@ -43,8 +43,6 @@ export async function GET(request: NextRequest) {
     // クライアントの Authorization ヘッダを転送（未ログイン時は未設定のまま）
     const authorization = getAuthHeader(request) || undefined
 
-    const hasInternalSecret = Boolean(process.env.INTERNAL_API_SECRET)
-
     let response: Response
     try {
       const headers: Record<string, string> = {
@@ -53,10 +51,6 @@ export async function GET(request: NextRequest) {
       
       if (authorization) {
         headers.Authorization = authorization
-      }
-      
-      if (process.env.INTERNAL_API_SECRET) {
-        headers['X-Internal-Api-Secret'] = process.env.INTERNAL_API_SECRET
       }
       
       // タイムアウト設定（30秒）- AbortSignal.timeout()のフォールバック

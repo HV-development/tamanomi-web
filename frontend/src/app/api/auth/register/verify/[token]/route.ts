@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ token: string }> }
@@ -11,24 +13,29 @@ export async function GET(
             return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
         }
 
-        // トークンをデコードして検証
+        // トークンはUUIDのみで、メールアドレスなどの個人情報は含まれない（セキュリティ改善）
+        // バックエンドAPIでトークンを検証
         try {
-            // Base64URLデコード
-            const paddedToken = token + '='.repeat((4 - token.length % 4) % 4)
-                .replace(/-/g, '+')
-                .replace(/_/g, '/')
+            const response = await fetch(`${API_BASE_URL}/api/v1/register/token-info?token=${encodeURIComponent(token)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
 
-            const decodedToken = Buffer.from(paddedToken, 'base64').toString('utf-8')
-            const tokenData = JSON.parse(decodedToken)
-
-            // 有効期限チェック
-            if (tokenData.expiresAt && Date.now() > tokenData.expiresAt) {
-                return NextResponse.redirect(new URL('/email-registration?error=token_expired', request.url))
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                console.error('Token verification failed:', errorData)
+                
+                // エラーコードに応じてリダイレクト
+                if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
+                    return NextResponse.redirect(new URL('/email-registration?error=token_expired', request.url))
+                }
+                return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
             }
 
-            // メールアドレスとトークンを含むクエリパラメータで新規登録画面にリダイレクト
+            // 検証成功 - 新規登録画面にリダイレクト（emailパラメータは含めない - セキュリティ改善）
             const registerUrl = new URL('/register', request.url)
-            registerUrl.searchParams.set('email', tokenData.email)
             registerUrl.searchParams.set('token', token)
             
             // URLパラメータから紹介者IDを取得して含める
@@ -37,12 +44,10 @@ export async function GET(
               registerUrl.searchParams.set('ref', ref)
             }
 
-            // shop_idがURLパラメータまたはトークンデータに含まれている場合は追加
+            // shop_idがURLパラメータに含まれている場合は追加
             const shopIdFromQuery = request.nextUrl.searchParams.get('shop_id')
-            const shopIdFromToken = tokenData.shopId
-            const shopId = shopIdFromQuery || shopIdFromToken
-            if (shopId) {
-              registerUrl.searchParams.set('shop_id', shopId)
+            if (shopIdFromQuery) {
+              registerUrl.searchParams.set('shop_id', shopIdFromQuery)
             }
 
             return NextResponse.redirect(registerUrl)

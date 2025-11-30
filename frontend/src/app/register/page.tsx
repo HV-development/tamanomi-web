@@ -7,38 +7,41 @@ import { UserRegistrationComplete } from "@hv-development/schemas"
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [searchParams, setSearchParams] = useState<{ email?: string; token?: string; shop_id?: string }>({})
+  const [isLoadingEmail, setIsLoadingEmail] = useState(true)
+  const [email, setEmail] = useState<string | undefined>(undefined)
+  const [token, setToken] = useState<string | undefined>(undefined)
+  const [shopId, setShopId] = useState<string | undefined>(undefined)
   const [isClient, setIsClient] = useState(false)
   const [initialFormData, setInitialFormData] = useState<UserRegistrationComplete | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  // クライアントサイドでのみ searchParams を取得
+  // クライアントサイドでのみ searchParams を取得し、APIからメールアドレスを取得
   useEffect(() => {
     setIsClient(true)
-    if (typeof window !== 'undefined') {
+    
+    const initializePage = async () => {
+      if (typeof window === 'undefined') return
+
       const urlParams = new URLSearchParams(window.location.search)
-      const email = urlParams.get('email') || undefined
-      const token = urlParams.get('token') || undefined
+      const tokenParam = urlParams.get('token') || undefined
       const shop_id = urlParams.get('shop_id') || undefined
       const ref = urlParams.get('ref') // 紹介者IDを取得
       const isEdit = urlParams.get('edit') === 'true'
 
       // トークンが存在しない場合はメール登録画面にリダイレクト
-      if (!token || token.trim() === '') {
+      if (!tokenParam || tokenParam.trim() === '') {
         router.push('/email-registration')
         return
       }
+
+      setToken(tokenParam)
+      setShopId(shop_id)
 
       // URLパラメータから紹介者IDを取得してセッションストレージに保存
       if (ref) {
         sessionStorage.setItem('referrerUserId', ref)
       }
-
-      setSearchParams({
-        email,
-        token,
-        shop_id,
-      })
 
       // 編集モードの場合、保存されたフォームデータを取得
       if (isEdit) {
@@ -52,29 +55,60 @@ export default function RegisterPage() {
             // エラーを無視
           }
         }
+        // 編集モードの場合、セッションストレージからメールアドレスを取得
+        const savedEmail = sessionStorage.getItem('registerEmail')
+        if (savedEmail) {
+          setEmail(savedEmail)
+          setIsLoadingEmail(false)
+          return
+        }
+      }
+
+      // トークンからメールアドレスを取得（セキュリティ改善：URLパラメータにメールアドレスを含めない）
+      try {
+        const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
+            setError('トークンの有効期限が切れています。再度メール登録からやり直してください。')
+          } else {
+            setError('トークンが無効です。再度メール登録からやり直してください。')
+          }
+          setTimeout(() => router.push('/email-registration'), 3000)
+          return
+        }
+
+        const data = await response.json()
+        setEmail(data.email)
+        // セッションストレージにメールアドレスを保存（確認画面での復元用）
+        sessionStorage.setItem('registerEmail', data.email)
+      } catch {
+        setError('エラーが発生しました。再度お試しください。')
+        setTimeout(() => router.push('/email-registration'), 3000)
+      } finally {
+        setIsLoadingEmail(false)
       }
     }
+
+    initializePage()
   }, [router])
 
   const handleRegisterSubmit = async (data: UserRegistrationComplete) => {
     setIsLoading(true)
 
-    // shop_idをURLパラメータから取得してデータに追加
+    // shop_idを追加
     const dataWithShopId = {
       ...data,
-      shop_id: searchParams.shop_id || undefined,
+      shop_id: shopId || undefined,
     }
 
     // フォームデータをセッションストレージに保存
     sessionStorage.setItem('registerFormData', JSON.stringify(dataWithShopId))
 
-    // 確認画面に遷移（shop_idも含める）
-    const shopIdParam = searchParams.shop_id ? `&shop_id=${encodeURIComponent(searchParams.shop_id)}` : ''
-    router.push(
-      `/register-confirmation?email=${encodeURIComponent(searchParams.email || '')}&token=${encodeURIComponent(
-        searchParams.token || ''
-      )}${shopIdParam}`
-    )
+    // 確認画面に遷移（emailパラメータを削除 - セキュリティ改善）
+    const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
+    router.push(`/register-confirmation?token=${encodeURIComponent(token || '')}${shopIdParam}`)
     setIsLoading(false)
   }
 
@@ -82,7 +116,7 @@ export default function RegisterPage() {
   const handleLogoClick = () => router.push('/')
 
   // クライアントサイドでの初期化が完了するまでローディング表示
-  if (!isClient) {
+  if (!isClient || isLoadingEmail) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
         <div className="text-center">
@@ -93,9 +127,21 @@ export default function RegisterPage() {
     )
   }
 
+  // エラー表示
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-gray-600">メール登録画面にリダイレクトします...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <RegisterContainer
-      email={searchParams.email}
+      email={email}
       initialFormData={initialFormData}
       onSubmit={handleRegisterSubmit}
       onCancel={handleCancel}
