@@ -6,7 +6,34 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    // Next.jsのAPIルートはプリフェッチなどで空ボディのまま叩かれることがあるため、
+    // まずテキストとして受け取り、空チェックとJSONパースを明示的に行う
+    const rawBody = await request.text()
+
+    if (!rawBody || rawBody.trim().length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'リクエストボディが空です。フォームから再度送信してください。'
+        },
+        { status: 400 }
+      )
+    }
+
+    let body: any
+    try {
+      body = JSON.parse(rawBody)
+    } catch (parseError) {
+      console.error('Register API: JSON parse error', parseError)
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'リクエスト形式が正しくありません。',
+          error: parseError instanceof Error ? parseError.message : 'JSON parse error'
+        },
+        { status: 400 }
+      )
+    }
 
     // バックエンドが期待するデータ構造に変換
     // 空文字列のsaitamaAppIdとreferrerUserIdは除外
