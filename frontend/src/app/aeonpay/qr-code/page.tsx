@@ -2,11 +2,29 @@
 
 import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import QRCode from 'react-qr-code'
 import { Loader2, ArrowLeft, CheckCircle, XCircle, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/atoms/Button'
 import { getQrTransaction } from '@/lib/api-client'
 
+/**
+ * イオンペイ決済のQRコード画面
+ * 
+ * 重要: イオンペイの「導入補足資料」に基づく正しい処理フロー
+ * 
+ * 1. PCブラウザの場合:
+ *    - payTransaction APIの応答で resultProperty.qrCodeUrl を取得
+ *    - このURLは「イオンペイが提供するQRコード表示画面のURL」
+ *    - このURLにGETでリダイレクトして、イオンペイのQRコード画面を表示
+ *    - ユーザーがスマホのiAEONアプリでそのQRコードを読み取る
+ * 
+ * 2. スマホブラウザの場合:
+ *    - 同様に qrCodeUrl にリダイレクト
+ *    - イオンペイがスマホを検知し、アプリ起動画面を表示
+ * 
+ * 3. スマホアプリの場合:
+ *    - resultProperty.application_start_key を使用
+ *    - &origin=app を末尾に追加してiAEONアプリを起動
+ */
 function AeonPayQrCodeContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -17,6 +35,7 @@ function AeonPayQrCodeContent() {
   const [transactionId, setTransactionId] = useState<string | null>(null)
   const [planId, setPlanId] = useState<string | null>(null)
   const [paymentTransactionId, setPaymentTransactionId] = useState<string | null>(null)
+  const [hasRedirected, setHasRedirected] = useState(false)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -25,6 +44,9 @@ function AeonPayQrCodeContent() {
     const paymentTransactionIdParam = searchParams.get('paymentTransactionId')
     const status = searchParams.get('status')
     const transactionIdParam = searchParams.get('transactionId')
+    // イオンペイからのコールバックパラメータを確認
+    const tradeStatus = searchParams.get('tradeStatus')
+    const tradeTransactionId = searchParams.get('transactionId')
 
     // paymentTransactionIdを設定
     if (paymentTransactionIdParam) {
@@ -34,6 +56,36 @@ function AeonPayQrCodeContent() {
     // transactionIdを設定（決済状態のポーリングに使用）
     if (transactionIdParam) {
       setTransactionId(transactionIdParam)
+    }
+
+    // イオンペイからのコールバック（成功/失敗/キャンセル/不明）を処理
+    // 導入補足資料 2.5/3.5 に基づき、tradeStatusパラメータを確認
+    if (tradeStatus) {
+      setIsLoading(false)
+      if (tradeStatus === 'success' || tradeStatus === 'unknown') {
+        // 成功または不明の場合は、取引情報を照会して確認
+        setPaymentStatus('pending')
+        if (tradeTransactionId) {
+          setTransactionId(tradeTransactionId)
+        }
+      } else if (tradeStatus === 'failure') {
+        setPaymentStatus('failed')
+      } else if (tradeStatus === 'cancel') {
+        setPaymentStatus('failed')
+        setError('決済がキャンセルされました。')
+      }
+      return
+    }
+
+    // status（通常のコールバック用）を確認
+    if (status === 'SUCCESS') {
+      setPaymentStatus('success')
+      setIsLoading(false)
+      return
+    } else if (status === 'FAILED' || status === 'CANCEL') {
+      setPaymentStatus('failed')
+      setIsLoading(false)
+      return
     }
 
     if (qrCodeUrlParam) {
@@ -63,13 +115,6 @@ function AeonPayQrCodeContent() {
     } else {
       setError('QRコード情報が取得できませんでした。')
       setIsLoading(false)
-    }
-
-    // ステータスを設定
-    if (status === 'SUCCESS') {
-      setPaymentStatus('success')
-    } else if (status === 'FAILED') {
-      setPaymentStatus('failed')
     }
 
     // クリーンアップ関数
@@ -134,15 +179,27 @@ function AeonPayQrCodeContent() {
     }
   }, [transactionId, paymentStatus, router, paymentTransactionId, planId])
 
+  // イオンペイのQRコード画面にリダイレクト（自動リダイレクト用）
+  // 導入補足資料7.1に基づき、qrCodeUrlにGETでリダイレクトしてイオンペイ画面を表示
+  useEffect(() => {
+    if (qrCodeUrl && !hasRedirected && paymentStatus === 'pending') {
+      // 自動リダイレクトを実行
+      setHasRedirected(true)
+      // イオンペイの画面にリダイレクト（GETリクエスト）
+      // イオンペイ側でQRコード画面またはスマホアプリ起動画面が表示される
+      window.location.href = qrCodeUrl
+    }
+  }, [qrCodeUrl, hasRedirected, paymentStatus])
+
   const handleBack = () => {
     router.push('/plan-registration')
   }
 
   const handleOpenInApp = () => {
     if (qrCodeUrl) {
-      // 同じタブで開く（セッションストレージを共有するため）
-      // QRコードを読み取る場合と同様に、同じタブで遷移することで
-      // イオンペイアプリから戻ってきた時にセッションストレージが利用可能になる
+      // イオンペイのQRコード画面/アプリ起動画面にリダイレクト
+      // 導入補足資料7.1「リダイレクト画面について」に基づく
+      // GETメソッドでqrCodeUrlに遷移することで、イオンペイが提供する画面が表示される
       window.location.href = qrCodeUrl
     }
   }
@@ -205,41 +262,41 @@ function AeonPayQrCodeContent() {
     )
   }
 
+  // イオンペイの画面にリダイレクト中の表示
+  // 導入補足資料に基づき、qrCodeUrlに自動リダイレクトして
+  // イオンペイが提供するQRコード画面またはアプリ起動画面を表示させる
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">イオンペイ決済</h1>
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto" />
+          <h1 className="text-2xl font-bold text-gray-900">イオンペイ決済画面に移動中</h1>
           <p className="text-sm text-gray-600">
-            下記のQRコードをイオンペイアプリで読み取ってください
+            イオンペイの決済画面にリダイレクトしています。<br />
+            しばらくお待ちください。
           </p>
         </div>
 
-        {qrCodeUrl && (
+        {qrCodeUrl && !hasRedirected && (
           <div className="flex flex-col items-center space-y-4 w-full">
-            <div className="bg-white p-4 rounded-lg border-2 border-blue-200">
-              <QRCode
-                value={qrCodeUrl}
-                size={256}
-                level="M"
-                className="w-full h-full"
-              />
-            </div>
+            <p className="text-xs text-gray-500 text-center">
+              自動的に画面が切り替わらない場合は下のボタンを押してください
+            </p>
             <Button 
               onClick={handleOpenInApp} 
               className="w-full flex items-center justify-center py-3 text-base font-medium"
               variant="primary"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
-              アプリを起動する
+              イオンペイ決済画面を開く
             </Button>
           </div>
         )}
 
         <div className="pt-4 border-t border-gray-200">
-          <Button onClick={handleBack} variant="primary" className="w-full flex items-center justify-center py-3 text-base font-medium">
+          <Button onClick={handleBack} variant="secondary" className="w-full flex items-center justify-center py-3 text-base font-medium">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            戻る
+            キャンセルして戻る
           </Button>
         </div>
       </div>
