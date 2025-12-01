@@ -71,13 +71,13 @@ export default function PlanRegistrationPage() {
         const errorData = await response.json().catch(() => ({}))
         console.error('❌ [fetchUserInfo] API error:', response.status, errorData)
         setSaitamaAppLinked(false)
-        
+
         // 認証失敗時（401/403）はログイン画面にリダイレクト
         if (response.status === 401 || response.status === 403) {
           router.push('/login?redirect=/plan-registration')
           return
         }
-        
+
         if (response.status === 404) {
           setError('ユーザー情報が見つかりません。新規登録画面からやり直してください。')
         } else {
@@ -99,7 +99,7 @@ export default function PlanRegistrationPage() {
       const saitamaAppLinkedParam = urlParams.get('saitamaAppLinked')
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
-      
+
       // セッションストレージからメールアドレスを取得（一時的に使用）
       const sessionEmail = sessionStorage.getItem('userEmail')
       if (sessionEmail) {
@@ -167,8 +167,17 @@ export default function PlanRegistrationPage() {
 
       const data = await response.json()
 
-      // バリデーションを有効化
-      const validatedData = PlanListResponseSchema.parse(data)
+      // バリデーションを有効化（safeParseでエラー詳細を確認）
+      const validationResult = PlanListResponseSchema.safeParse(data)
+
+      if (!validationResult.success) {
+        console.error('❌ [fetchPlans] バリデーションエラー:', validationResult.error)
+        console.error('❌ [fetchPlans] エラー詳細:', validationResult.error.errors)
+        throw new Error('プランのバリデーションに失敗しました')
+      }
+
+      const validatedData = validationResult.data
+
       setPlans(validatedData.plans)
     } catch {
       setError('プランの取得に失敗しました')
@@ -245,7 +254,7 @@ export default function PlanRegistrationPage() {
       }
 
       sessionStorage.setItem('userEmail', currentEmail)
-      
+
       // 支払い方法ごとの分岐
 
       if (paymentMethod === 'AeonPay') {
@@ -274,7 +283,8 @@ export default function PlanRegistrationPage() {
         }
 
         const isLinked = saitamaAppLinked === true
-        const discountPrice = (selectedPlan as any).discountPrice ?? null
+        const discountPrice = (selectedPlan as any).discount_price ?? null
+
         const rawAmount = isLinked && discountPrice != null ? discountPrice : selectedPlan.price
         const paymentAmount = Number(rawAmount)
 
@@ -343,7 +353,7 @@ export default function PlanRegistrationPage() {
           // QRコード表示が必要な場合（resultProperty.qrCodeUrlが存在する場合）
           const qrCodeUrl = data.resultProperty?.qrCodeUrl as string | undefined
           const transactionId = data.transactionId
-          
+
           if (qrCodeUrl) {
             // QRコードURLとtransactionIdをセッションストレージに保存
             if (typeof window !== 'undefined' && data.paymentTransactionId) {
@@ -352,7 +362,7 @@ export default function PlanRegistrationPage() {
                 sessionStorage.setItem(`transactionId_${data.paymentTransactionId}`, transactionId)
               }
             }
-            
+
             // QRコード画面に遷移（transactionIdも渡す）
             const queryParams = new URLSearchParams({
               qrCodeUrl,
@@ -402,7 +412,8 @@ export default function PlanRegistrationPage() {
         }
 
         const isLinked = saitamaAppLinked === true
-        const discountPrice = (selectedPlan as any).discountPrice ?? null
+        const discountPrice = (selectedPlan as any).discount_price ?? null
+
         const rawAmount = isLinked && discountPrice != null ? discountPrice : selectedPlan.price
         const paymentAmount = Number(rawAmount)
 
@@ -485,9 +496,9 @@ export default function PlanRegistrationPage() {
         // "cust_" + ハッシュ値 = 最大13文字
         return `cust_${hashStr}`
       }
-      
+
       const customerId = generateCustomerId(currentEmail)
-      
+
       // 支払い方法変更のみの場合はplanIdを送信しない
       const requestBody: Record<string, string> = {
         customerId: customerId,
@@ -610,7 +621,8 @@ export default function PlanRegistrationPage() {
       const selectedPlan = plans.find((p) => p.id === planId)
       if (selectedPlan) {
         const isLinked = saitamaAppLinked === true
-        const discountPrice = (selectedPlan as any).discountPrice ?? null
+        const discountPrice = (selectedPlan as any).discount_price ?? null
+
         const rawAmount = isLinked && discountPrice != null ? discountPrice : selectedPlan.price
         const paymentAmount = Number(rawAmount)
 
@@ -618,29 +630,29 @@ export default function PlanRegistrationPage() {
           paymentMethod === 'PayPay'
             ? 'PayPay（QRコード決済）'
             : paymentMethod === 'AeonPay'
-            ? 'イオンペイ（QRコード決済）'
-            : 'クレジットカード'
+              ? 'イオンペイ（QRコード決済）'
+              : 'クレジットカード'
 
         // サブスクリプションプランかどうかで表示メッセージを切り替え
         const isSubscriptionPlan = selectedPlan.is_subscription
         let actionDescription = ''
-        
+
         if (isSubscriptionPlan) {
           // サブスクリプションプランの場合
           actionDescription =
             paymentMethod === 'PayPay'
               ? '選択したプランの初回決済を、PayPayアプリで行います。'
               : paymentMethod === 'AeonPay'
-              ? '選択したプランの初回決済を、イオンペイで行います。'
-              : 'カード登録と同時に初回決済を行います。'
+                ? '選択したプランの初回決済を、イオンペイで行います。'
+                : 'カード登録と同時に初回決済を行います。'
         } else {
           // 非サブスクリプションプランの場合
           actionDescription =
             paymentMethod === 'PayPay'
               ? 'PayPayで決済を実行します'
               : paymentMethod === 'AeonPay'
-              ? 'イオンペイで決済を実行します'
-              : 'クレジットカードで決済を実行します'
+                ? 'イオンペイで決済を実行します'
+                : 'クレジットカードで決済を実行します'
         }
 
         // 確認モーダルを表示

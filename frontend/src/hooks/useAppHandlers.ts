@@ -33,12 +33,12 @@ export const useAppHandlers = (
     const handleCurrentLocationClick = useCallback(async () => {
         const newFilterState = !filters.isNearbyFilter
         filters.setIsNearbyFilter(newFilterState)
-        
+
         if (newFilterState) {
             // フィルターをONにする場合、位置情報を取得
             dispatch({ type: 'SET_LOCATION_LOADING', payload: true })
             dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
-            
+
             try {
                 const location = await getCurrentPosition()
                 dispatch({ type: 'SET_CURRENT_LOCATION', payload: location })
@@ -429,21 +429,21 @@ export const useAppHandlers = (
         // 現在の状態を確認（UIの状態ではなく、データの状態を確認）
         const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
         const currentIsFavorite = currentStore?.isFavorite ?? false
-        
+
         // 未認証の場合はセッションストレージに保存（モーダルは表示しない）
         if (!auth.isAuthenticated) {
             try {
                 // セッションストレージの状態も確認
                 const { isFavoriteInStorage, addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
                 const storageIsFavorite = isFavoriteInStorage(storeId)
-                
+
                 // 現在の状態の逆にする（登録されている場合は削除、削除されている場合は登録）
                 if (storageIsFavorite) {
                     removeFavoriteFromStorage(storeId)
                 } else {
                     addFavoriteToStorage(storeId)
                 }
-                
+
                 // UIを更新（現在の状態の逆にする）
                 dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
             } catch (error) {
@@ -477,7 +477,7 @@ export const useAppHandlers = (
                     if (response.status === 401 || response.status === 403) {
                         // ログアウト（Cookieはサーバーサイドでクリアされる）
                         auth.logout()
-                        
+
                         // セッションストレージにお気に入りを保存
                         // 楽観的更新で既にUIが反転しているが、元の状態（currentIsFavorite）の逆に保存する
                         try {
@@ -491,7 +491,7 @@ export const useAppHandlers = (
                         } catch (storageError) {
                             console.error('セッションストレージへの保存エラー:', storageError)
                         }
-                        
+
                         // UIは既に楽観的更新で更新済みなので、そのまま維持
                         // 403エラーは正常処理なので、エラーとして扱わない（早期リターン）
                         return
@@ -505,7 +505,7 @@ export const useAppHandlers = (
                 // ネットワークエラーなどの場合は、トークン期限切れの可能性があるのでセッションストレージに保存
                 // ログアウト（Cookieはサーバーサイドでクリアされる）
                 auth.logout()
-                
+
                 // セッションストレージにお気に入りを保存
                 // 楽観的更新で既にUIが反転しているが、元の状態（currentIsFavorite）の逆に保存する
                 try {
@@ -519,7 +519,7 @@ export const useAppHandlers = (
                 } catch (storageError) {
                     console.error('セッションストレージへの保存エラー:', storageError)
                 }
-                
+
                 // UIは既に楽観的更新で更新済みなので、そのまま維持
                 // fetchErrorは無視（早期リターン）
                 return
@@ -530,11 +530,11 @@ export const useAppHandlers = (
             if (data.isFavorite !== undefined) {
                 const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
                 const currentUIState = currentStore?.isFavorite ?? false
-                
+
                 // 楽観的更新後の状態（元の状態の逆）とAPIの結果を比較
                 // 元の状態（currentIsFavorite）の逆が期待値
                 const expectedState = !currentIsFavorite
-                
+
                 // APIの結果が期待値と異なる場合は調整（通常は一致するはず）
                 if (data.isFavorite !== expectedState) {
                     // APIの結果が正しいので、UIをAPIの結果に合わせる
@@ -547,23 +547,23 @@ export const useAppHandlers = (
             // トークン期限切れエラー（403など）は既に処理済みなので、ここでは処理しない
             // その他のエラーのみ処理
             const errorMessage = error instanceof Error ? error.message : 'お気に入りの登録/削除に失敗しました'
-            
+
             // 認証関連のエラーは既に処理済みなので、エラーログを出力しない
             if (errorMessage.includes('無効なトークン') || errorMessage.includes('認証')) {
                 return
             }
-            
+
             // その他のエラー時はロールバック（再度トグル）
             dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
             console.error('お気に入り登録/削除エラー:', errorMessage)
-            
+
             // TODO: トーストやアラートでエラーを表示
         }
     }, [auth, dispatch, state.stores])
 
     const handleCouponsClick = useCallback(async (storeId: string) => {
         const store = state.stores.find((s: { id: string }) => s.id === storeId)
-        
+
         if (store) {
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
             dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
@@ -571,7 +571,7 @@ export const useAppHandlers = (
             // クーポンを取得
             try {
                 const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
-                
+
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
@@ -590,7 +590,7 @@ export const useAppHandlers = (
                 }
 
                 const data = await response.json()
-                
+
                 if (data.coupons && data.coupons.length > 0) {
                     // APIからのクーポンをfrontend用の形式に変換
                     const storeCoupons = data.coupons.map((coupon: {
@@ -647,8 +647,8 @@ export const useAppHandlers = (
 
     const handleViewPlan = useCallback(() => {
         // プラン有無に応じて遷移先を分岐
-        const hasPlan = latestState.current.plan !== null && latestState.current.plan !== undefined
-        
+        const hasPlan = auth.plan !== null && auth.plan !== undefined
+
         if (!hasPlan) {
             // プラン未登録の場合は独立したプラン登録ページへ遷移
             router.push('/plan-registration')
@@ -656,7 +656,7 @@ export const useAppHandlers = (
             // プラン登録済みの場合は既存のプラン管理画面へ
             navigation.navigateToMyPage("plan-management")
         }
-    }, [navigation, router])
+    }, [navigation, router, auth])
 
     const handleChangePlan = useCallback(() => {
         navigation.navigateToMyPage("plan-change")
@@ -770,16 +770,32 @@ export const useAppHandlers = (
 
             // userPlanまたはplanからrunningIdを取得（userPlanを優先）
             const runningId = userData.userPlan?.paygentRunningId || userData.plan?.paygentRunningId
-
+            const userPlanId = userData.userPlan?.id
 
             if (!runningId) {
-                console.error('❌ [handleWithdrawConfirm] runningId not found:', {
-                    plan: userData.plan,
-                    userPlan: userData.userPlan,
-                    planPaygentRunningId: userData.plan?.paygentRunningId,
-                    userPlanPaygentRunningId: userData.userPlan?.paygentRunningId,
+                if (!userPlanId) {
+                    console.error('❌ [handleWithdrawConfirm] userPlanId not found:', {
+                        plan: userData.plan,
+                        userPlan: userData.userPlan,
+                    })
+                    throw new Error('退会に必要な契約情報が見つかりません。サポートへお問い合わせください。')
+                }
+
+                // PAYGENT未連携（または単発決済）の場合は、ユーザープランを直接削除して退会扱いとする
+                const deleteResponse = await fetch(`/api/user-plans/${userPlanId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 })
-                throw new Error('プラン情報が見つかりません。プランが登録されていない可能性があります。')
+
+                if (!deleteResponse.ok) {
+                    const errorData = await deleteResponse.json().catch(() => ({}))
+                    throw new Error(errorData.message || errorData.error?.message || '退会処理に失敗しました')
+                }
+
+                navigation.navigateToMyPage("withdrawal-complete")
+                return
             }
 
             // 次回課金日を取得（userPlanまたはplanから、userPlanを優先）
@@ -800,7 +816,7 @@ export const useAppHandlers = (
 
             const endScheduled = formatDate(nextBillingDate)
 
-            // 退会処理APIを呼び出し
+            // 退会処理APIを呼び出し（Paygent継続課金ありの場合）
             const response = await fetch('/api/payment/update', {
                 method: 'POST',
                 headers: {
@@ -842,7 +858,7 @@ export const useAppHandlers = (
         // まず認証状態をクリア（cookieの削除も含む）
         await auth.logout()
         navigation.resetNavigation()
-        
+
         // ログアウト完了後にログイン画面に遷移（home画面を表示しない）
         if (typeof window !== 'undefined') {
             window.location.href = '/'
@@ -853,7 +869,7 @@ export const useAppHandlers = (
         // まず認証状態をクリア（cookieの削除も含む）
         await auth.logout()
         navigation.resetNavigation()
-        
+
         // ログアウト完了後にログイン画面に遷移（home画面を表示しない）
         if (typeof window !== 'undefined') {
             window.location.href = '/'
@@ -928,7 +944,7 @@ export const useAppHandlers = (
                 let errorMessage = 'クーポンの使用に失敗しました'
                 try {
                     const error = await response.json()
-                    
+
                     // エラーレスポンスの構造に応じてメッセージを取得
                     if (error.error?.message) {
                         errorMessage = error.error.message
@@ -940,7 +956,7 @@ export const useAppHandlers = (
                 } catch {
                     errorMessage = `クーポンの使用に失敗しました (HTTP ${response.status})`
                 }
-                
+
                 alert(errorMessage)
                 return
             }
@@ -1055,7 +1071,7 @@ export const useAppHandlers = (
                 const userResponse = await fetch('/api/user/me', {
                     cache: 'no-store',
                 })
-                
+
                 if (userResponse.ok) {
                     const userData = await userResponse.json()
                     // authの状態を更新
@@ -1064,10 +1080,10 @@ export const useAppHandlers = (
             } catch {
                 // エラー処理
             }
-            
+
             // トースターで成功メッセージを表示
             toast.success('プロフィールを更新しました')
-            
+
             // マイページに戻る
             navigation.navigateToView("mypage", "mypage")
             navigation.navigateToMyPage("main")
@@ -1151,10 +1167,10 @@ export const useAppHandlers = (
 
     const handleEmailChangeSuccessModalClose = useCallback(() => {
         dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: false })
-        
+
         // ログイン状態をリセット
         dispatch({ type: 'RESET_LOGIN_STATE' })
-        
+
         // authのログアウトも実行（Cookieはサーバーサイドでクリアされる）
         auth.logout()
 
@@ -1241,9 +1257,7 @@ export const useAppHandlers = (
             }
 
             toast.success('店舗紹介を登録しました')
-            // 登録状態を更新
-            dispatch({ type: 'SET_HAS_STORE_INTRODUCTION', payload: true })
-            // マイページのメイン画面に戻る
+            // マイページのメイン画面に戻る（状態はHomeLayoutのuseEffectで自動更新される）
             navigation.navigateToMyPage("main")
         } catch (error) {
             console.error('店舗紹介登録エラー:', error)

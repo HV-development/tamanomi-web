@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// 認証必須ページへのアクセスをサーバー側でガード
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -25,17 +24,33 @@ export async function middleware(request: NextRequest) {
     // 署名検証はAPI層で実施。ここではCookieの存在のみでガード。
   }
 
-  return NextResponse.next()
+  const response = NextResponse.next()
+
+  // HSTS: HTTPSの接続を強制（1年間）
+  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
+
+  // キャッシュ制御
+  if (pathname.startsWith('/api/')) {
+    // 公開API: 短いキャッシュを許可
+    const publicApis = ['/api/shops', '/api/genres', '/api/plans']
+    const isPublicApi = publicApis.some(api => pathname === api || pathname.startsWith(`${api}/`))
+    
+    if (isPublicApi) {
+      response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=30')
+    } else {
+      // 機密APIはキャッシュ無効化
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+      response.headers.set('Pragma', 'no-cache')
+      response.headers.set('Expires', '0')
+    }
+  }
+
+  return response
 }
 
-// 対象ルート（保護対象）
+// 静的ファイル以外のすべてのルートに適用
 export const config = {
   matcher: [
-    '/home/:path*',
-    '/mypage/:path*',
-    '/plan-registration/:path*',
-    '/payment-method-change/:path*',
-    '/usage-guide/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }
-

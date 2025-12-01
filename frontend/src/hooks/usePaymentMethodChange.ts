@@ -21,12 +21,14 @@ export const usePaymentMethodChange = () => {
       try {
         // Cookieベースの認証のみを使用（localStorageは廃止）
         // モックモード状態を取得
+        let isMockMode = false
         const mockStatusResponse = await fetch('/api/payment/mock-status', {
           cache: 'no-store',
         })
-        
+
         if (mockStatusResponse.ok) {
           const mockStatus = await mockStatusResponse.json()
+          isMockMode = mockStatus.useMockPayment
           setUseMockPayment(mockStatus.useMockPayment)
         }
 
@@ -39,8 +41,9 @@ export const usePaymentMethodChange = () => {
           const userData = await response.json()
           setUserEmail(userData.email)
           setPaymentCard(userData.paymentCard)
-          
-          if (!userData.paymentCard && !useMockPayment) {
+
+          // モックモードでない場合のみ、カード情報がないことをエラーとする
+          if (!userData.paymentCard && !isMockMode) {
             setError('カード情報が登録されていません。')
           }
         } else {
@@ -52,25 +55,27 @@ export const usePaymentMethodChange = () => {
     }
 
     fetchUserInfo()
-  }, [useMockPayment])
+  }, [])
 
   const handleChangePaymentMethod = async () => {
     try {
       setIsLoading(true)
       setError('')
-      
+
       if (!userEmail || userEmail.trim() === '') {
         setError('メールアドレスが見つかりません。')
         setIsLoading(false)
         return
       }
-      
+
+      // モックモードの判定
       const isMockMode = useMockPayment || !paymentCard
-      
+
+      // モックモードの場合
       if (isMockMode) {
         const mockCustomerId = paymentCard?.paygentCustomerId || `cust_${Date.now()}`
         const mockCustomerCardId = paymentCard?.paygentCustomerCardId || 'mock_initial'
-        
+
         const response = await fetch('/api/payment/update', {
           method: 'POST',
           headers: {
@@ -82,49 +87,54 @@ export const usePaymentMethodChange = () => {
             userEmail: userEmail,
           })
         })
-        
+
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
           throw new Error(errorData.error || 'PaymentSession作成に失敗しました')
         }
-        
+
         await response.json()
-        
+
+        // モック画面にリダイレクト
         const mockUrl = `/payment-mock?customer_id=${mockCustomerId}&operation_type=02`
         window.location.href = mockUrl
         return
       }
-      
+
+      // 実際のPayGent連携の場合
       if (!paymentCard) {
         setError('カード情報が見つかりません。')
         setIsLoading(false)
         return
       }
-      
-      const response = await fetch('/api/payment/update', {
+
+      // PayGentへのカード変更申込（リンクタイプ方式）
+      // customerIdとuserEmailを送信（planIdは送信しない）
+      const response = await fetch('/api/payment/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           customerId: paymentCard.paygentCustomerId,
-          customerCardId: paymentCard.paygentCustomerCardId,
           userEmail: userEmail,
+          // planIdは送信しない（支払い方法変更のみ）
         })
       })
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'カード変更の準備に失敗しました')
+        throw new Error(errorData.error || errorData.message || 'カード変更の準備に失敗しました')
       }
-      
+
       const data = await response.json()
-      
+
+      // PayGentのカード変更画面にリダイレクト
       if (data.redirectUrl && data.params) {
         const form = document.createElement('form')
         form.method = 'POST'
         form.action = data.redirectUrl
-        
+
         Object.keys(data.params).forEach(key => {
           const input = document.createElement('input')
           input.type = 'hidden'
@@ -132,11 +142,13 @@ export const usePaymentMethodChange = () => {
           input.value = data.params[key]
           form.appendChild(input)
         })
-        
+
         document.body.appendChild(form)
         form.submit()
+      } else {
+        throw new Error('PayGentからのリダイレクト情報が取得できませんでした')
       }
-      
+
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'カード変更の準備中にエラーが発生しました')
       setIsLoading(false)
