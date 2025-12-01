@@ -41,6 +41,10 @@ const nextConfig = {
         key: 'Permissions-Policy',
         value: 'camera=(), microphone=(), geolocation=(self)'
       },
+      {
+        key: 'Strict-Transport-Security',
+        value: 'max-age=31536000; includeSubDomains; preload'
+      },
     ]
 
     if (process.env.VERCEL_ENV === 'preview') {
