@@ -4,6 +4,7 @@ import { Suspense, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { EmailRegistrationContainer } from '@/components/organisms/EmailRegistrationContainer'
 import { useEmailRegistration } from '@/hooks/useEmailRegistration'
+import { setRegisterSessionItem } from '@/lib/register-session'
 
 function EmailRegistrationContent() {
   const router = useRouter()
@@ -17,20 +18,18 @@ function EmailRegistrationContent() {
     handleResend,
   } = useEmailRegistration()
 
-  // URLパラメータから紹介者IDを取得してセッションストレージに保存
+  // URLパラメータから紹介者IDを取得してサーバーサイドセッションに保存
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search)
-      const ref = urlParams.get('ref')
-      if (ref) {
-        sessionStorage.setItem('referrerUserId', ref)
-        // 保存後に確認
-        const saved = sessionStorage.getItem('referrerUserId')
-      } else {
-        // 既存の値を確認
-        const existing = sessionStorage.getItem('referrerUserId')
+    const saveReferrer = async () => {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search)
+        const ref = urlParams.get('ref')
+        if (ref) {
+          await setRegisterSessionItem('referrerUserId', ref)
+        }
       }
     }
+    saveReferrer()
   }, [])
 
   const handleBack = () => router.push('/')
