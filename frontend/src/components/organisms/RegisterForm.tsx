@@ -298,19 +298,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* メールアドレス表示 */}
-      {email && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            メールアドレス
-          </label>
-          <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
-            {email}
-          </div>
-          <p className="mt-1 text-xs text-gray-500">※認証済みのメールアドレスです</p>
-        </div>
-      )}
-
       {/* ニックネーム */}
       <Input
         type="text"

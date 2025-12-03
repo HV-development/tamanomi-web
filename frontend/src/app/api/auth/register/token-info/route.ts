@@ -4,11 +4,12 @@ const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
 
 /**
  * トークンからメールアドレスを取得するAPIプロキシ
- * URLパラメータにメールアドレスを含めないためのセキュリティ改善
+ * POSTメソッドを使用してトークンをボディで送信（プロキシログへの記録を防止）
  */
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
     try {
-        const token = request.nextUrl.searchParams.get('token')
+        const body = await request.json()
+        const { token } = body
 
         if (!token) {
             return NextResponse.json(
@@ -17,12 +18,13 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        // バックエンドAPIにプロキシ
-        const response = await fetch(`${API_BASE_URL}/api/v1/register/token-info?token=${encodeURIComponent(token)}`, {
-            method: 'GET',
+        // バックエンドAPIにPOSTでプロキシ（トークンをボディで送信）
+        const response = await fetch(`${API_BASE_URL}/api/v1/register/token-info`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ token }),
         })
 
         if (!response.ok) {

@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { RegisterConfirmationContainer } from '@/components/organisms/RegisterConfirmationContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
 import { Modal } from '@/components/atoms/Modal'
 import { Button } from '@/components/atoms/Button'
+import { 
+  getRegisterSession, 
+  setRegisterSessionItem, 
+  clearRegisterSession 
+} from '@/lib/register-session'
 
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -19,7 +24,10 @@ export default function RegisterConfirmationPage() {
   const [pointsGranted, setPointsGranted] = useState<number | null>(null)
   const [shopId, setShopId] = useState<string | undefined>(undefined)
   const [error, setError] = useState<string | null>(null)
+  const [referrerUserId, setReferrerUserId] = useState<string | null>(null)
   const router = useRouter()
+  // セッションデータを保持するref（handleRegisterで使用）
+  const sessionDataRef = useRef<{ referrerUserId?: string } | null>(null)
 
   // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
@@ -43,34 +51,48 @@ export default function RegisterConfirmationPage() {
 
       setToken(tokenParam)
 
-      // まずsessionStorageからフォームデータを取得
-      const storedData = sessionStorage.getItem('registerFormData')
+      // サーバーサイドセッションからデータを取得
+      const sessionData = await getRegisterSession()
+      
+      // 紹介者IDをrefに保存（handleRegisterで使用）
+      if (sessionData?.referrerUserId) {
+        sessionDataRef.current = { referrerUserId: sessionData.referrerUserId }
+        setReferrerUserId(sessionData.referrerUserId)
+      }
+      
+      const storedData = sessionData?.registerFormData
 
       if (storedData) {
-        // sessionStorageにデータがある場合（通常フロー）
+        // サーバーサイドセッションにデータがある場合（通常フロー）
         try {
-          const parsedData = JSON.parse(storedData) as UserRegistrationComplete
+          const parsedData = storedData as UserRegistrationComplete
           // shop_idがURLパラメータにある場合は上書き
           if (shopIdParam) {
             parsedData.shopId = shopIdParam
           }
           setFormData(parsedData)
 
-          // メールアドレスをセッションストレージから取得（セキュリティ改善：URLパラメータから削除）
-          const storedEmail = sessionStorage.getItem('registerEmail')
+          // メールアドレスをサーバーサイドセッションから取得
+          const storedEmail = sessionData?.registerEmail
           if (storedEmail) {
             setEmail(storedEmail)
             setIsLoadingEmail(false)
             return
           }
 
-          // セッションストレージにメールアドレスがない場合、APIから取得
+          // サーバーサイドセッションにメールアドレスがない場合、APIから取得（POSTでトークンをボディ送信）
           try {
-            const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+            const response = await fetch('/api/auth/register/token-info', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ token: tokenParam }),
+            })
             if (response.ok) {
               const data = await response.json()
               setEmail(data.email)
-              sessionStorage.setItem('registerEmail', data.email)
+              await setRegisterSessionItem('registerEmail', data.email)
             } else {
               throw new Error('Failed to fetch email')
             }
@@ -85,14 +107,20 @@ export default function RegisterConfirmationPage() {
           setIsLoadingEmail(false)
           return
         } catch (err) {
-          console.error('sessionStorage parse error:', err)
+          console.error('Session data parse error:', err)
           // パースエラーの場合は次の処理へ
         }
       }
 
-      // sessionStorageがない場合、APIからメールアドレスを取得して登録画面に戻す
+      // サーバーサイドセッションがない場合、APIからメールアドレスを取得して登録画面に戻す（POSTでトークンをボディ送信）
       try {
-        const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+        const response = await fetch('/api/auth/register/token-info', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token: tokenParam }),
+        })
         
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
@@ -129,11 +157,8 @@ export default function RegisterConfirmationPage() {
     try {
       const saitamaAppIdValue = formData.saitamaAppId && formData.saitamaAppId.trim() !== '' ? formData.saitamaAppId.trim() : undefined;
       
-      // セッションストレージから紹介者IDを取得
-      const referrerUserId = typeof window !== 'undefined' 
-        ? sessionStorage.getItem('referrerUserId') 
-        : null;
-      
+      // サーバーサイドセッションから取得した紹介者IDを使用
+      const referrerUserIdValue = sessionDataRef.current?.referrerUserId || referrerUserId;
 
       // バックエンドAPIに登録リクエストを送信
       const response = await fetch('/api/auth/register', {
@@ -154,7 +179,7 @@ export default function RegisterConfirmationPage() {
           // 空文字列の場合はundefinedとして送信しない
           saitamaAppId: saitamaAppIdValue,
           // 紹介者IDを追加
-          referrerUserId: referrerUserId && referrerUserId.trim() !== '' ? referrerUserId.trim() : undefined,
+          referrerUserId: referrerUserIdValue && referrerUserIdValue.trim() !== '' ? referrerUserIdValue.trim() : undefined,
           token: token,
           shopId: shopId,
         }),
@@ -166,10 +191,8 @@ export default function RegisterConfirmationPage() {
         // Cookieベースの認証のみを使用（localStorageは廃止）
         // トークンはサーバー側でCookieに設定されるため、フロントエンドでの保存は不要
 
-        // 登録成功後はセッションストレージをクリア
-        sessionStorage.removeItem('registerFormData')
-        sessionStorage.removeItem('referrerUserId')
-        sessionStorage.removeItem('registerEmail')
+        // 登録成功後はサーバーサイドセッションをクリア
+        await clearRegisterSession()
 
         // さいたま市アプリ連携が失敗した場合（ポイント付与API失敗）
         if (result.saitamaAppLinkFailed) {
@@ -182,8 +205,8 @@ export default function RegisterConfirmationPage() {
           setPointsGranted(result.pointsGranted)
           setShowSuccessModal(true)
         } else {
-          // ポイント付与がない場合は直接プラン登録画面に遷移（セッションストレージにメールアドレスを保存）
-          sessionStorage.setItem('userEmail', email)
+          // ポイント付与がない場合は直接プラン登録画面に遷移（サーバーサイドセッションにメールアドレスを保存）
+          await setRegisterSessionItem('userEmail', email)
           // window.location.hrefを使用して強制的に遷移
           if (typeof window !== 'undefined') {
             window.location.href = '/plan-registration'
@@ -210,10 +233,10 @@ export default function RegisterConfirmationPage() {
     }
   }
 
-  const handleEdit = () => {
-    // フォームデータをsessionStorageに保存してから登録画面に戻る（emailパラメータは含めない - セキュリティ改善）
+  const handleEdit = async () => {
+    // フォームデータをサーバーサイドセッションに保存してから登録画面に戻る（emailパラメータは含めない - セキュリティ改善）
     if (formData) {
-      sessionStorage.setItem('editFormData', JSON.stringify(formData))
+      await setRegisterSessionItem('editFormData', formData)
     }
     const shopIdParam = formData?.shopId ? `&shop_id=${encodeURIComponent(formData?.shopId)}` : ''
     router.push(`/register?token=${encodeURIComponent(token)}&edit=true${shopIdParam}`)
@@ -221,10 +244,10 @@ export default function RegisterConfirmationPage() {
 
   const handleLogoClick = () => router.push('/')
 
-  const handleModalClose = () => {
+  const handleModalClose = async () => {
     setShowSuccessModal(false)
-    // モーダルを閉じた後、プラン登録画面に遷移（セッションストレージにメールアドレスを保存）
-    sessionStorage.setItem('userEmail', email)
+    // モーダルを閉じた後、プラン登録画面に遷移（サーバーサイドセッションにメールアドレスを保存）
+    await setRegisterSessionItem('userEmail', email)
     // window.location.hrefを使用して強制的に遷移
     if (typeof window !== 'undefined') {
       window.location.href = '/plan-registration?saitamaAppLinked=true'
@@ -233,10 +256,10 @@ export default function RegisterConfirmationPage() {
     }
   }
 
-  const handleSaitamaFailedModalClose = () => {
+  const handleSaitamaFailedModalClose = async () => {
     setShowSaitamaFailedModal(false)
     // さいたま市アプリ連携なしでプラン登録画面に遷移
-    sessionStorage.setItem('userEmail', email)
+    await setRegisterSessionItem('userEmail', email)
     if (typeof window !== 'undefined') {
       window.location.href = '/plan-registration'
     } else {

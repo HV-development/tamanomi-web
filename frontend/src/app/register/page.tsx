@@ -4,6 +4,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { RegisterContainer } from '@/components/organisms/RegisterContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
+import { 
+  getRegisterSession, 
+  setRegisterSessionItem, 
+  removeRegisterSessionItem 
+} from '@/lib/register-session'
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -38,25 +43,26 @@ export default function RegisterPage() {
       setToken(tokenParam)
       setShopId(shop_id)
 
-      // URLパラメータから紹介者IDを取得してセッションストレージに保存
+      // URLパラメータから紹介者IDを取得してサーバーサイドセッションに保存
       if (ref) {
-        sessionStorage.setItem('referrerUserId', ref)
+        await setRegisterSessionItem('referrerUserId', ref)
       }
 
       // 編集モードの場合、保存されたフォームデータを取得
       if (isEdit) {
-        const savedData = sessionStorage.getItem('registerFormData')
+        const sessionData = await getRegisterSession()
+        const savedData = sessionData?.registerFormData
         if (savedData) {
           try {
-            const parsedData = JSON.parse(savedData) as UserRegistrationComplete
+            const parsedData = savedData as UserRegistrationComplete
             setInitialFormData(parsedData)
-            sessionStorage.removeItem('registerFormData')
+            await removeRegisterSessionItem('registerFormData')
           } catch {
             // エラーを無視
           }
         }
-        // 編集モードの場合、セッションストレージからメールアドレスを取得
-        const savedEmail = sessionStorage.getItem('registerEmail')
+        // 編集モードの場合、サーバーサイドセッションからメールアドレスを取得
+        const savedEmail = sessionData?.registerEmail
         if (savedEmail) {
           setEmail(savedEmail)
           setIsLoadingEmail(false)
@@ -64,9 +70,15 @@ export default function RegisterPage() {
         }
       }
 
-      // トークンからメールアドレスを取得（セキュリティ改善：URLパラメータにメールアドレスを含めない）
+      // トークンからメールアドレスを取得（セキュリティ改善：POSTでトークンをボディ送信）
       try {
-        const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+        const response = await fetch('/api/auth/register/token-info', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token: tokenParam }),
+        })
         
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
@@ -81,8 +93,8 @@ export default function RegisterPage() {
 
         const data = await response.json()
         setEmail(data.email)
-        // セッションストレージにメールアドレスを保存（確認画面での復元用）
-        sessionStorage.setItem('registerEmail', data.email)
+        // サーバーサイドセッションにメールアドレスを保存（確認画面での復元用）
+        await setRegisterSessionItem('registerEmail', data.email)
       } catch {
         setError('エラーが発生しました。再度お試しください。')
         setTimeout(() => router.push('/email-registration'), 3000)
@@ -103,8 +115,8 @@ export default function RegisterPage() {
       shop_id: shopId || undefined,
     }
 
-    // フォームデータをセッションストレージに保存
-    sessionStorage.setItem('registerFormData', JSON.stringify(dataWithShopId))
+    // フォームデータをサーバーサイドセッションに保存
+    await setRegisterSessionItem('registerFormData', dataWithShopId)
 
     // 確認画面に遷移（emailパラメータを削除 - セキュリティ改善）
     const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''

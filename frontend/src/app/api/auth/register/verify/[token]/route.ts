@@ -14,13 +14,14 @@ export async function GET(
         }
 
         // トークンはUUIDのみで、メールアドレスなどの個人情報は含まれない（セキュリティ改善）
-        // バックエンドAPIでトークンを検証
+        // バックエンドAPIでトークンを検証（POSTメソッドでトークンをボディ送信）
         try {
-            const response = await fetch(`${API_BASE_URL}/api/v1/register/token-info?token=${encodeURIComponent(token)}`, {
-                method: 'GET',
+            const response = await fetch(`${API_BASE_URL}/api/v1/register/token-info`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ token }),
             })
 
             if (!response.ok) {

@@ -12,6 +12,7 @@ import {
   PlanListResponseSchema
 } from '@hv-development/schemas'
 import type { PayPayPaymentRequest } from '@hv-development/schemas'
+import { getRegisterSessionItem, removeRegisterSessionItem } from '@/lib/register-session'
 
 export default function PlanRegistrationPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -94,16 +95,21 @@ export default function PlanRegistrationPage() {
   // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
     setIsClient(true)
-    if (typeof window !== 'undefined') {
+    const initializePage = async () => {
+      if (typeof window === 'undefined') return
+
       const urlParams = new URLSearchParams(window.location.search)
       const saitamaAppLinkedParam = urlParams.get('saitamaAppLinked')
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
 
-      // セッションストレージからメールアドレスを取得（一時的に使用）
-      const sessionEmail = sessionStorage.getItem('userEmail')
-      if (sessionEmail) {
-        setEmail(sessionEmail)
+      // サーバーサイドセッションからメールアドレスを取得（登録フローからの遷移用）
+      // セキュリティ改善：sessionStorageの代わりにhttpOnly Cookieベースのセッションを使用
+      const serverSessionEmail = await getRegisterSessionItem<string>('userEmail')
+      if (serverSessionEmail) {
+        setEmail(serverSessionEmail)
+        // 使用後にサーバーサイドセッションからクリア
+        await removeRegisterSessionItem('userEmail')
       }
 
       // 支払い方法変更のみの場合はフラグを設定
@@ -121,10 +127,11 @@ export default function PlanRegistrationPage() {
         fetchUserInfo()
       } else {
         // 常にユーザー情報を取得してメールアドレスを確実に取得する
-        // （sessionStorageは一時的なものなので、APIから取得した方が確実）
+        // （APIから取得した方が確実）
         fetchUserInfo()
       }
     }
+    initializePage()
   }, [fetchUserInfo])
 
   // ページがフォーカスされた時にユーザー情報を再取得（戻るボタンで戻ってきた時など）
