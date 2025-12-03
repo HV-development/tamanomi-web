@@ -33,6 +33,12 @@ export default function RegisterPage() {
       const shop_id = urlParams.get('shop_id') || undefined
       const ref = urlParams.get('ref') // 紹介者IDを取得
       const isEdit = urlParams.get('edit') === 'true'
+      const errorParam = urlParams.get('error') // エラーメッセージを取得
+
+      // エラーパラメータがある場合は表示
+      if (errorParam) {
+        setError(decodeURIComponent(errorParam))
+      }
 
       // トークンが存在しない場合はメール登録画面にリダイレクト
       if (!tokenParam || tokenParam.trim() === '') {
@@ -139,8 +145,8 @@ export default function RegisterPage() {
     )
   }
 
-  // エラー表示
-  if (error) {
+  // トークン関連のエラー（トークンが無効など）の場合は専用画面を表示
+  if (error && (!token || !email)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
         <div className="text-center">
@@ -160,6 +166,7 @@ export default function RegisterPage() {
       onLogoClick={handleLogoClick}
       isLoading={isLoading}
       backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
+      errorMessage={error || undefined}
     />
   )
 }

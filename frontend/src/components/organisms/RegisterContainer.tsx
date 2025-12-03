@@ -12,6 +12,7 @@ interface RegisterContainerProps {
   onLogoClick: () => void
   isLoading?: boolean
   backgroundColorClass?: string
+  errorMessage?: string
 }
 
 export function RegisterContainer({
@@ -21,7 +22,8 @@ export function RegisterContainer({
   onCancel,
   onLogoClick,
   isLoading,
-  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
+  errorMessage
 }: RegisterContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
@@ -36,6 +38,12 @@ export function RegisterContainer({
               <h2 className="text-2xl font-bold text-gray-900 mb-2">新規登録</h2>
               <p className="text-gray-600">必要事項を入力してください</p>
             </div>
+
+            {errorMessage && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{errorMessage}</p>
+              </div>
+            )}
 
             <RegisterForm
               email={email}
