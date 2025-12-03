@@ -185,7 +185,20 @@ export default function RegisterConfirmationPage() {
         }),
       })
 
-      const result = await response.json()
+      let result: any
+      try {
+        result = await response.json()
+      } catch (jsonError) {
+        console.error('❌ [register-confirmation] Failed to parse JSON:', jsonError)
+        const text = await response.text().catch(() => '')
+        console.error('❌ [register-confirmation] Response text:', text.substring(0, 500))
+        alert('サーバーエラーが発生しました。再度お試しください。')
+        setIsLoading(false)
+        return
+      }
+
+      console.log('🔍 [register-confirmation] Response status:', response.status)
+      console.log('🔍 [register-confirmation] Response result:', result)
 
       if (response.ok) {
         // Cookieベースの認証のみを使用（localStorageは廃止）
@@ -213,6 +226,13 @@ export default function RegisterConfirmationPage() {
         const errorCode = result.error?.code || result.errorCode
         const errorMessage = result.message || result.error?.message || '登録に失敗しました'
 
+        console.error('❌ [register-confirmation] Registration failed:', {
+          status: response.status,
+          errorCode,
+          errorMessage,
+          result
+        })
+
         // 409エラー（既存アカウント）の場合は特別な処理
         if (response.status === 409 && (errorCode === 'USER_ALREADY_EXISTS' || errorCode === 'SAITAMA_APP_ID_ALREADY_EXISTS')) {
           if (errorCode === 'USER_ALREADY_EXISTS') {
@@ -223,15 +243,33 @@ export default function RegisterConfirmationPage() {
             const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
             const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
             const errorParam = `&error=${encodeURIComponent(errorMessage)}`
-            router.push(`/register${tokenParam}${shopIdParam}${errorParam}`)
+            const redirectUrl = `/register${tokenParam}${shopIdParam}${errorParam}`
+            console.log('🔍 [register-confirmation] Redirecting to register page with error:', errorMessage)
+            console.log('🔍 [register-confirmation] Redirect URL:', redirectUrl)
+            // 強制的にリダイレクト
+            if (typeof window !== 'undefined') {
+              window.location.href = redirectUrl
+            } else {
+              router.push(redirectUrl)
+            }
           }
         } else if (response.status === 500 && errorCode === 'POINT_GRANT_FAILED') {
           // ポイント付与失敗の場合は新規登録画面に戻す
           const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
           const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
           const errorParam = `&error=${encodeURIComponent(errorMessage)}`
-          router.push(`/register${tokenParam}${shopIdParam}${errorParam}`)
+          const redirectUrl = `/register${tokenParam}${shopIdParam}${errorParam}`
+          console.log('🔍 [register-confirmation] Redirecting to register page with point grant error:', errorMessage)
+          console.log('🔍 [register-confirmation] Redirect URL:', redirectUrl)
+          // 強制的にリダイレクト
+          if (typeof window !== 'undefined') {
+            window.location.href = redirectUrl
+          } else {
+            router.push(redirectUrl)
+          }
         } else {
+          // その他のエラー
+          console.error('❌ [register-confirmation] Unknown error:', { status: response.status, errorCode, errorMessage })
           alert(errorMessage)
         }
       }

@@ -72,26 +72,87 @@ export async function POST(request: NextRequest) {
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
+        let errorData: any = {}
+        try {
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            errorData = await response.json()
+          } else {
+            const text = await response.text()
+            console.error('[api/auth/register] backend returned non-JSON response:', text.substring(0, 200))
+            errorData = { message: text.substring(0, 200) }
+          }
+        } catch (parseError) {
+          console.error('[api/auth/register] failed to parse error response:', parseError)
+          errorData = { message: 'レスポンスの解析に失敗しました' }
+        }
 
-        // 409エラー（既存アカウント）の場合は特別な処理
+        console.error('[api/auth/register] backend error:', {
+          status: response.status,
+          errorData,
+        })
+
+        // エラーコードを取得
+        const errorCode = errorData?.error?.code || errorData?.errorCode
+        const errorMessage = errorData?.error?.message || errorData?.message
+
+        // 409エラー（既存アカウント・重複ID）の場合は特別な処理
         if (response.status === 409) {
+          if (errorCode === 'SAITAMA_APP_ID_ALREADY_EXISTS') {
+            return NextResponse.json(
+              {
+                success: false,
+                message: errorMessage || 'このさいたま市アプリIDは既に登録されています',
+                errorCode: 'SAITAMA_APP_ID_ALREADY_EXISTS',
+                error: {
+                  code: 'SAITAMA_APP_ID_ALREADY_EXISTS',
+                  message: errorMessage || 'このさいたま市アプリIDは既に登録されています'
+                }
+              },
+              { status: 409 }
+            )
+          }
+          // USER_ALREADY_EXISTSの場合
           return NextResponse.json(
             {
               success: false,
-              message: 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
+              message: errorMessage || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
               errorCode: 'USER_ALREADY_EXISTS',
-              error: errorData
+              error: {
+                code: 'USER_ALREADY_EXISTS',
+                message: errorMessage || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
+              }
             },
             { status: 409 }
           )
         }
 
+        // 500エラー（ポイント付与失敗）の場合
+        if (response.status === 500 && errorCode === 'POINT_GRANT_FAILED') {
+          return NextResponse.json(
+            {
+              success: false,
+              message: errorMessage || 'ポイント付与に失敗しました。しばらく経ってから再度お試しください。',
+              errorCode: 'POINT_GRANT_FAILED',
+              error: {
+                code: 'POINT_GRANT_FAILED',
+                message: errorMessage || 'ポイント付与に失敗しました。しばらく経ってから再度お試しください。'
+              }
+            },
+            { status: 500 }
+          )
+        }
+
+        // その他のエラー
         return NextResponse.json(
           {
             success: false,
-            message: errorData.message || `サーバーエラーが発生しました (${response.status})`,
-            error: errorData
+            message: errorMessage || `サーバーエラーが発生しました (${response.status})`,
+            errorCode: errorCode,
+            error: errorData?.error || {
+              code: errorCode || 'API_ERROR',
+              message: errorMessage || `サーバーエラーが発生しました (${response.status})`
+            }
           },
           { status: response.status }
         )
