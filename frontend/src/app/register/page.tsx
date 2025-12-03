@@ -63,8 +63,13 @@ export default function RegisterPage() {
         const savedData = sessionData?.registerFormData
         if (savedData) {
           try {
-            const parsedData = savedData as UserRegistrationComplete
-            setInitialFormData(parsedData)
+            const parsedData = savedData as Partial<UserRegistrationComplete>
+            // パスワードフィールドは空にする（セキュリティ上の理由）
+            setInitialFormData({
+              ...parsedData,
+              password: '',
+              passwordConfirm: '',
+            } as UserRegistrationComplete)
             await removeRegisterSessionItem('registerFormData')
           } catch {
             // エラーを無視
@@ -124,8 +129,9 @@ export default function RegisterPage() {
       shop_id: shopId || undefined,
     }
 
-    // フォームデータをサーバーサイドセッションに保存
-    await setRegisterSessionItem('registerFormData', dataWithShopId)
+    // フォームデータをサーバーサイドセッションに保存（パスワードは除外）
+    const { password, passwordConfirm, ...dataWithoutPassword } = dataWithShopId
+    await setRegisterSessionItem('registerFormData', dataWithoutPassword)
 
     // 確認画面に遷移（emailパラメータを削除 - セキュリティ改善）
     const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''

@@ -240,9 +240,10 @@ export default function RegisterConfirmationPage() {
             router.push(`/?error=already_registered`)
           } else {
             // さいたま市アプリID重複の場合は新規登録画面に戻す
-            // フォームデータをセッションに保存
+            // フォームデータをセッションに保存（パスワードは除外）
             if (formData) {
-              await setRegisterSessionItem('registerFormData', formData)
+              const { password: _password, passwordConfirm: _passwordConfirm, ...formDataWithoutPassword } = formData
+              await setRegisterSessionItem('registerFormData', formDataWithoutPassword)
             }
             const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
             const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
@@ -259,9 +260,10 @@ export default function RegisterConfirmationPage() {
           }
         } else if (response.status === 500 && errorCode === 'POINT_GRANT_FAILED') {
           // ポイント付与失敗の場合は新規登録画面に戻す
-          // フォームデータをセッションに保存
+          // フォームデータをセッションに保存（パスワードは除外）
           if (formData) {
-            await setRegisterSessionItem('registerFormData', formData)
+            const { password: _password, passwordConfirm: _passwordConfirm, ...formDataWithoutPassword } = formData
+            await setRegisterSessionItem('registerFormData', formDataWithoutPassword)
           }
           const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
           const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
