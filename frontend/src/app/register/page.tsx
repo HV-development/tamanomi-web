@@ -34,6 +34,7 @@ export default function RegisterPage() {
       const ref = urlParams.get('ref') // 紹介者IDを取得
       const isEdit = urlParams.get('edit') === 'true'
       const errorParam = urlParams.get('error') // エラーメッセージを取得
+      const errorRestore = urlParams.get('error_restore') === 'true' // エラー時フォームデータ復元フラグ
 
       // エラーパラメータがある場合は表示
       if (errorParam) {
@@ -56,8 +57,8 @@ export default function RegisterPage() {
         await setRegisterSessionItem('referrerUserId', ref)
       }
 
-      // 編集モードの場合、保存されたフォームデータを取得
-      if (isEdit) {
+      // 編集モードまたはエラー復元モードの場合、保存されたフォームデータを取得
+      if (isEdit || errorRestore) {
         const sessionData = await getRegisterSession()
         const savedData = sessionData?.registerFormData
         if (savedData) {
@@ -69,7 +70,7 @@ export default function RegisterPage() {
             // エラーを無視
           }
         }
-        // 編集モードの場合、サーバーサイドセッションからメールアドレスを取得
+        // 編集モードまたはエラー復元モードの場合、サーバーサイドセッションからメールアドレスを取得
         const savedEmail = sessionData?.registerEmail
         if (savedEmail) {
           setEmail(savedEmail)

@@ -240,10 +240,14 @@ export default function RegisterConfirmationPage() {
             router.push(`/?error=already_registered`)
           } else {
             // さいたま市アプリID重複の場合は新規登録画面に戻す
+            // フォームデータをセッションに保存
+            if (formData) {
+              await setRegisterSessionItem('registerFormData', formData)
+            }
             const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
             const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
             const errorParam = `&error=${encodeURIComponent(errorMessage)}`
-            const redirectUrl = `/register${tokenParam}${shopIdParam}${errorParam}`
+            const redirectUrl = `/register${tokenParam}${shopIdParam}${errorParam}&error_restore=true`
             console.log('🔍 [register-confirmation] Redirecting to register page with error:', errorMessage)
             console.log('🔍 [register-confirmation] Redirect URL:', redirectUrl)
             // 強制的にリダイレクト
@@ -255,10 +259,14 @@ export default function RegisterConfirmationPage() {
           }
         } else if (response.status === 500 && errorCode === 'POINT_GRANT_FAILED') {
           // ポイント付与失敗の場合は新規登録画面に戻す
+          // フォームデータをセッションに保存
+          if (formData) {
+            await setRegisterSessionItem('registerFormData', formData)
+          }
           const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
           const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
           const errorParam = `&error=${encodeURIComponent(errorMessage)}`
-          const redirectUrl = `/register${tokenParam}${shopIdParam}${errorParam}`
+          const redirectUrl = `/register${tokenParam}${shopIdParam}${errorParam}&error_restore=true`
           console.log('🔍 [register-confirmation] Redirecting to register page with point grant error:', errorMessage)
           console.log('🔍 [register-confirmation] Redirect URL:', redirectUrl)
           // 強制的にリダイレクト
