@@ -37,7 +37,9 @@ export default function RegisterPage() {
 
       // エラーパラメータがある場合は表示
       if (errorParam) {
-        setError(decodeURIComponent(errorParam))
+        const decodedError = decodeURIComponent(errorParam)
+        console.log('🔍 [register] Error parameter found:', decodedError)
+        setError(decodedError)
       }
 
       // トークンが存在しない場合はメール登録画面にリダイレクト
