@@ -194,12 +194,6 @@ export default function RegisterConfirmationPage() {
         // 登録成功後はサーバーサイドセッションをクリア
         await clearRegisterSession()
 
-        // さいたま市アプリ連携が失敗した場合（ポイント付与API失敗）
-        if (result.saitamaAppLinkFailed) {
-          setShowSaitamaFailedModal(true)
-          return
-        }
-
         // さいたま市アプリ連携でポイント付与があった場合はモーダルを表示
         if (result.pointsGranted) {
           setPointsGranted(result.pointsGranted)
@@ -216,12 +210,27 @@ export default function RegisterConfirmationPage() {
         }
       } else {
         // エラーハンドリング
+        const errorCode = result.error?.code || result.errorCode
         const errorMessage = result.message || result.error?.message || '登録に失敗しました'
 
         // 409エラー（既存アカウント）の場合は特別な処理
-        if (response.status === 409 && result.errorCode === 'USER_ALREADY_EXISTS') {
-          // ログイン画面にリダイレクト
-          router.push(`/?error=already_registered`)
+        if (response.status === 409 && (errorCode === 'USER_ALREADY_EXISTS' || errorCode === 'SAITAMA_APP_ID_ALREADY_EXISTS')) {
+          if (errorCode === 'USER_ALREADY_EXISTS') {
+            // ログイン画面にリダイレクト
+            router.push(`/?error=already_registered`)
+          } else {
+            // さいたま市アプリID重複の場合は新規登録画面に戻す
+            const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
+            const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
+            const errorParam = `&error=${encodeURIComponent(errorMessage)}`
+            router.push(`/register${tokenParam}${shopIdParam}${errorParam}`)
+          }
+        } else if (response.status === 500 && errorCode === 'POINT_GRANT_FAILED') {
+          // ポイント付与失敗の場合は新規登録画面に戻す
+          const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
+          const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
+          const errorParam = `&error=${encodeURIComponent(errorMessage)}`
+          router.push(`/register${tokenParam}${shopIdParam}${errorParam}`)
         } else {
           alert(errorMessage)
         }
