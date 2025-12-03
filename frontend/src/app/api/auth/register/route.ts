@@ -74,12 +74,27 @@ export async function POST(request: NextRequest) {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
 
-        // 409エラー（既存アカウント）の場合は特別な処理
+        // エラーコードを取得
+        const errorCode = errorData?.error?.code || errorData?.errorCode
+
+        // 409エラー（既存アカウント・重複ID）の場合は特別な処理
         if (response.status === 409) {
+          if (errorCode === 'SAITAMA_APP_ID_ALREADY_EXISTS') {
+            return NextResponse.json(
+              {
+                success: false,
+                message: errorData?.error?.message || 'このさいたま市アプリIDは既に登録されています',
+                errorCode: 'SAITAMA_APP_ID_ALREADY_EXISTS',
+                error: errorData
+              },
+              { status: 409 }
+            )
+          }
+          // USER_ALREADY_EXISTSの場合
           return NextResponse.json(
             {
               success: false,
-              message: 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
+              message: errorData?.error?.message || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
               errorCode: 'USER_ALREADY_EXISTS',
               error: errorData
             },
@@ -87,10 +102,24 @@ export async function POST(request: NextRequest) {
           )
         }
 
+        // 500エラー（ポイント付与失敗）の場合
+        if (response.status === 500 && errorCode === 'POINT_GRANT_FAILED') {
+          return NextResponse.json(
+            {
+              success: false,
+              message: errorData?.error?.message || 'ポイント付与に失敗しました。しばらく経ってから再度お試しください。',
+              errorCode: 'POINT_GRANT_FAILED',
+              error: errorData
+            },
+            { status: 500 }
+          )
+        }
+
         return NextResponse.json(
           {
             success: false,
-            message: errorData.message || `サーバーエラーが発生しました (${response.status})`,
+            message: errorData?.error?.message || errorData.message || `サーバーエラーが発生しました (${response.status})`,
+            errorCode: errorCode,
             error: errorData
           },
           { status: response.status }
