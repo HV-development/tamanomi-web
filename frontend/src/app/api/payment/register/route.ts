@@ -7,14 +7,12 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { customerId, userEmail, planId, customerFamilyName, customerName, companyName, isPaymentMethodChange } = body
+    const { customerId, userEmail, planId, customerFamilyName, customerName, companyName } = body
 
     console.log('🔍 [Next.js API Route] Request body:', {
       customerId,
       userEmail,
       planId,
-      isPaymentMethodChange,
-      hasIsPaymentMethodChange: 'isPaymentMethodChange' in body,
       bodyKeys: Object.keys(body),
     })
 
@@ -27,8 +25,7 @@ export async function POST(request: NextRequest) {
       planId,
       customerFamilyName,
       customerName,
-      companyName,
-      isPaymentMethodChange
+      companyName
     }
 
     console.log('🔍 [Next.js API Route] Backend request body:', backendRequestBody)
