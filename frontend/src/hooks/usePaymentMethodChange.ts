@@ -15,6 +15,7 @@ export const usePaymentMethodChange = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const fromPlanChange = searchParams.get('from') === 'plan-change'
+  const planId = searchParams.get('planId') // プラン変更時の新しいプランID
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -109,17 +110,19 @@ export const usePaymentMethodChange = () => {
       }
 
       // PayGentへのカード変更申込（リンクタイプ方式）
-      // customerIdとuserEmailを送信（planIdは送信しない）
+      // customerIdとuserEmailを送信
+      // planIdは送信しない（planIdがない場合、バックエンドで支払い方法変更と判定される）
+      const requestBody: Record<string, string> = {
+        customerId: paymentCard.paygentCustomerId,
+        userEmail: userEmail,
+      }
+
       const response = await fetch('/api/payment/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          customerId: paymentCard.paygentCustomerId,
-          userEmail: userEmail,
-          // planIdは送信しない（支払い方法変更のみ）
-        })
+        body: JSON.stringify(requestBody)
       })
 
       if (!response.ok) {
