@@ -104,11 +104,14 @@ function ContactFormContent() {
           inquiryType: formData.inquiryType,
         })
       } else {
-        setSubmitError(data.message || 'お問い合わせの送信に失敗しました')
+        // エラーレスポンスからメッセージを抽出
+        const errorMessage = data?.error?.message || data?.message || 'お問い合わせの送信に失敗しました'
+        setSubmitError(errorMessage)
       }
     } catch (error: unknown) {
       console.error('❌ お問い合わせ送信エラー:', error)
-      setSubmitError('お問い合わせの送信中にエラーが発生しました')
+      const errorMessage = error instanceof Error ? error.message : 'お問い合わせの送信中にエラーが発生しました'
+      setSubmitError(errorMessage)
     } finally {
       setIsSubmitting(false)
     }

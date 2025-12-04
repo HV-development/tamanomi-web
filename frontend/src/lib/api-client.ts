@@ -61,8 +61,18 @@ export class ApiClient {
       }
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        return { error: errorData.error || { code: 'API_ERROR', message: 'API呼び出しに失敗しました' } };
+        const errorData = await response.json().catch(() => ({ 
+          error: { 
+            code: 'PARSE_ERROR',
+            message: 'エラーレスポンスの解析に失敗しました'
+          }
+        }));
+        // 標準形式 { error: { code, message } } を優先的に処理
+        const error = errorData?.error || { 
+          code: 'API_ERROR', 
+          message: errorData?.message || `リクエストに失敗しました (ステータス: ${response.status})`
+        };
+        return { error };
       }
 
       return { data: await response.json() };

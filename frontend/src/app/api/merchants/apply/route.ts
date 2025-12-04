@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
+    const message = error instanceof Error ? error.message : '不明なエラーが発生しました'
     return NextResponse.json(
       { error: { code: 'NETWORK_ERROR', message: 'ネットワークエラーが発生しました', detail: message } },
       { status: 500 }

@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
+    const message = error instanceof Error ? error.message : '不明なエラーが発生しました'
     console.error('[api/shops] network error:', message)
     return NextResponse.json(
       {

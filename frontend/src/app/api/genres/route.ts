@@ -51,7 +51,7 @@ export async function GET() {
 
     return NextResponse.json(data)
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
+    const message = error instanceof Error ? error.message : '不明なエラーが発生しました'
     console.error('[api/genres] network error:', message)
     return NextResponse.json(
       {

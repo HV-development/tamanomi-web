@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     console.error('❌ [user-plans/create] Error:', error);
     console.error('Error details:', {
       name: error instanceof Error ? error.name : 'Unknown',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      message: error instanceof Error ? error.message : '不明なエラーが発生しました',
       stack: error instanceof Error ? error.stack : 'No stack trace',
     });
 

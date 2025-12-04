@@ -169,7 +169,8 @@ export default function PlanRegistrationPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+        const errorMessage = errorData?.error?.message || errorData?.message || `プラン情報の取得に失敗しました (ステータス: ${response.status})`
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()

@@ -33,12 +33,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error: unknown) {
     console.error('❌ お問い合わせAPI 例外エラー:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : '不明なエラーが発生しました';
     return NextResponse.json(
       {
         success: false,
         message: 'お問い合わせの送信中にエラーが発生しました',
-        error: errorMessage,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'お問い合わせの送信に失敗しました',
+          details: errorMessage,
+        },
       },
       { status: 500 }
     );
