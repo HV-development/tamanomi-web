@@ -7,11 +7,19 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { planId } = body
+    const { planId, alsoChangePaymentMethod } = body
+
+    console.log('🔍 [user-plans/update] リクエスト受信:', {
+      body,
+      planId,
+      alsoChangePaymentMethod,
+      alsoChangePaymentMethodType: typeof alsoChangePaymentMethod,
+    });
 
     // アクセストークンを取得
     const authHeader = getAuthHeader(request)
     if (!authHeader) {
+      console.warn('⚠️ [user-plans/update] 認証ヘッダーなし');
       return NextResponse.json(
         { success: false, message: '認証が必要です' },
         { status: 401 }
@@ -20,12 +28,18 @@ export async function POST(request: NextRequest) {
 
     // バリデーション
     if (!planId) {
+      console.warn('⚠️ [user-plans/update] planIdなし');
       return NextResponse.json(
         { success: false, message: 'プランIDは必須です' },
         { status: 400 }
       )
     }
 
+    const requestBody = {
+      planId: planId,
+      alsoChangePaymentMethod: alsoChangePaymentMethod || false,
+    };
+    console.log('🔍 [user-plans/update] バックエンドAPIに送信:', requestBody);
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController()
@@ -40,22 +54,25 @@ export async function POST(request: NextRequest) {
           'Content-Type': 'application/json',
           'Authorization': authHeader,
         },
-        body: JSON.stringify({
-          planId: planId,
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       })
 
       clearTimeout(timeoutId)
 
+      console.log('🔍 [user-plans/update] バックエンドAPIレスポンス:', {
+        status: response.status,
+        ok: response.ok,
+      });
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
+        console.error('❌ [user-plans/update] バックエンドAPIエラー:', errorData);
 
         // エラーメッセージを返す
         let errorMessage = 'プラン変更に失敗しました'
-        
+
         if (response.status === 401) {
           errorMessage = '認証エラー: ログインしてください'
         } else if (response.status === 404) {
@@ -77,6 +94,7 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json()
+      console.log('🔍 [user-plans/update] バックエンドAPIレスポンスdata:', data);
       return NextResponse.json(data, { status: response.status })
     } catch (fetchError) {
       clearTimeout(timeoutId)

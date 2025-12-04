@@ -664,7 +664,19 @@ export const useAppHandlers = (
 
     const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
         try {
+            console.log('🔍 [handlePlanChangeSubmit] プラン変更開始:', {
+                planId,
+                alsoChangePaymentMethod,
+                alsoChangePaymentMethodType: typeof alsoChangePaymentMethod,
+            });
+
             auth.setIsLoading(true)
+
+            const requestBody = {
+                planId: planId,
+                alsoChangePaymentMethod: alsoChangePaymentMethod || false,
+            };
+            console.log('🔍 [handlePlanChangeSubmit] APIリクエストbody:', requestBody);
 
             // プラン変更APIを呼び出し
             const response = await fetch('/api/user-plans/update', {
@@ -672,18 +684,20 @@ export const useAppHandlers = (
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    planId: planId,
-                }),
+                body: JSON.stringify(requestBody),
                 credentials: 'include', // Cookieを送信
             })
 
+            console.log('🔍 [handlePlanChangeSubmit] APIレスポンスstatus:', response.status);
+
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
+                console.error('❌ [handlePlanChangeSubmit] APIエラー:', errorData);
                 throw new Error(errorData.message || 'プラン変更に失敗しました')
             }
 
-            await response.json()
+            const responseData = await response.json();
+            console.log('🔍 [handlePlanChangeSubmit] APIレスポンスdata:', responseData);
 
             // プラン変更後、新しいユーザー情報を取得してauth状態を更新
             try {
@@ -697,21 +711,36 @@ export const useAppHandlers = (
                     // auth状態を更新
                     auth.login(updatedUserData, updatedUserData.plan, updatedUserData.usageHistory || [], updatedUserData.paymentHistory || [])
                 }
-            } catch {
+            } catch (userError) {
+                console.error('❌ [handlePlanChangeSubmit] ユーザー情報取得エラー:', userError);
                 // プラン変更は成功しているので、エラーでも続行
             }
 
-            // 支払い方法も変更する場合は、支払い方法変更画面へ遷移
+            // 支払い方法も変更する場合は、支払い方法変更確認画面へ遷移
+            console.log('🔍 [handlePlanChangeSubmit] 遷移判定:', {
+                alsoChangePaymentMethod,
+                alsoChangePaymentMethodValue: alsoChangePaymentMethod,
+                isTrue: alsoChangePaymentMethod === true,
+                isTruthy: !!alsoChangePaymentMethod,
+            });
+
             if (alsoChangePaymentMethod) {
+                console.log('✅ [handlePlanChangeSubmit] 支払い方法変更確認画面へ遷移します');
                 if (typeof window !== 'undefined') {
-                    window.location.href = '/payment-method-change?from=plan-change'
+                    // 支払い方法変更確認画面へ遷移（カード登録APIは、確認画面で「カード情報を変更する」ボタンをクリックしたときに呼び出される）
+                    // プラン変更時の新しいplanIdをURLパラメータとして渡す
+                    window.location.href = `/payment-method-change?from=plan-change&planId=${encodeURIComponent(planId)}`;
+                } else {
+                    console.warn('⚠️ [handlePlanChangeSubmit] windowが定義されていません');
                 }
             } else {
+                console.log('ℹ️ [handlePlanChangeSubmit] マイページに戻ります');
                 // 成功時はマイページに戻る
                 navigation.navigateToMyPage("main")
             }
 
-        } catch {
+        } catch (error) {
+            console.error('❌ [handlePlanChangeSubmit] エラー発生:', error);
             // エラー時もマイページに戻る（エラーメッセージは別途表示）
             navigation.navigateToMyPage("main")
         } finally {
