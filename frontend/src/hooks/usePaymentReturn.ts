@@ -118,7 +118,7 @@ export const usePaymentReturn = () => {
             throw new Error(errorMessage)
           }
 
-          const planData = await createPlanResponse.json()
+          await createPlanResponse.json()
         }
 
         // PaymentSessionをクリーンアップ（成功時のみ）

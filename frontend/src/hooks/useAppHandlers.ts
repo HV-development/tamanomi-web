@@ -1294,7 +1294,7 @@ export const useAppHandlers = (
             console.error('店舗紹介登録エラー:', error)
             toast.error('店舗紹介の登録に失敗しました')
         }
-    }, [dispatch, navigation])
+    }, [navigation])
 
     const handlePasswordChangeComplete = useCallback(() => {
         // ログアウト処理

@@ -142,7 +142,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
           // 401, 404などのエラーは未登録として扱う
           setHasStoreIntroduction(false)
         }
-      } catch (error) {
+      } catch {
         // ネットワークエラーなども未登録として扱う
         setHasStoreIntroduction(false)
       }
@@ -254,7 +254,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     } finally {
       setIsLoadingCoupons(false)
     }
-  }, [handlers.handleCouponsClick])
+  }, [handlers])
   const onMyPageViewChange = navigation.navigateToMyPage
   const onEditProfile = handlers.handleEditProfile
   const onChangeEmail = handlers.handleChangeEmail

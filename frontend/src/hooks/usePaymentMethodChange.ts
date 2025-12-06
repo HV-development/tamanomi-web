@@ -15,7 +15,6 @@ export const usePaymentMethodChange = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const fromPlanChange = searchParams.get('from') === 'plan-change'
-  const planId = searchParams.get('planId') // プラン変更時の新しいプランID
 
   useEffect(() => {
     const fetchUserInfo = async () => {
