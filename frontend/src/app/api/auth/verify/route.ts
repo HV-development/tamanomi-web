@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { EmailValidationSchema } from '@/schemas/auth'
+import { UserRegistrationRequestSchema } from '@/schemas/auth'
+import { z } from 'zod'
 
 const TAMAYOI_API_URL = process.env.TAMAYOI_API_URL || 'http://localhost:3001'
+
+// メールアドレスのみのバリデーションスキーマ
+const EmailValidationSchema = z.object({
+  email: z.string().email('有効なメールアドレスを入力してください'),
+})
 
 export async function POST(request: NextRequest) {
   try {

@@ -69,7 +69,7 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
   }
 
   const handleItemClick = (item: MenuItem) => {
-    item.onClick()
+    item.onClick?.()
     setIsOpen(false) // メニューを閉じる
   }
 

@@ -5,9 +5,9 @@ import { getAuthHeader } from '@/lib/auth-header'
 export const dynamic = 'force-dynamic'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
@@ -21,7 +21,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    const userPlanId = params.id
+    const { id: userPlanId } = await params
     if (!userPlanId) {
       return NextResponse.json(
         { success: false, message: 'ユーザープランIDが指定されていません' },

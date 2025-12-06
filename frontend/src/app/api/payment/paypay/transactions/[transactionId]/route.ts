@@ -4,14 +4,14 @@ import { buildApiUrl } from '@/lib/api-config'
 export const dynamic = 'force-dynamic'
 
 interface Params {
-  params: {
+  params: Promise<{
     transactionId: string
-  }
+  }>
 }
 
 export async function GET(request: NextRequest, { params }: Params) {
   try {
-    const { transactionId } = params
+    const { transactionId } = await params
 
     const fullUrl = buildApiUrl(`/payment/paypay/transactions/${encodeURIComponent(transactionId)}`)
 

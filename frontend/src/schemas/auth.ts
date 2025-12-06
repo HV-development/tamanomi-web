@@ -5,11 +5,10 @@ export {
   UseRregistrationCompleteSchema,
   otpRequestSchema,
   otpVerifySchema,
-  EmailValidationSchema,
 
   // 型のエクスポート
   type UserRegistrationRequest,
   type UserRegistrationComplete,
-  type OTPRequest,
-  type OTPVerify,
+  type OtpRequest,
+  type OtpVerify,
 } from '@hv-development/schemas';
