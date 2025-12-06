@@ -82,5 +82,10 @@
   "engines": {
     "node": "22.x"
   },
-  "packageManager": "pnpm@8.15.8"
+  "packageManager": "pnpm@8.15.8",
+  "pnpm": {
+    "overrides": {
+      "glob": ">=10.5.0"
+    }
+  }
 }
