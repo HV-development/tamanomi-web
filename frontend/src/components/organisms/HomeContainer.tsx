@@ -146,6 +146,14 @@ export function HomeContainer({
           isLoading={isInitialLoading}
         />
 
+        {/* 追加ロード時のローディング表示 */}
+        {isLoadingMore && (
+          <div className="mt-4 mx-2 flex flex-col items-center justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-2"></div>
+            <div className="text-gray-500 text-sm">読み込み中...</div>
+          </div>
+        )}
+
         {/* 追加ロード時のエラー表示 */}
         {bottomError && (
           <div className="mt-4 mx-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">

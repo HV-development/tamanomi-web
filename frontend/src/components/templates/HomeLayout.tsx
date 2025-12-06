@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { HomeContainer } from "../organisms/HomeContainer"
 import { LoginLayout } from "./LoginLayout"
 import { EmailRegistrationContainer } from "../organisms/EmailRegistrationContainer"
@@ -53,6 +53,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
   const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
   const [isCheckingUsage, setIsCheckingUsage] = useState(false)
+  const [isLoadingCoupons, setIsLoadingCoupons] = useState(false)
   const [hasStoreIntroduction, setHasStoreIntroduction] = useState(false)
 
   // 必要な値をローカル変数として定義
@@ -245,7 +246,15 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onFavoritesClose = handlers.handleFavoritesClose
   const onHistoryClose = handlers.handleHistoryClose
   const onFavoriteToggle = handlers.handleFavoriteToggle
-  const onCouponsClick = handlers.handleCouponsClick
+  // クーポン取得中のローディング状態を管理するラッパー
+  const onCouponsClick = useCallback(async (storeId: string) => {
+    setIsLoadingCoupons(true)
+    try {
+      await handlers.handleCouponsClick(storeId)
+    } finally {
+      setIsLoadingCoupons(false)
+    }
+  }, [handlers.handleCouponsClick])
   const onMyPageViewChange = navigation.navigateToMyPage
   const onEditProfile = handlers.handleEditProfile
   const onChangeEmail = handlers.handleChangeEmail
@@ -831,7 +840,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
         userAge={userAge}
         isUsedToday={isCouponUsedToday}
-        isCheckingUsage={isCheckingUsage}
+        isCheckingUsage={isCheckingUsage || isLoadingCoupons}
       />
 
       {/* 使用方法ガイドモーダル */}

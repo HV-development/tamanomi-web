@@ -29,9 +29,14 @@ export function StoreList({
   showEmptyMessage = true,
   isLoading = false,
 }: StoreListProps) {
-  // ローディング中は何も表示しない
+  // ローディング中はスピナーを表示
   if (isLoading) {
-    return null
+    return (
+      <div className={`flex flex-col items-center justify-center py-12 ${className}`}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+        <div className="text-gray-600 text-lg font-medium">読み込み中...</div>
+      </div>
+    )
   }
   
   if (stores.length === 0 && showEmptyMessage) {

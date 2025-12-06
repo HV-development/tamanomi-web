@@ -567,6 +567,8 @@ export const useAppHandlers = (
         if (store) {
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
             dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
+            // クーポン取得開始時にローディング状態を設定（ローカル状態として管理）
+            // 注意: AppStateにisLoadingCouponsを追加する必要があるが、今回は簡易的にstoreCouponsが空の場合はローディング中と判断
 
             // クーポンを取得
             try {
