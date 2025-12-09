@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { getRegisterSessionItem } from '@/lib/register-session'
 
 export const useVerifyOtpPage = () => {
   const router = useRouter()
@@ -10,10 +11,42 @@ export const useVerifyOtpPage = () => {
   const [error, setError] = useState<string>("")
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [isRedirecting, setIsRedirecting] = useState(false)
+  const [email, setEmail] = useState<string>("")
   
-  // URLパラメータからemailとrequestIdを取得
-  const email = searchParams.get('email') || ""
+  // セキュリティ改善：URLパラメータからメールアドレスを取得せず、サーバーサイドセッションから取得
+  // requestIdのみをURLパラメータから取得
   const requestId = searchParams.get('requestId') || ""
+  
+  // サーバーサイドセッションからメールアドレスを取得
+  useEffect(() => {
+    const fetchEmailFromSession = async () => {
+      if (!requestId) {
+        return
+      }
+      
+      try {
+        const sessionEmail = await getRegisterSessionItem<string>('otpEmail')
+        const sessionRequestId = await getRegisterSessionItem<string>('otpRequestId')
+        
+        // requestIdが一致する場合のみメールアドレスを使用
+        if (sessionEmail && sessionRequestId === requestId) {
+          setEmail(sessionEmail)
+        } else {
+          // セッションにメールアドレスがない、またはrequestIdが一致しない場合はエラー
+          setError('セッションが無効です。再度ログインしてください。')
+          router.replace('/login?skip-auth-check=true')
+        }
+      } catch (error) {
+        console.error('Failed to get email from session:', error)
+        setError('セッション情報の取得に失敗しました。再度ログインしてください。')
+        router.replace('/login?skip-auth-check=true')
+      }
+    }
+    
+    if (requestId) {
+      fetchEmailFromSession()
+    }
+  }, [requestId, router])
 
   // ログイン後のリダイレクトフラグをチェック
   useEffect(() => {
@@ -57,12 +90,12 @@ export const useVerifyOtpPage = () => {
     checkAuth()
   }, [router])
 
-  // emailまたはrequestIdが無い場合はログインページへリダイレクト
+  // requestIdが無い場合はログインページへリダイレクト
   useEffect(() => {
-    if (!isCheckingAuth && (!email || !requestId)) {
+    if (!isCheckingAuth && !requestId) {
       router.replace('/login?skip-auth-check=true')
     }
-  }, [email, requestId, isCheckingAuth, router])
+  }, [requestId, isCheckingAuth, router])
 
   // OTP認証
   const handleOtpVerify = useCallback(async (otp: string) => {
@@ -140,6 +173,11 @@ export const useVerifyOtpPage = () => {
     setError("")
 
     try {
+      // セキュリティ改善：メールアドレスはサーバーサイドセッションから取得
+      if (!email) {
+        throw new Error('メールアドレスが見つかりません')
+      }
+
       const response = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: {
@@ -154,9 +192,10 @@ export const useVerifyOtpPage = () => {
 
       const data = await response.json()
       
-      // 新しいrequestIdでURLパラメータを更新
+      // セキュリティ改善：メールアドレスをURLパラメータで送信しない
+      // 新しいrequestIdでURLパラメータを更新（requestIdのみ）
       if (data.requestId) {
-        const newUrl = `/login/verify-otp?email=${encodeURIComponent(email as string)}&requestId=${encodeURIComponent(data.requestId)}`
+        const newUrl = `/login/verify-otp?requestId=${encodeURIComponent(data.requestId)}`
         router.replace(newUrl)
       }
     } catch (err) {

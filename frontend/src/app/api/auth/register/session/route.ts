@@ -69,6 +69,8 @@ interface RegisterSessionData {
   referrerUserId?: string
   userEmail?: string
   editFormData?: Record<string, unknown>
+  otpEmail?: string // OTP認証用のメールアドレス
+  otpRequestId?: string // OTP認証用のrequestId
 }
 
 /**

@@ -57,6 +57,7 @@ export const usePaymentReturn = () => {
         }
 
         // PaymentSessionから情報を取得
+        // セキュリティ改善：sessionStorageの使用を廃止し、PaymentSessionから取得
         let selectedPlanId: string | null = null
         let userEmail: string | null = null
 
@@ -68,12 +69,12 @@ export const usePaymentReturn = () => {
             selectedPlanId = sessionData.planId || null
             userEmail = sessionData.userEmail
           } else {
-            selectedPlanId = sessionStorage.getItem('selectedPlanId')
-            userEmail = sessionStorage.getItem('userEmail')
+            // PaymentSessionが取得できない場合はエラー
+            throw new Error('セッション情報が見つかりません')
           }
-        } catch {
-          selectedPlanId = sessionStorage.getItem('selectedPlanId')
-          userEmail = sessionStorage.getItem('userEmail')
+        } catch (error) {
+          // PaymentSessionから取得できない場合はエラー
+          throw new Error('セッション情報の取得に失敗しました')
         }
 
         if (!userEmail) {
@@ -130,9 +131,7 @@ export const usePaymentReturn = () => {
           // クリーンアップ失敗
         }
 
-        // sessionStorageをクリア
-        sessionStorage.removeItem('selectedPlanId')
-        sessionStorage.removeItem('userEmail')
+        // セキュリティ改善：sessionStorageの使用を廃止（削除処理も不要）
 
         // 処理完了
         setIsProcessing(false)

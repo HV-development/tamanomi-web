@@ -93,9 +93,19 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       return
     }
 
+    // emailフィールドはバリデーションしない（トークンから取得されるため）
+    if (fieldName === 'email') {
+      return
+    }
+
     try {
       // 個別フィールドのバリデーション（フォーム全体をパースして該当フィールドのエラーのみを抽出）
-      const testData = { ...formData, [fieldName]: value }
+      // emailは一時的な値を設定（トークンから取得されるため）
+      const testData = {
+        ...formData,
+        [fieldName]: value,
+        email: formData.email || 'temp@example.com' // バリデーション用の一時的な値
+      }
       UseRregistrationCompleteSchema.parse(testData)
 
       // バリデーション成功時はエラーをクリア
@@ -125,8 +135,15 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   const validateForm = () => {
     try {
+      // emailが空の場合は、バリデーション用に一時的な値を設定
+      // （実際の送信時にはemailは除外され、サーバー側でトークンから取得される）
+      const validationData = {
+        ...formData,
+        email: formData.email || 'temp@example.com', // バリデーション用の一時的な値
+      }
+
       // スキーマを使用してバリデーション
-      UseRregistrationCompleteSchema.parse(formData)
+      UseRregistrationCompleteSchema.parse(validationData)
       setErrors({})
       return true
     } catch (error) {
@@ -138,7 +155,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
         zodError.errors.forEach((err) => {
           const field = err.path?.[0] as keyof UserRegistrationComplete
-          if (field) {
+          // emailフィールドのエラーは無視（トークンから取得されるため）
+          if (field && field !== 'email') {
             newErrors[field] = err.message
           }
         })
@@ -170,6 +188,21 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     if (isValid) {
       onSubmit(formData)
+    } else {
+      // すべてのフィールドをタッチ済みとしてマーク（エラーを表示するため）
+      const allFields: (keyof UserRegistrationComplete)[] = [
+        'email',
+        'nickname',
+        'postalCode',
+        'address',
+        'birthDate',
+        'gender',
+        'phone',
+        'saitamaAppId',
+        'password',
+        'passwordConfirm',
+      ]
+      setTouchedFields(new Set(allFields))
     }
   }
 
@@ -200,7 +233,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       const response = await fetch(apiUrl)
-      
+
       // レスポンスのステータスコードをチェック
       if (!response.ok) {
         // エラーレスポンスの場合
@@ -213,12 +246,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         } catch {
           // JSONパースに失敗した場合はデフォルトメッセージを使用
         }
-        
+
         setErrors(prev => ({
           ...prev,
           postalCode: errorMessage
         }))
-        
+
         // 住所フィールドにフォーカス
         setTimeout(() => {
           if (addressInputRef.current) {

@@ -9,6 +9,8 @@ export type RegisterSessionKey =
   | 'referrerUserId' 
   | 'userEmail' 
   | 'editFormData'
+  | 'otpEmail' // OTP認証用のメールアドレス
+  | 'otpRequestId' // OTP認証用のrequestId
 
 export interface RegisterSessionData {
   registerEmail?: string
@@ -16,6 +18,8 @@ export interface RegisterSessionData {
   referrerUserId?: string
   userEmail?: string
   editFormData?: Record<string, unknown>
+  otpEmail?: string // OTP認証用のメールアドレス
+  otpRequestId?: string // OTP認証用のrequestId
 }
 
 
