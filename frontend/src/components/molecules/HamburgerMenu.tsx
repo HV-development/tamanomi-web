@@ -62,6 +62,10 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
       label: "ログアウト",
       onClick: () => onMenuItemClick("logout"),
     }] : []),
+    {
+      id: "voicevox-credit",
+      label: "VOICEVOX:ずんだもん",
+    },
   ]
 
   const handleToggle = () => {
@@ -94,8 +98,8 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
 
       {/* オーバーレイ */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 z-40" 
+        <div
+          className="fixed inset-0 bg-black/20 z-40"
           onClick={handleOverlayClick}
         ></div>
       )}
@@ -112,7 +116,9 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
                   className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between group"
                 >
                   <span className="text-gray-700 font-medium text-sm">{item.label}</span>
-                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  {item.onClick && (
+                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  )}
                 </button>
               )
             })}
