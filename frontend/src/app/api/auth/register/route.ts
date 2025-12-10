@@ -36,21 +36,38 @@ export async function POST(request: NextRequest) {
     }
 
     // バックエンドが期待するデータ構造に変換
+    // セキュリティ改善：メールアドレスはリクエストボディに含めず、トークンから取得される
     // 空文字列のsaitamaAppIdとreferrerUserIdは除外
-    const validatedData = {
-      email: body.email,
+    // 生年月日をISO形式（YYYY-MM-DD）に変換（スラッシュ区切りから変換）
+    const formatBirthDate = (dateStr: string | undefined): string | undefined => {
+      if (!dateStr) return undefined
+      // yyyy/MM/dd形式をyyyy-MM-dd形式に変換
+      return dateStr.replace(/\//g, '-')
+    }
+
+    const validatedData: any = {
+      // emailはスキーマでオプショナルになったため、送信しない（トークンから取得される）
       password: body.password,
       passwordConfirm: body.passwordConfirm,
       nickname: body.nickname,
       postalCode: body.postalCode,
       address: body.address,
-      birthDate: body.birthDate,
+      birthDate: formatBirthDate(body.birthDate),
       gender: body.gender,
       phone: body.phone,
-      ...(body.saitamaAppId && body.saitamaAppId.trim() !== '' ? { saitamaAppId: body.saitamaAppId.trim() } : {}),
-      ...(body.referrerUserId && body.referrerUserId.trim() !== '' ? { referrerUserId: body.referrerUserId.trim() } : {}),
       token: body.token
     };
+
+    // オプショナルフィールドを追加（存在する場合のみ）
+    if (body.saitamaAppId && body.saitamaAppId.trim() !== '') {
+      validatedData.saitamaAppId = body.saitamaAppId.trim()
+    }
+    if (body.referrerUserId && body.referrerUserId.trim() !== '') {
+      validatedData.referrerUserId = body.referrerUserId.trim()
+    }
+    if (body.shopId) {
+      validatedData.shopId = body.shopId
+    }
 
     // タイムアウト設定付きのfetch
     const controller = new AbortController()
@@ -73,28 +90,29 @@ export async function POST(request: NextRequest) {
       // レスポンスのステータスをチェック
       if (!response.ok) {
         let errorData: any = {}
+        let responseText: string = ''
         try {
+          // まずテキストとして取得（JSONパースに失敗する可能性があるため）
+          responseText = await response.text()
+
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {
-            errorData = await response.json()
+            try {
+              errorData = JSON.parse(responseText)
+            } catch (jsonParseError) {
+              errorData = { message: responseText.substring(0, 200) }
+            }
           } else {
-            const text = await response.text()
-            console.error('[api/auth/register] backend returned non-JSON response:', text.substring(0, 200))
-            errorData = { message: text.substring(0, 200) }
+            errorData = { message: responseText.substring(0, 200) }
           }
         } catch (parseError) {
-          console.error('[api/auth/register] failed to parse error response:', parseError)
           errorData = { message: 'レスポンスの解析に失敗しました' }
         }
-
-        console.error('[api/auth/register] backend error:', {
-          status: response.status,
-          errorData,
-        })
 
         // エラーコードを取得
         const errorCode = errorData?.error?.code || errorData?.errorCode
         const errorMessage = errorData?.error?.message || errorData?.message
+        const errorDetails = errorData?.error?.details || errorData?.error?.errors || errorData?.errors
 
         // 409エラー（既存アカウント・重複ID）の場合は特別な処理
         if (response.status === 409) {
@@ -143,15 +161,47 @@ export async function POST(request: NextRequest) {
           )
         }
 
+        // バリデーションエラーの場合は特別な処理
+        if (errorCode === 'VALIDATION_ERROR' && errorDetails) {
+          // バリデーションエラーの詳細を返す
+          return NextResponse.json(
+            {
+              success: false,
+              message: errorMessage || '入力データが無効です',
+              errorCode: 'VALIDATION_ERROR',
+              error: {
+                code: 'VALIDATION_ERROR',
+                message: errorMessage || '入力データが無効です',
+                details: errorDetails
+              }
+            },
+            { status: 400 }
+          )
+        }
+
         // その他のエラー
+        // エラーレスポンスの構造を確認して、適切にエラー情報を返す
+        const finalErrorCode = errorCode || errorData?.error?.code || 'API_ERROR'
+        const finalErrorMessage = errorMessage || errorData?.error?.message || `サーバーエラーが発生しました (${response.status})`
+        const finalErrorDetails = errorData?.error?.details || errorData?.error?.errors || errorData?.error
+
+        console.error('[api/auth/register] Final error response:', {
+          status: response.status,
+          errorCode: finalErrorCode,
+          errorMessage: finalErrorMessage,
+          errorDetails: finalErrorDetails,
+          fullErrorData: errorData
+        })
+
         return NextResponse.json(
           {
             success: false,
-            message: errorMessage || `サーバーエラーが発生しました (${response.status})`,
-            errorCode: errorCode,
-            error: errorData?.error || {
-              code: errorCode || 'API_ERROR',
-              message: errorMessage || `サーバーエラーが発生しました (${response.status})`
+            message: finalErrorMessage,
+            errorCode: finalErrorCode,
+            error: {
+              code: finalErrorCode,
+              message: finalErrorMessage,
+              ...(finalErrorDetails && Object.keys(finalErrorDetails).length > 0 && { details: finalErrorDetails })
             }
           },
           { status: response.status }
@@ -159,16 +209,16 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json()
-      
+
       // トークンをCookieに保存（ログイン時と同様に）
       const nextResponse = NextResponse.json(data, { status: response.status })
       const isSecure = (() => {
         try { return new URL(request.url).protocol === 'https:' } catch { return process.env.NODE_ENV === 'production' }
       })()
-      
+
       nextResponse.headers.set('Cache-Control', 'no-store')
       nextResponse.headers.set('Pragma', 'no-cache')
-      
+
       if (data.accessToken) {
         nextResponse.cookies.set('accessToken', data.accessToken, {
           httpOnly: true,
@@ -201,7 +251,7 @@ export async function POST(request: NextRequest) {
           maxAge: 60 * 60 * 24 * 30,
         })
       }
-      
+
       return nextResponse
     } catch (fetchError) {
       clearTimeout(timeoutId)

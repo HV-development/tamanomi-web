@@ -65,8 +65,8 @@ export const useLoginPage = () => {
           
           let targetPath: string
           if (!hasPlan) {
-            // プラン未登録の場合はプラン登録画面へ（セッションストレージにメールアドレスを保存）
-            sessionStorage.setItem('userEmail', userData.email)
+            // セキュリティ改善：sessionStorageの使用を廃止
+            // メールアドレスはAPIから直接取得可能なため、sessionStorageに保存しない
             targetPath = '/plan-registration'
           } else {
             targetPath = '/home'
@@ -145,8 +145,9 @@ export const useLoginPage = () => {
 
       const otpData = await otpResponse.json()
       
-      // OTP入力ページへ遷移
-      const targetUrl = `/login/verify-otp?email=${encodeURIComponent(loginData.email)}&requestId=${encodeURIComponent(otpData.requestId)}`
+      // セキュリティ改善：メールアドレスをURLパラメータで送信しない
+      // requestIdのみをURLパラメータで送信（メールアドレスはサーバーサイドセッションに保存済み）
+      const targetUrl = `/login/verify-otp?requestId=${encodeURIComponent(otpData.requestId)}`
       
       // window.location.hrefを使って強制的にページ遷移
       window.location.href = targetUrl

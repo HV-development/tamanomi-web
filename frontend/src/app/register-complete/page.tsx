@@ -20,11 +20,8 @@ export default function RegisterCompletePage() {
   }
 
   const handleGoToPlanRegistration = () => {
-    // プラン登録画面に遷移（セッションストレージからメールアドレスを取得）
-    const userEmail = sessionStorage.getItem('userEmail')
-    if (userEmail) {
-      sessionStorage.setItem('userEmail', userEmail)
-    }
+    // セキュリティ改善：sessionStorageの使用を廃止
+    // メールアドレスはプラン登録画面でAPIから直接取得可能なため、sessionStorageに保存しない
     
     // URLパラメータからさいたま市アプリ連携フラグを取得
     const urlParams = new URLSearchParams(window.location.search)

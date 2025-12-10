@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { RegisterContainer } from '@/components/organisms/RegisterContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
-import { 
-  getRegisterSession, 
-  setRegisterSessionItem, 
-  removeRegisterSessionItem 
+import {
+  getRegisterSession,
+  setRegisterSessionItem,
+  removeRegisterSessionItem
 } from '@/lib/register-session'
 
 export default function RegisterPage() {
@@ -24,7 +24,7 @@ export default function RegisterPage() {
   // クライアントサイドでのみ searchParams を取得し、APIからメールアドレスを取得
   useEffect(() => {
     setIsClient(true)
-    
+
     const initializePage = async () => {
       if (typeof window === 'undefined') return
 
@@ -38,7 +38,6 @@ export default function RegisterPage() {
       // エラーパラメータがある場合は表示
       if (errorParam) {
         const decodedError = decodeURIComponent(errorParam)
-        console.log('🔍 [register] Error parameter found:', decodedError)
         setError(decodedError)
       }
 
@@ -87,7 +86,7 @@ export default function RegisterPage() {
           },
           body: JSON.stringify({ token: tokenParam }),
         })
-        
+
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
           if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
@@ -100,9 +99,13 @@ export default function RegisterPage() {
         }
 
         const data = await response.json()
-        setEmail(data.email)
-        // サーバーサイドセッションにメールアドレスを保存（確認画面での復元用）
-        await setRegisterSessionItem('registerEmail', data.email)
+        // セキュリティ改善：token-info APIはメールアドレスを返さないため、セッションから取得するか、表示用に別の方法を使用
+        // メールアドレスは登録完了時にトークンから取得されるため、ここでは表示しない
+        // セッションにトークンの有効性のみを保存
+        if (data.valid) {
+          // トークンが有効であることを確認
+          // メールアドレスの表示は、登録完了時にトークンから取得されるため、ここでは不要
+        }
       } catch {
         setError('エラーが発生しました。再度お試しください。')
         setTimeout(() => router.push('/email-registration'), 3000)
@@ -115,21 +118,60 @@ export default function RegisterPage() {
   }, [router])
 
   const handleRegisterSubmit = async (data: UserRegistrationComplete) => {
-    setIsLoading(true)
-
-    // shop_idを追加
-    const dataWithShopId = {
-      ...data,
-      shop_id: shopId || undefined,
+    if (!token) {
+      setError('トークンが見つかりません。再度メール登録からやり直してください。')
+      setIsLoading(false)
+      return
     }
 
-    // フォームデータをサーバーサイドセッションに保存
-    await setRegisterSessionItem('registerFormData', dataWithShopId)
+    setIsLoading(true)
 
-    // 確認画面に遷移（emailパラメータを削除 - セキュリティ改善）
-    const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
-    router.push(`/register-confirmation?token=${encodeURIComponent(token || '')}${shopIdParam}`)
-    setIsLoading(false)
+    try {
+      // emailはトークンから取得されるため、送信時には空文字列または除外
+      // shop_idを追加
+      const dataWithShopId = {
+        ...data,
+        email: data.email || '', // 空文字列を設定（サーバー側でトークンから取得される）
+        shop_id: shopId || undefined,
+      }
+
+      // フォームデータをサーバーサイドセッションに保存
+      try {
+        const sessionSaved = await setRegisterSessionItem('registerFormData', dataWithShopId)
+
+        if (!sessionSaved) {
+          setError('フォームデータの保存に失敗しました。再度お試しください。')
+          setIsLoading(false)
+          return
+        }
+
+        // セッションが正しく保存されたか確認
+        const verifySession = await getRegisterSession()
+        if (!verifySession?.registerFormData) {
+          setError('セッションの保存を確認できませんでした。再度お試しください。')
+          setIsLoading(false)
+          return
+        }
+      } catch (sessionError) {
+        setError('セッションの保存中にエラーが発生しました。再度お試しください。')
+        setIsLoading(false)
+        return
+      }
+
+      // 確認画面に遷移（emailパラメータを削除 - セキュリティ改善）
+      const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
+      const confirmationUrl = `/register-confirmation?token=${encodeURIComponent(token)}${shopIdParam}`
+
+      // router.pushの代わりにwindow.location.hrefを使用して確実に遷移
+      if (typeof window !== 'undefined') {
+        window.location.href = confirmationUrl
+      } else {
+        router.push(confirmationUrl)
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : '登録処理中にエラーが発生しました。再度お試しください。')
+      setIsLoading(false)
+    }
   }
 
   const handleCancel = () => router.push('/')

@@ -7,7 +7,7 @@ import type { NextRequest } from 'next/server'
  */
 function validateImageUrl(url: string | null): boolean {
   if (!url) return false;
-  
+
   // URLデコードして正規化（複数回デコードを試みてエンコードされた攻撃を検出）
   let decodedUrl = url;
   try {
@@ -21,22 +21,22 @@ function validateImageUrl(url: string | null): boolean {
     // デコード失敗は不正なURLとして拒否
     return false;
   }
-  
+
   // パストラバーサルパターンを禁止
   if (decodedUrl.includes('..') || decodedUrl.includes('./')) {
     return false;
   }
-  
+
   // バックスラッシュによるトラバーサルも禁止
   if (decodedUrl.includes('..\\') || decodedUrl.includes('.\\')) {
     return false;
   }
-  
+
   // ローカルパスは / で始まる必要がある
   if (!decodedUrl.startsWith('/') && !decodedUrl.startsWith('http')) {
     return false;
   }
-  
+
   // リモートURLの場合は許可されたドメインのみ
   if (decodedUrl.startsWith('http')) {
     const allowedHosts = [
@@ -52,7 +52,7 @@ function validateImageUrl(url: string | null): boolean {
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -84,7 +84,7 @@ export async function middleware(request: NextRequest) {
     '/payment-method-change',
     '/usage-guide',
   ]
-  
+
   if (protectedPaths.some(p => pathname === p || pathname.startsWith(`${p}/`))) {
     const token = request.cookies.get('accessToken')?.value || request.cookies.get('__Host-accessToken')?.value
     if (!token) {
@@ -106,11 +106,19 @@ export async function middleware(request: NextRequest) {
     // 公開API: 短いキャッシュを許可
     const publicApis = ['/api/shops', '/api/genres', '/api/plans']
     const isPublicApi = publicApis.some(api => pathname === api || pathname.startsWith(`${api}/`))
-    
+
     if (isPublicApi) {
       response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=30')
     } else {
       // 機密APIはキャッシュ無効化
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+      response.headers.set('Pragma', 'no-cache')
+      response.headers.set('Expires', '0')
+    }
+  } else {
+    // 保護されたページ（認証が必要なページ）はキャッシュ無効化
+    // 機密情報を含む可能性があるため、キャッシュから情報が漏洩することを防止
+    if (protectedPaths.some(p => pathname === p || pathname.startsWith(`${p}/`))) {
       response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
       response.headers.set('Pragma', 'no-cache')
       response.headers.set('Expires', '0')

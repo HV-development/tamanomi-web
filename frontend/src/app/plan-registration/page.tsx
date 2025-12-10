@@ -50,13 +50,12 @@ export default function PlanRegistrationPage() {
 
         if (userData.id) {
           setUserId(userData.id)
-          sessionStorage.setItem('userId', userData.id)
         }
 
         // メールアドレスをユーザーデータから取得（常に更新）
+        // セキュリティ改善：sessionStorageの使用を廃止し、APIから直接取得
         if (userData.email) {
           setEmail(userData.email)
-          sessionStorage.setItem('userEmail', userData.email)
         } else {
           console.error('❌ [fetchUserInfo] No email found in user data')
           setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
@@ -238,20 +237,13 @@ export default function PlanRegistrationPage() {
       setIsLoading(true)
       setError('')
 
-      const getEmailFromSession = () => {
-        const storedEmail = sessionStorage.getItem('userEmail')
-        return storedEmail ? storedEmail.trim() : ''
-      }
-
+      // セキュリティ改善：sessionStorageの使用を廃止し、APIから直接取得
       let currentEmail = email?.trim() ?? ''
-      if (!currentEmail) {
-        currentEmail = getEmailFromSession()
-      }
-
-      // メールアドレスの検証
+      
+      // メールアドレスの検証（stateにない場合はAPIから再取得）
       if (!currentEmail) {
         await fetchUserInfo()
-        currentEmail = getEmailFromSession() || email?.trim() || ''
+        currentEmail = email?.trim() || ''
       }
 
       if (!currentEmail) {
@@ -259,8 +251,6 @@ export default function PlanRegistrationPage() {
         setIsLoading(false)
         return
       }
-
-      sessionStorage.setItem('userEmail', currentEmail)
 
       // 支払い方法ごとの分岐
 
@@ -272,10 +262,9 @@ export default function PlanRegistrationPage() {
         }
 
         if (!userId) {
-          const storedUserId = sessionStorage.getItem('userId') || ''
-          if (storedUserId) {
-            setUserId(storedUserId)
-          } else {
+          // セキュリティ改善：sessionStorageの使用を廃止し、APIから再取得
+          await fetchUserInfo()
+          if (!userId) {
             setError('ユーザー情報が取得できませんでした。ログインし直してからお試しください。')
             setIsLoading(false)
             return
@@ -298,9 +287,9 @@ export default function PlanRegistrationPage() {
         // イオンペイのrequestIdは20文字以内の制約がある
         const requestId = `aeon_${Date.now()}`.substring(0, 20)
 
-        // planIdをセッションストレージに保存（URLを短くするため）
-        // I002エラー（successUrlが1000文字以上）を防ぐため、planIdをURLパラメータから削除
-        sessionStorage.setItem(`planId_${requestId}`, planId)
+        // セキュリティ改善：planIdはPaymentSessionに保存されるため、sessionStorageは不要
+        // I002エラー（successUrlが1000文字以上）を防ぐため、planIdはURLパラメータから削除
+        // planIdはPaymentSessionから取得可能
 
         // イオンペイ固有のURLを設定（決済完了後のリダイレクト先）
         // PDF「導入補足資料（イオンペイ）」3.4.API一覧に基づき、PCブラウザ/スマホブラウザではスネークケースを使用
@@ -318,7 +307,7 @@ export default function PlanRegistrationPage() {
         // - failure_url (失敗時URL)
         // - cancel_url (キャンセル時URL)
         const qrPaymentRequest = {
-          userId: userId || sessionStorage.getItem('userId') || '',
+          userId: userId || '',
           paymentMethodId: 'AeonPay' as const,
           requestId,
           amount: {
@@ -401,10 +390,9 @@ export default function PlanRegistrationPage() {
         }
 
         if (!userId) {
-          const storedUserId = sessionStorage.getItem('userId') || ''
-          if (storedUserId) {
-            setUserId(storedUserId)
-          } else {
+          // セキュリティ改善：sessionStorageの使用を廃止し、APIから再取得
+          await fetchUserInfo()
+          if (!userId) {
             setError('ユーザー情報が取得できませんでした。ログインし直してからお試しください。')
             setIsLoading(false)
             return
@@ -425,7 +413,7 @@ export default function PlanRegistrationPage() {
         const paymentAmount = Number(rawAmount)
 
         const payPayRequest: PayPayPaymentRequest = {
-          userId: userId || sessionStorage.getItem('userId') || '',
+          userId: userId || '',
           // 現時点ではショップIDは未使用のため省略
           requestId: `${Date.now()}`,  // PayPay APIは数値のみを期待するため、プレフィックスなし
           amount: {
@@ -541,8 +529,7 @@ export default function PlanRegistrationPage() {
       // リンクタイプ方式では、redirectUrlにGETパラメータを付与してリダイレクト
       const { redirectUrl, params } = data
 
-      // プラン登録成功後、セッションストレージからメールアドレスをクリア
-      sessionStorage.removeItem('userEmail')
+      // セキュリティ改善：sessionStorageの使用を廃止（削除処理も不要）
       // モック環境の場合はGETパラメータとしてリダイレクト
       if (redirectUrl.includes('/payment-mock')) {
         const url = new URL(redirectUrl)
