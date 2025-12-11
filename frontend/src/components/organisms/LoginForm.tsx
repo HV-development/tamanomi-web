@@ -105,8 +105,9 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
           throw new Error('OTPの送信に失敗しました')
         }
 
-        // ページ遷移
-        const targetUrl = `/login/verify-otp?email=${encodeURIComponent(formData.email)}&requestId=${encodeURIComponent(otpData.requestId)}`
+        // セキュリティ改善：メールアドレスをURLパラメータで送信しない
+        // requestIdのみをURLパラメータで送信（メールアドレスはサーバーサイドセッションに保存済み）
+        const targetUrl = `/login/verify-otp?requestId=${encodeURIComponent(otpData.requestId)}`
         window.location.href = targetUrl
       } catch {
         // エラーは親コンポーネントに渡す

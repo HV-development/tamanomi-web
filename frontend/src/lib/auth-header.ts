@@ -6,17 +6,25 @@
 /**
  * Requestからアクセストークンを取得してAuthorizationヘッダーを返す
  * 1. Authorization ヘッダーがあればそれを使用
- * 2. なければCookieから取得
+ * 2. なければCookieから取得（NextRequestのcookies APIもサポート）
  * 3. どちらもなければnull
  */
-export function getAuthHeader(request: Request): string | null {
+export function getAuthHeader(request: Request | { cookies?: { get: (name: string) => { value: string } | undefined }; headers: Headers }): string | null {
   // まずAuthorizationヘッダーをチェック
   const headerToken = request.headers.get('authorization');
   if (headerToken) {
     return headerToken;
   }
 
-  // Cookieから取得
+  // NextRequestのcookies APIから取得を試みる
+  if ('cookies' in request && request.cookies) {
+    const accessTokenCookie = request.cookies.get('accessToken') || request.cookies.get('__Host-accessToken');
+    if (accessTokenCookie?.value) {
+      return `Bearer ${accessTokenCookie.value}`;
+    }
+  }
+
+  // Cookieヘッダーから取得（フォールバック）
   const cookieHeader = request.headers.get('cookie') || '';
   const pairs = cookieHeader.split(';').map(v => v.trim());
   const accessPair = pairs.find(v => v.startsWith('accessToken=')) || pairs.find(v => v.startsWith('__Host-accessToken='));

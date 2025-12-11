@@ -101,20 +101,14 @@ export async function middleware(request: NextRequest) {
   // HSTS: HTTPSの接続を強制（1年間）
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
 
-  // キャッシュ制御
+  // キャッシュ制御: 全てのAPIレスポンスでキャッシュを無効化（セキュリティ対応）
+  // ユーザー固有情報（お気に入り状態など）が含まれる可能性があるため、
+  // 共有キャッシュによる情報漏洩を防止
   if (pathname.startsWith('/api/')) {
-    // 公開API: 短いキャッシュを許可
-    const publicApis = ['/api/shops', '/api/genres', '/api/plans']
-    const isPublicApi = publicApis.some(api => pathname === api || pathname.startsWith(`${api}/`))
-
-    if (isPublicApi) {
-      response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=30')
-    } else {
-      // 機密APIはキャッシュ無効化
-      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
-      response.headers.set('Pragma', 'no-cache')
-      response.headers.set('Expires', '0')
-    }
+    // 全てのAPIはキャッシュ無効化
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
   } else {
     // 保護されたページ（認証が必要なページ）はキャッシュ無効化
     // 機密情報を含む可能性があるため、キャッシュから情報が漏洩することを防止

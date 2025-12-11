@@ -27,14 +27,14 @@ export const useLoginPage = () => {
         const shouldRedirect = !!loginRedirecting
         setIsRedirecting(shouldRedirect)
       }
-      
+
       // 初回チェック
       checkRedirecting()
-      
+
       // 定期的にチェック（遷移先のページでフラグがクリアされるまで）
       // ページ遷移が始まっても、ログインページがアンマウントされるまでチェックを継続
       const interval = setInterval(checkRedirecting, 50) // より頻繁にチェック
-      
+
       return () => clearInterval(interval)
     }
   }, [])
@@ -45,7 +45,7 @@ export const useLoginPage = () => {
       // skip-auth-check パラメータがある場合は認証チェックをスキップ
       const urlParams = new URLSearchParams(window.location.search)
       const skipAuthCheck = urlParams.get('skip-auth-check')
-      
+
       if (skipAuthCheck === 'true') {
         // URLパラメータをクリア
         const newUrl = new URL(window.location.href)
@@ -54,7 +54,7 @@ export const useLoginPage = () => {
         setIsCheckingAuth(false)
         return
       }
-      
+
       // Cookieから自動的に認証チェック
       try {
         const response = await fetch('/api/user/me')
@@ -62,7 +62,7 @@ export const useLoginPage = () => {
         if (response.ok) {
           const userData = await response.json()
           const hasPlan = userData.plan !== null && userData.plan !== undefined
-          
+
           let targetPath: string
           if (!hasPlan) {
             // セキュリティ改善：sessionStorageの使用を廃止
@@ -76,7 +76,7 @@ export const useLoginPage = () => {
           // 遷移先のページで完全に表示されたらクリアされる
           sessionStorage.setItem('loginRedirecting', targetPath)
           setIsRedirecting(true)
-          
+
           router.replace(targetPath)
         } else {
           setIsCheckingAuth(false)
@@ -144,11 +144,11 @@ export const useLoginPage = () => {
       }
 
       const otpData = await otpResponse.json()
-      
+
       // セキュリティ改善：メールアドレスをURLパラメータで送信しない
       // requestIdのみをURLパラメータで送信（メールアドレスはサーバーサイドセッションに保存済み）
       const targetUrl = `/login/verify-otp?requestId=${encodeURIComponent(otpData.requestId)}`
-      
+
       // window.location.hrefを使って強制的にページ遷移
       window.location.href = targetUrl
     } catch (err) {
