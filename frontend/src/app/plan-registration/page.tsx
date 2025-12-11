@@ -69,19 +69,29 @@ export default function PlanRegistrationPage() {
         setHasPaymentMethod(hasCard)
       } else {
         const errorData = await response.json().catch(() => ({}))
-        console.error('❌ [fetchUserInfo] API error:', response.status, errorData)
+        console.error('❌ [fetchUserInfo] API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          url: '/api/user/me',
+        })
         setSaitamaAppLinked(false)
 
         // 認証失敗時（401/403）はログイン画面にリダイレクト
         if (response.status === 401 || response.status === 403) {
+          console.error('❌ [fetchUserInfo] Authentication failed, redirecting to login')
           router.push('/login?redirect=/plan-registration')
           return
         }
 
         if (response.status === 404) {
-          setError('ユーザー情報が見つかりません。新規登録画面からやり直してください。')
+          const errorMessage = errorData.error?.message || errorData.message || 'ユーザー情報が見つかりません。新規登録画面からやり直してください。'
+          console.error('❌ [fetchUserInfo] User not found:', errorMessage)
+          setError(errorMessage)
         } else {
-          setError('ユーザー情報の取得に失敗しました。再度お試しください。')
+          const errorMessage = errorData.error?.message || errorData.message || 'ユーザー情報の取得に失敗しました。再度お試しください。'
+          console.error('❌ [fetchUserInfo] Unknown error:', errorMessage)
+          setError(errorMessage)
         }
       }
     } catch (error) {
