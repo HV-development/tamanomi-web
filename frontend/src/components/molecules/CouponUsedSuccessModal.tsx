@@ -96,6 +96,11 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
             >
               閉じる
             </button>
+
+            {/* VOICEVOXクレジット表記 */}
+            <div className="mt-3 text-center">
+              <p className="text-xs text-gray-400">VOICEVOX:ずんだもん</p>
+            </div>
           </div>
         </div>
       </div>

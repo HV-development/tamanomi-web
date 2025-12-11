@@ -62,10 +62,6 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
       label: "ログアウト",
       onClick: () => onMenuItemClick("logout"),
     }] : []),
-    {
-      id: "voicevox-credit",
-      label: "VOICEVOX:ずんだもん",
-    },
   ]
 
   const handleToggle = () => {
