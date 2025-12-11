@@ -12,27 +12,51 @@ export const useVerifyOtpPage = () => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [email, setEmail] = useState<string>("")
-  
+
   // セキュリティ改善：URLパラメータからメールアドレスを取得せず、サーバーサイドセッションから取得
   // requestIdのみをURLパラメータから取得
   const requestId = searchParams.get('requestId') || ""
-  
+
   // サーバーサイドセッションからメールアドレスを取得
   useEffect(() => {
     const fetchEmailFromSession = async () => {
       if (!requestId) {
         return
       }
-      
+
       try {
         const sessionEmail = await getRegisterSessionItem<string>('otpEmail')
         const sessionRequestId = await getRegisterSessionItem<string>('otpRequestId')
-        
+
+        // デバッグログ：セッション取得結果を確認
+        console.log('🔍 [useVerifyOtpPage] Session check:', {
+          urlRequestId: requestId,
+          sessionEmail: sessionEmail,
+          sessionEmailType: typeof sessionEmail,
+          sessionEmailExists: !!sessionEmail,
+          sessionRequestId: sessionRequestId,
+          sessionRequestIdType: typeof sessionRequestId,
+          sessionRequestIdExists: !!sessionRequestId,
+          requestIdMatch: sessionRequestId === requestId,
+          requestIdMatchStrict: sessionRequestId === requestId ? 'true' : 'false',
+          bothExist: !!sessionEmail && !!sessionRequestId,
+          conditionResult: sessionEmail && sessionRequestId === requestId
+        })
+
         // requestIdが一致する場合のみメールアドレスを使用
         if (sessionEmail && sessionRequestId === requestId) {
+          console.log('✅ [useVerifyOtpPage] Session validation passed, setting email:', sessionEmail)
           setEmail(sessionEmail)
         } else {
           // セッションにメールアドレスがない、またはrequestIdが一致しない場合はエラー
+          console.warn('❌ [useVerifyOtpPage] Session validation failed:', {
+            hasEmail: !!sessionEmail,
+            hasRequestId: !!sessionRequestId,
+            requestIdMatch: sessionRequestId === requestId,
+            urlRequestId: requestId,
+            sessionRequestId: sessionRequestId,
+            emailValue: sessionEmail
+          })
           setError('セッションが無効です。再度ログインしてください。')
           router.replace('/login?skip-auth-check=true')
         }
@@ -42,7 +66,7 @@ export const useVerifyOtpPage = () => {
         router.replace('/login?skip-auth-check=true')
       }
     }
-    
+
     if (requestId) {
       fetchEmailFromSession()
     }
@@ -56,39 +80,21 @@ export const useVerifyOtpPage = () => {
         const shouldRedirect = !!loginRedirecting
         setIsRedirecting(shouldRedirect)
       }
-      
+
       checkRedirecting()
       const interval = setInterval(checkRedirecting, 50)
-      
+
       return () => clearInterval(interval)
     }
   }, [])
 
-  // 認証状態チェック（既にログイン済みの場合はリダイレクト）
+  // 認証状態チェック（OTP入力画面ではスキップ）
+  // パスワード認証成功時にトークンが発行されるため、OTP認証完了まで認証チェックをスキップする
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/user/me')
-
-        if (response.ok) {
-          const userData = await response.json()
-          const hasPlan = userData.plan !== null && userData.plan !== undefined
-          
-          const targetPath = hasPlan ? '/home' : '/plan-registration'
-          
-          sessionStorage.setItem('loginRedirecting', targetPath)
-          setIsRedirecting(true)
-          router.replace(targetPath)
-        } else {
-          setIsCheckingAuth(false)
-        }
-      } catch {
-        setIsCheckingAuth(false)
-      }
-    }
-
-    checkAuth()
-  }, [router])
+    // OTP入力画面では認証チェックをスキップ
+    // パスワード認証成功時にトークンが発行されるが、OTP認証が完了するまではログインを完了させない
+    setIsCheckingAuth(false)
+  }, [])
 
   // requestIdが無い場合はログインページへリダイレクト
   useEffect(() => {
@@ -122,7 +128,7 @@ export const useVerifyOtpPage = () => {
       let hasPlan = false
       try {
         const userResponse = await fetch('/api/user/me')
-        
+
         if (userResponse.ok) {
           const userData = await userResponse.json()
           hasPlan = userData.plan !== null && userData.plan !== undefined
@@ -133,7 +139,7 @@ export const useVerifyOtpPage = () => {
 
       // リダイレクト
       const redirectPath = sessionStorage.getItem('redirectAfterLogin')
-      
+
       let targetPath: string
       if (redirectPath) {
         sessionStorage.removeItem('redirectAfterLogin')
@@ -145,18 +151,18 @@ export const useVerifyOtpPage = () => {
           targetPath = '/home'
         }
       }
-      
+
       // ローディング継続フラグをセッションストレージに設定
       sessionStorage.setItem('loginRedirecting', targetPath)
-      
+
       // 遷移前にisRedirectingをtrueに設定
       setIsRedirecting(true)
-      
+
       // 少し待ってから遷移
       requestAnimationFrame(() => {
         router.replace(targetPath)
       })
-      
+
       // 成功時はsetIsLoading(false)を呼ばない（リダイレクト後に自動的にアンマウントされるため）
       return
     } catch (err) {
@@ -191,7 +197,7 @@ export const useVerifyOtpPage = () => {
       }
 
       const data = await response.json()
-      
+
       // セキュリティ改善：メールアドレスをURLパラメータで送信しない
       // 新しいrequestIdでURLパラメータを更新（requestIdのみ）
       if (data.requestId) {
