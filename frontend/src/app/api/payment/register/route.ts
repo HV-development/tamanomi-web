@@ -9,6 +9,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { customerId, userEmail, planId, customerFamilyName, customerName, companyName } = body
 
+    // 環境情報を取得
+    const apiBaseUrl = process.env.API_BASE_URL || 'not set'
+    const nodeEnv = process.env.NODE_ENV || 'not set'
+    const host = request.headers.get('host') || 'not set'
+    const cookieHeader = request.headers.get('cookie') ? 'present' : 'missing'
+
+    console.log('🔍 [Next.js API Route] Environment info:', {
+      nodeEnv,
+      apiBaseUrl,
+      host,
+      cookieHeader,
+      hasCookie: !!request.headers.get('cookie'),
+    })
+
     console.log('🔍 [Next.js API Route] Request body:', {
       customerId,
       userEmail,
@@ -18,6 +32,8 @@ export async function POST(request: NextRequest) {
 
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const fullUrl = buildApiUrl('/payment/register')
+
+    console.log('🔍 [Next.js API Route] Backend URL:', fullUrl)
 
     const backendRequestBody = {
       customerId,
@@ -30,11 +46,26 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 [Next.js API Route] Backend request body:', backendRequestBody)
 
+    // リクエストヘッダーを構築（Cookieを転送）
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    }
+
+    // Cookieを転送（認証情報を含む）
+    const cookie = request.headers.get('cookie')
+    if (cookie) {
+      headers['Cookie'] = cookie
+    }
+
+    console.log('🔍 [Next.js API Route] Request headers:', {
+      hasCookie: !!cookie,
+      cookieLength: cookie?.length || 0,
+      contentType: headers['Content-Type'],
+    })
+
     const response = await fetch(fullUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(backendRequestBody),
     })
 
@@ -54,12 +85,21 @@ export async function POST(request: NextRequest) {
         errorData = { message: 'レスポンスの解析に失敗しました' }
       }
 
-      // エラーデータの詳細をログ出力
-      console.error('[api/payment/register] backend error response:', {
+      // エラーデータの詳細をログ出力（デバッグ用に詳細情報を含める）
+      console.error('❌ [api/payment/register] backend error response:', {
         status: response.status,
+        statusText: response.statusText,
         errorData,
         errorMessage: errorData.message,
         errorCode: errorData.code,
+        fullErrorData: JSON.stringify(errorData, null, 2),
+        requestBody: backendRequestBody,
+        backendUrl: fullUrl,
+        environment: {
+          nodeEnv: process.env.NODE_ENV,
+          apiBaseUrl: process.env.API_BASE_URL || 'not set',
+          host: request.headers.get('host'),
+        },
       })
 
       // バックエンドからのエラーメッセージを優先的に使用
@@ -81,14 +121,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     const errorStack = error instanceof Error ? error.stack : undefined
-    
+
     console.error('❌ [api/payment/register] Unexpected error:', {
       error,
       errorMessage,
       errorStack,
       errorName: error instanceof Error ? error.name : 'Unknown',
     })
-    
+
     return NextResponse.json(
       { error: 'カード登録の準備中にエラーが発生しました' },
       { status: 500 }

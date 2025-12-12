@@ -426,12 +426,16 @@ export const useAppHandlers = (
     }, [dispatch])
 
     const handleFavoriteToggle = useCallback(async (storeId: string) => {
+        // Cookieの存在を確認
+        const hasCookie = typeof document !== 'undefined' && document.cookie.includes('accessToken')
+        
         // 現在の状態を確認（UIの状態ではなく、データの状態を確認）
         const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
         const currentIsFavorite = currentStore?.isFavorite ?? false
 
-        // 未認証の場合はセッションストレージに保存（モーダルは表示しない）
-        if (!auth.isAuthenticated) {
+        // Cookieが存在する場合は認証済みとして扱い、API呼び出しを試みる
+        // 未認証かつCookieもない場合はセッションストレージに保存
+        if (!auth.isAuthenticated && !hasCookie) {
             try {
                 // セッションストレージの状態も確認
                 const { isFavoriteInStorage, addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
@@ -452,10 +456,10 @@ export const useAppHandlers = (
             return
         }
 
-        // 認証済みの場合は楽観的更新：UIを先に更新
+        // 認証済みまたはCookieが存在する場合は楽観的更新：UIを先に更新
         dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
 
-        // 認証済みの場合はAPI呼び出し
+        // 認証済みまたはCookieが存在する場合はAPI呼び出し
         try {
             // API呼び出し
             let response: Response
@@ -542,6 +546,30 @@ export const useAppHandlers = (
                         dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
                     }
                 }
+            }
+            
+            // お気に入り一覧を再取得して状態を同期
+            try {
+                const syncResponse = await fetch('/api/favorites', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    cache: 'no-store',
+                    credentials: 'include',
+                })
+
+                if (syncResponse.ok) {
+                    const syncData = await syncResponse.json()
+                    const favoriteShopIds = (syncData.shops || []).map((shop: { id: string }) => shop.id) as string[]
+                    
+                    dispatch({
+                        type: 'SYNC_FAVORITES',
+                        payload: favoriteShopIds
+                    })
+                }
+            } catch (syncError) {
+                console.error('お気に入り一覧の同期エラー:', syncError)
             }
         } catch (error) {
             // トークン期限切れエラー（403など）は既に処理済みなので、ここでは処理しない
