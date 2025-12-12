@@ -428,7 +428,7 @@ export const useAppHandlers = (
     const handleFavoriteToggle = useCallback(async (storeId: string) => {
         // Cookieの存在を確認
         const hasCookie = typeof document !== 'undefined' && document.cookie.includes('accessToken')
-        
+
         // 現在の状態を確認（UIの状態ではなく、データの状態を確認）
         const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
         const currentIsFavorite = currentStore?.isFavorite ?? false
@@ -547,7 +547,7 @@ export const useAppHandlers = (
                     }
                 }
             }
-            
+
             // お気に入り一覧を再取得して状態を同期
             try {
                 const syncResponse = await fetch('/api/favorites', {
@@ -562,7 +562,7 @@ export const useAppHandlers = (
                 if (syncResponse.ok) {
                     const syncData = await syncResponse.json()
                     const favoriteShopIds = (syncData.shops || []).map((shop: { id: string }) => shop.id) as string[]
-                    
+
                     dispatch({
                         type: 'SYNC_FAVORITES',
                         payload: favoriteShopIds
