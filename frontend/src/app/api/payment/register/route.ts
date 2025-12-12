@@ -19,13 +19,29 @@ export async function POST(request: NextRequest) {
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const fullUrl = buildApiUrl('/payment/register')
 
-    const backendRequestBody = {
+    // undefinedのフィールドを除外してバックエンドに送信
+    const backendRequestBody: Record<string, string> = {
       customerId,
-      userEmail,
-      planId,
-      customerFamilyName,
-      customerName,
-      companyName
+    }
+
+    if (userEmail) {
+      backendRequestBody.userEmail = userEmail
+    }
+
+    if (planId) {
+      backendRequestBody.planId = planId
+    }
+
+    if (customerFamilyName) {
+      backendRequestBody.customerFamilyName = customerFamilyName
+    }
+
+    if (customerName) {
+      backendRequestBody.customerName = customerName
+    }
+
+    if (companyName) {
+      backendRequestBody.companyName = companyName
     }
 
     console.log('🔍 [Next.js API Route] Backend request body:', backendRequestBody)

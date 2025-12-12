@@ -24,6 +24,7 @@ export default function PlanRegistrationPage() {
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const [hasPaymentMethod, setHasPaymentMethod] = useState<boolean>(false)
   const [isPaymentMethodChangeOnly, setIsPaymentMethodChangeOnly] = useState<boolean>(false)
+  const [existingPaygentCustomerId, setExistingPaygentCustomerId] = useState<string | null>(null)
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
   const [confirmModalData, setConfirmModalData] = useState<{
     planName: string
@@ -63,6 +64,13 @@ export default function PlanRegistrationPage() {
 
         const newLinkedState = userData.saitamaAppLinked === true
         setSaitamaAppLinked(newLinkedState)
+
+        // 既存のpaygentCustomerIdを取得（既にカード登録済みの場合）
+        if (userData.paymentCard?.paygentCustomerId) {
+          setExistingPaygentCustomerId(userData.paymentCard.paygentCustomerId)
+        } else {
+          setExistingPaygentCustomerId(null)
+        }
 
         // カード登録状態を確認（sessionStorageにpaygentCustomerCardIdがあれば登録済み）
         const hasCard = !!sessionStorage.getItem('paygentCustomerCardId')
@@ -477,22 +485,29 @@ export default function PlanRegistrationPage() {
       }
 
       // クレジットカード: カード登録APIを呼び出し
-      // customerId: メールアドレスのハッシュ値を使用して25文字以内に収める
-      const generateCustomerId = (email: string): string => {
-        // メールアドレスのハッシュ値を生成（簡易版）
-        let hash = 0
-        for (let i = 0; i < email.length; i++) {
-          const char = email.charCodeAt(i)
-          hash = ((hash << 5) - hash) + char
-          hash = hash & hash // Convert to 32bit integer
-        }
-        // 絶対値を取得して16進数に変換（最大8文字）
-        const hashStr = Math.abs(hash).toString(16).padStart(8, '0')
-        // "cust_" + ハッシュ値 = 最大13文字
-        return `cust_${hashStr}`
-      }
+      // customerId: 既存のpaygentCustomerIdがある場合はそれを使用、なければメールアドレスのハッシュ値を使用
+      let customerId: string
 
-      const customerId = generateCustomerId(currentEmail)
+      if (existingPaygentCustomerId) {
+        // 既にpaygentCustomerIdが設定されている場合はそれを使用
+        customerId = existingPaygentCustomerId
+      } else {
+        // 新規登録の場合はメールアドレスのハッシュ値を使用して25文字以内に収める
+        const generateCustomerId = (email: string): string => {
+          // メールアドレスのハッシュ値を生成（簡易版）
+          let hash = 0
+          for (let i = 0; i < email.length; i++) {
+            const char = email.charCodeAt(i)
+            hash = ((hash << 5) - hash) + char
+            hash = hash & hash // Convert to 32bit integer
+          }
+          // 絶対値を取得して16進数に変換（最大8文字）
+          const hashStr = Math.abs(hash).toString(16).padStart(8, '0')
+          // "cust_" + ハッシュ値 = 最大13文字
+          return `cust_${hashStr}`
+        }
+        customerId = generateCustomerId(currentEmail)
+      }
 
       // 支払い方法変更のみの場合はplanIdを送信しない
       const requestBody: Record<string, string> = {
