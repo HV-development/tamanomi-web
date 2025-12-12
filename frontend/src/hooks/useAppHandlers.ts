@@ -804,11 +804,10 @@ export const useAppHandlers = (
 
             // Cookieベースの認証のみを使用（localStorageは廃止）
 
-            // ユーザー情報とプラン情報を取得
+            // ユーザー情報を取得（プラン情報は必須ではない）
             const user = auth.user
-            const plan = auth.plan
 
-            if (!user || !plan) {
+            if (!user) {
                 throw new Error('ユーザー情報が見つかりません')
             }
 
@@ -833,11 +832,24 @@ export const useAppHandlers = (
 
             if (!runningId) {
                 if (!userPlanId) {
-                    console.error('❌ [handleWithdrawConfirm] userPlanId not found:', {
-                        plan: userData.plan,
-                        userPlan: userData.userPlan,
+                    // プラン登録していない場合は、アカウントのstatusを直接suspendedに更新
+                    console.log('🔄 [handleWithdrawConfirm] No userPlan found, withdrawing account directly')
+                    const withdrawResponse = await fetch('/api/user/withdraw', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({}),
+                        credentials: 'include',
                     })
-                    throw new Error('退会に必要な契約情報が見つかりません。サポートへお問い合わせください。')
+
+                    if (!withdrawResponse.ok) {
+                        const errorData = await withdrawResponse.json().catch(() => ({}))
+                        throw new Error(errorData.error?.message || errorData.message || '退会処理に失敗しました')
+                    }
+
+                    navigation.navigateToMyPage("withdrawal-complete")
+                    return
                 }
 
                 // PAYGENT未連携（または単発決済）の場合は、ユーザープランを直接削除して退会扱いとする
@@ -858,7 +870,7 @@ export const useAppHandlers = (
             }
 
             // 次回課金日を取得（userPlanまたはplanから、userPlanを優先）
-            const nextBillingDate = userData.userPlan?.nextBillingDate || userData.plan?.nextBillingDate || plan.nextBillingDate
+            const nextBillingDate = userData.userPlan?.nextBillingDate || userData.plan?.nextBillingDate
 
             if (!nextBillingDate) {
                 throw new Error('次回課金日が見つかりません')
