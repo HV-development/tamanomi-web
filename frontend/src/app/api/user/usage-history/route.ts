@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       console.error('❌ [usage-history] Backend API error:', data)
       
-      // 401エラーの場合、リフレッシュトークンで再試行
-      if (response.status === 401) {
+      // 401または403エラーの場合、リフレッシュトークンで再試行
+      if (response.status === 401 || response.status === 403) {
         const refreshToken = getRefreshToken(request)
         
         if (refreshToken) {

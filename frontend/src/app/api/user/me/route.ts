@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       console.error('❌ [user/me] Backend API error:', data)
       
-      // 401エラーの場合、リフレッシュトークンで再試行
-      if (response.status === 401) {
+      // 401または403エラーの場合、リフレッシュトークンで再試行
+      if (response.status === 401 || response.status === 403) {
         const refreshToken = getRefreshToken(request)
         
         if (refreshToken) {
@@ -107,17 +107,29 @@ export async function GET(request: NextRequest) {
               }
               
               return res
+            } else {
+              // リトライが失敗した場合、403エラーがアカウントタイプ不一致の可能性がある
+              const retryData = await retryResponse.json().catch(() => ({}))
+              if (retryResponse.status === 403 && retryData.message?.includes('アカウントタイプ')) {
+                return NextResponse.json(
+                  { error: 'この機能はユーザーアカウント専用です' },
+                  { status: 403 }
+                )
+              }
             }
           }
         }
-      }
-      
-      // 403エラーの場合（アカウントタイプ不一致）は特別に処理
-      if (response.status === 403) {
-        return NextResponse.json(
-          { error: 'この機能はユーザーアカウント専用です' },
-          { status: 403 }
-        )
+        
+        // リフレッシュに失敗した場合、403エラーがアカウントタイプ不一致の可能性がある
+        if (response.status === 403) {
+          const errorMessage = data.message || data.error?.message || ''
+          if (errorMessage.includes('アカウントタイプ') || errorMessage.includes('account type')) {
+            return NextResponse.json(
+              { error: 'この機能はユーザーアカウント専用です' },
+              { status: 403 }
+            )
+          }
+        }
       }
       
       return NextResponse.json(
