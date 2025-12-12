@@ -513,8 +513,33 @@ export default function PlanRegistrationPage() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'カード登録の準備に失敗しました')
+        let errorData: any = {}
+        try {
+          errorData = await response.json()
+        } catch (jsonError) {
+          console.error('▲[fetch] error response.json()エラー:', jsonError)
+          errorData = {}
+        }
+
+        // エラーレスポンスの詳細をログ出力
+        console.error('▲[fetch] Payment register error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+          errorMessage: errorData.message || errorData.error,
+          errorCode: errorData.code,
+        })
+
+        // バックエンドからのエラーメッセージを優先的に使用
+        // Next.js APIルートから返される形式: { error: string, code?: string }
+        // バックエンドから直接返される形式: { message: string, code?: string } または { error: { message: string, code?: string } }
+        const errorMessage =
+          errorData.error ||
+          errorData.message ||
+          errorData.error?.message ||
+          'カード登録の準備に失敗しました'
+
+        throw new Error(errorMessage)
       }
 
       let data
