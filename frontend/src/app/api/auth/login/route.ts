@@ -23,17 +23,33 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
 
+      // エラーメッセージを取得（formatErrorResponseの構造に対応）
+      let errorMessage = errorData.error?.message || errorData.message || 'ログインに失敗しました'
+
+      // 退会済みアカウントの場合、より分かりやすいメッセージに変更
+      if (errorMessage.includes('退会済み') || errorMessage.includes('suspended')) {
+        errorMessage = 'このアカウントは退会済みです。同じメールアドレスで新規登録を行ってください。'
+      }
+
       // バリデーションエラーの場合
-      if (response.status === 400 && errorData.message) {
+      if (response.status === 400) {
         return NextResponse.json(
-          { error: errorData.message },
+          { error: errorMessage },
+          { status: response.status }
+        )
+      }
+
+      // 認証エラー（401）の場合
+      if (response.status === 401) {
+        return NextResponse.json(
+          { error: errorMessage },
           { status: response.status }
         )
       }
 
       // その他のエラー
       return NextResponse.json(
-        { error: errorData.error?.message || errorData.message || 'ログインに失敗しました' },
+        { error: errorMessage },
         { status: response.status }
       )
     }

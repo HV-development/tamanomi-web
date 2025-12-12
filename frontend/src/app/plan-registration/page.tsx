@@ -237,19 +237,6 @@ export default function PlanRegistrationPage() {
       setIsLoading(true)
       setError('')
 
-      // 環境情報をログ出力（ローカル/本番の違いを確認するため）
-      const isClient = typeof window !== 'undefined'
-      const currentUrl = isClient ? window.location.href : 'server-side'
-      const hasCookies = isClient ? document.cookie.length > 0 : false
-
-      console.log('🔍 [executePaymentMethodRegister] Environment info:', {
-        isClient,
-        currentUrl,
-        hasCookies,
-        cookieLength: isClient ? document.cookie.length : 0,
-        userAgent: isClient ? navigator.userAgent.substring(0, 50) : 'server-side',
-      })
-
       // セキュリティ改善：sessionStorageの使用を廃止し、APIから直接取得
       let currentEmail = email?.trim() ?? ''
 
@@ -517,14 +504,6 @@ export default function PlanRegistrationPage() {
         requestBody.planId = planId // セッション管理用（これがPaymentSessionに保存される）
       }
 
-      // リクエストの詳細をログ出力
-      console.log('🔍 [executePaymentMethodRegister] Request to /api/payment/register:', {
-        customerId: requestBody.customerId,
-        userEmail: requestBody.userEmail,
-        planId: requestBody.planId,
-        hasPlanId: !!requestBody.planId,
-      })
-
       const response = await fetch('/api/payment/register', {
         method: 'POST',
         headers: {
@@ -534,39 +513,8 @@ export default function PlanRegistrationPage() {
       })
 
       if (!response.ok) {
-        let errorData: any = {}
-        try {
-          errorData = await response.json()
-        } catch (jsonError) {
-          console.error('▲[fetch] error response.json()エラー:', jsonError)
-          errorData = {}
-        }
-
-        // エラーレスポンスの詳細をログ出力（デバッグ用に詳細情報を含める）
-        console.error('❌ [executePaymentMethodRegister] Payment register error response:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorData,
-          errorMessage: errorData.message || errorData.error,
-          errorCode: errorData.code,
-          fullErrorData: JSON.stringify(errorData, null, 2),
-          requestBody: {
-            customerId: requestBody.customerId,
-            userEmail: requestBody.userEmail,
-            planId: requestBody.planId,
-          },
-        })
-
-        // バックエンドからのエラーメッセージを優先的に使用
-        // Next.js APIルートから返される形式: { error: string, code?: string }
-        // バックエンドから直接返される形式: { message: string, code?: string } または { error: { message: string, code?: string } }
-        const errorMessage =
-          errorData.error ||
-          errorData.message ||
-          errorData.error?.message ||
-          'カード登録の準備に失敗しました'
-
-        throw new Error(errorMessage)
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'カード登録の準備に失敗しました')
       }
 
       let data
@@ -610,30 +558,14 @@ export default function PlanRegistrationPage() {
         form.submit()
       }
     } catch (error) {
-      // エラー発生時のコンテキスト情報を含めてログ出力
-      const errorContext = {
-        planId,
-        paymentMethod,
-        email,
-        userId,
-        isPaymentMethodChangeOnly,
-        plansCount: plans.length,
-        hasPaymentMethod,
-        saitamaAppLinked,
-      }
-
-      console.error('❌ [handlePaymentMethodRegister] エラー発生:', error)
-      console.error('❌ [handlePaymentMethodRegister] エラー詳細:', {
+      console.error('▲ERROR [handlePaymentMethodRegister] エラー発生:', error)
+      console.error('▲ERROR [handlePaymentMethodRegister] エラー詳細:', {
         errorType: typeof error,
         errorName: error instanceof Error ? error.name : 'Unknown',
         errorMessage: error instanceof Error ? error.message : String(error),
-        errorStack: error instanceof Error ? error.stack : 'No stack trace',
-        context: errorContext,
+        errorStack: error instanceof Error ? error.stack : 'No stack trace'
       })
-
-      // エラーメッセージを設定（ユーザーに表示される）
-      const errorMessage = error instanceof Error ? error.message : 'プランの登録に失敗しました'
-      setError(errorMessage)
+      setError(error instanceof Error ? error.message : 'プランの登録に失敗しました')
     } finally {
       setIsLoading(false)
     }
@@ -676,15 +608,6 @@ export default function PlanRegistrationPage() {
   const handleLogoClick = () => router.push('/')
 
   const handlePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType = 'CreditCard') => {
-    // デバッグ用: 関数呼び出し時のパラメータをログ出力
-    console.log('🔍 [handlePaymentMethodRegister] Called with:', {
-      planId,
-      paymentMethod,
-      email,
-      userId,
-      hasPlans: plans.length > 0,
-    })
-
     const isPaymentMethodChangeOnly = !planId || planId === ""
 
     // プラン選択時は確認モーダルを表示
