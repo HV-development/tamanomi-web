@@ -39,10 +39,38 @@ export async function POST(request: NextRequest) {
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      console.error('Payment register API error:', errorData)
+      let errorData: any = {}
+      try {
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await response.json()
+        } else {
+          const text = await response.text()
+          console.error('[api/payment/register] backend returned non-JSON response:', text.substring(0, 200))
+          errorData = { message: text.substring(0, 200) }
+        }
+      } catch (parseError) {
+        console.error('[api/payment/register] failed to parse error response:', parseError)
+        errorData = { message: 'レスポンスの解析に失敗しました' }
+      }
+
+      // エラーデータの詳細をログ出力
+      console.error('[api/payment/register] backend error response:', {
+        status: response.status,
+        errorData,
+        errorMessage: errorData.message,
+        errorCode: errorData.code,
+      })
+
+      // バックエンドからのエラーメッセージを優先的に使用
+      // レスポンス形式: { statusCode, code, message } または { error: { code, message } }
+      const errorMessage =
+        errorData.message ||
+        errorData.error?.message ||
+        'カード登録の準備に失敗しました'
+
       return NextResponse.json(
-        { error: errorData.message || 'カード登録の準備に失敗しました' },
+        { error: errorMessage, code: errorData.code || errorData.error?.code },
         { status: response.status }
       )
     }
@@ -51,7 +79,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Payment register API fetch error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    
+    console.error('❌ [api/payment/register] Unexpected error:', {
+      error,
+      errorMessage,
+      errorStack,
+      errorName: error instanceof Error ? error.name : 'Unknown',
+    })
+    
     return NextResponse.json(
       { error: 'カード登録の準備中にエラーが発生しました' },
       { status: 500 }
