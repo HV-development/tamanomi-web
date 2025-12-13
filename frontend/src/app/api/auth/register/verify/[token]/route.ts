@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { secureFetch } from '@/lib/fetch-utils'
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
 
@@ -16,7 +17,7 @@ export async function GET(
         // トークンはUUIDのみで、メールアドレスなどの個人情報は含まれない（セキュリティ改善）
         // バックエンドAPIでトークンを検証（POSTメソッドでトークンをボディ送信）
         try {
-            const response = await fetch(`${API_BASE_URL}/api/v1/register/token-info`, {
+            const response = await secureFetch(`${API_BASE_URL}/api/v1/register/token-info`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

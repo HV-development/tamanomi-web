@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     const fullUrl = buildApiUrl('/otp/verify')
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +25,7 @@ export async function POST(request: NextRequest) {
       const errorData = await response.json().catch(() => ({}))
       
 
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: errorData.error?.message || errorData.message || 'OTP検証に失敗しました' },
         { status: response.status }
       )
@@ -32,13 +34,10 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
 
     // トークンをhttpOnly Cookieに保存し、ボディでは返却しない
-    const res = NextResponse.json({ message: 'OTP verification successful' })
+    const res = createNoCacheResponse({ message: 'OTP verification successful' })
     const isSecure = (() => {
       try { return new URL(request.url).protocol === 'https:'; } catch { return process.env.NODE_ENV === 'production'; }
     })()
-    
-    res.headers.set('Cache-Control', 'no-store')
-    res.headers.set('Pragma', 'no-cache')
     
     if (data.accessToken) {
       res.cookies.set('accessToken', data.accessToken, {
@@ -75,10 +74,9 @@ export async function POST(request: NextRequest) {
     
     return res
   } catch {
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'OTP検証処理中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-

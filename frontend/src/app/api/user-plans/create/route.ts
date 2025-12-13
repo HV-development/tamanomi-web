@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildApiUrl } from '@/lib/api-config';
 import { getAuthHeader } from '@/lib/auth-header';
+import { secureFetchWithAuth } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +15,7 @@ export async function POST(request: NextRequest) {
     // アクセストークンを取得
     const authHeader = getAuthHeader(request);
     if (!authHeader) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { success: false, message: '認証が必要です' },
         { status: 401 }
       );
@@ -21,12 +23,11 @@ export async function POST(request: NextRequest) {
 
     // バリデーション
     if (!planId) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { success: false, message: 'プランIDは必須です' },
         { status: 400 }
       );
     }
-
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController();
@@ -35,12 +36,8 @@ export async function POST(request: NextRequest) {
     const fullUrl = buildApiUrl('/plans/user-plans');
 
     try {
-      const response = await fetch(fullUrl, {
+      const response = await secureFetchWithAuth(fullUrl, authHeader, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
-        },
         body: JSON.stringify({
           plan_id: planId,
           ...(validUntil && { valid_until: validUntil }),
@@ -49,7 +46,6 @@ export async function POST(request: NextRequest) {
       });
 
       clearTimeout(timeoutId);
-
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
@@ -66,7 +62,7 @@ export async function POST(request: NextRequest) {
           errorMessage = errorData.error.message;
         }
 
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: errorMessage,
@@ -77,7 +73,7 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      return NextResponse.json(data, { status: response.status });
+      return createNoCacheResponse(data, { status: response.status });
     } catch (fetchError) {
       clearTimeout(timeoutId);
       throw fetchError;
@@ -93,7 +89,7 @@ export async function POST(request: NextRequest) {
     // エラーの種類に応じて適切なメッセージを返す
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。',
@@ -103,7 +99,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: 'サーバーに接続できません。ネットワーク接続を確認してください。',
@@ -113,7 +109,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(
+    return createNoCacheResponse(
       {
         success: false,
         message: 'プラン登録の処理に失敗しました。しばらくしてから再度お試しください。',
@@ -123,4 +119,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

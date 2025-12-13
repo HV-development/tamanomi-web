@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildApiUrl } from '@/lib/api-config';
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic';
 
@@ -9,21 +11,21 @@ export async function POST(request: NextRequest) {
 
     // バリデーション
     if (!body.token) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { success: false, message: 'リセットトークンが必要です' },
         { status: 400 }
       );
     }
 
     if (!body.newPassword) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { success: false, message: '新しいパスワードが必要です' },
         { status: 400 }
       );
     }
 
     if (body.newPassword.length < 8) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { success: false, message: 'パスワードは8文字以上である必要があります' },
         { status: 400 }
       );
@@ -36,7 +38,7 @@ export async function POST(request: NextRequest) {
     const fullUrl = buildApiUrl('/password/reset/confirm');
 
     try {
-      const response = await fetch(fullUrl, {
+      const response = await secureFetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +59,7 @@ export async function POST(request: NextRequest) {
 
         // 400エラー（無効なトークンなど）の場合は特別な処理
         if (response.status === 400) {
-          return NextResponse.json(
+          return createNoCacheResponse(
             {
               success: false,
               message: errorData.message || '無効なリセットトークンです。リンクの有効期限が切れている可能性があります。',
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: errorData.message || `サーバーエラーが発生しました (${response.status})`,
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      return NextResponse.json(data, { status: response.status });
+      return createNoCacheResponse(data, { status: response.status });
     } catch (fetchError) {
       clearTimeout(timeoutId);
       throw fetchError;
@@ -94,7 +96,7 @@ export async function POST(request: NextRequest) {
     // エラーの種類に応じて適切なメッセージを返す
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。',
@@ -104,7 +106,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: 'サーバーに接続できません。ネットワーク接続を確認してください。',
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(
+    return createNoCacheResponse(
       {
         success: false,
         message: 'パスワードリセットの処理に失敗しました。しばらくしてから再度お試しください。',

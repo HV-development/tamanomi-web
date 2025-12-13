@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthHeader } from '@/lib/auth-header'
+import { secureFetch, secureFetchWithAuth } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 // サーバーサイドなので NEXT_PUBLIC_ なしの環境変数を使用
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
@@ -45,24 +47,25 @@ export async function GET(request: NextRequest) {
 
     let response: Response
     try {
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      }
-      
-      if (authorization) {
-        headers.Authorization = authorization
-      }
-      
       // タイムアウト設定（30秒）- AbortSignal.timeout()のフォールバック
       const timeoutSignal = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
         ? AbortSignal.timeout(30000)
         : createTimeoutSignal(30000)
       
-      response = await fetch(backendUrl, {
-        method: 'GET',
-        headers,
-        signal: timeoutSignal,
-      })
+      if (authorization) {
+        response = await secureFetchWithAuth(backendUrl, authorization, {
+          method: 'GET',
+          signal: timeoutSignal,
+        })
+      } else {
+        response = await secureFetch(backendUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal: timeoutSignal,
+        })
+      }
       
     } catch (fetchError: unknown) {
       const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError)
@@ -88,7 +91,7 @@ export async function GET(request: NextRequest) {
         userMessage = 'リクエストがタイムアウトしました。しばらく待ってから再度お試しください。'
       }
       
-      return NextResponse.json(
+      return createNoCacheResponse(
         {
           error: {
             code: 'NETWORK_ERROR',
@@ -123,7 +126,7 @@ export async function GET(request: NextRequest) {
           status: response.status,
           data,
         })
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             error: {
               code: 'INTERNAL_SERVER_ERROR',
@@ -139,7 +142,7 @@ export async function GET(request: NextRequest) {
         status: response.status,
         data,
       })
-      return NextResponse.json(
+      return createNoCacheResponse(
         {
           error: data?.error || {
             code: 'API_ERROR',
@@ -150,11 +153,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     console.error('[api/shops] network error:', message)
-    return NextResponse.json(
+    return createNoCacheResponse(
       {
         error: {
           code: 'NETWORK_ERROR',
@@ -166,5 +169,3 @@ export async function GET(request: NextRequest) {
     )
   }
 }
-
-

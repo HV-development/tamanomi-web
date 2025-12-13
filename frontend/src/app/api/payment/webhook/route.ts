@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse, addNoCacheHeaders } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +11,7 @@ export async function POST(request: NextRequest) {
     
     const fullUrl = buildApiUrl('/payment/webhook')
     
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,7 +23,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Payment webhook API error:', errorText)
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: 'Webhook処理に失敗しました' },
         { status: response.status }
       )
@@ -29,14 +31,13 @@ export async function POST(request: NextRequest) {
     
     const data = await response.text()
     
-    return new NextResponse(data, { status: 200 })
+    const nextResponse = new NextResponse(data, { status: 200 })
+    return addNoCacheHeaders(nextResponse)
   } catch (error) {
     console.error('Payment webhook API fetch error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'Webhook処理中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-
-

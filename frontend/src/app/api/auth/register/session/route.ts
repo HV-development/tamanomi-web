@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { encrypt, decrypt, COOKIE_NAME, SESSION_MAX_AGE } from '@/lib/session-encryption'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 /**
  * 登録セッションデータをサーバーサイドで管理するAPI
@@ -27,20 +28,20 @@ export async function GET(request: NextRequest) {
     const sessionCookie = request.cookies.get(COOKIE_NAME)
     
     if (!sessionCookie?.value) {
-      return NextResponse.json({ data: null })
+      return createNoCacheResponse({ data: null })
     }
     
     try {
       const decrypted = decrypt(sessionCookie.value)
       const data = JSON.parse(decrypted) as RegisterSessionData
-      return NextResponse.json({ data })
+      return createNoCacheResponse({ data })
     } catch {
       // 復号化に失敗した場合は空のデータを返す
-      return NextResponse.json({ data: null })
+      return createNoCacheResponse({ data: null })
     }
   } catch (error) {
     console.error('Session GET error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: { code: 'INTERNAL_ERROR', message: '内部エラーが発生しました' } },
       { status: 500 }
     )
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     const { key, value } = body as { key: keyof RegisterSessionData; value: unknown }
     
     if (!key) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: { code: 'MISSING_KEY', message: 'キーが必要です' } },
         { status: 400 }
       )
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
       try { return new URL(request.url).protocol === 'https:' } catch { return process.env.NODE_ENV === 'production' }
     })()
     
-    const response = NextResponse.json({ success: true })
+    const response = createNoCacheResponse({ success: true })
     response.cookies.set(COOKIE_NAME, encrypted, {
       httpOnly: true,
       secure: isSecure,
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     console.error('Session POST error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: { code: 'INTERNAL_ERROR', message: '内部エラーが発生しました' } },
       { status: 500 }
     )
@@ -136,7 +137,7 @@ export async function DELETE(request: NextRequest) {
         }
       }
       
-      const response = NextResponse.json({ success: true })
+      const response = createNoCacheResponse({ success: true })
       
       if (Object.keys(existingData).length > 0) {
         const encrypted = encrypt(JSON.stringify(existingData))
@@ -161,7 +162,7 @@ export async function DELETE(request: NextRequest) {
       return response
     } else {
       // 全体を削除
-      const response = NextResponse.json({ success: true })
+      const response = createNoCacheResponse({ success: true })
       response.cookies.set(COOKIE_NAME, '', {
         httpOnly: true,
         secure: isSecure,
@@ -174,14 +175,9 @@ export async function DELETE(request: NextRequest) {
     }
   } catch (error) {
     console.error('Session DELETE error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: { code: 'INTERNAL_ERROR', message: '内部エラーが発生しました' } },
       { status: 500 }
     )
   }
 }
-
-
-
-
-

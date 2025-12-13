@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { getAuthHeader } from '@/lib/auth-header'
+import { secureFetch, secureFetchWithAuth } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,44 +30,39 @@ export async function GET(request: NextRequest) {
       queryParams.append('isPublic', isPublic)
     }
 
-
     const authHeader = getAuthHeader(request)
     
     const fullUrl = `${buildApiUrl('/coupons')}?${queryParams.toString()}`
 
-    // 認証ヘッダーがある場合のみ追加
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
+    let response: Response
     if (authHeader) {
-      headers['Authorization'] = authHeader
+      response = await secureFetchWithAuth(fullUrl, authHeader, { method: 'GET' })
+    } else {
+      response = await secureFetch(fullUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
     }
-
-    const response = await fetch(fullUrl, {
-      method: 'GET',
-      headers,
-      cache: 'no-store',
-    })
-
 
     const data = await response.json()
 
     if (!response.ok) {
       console.error('❌ [coupons] Backend API error:', data)
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: data.message || data.error?.message || 'クーポンの取得に失敗しました' },
         { status: response.status }
       )
     }
     
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
 
   } catch (error) {
     console.error('❌ [coupons] Route error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'クーポンの取得中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-

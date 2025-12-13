@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse, addNoCacheHeaders } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +13,7 @@ export async function POST(request: NextRequest) {
     const rawBody = await request.text()
 
     if (!rawBody || rawBody.trim().length === 0) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         {
           success: false,
           message: 'リクエストボディが空です。フォームから再度送信してください。'
@@ -25,7 +27,7 @@ export async function POST(request: NextRequest) {
       body = JSON.parse(rawBody)
     } catch (parseError) {
       console.error('Register API: JSON parse error', parseError)
-      return NextResponse.json(
+      return createNoCacheResponse(
         {
           success: false,
           message: 'リクエスト形式が正しくありません。',
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
     const fullUrl = buildApiUrl('/register/complete');
 
     try {
-      const response = await fetch(fullUrl, {
+      const response = await secureFetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +119,7 @@ export async function POST(request: NextRequest) {
         // 409エラー（既存アカウント・重複ID）の場合は特別な処理
         if (response.status === 409) {
           if (errorCode === 'SAITAMA_APP_ID_ALREADY_EXISTS') {
-            return NextResponse.json(
+            return createNoCacheResponse(
               {
                 success: false,
                 message: errorMessage || 'このさいたま市アプリIDは既に登録されています',
@@ -131,7 +133,7 @@ export async function POST(request: NextRequest) {
             )
           }
           // USER_ALREADY_EXISTSの場合
-          return NextResponse.json(
+          return createNoCacheResponse(
             {
               success: false,
               message: errorMessage || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
@@ -147,7 +149,7 @@ export async function POST(request: NextRequest) {
 
         // 500エラー（ポイント付与失敗）の場合
         if (response.status === 500 && errorCode === 'POINT_GRANT_FAILED') {
-          return NextResponse.json(
+          return createNoCacheResponse(
             {
               success: false,
               message: errorMessage || 'ポイント付与に失敗しました。しばらく経ってから再度お試しください。',
@@ -164,7 +166,7 @@ export async function POST(request: NextRequest) {
         // バリデーションエラーの場合は特別な処理
         if (errorCode === 'VALIDATION_ERROR' && errorDetails) {
           // バリデーションエラーの詳細を返す
-          return NextResponse.json(
+          return createNoCacheResponse(
             {
               success: false,
               message: errorMessage || '入力データが無効です',
@@ -193,7 +195,7 @@ export async function POST(request: NextRequest) {
           fullErrorData: errorData
         })
 
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: finalErrorMessage,
@@ -211,13 +213,10 @@ export async function POST(request: NextRequest) {
       const data = await response.json()
 
       // トークンをCookieに保存（ログイン時と同様に）
-      const nextResponse = NextResponse.json(data, { status: response.status })
+      const nextResponse = createNoCacheResponse(data, { status: response.status })
       const isSecure = (() => {
         try { return new URL(request.url).protocol === 'https:' } catch { return process.env.NODE_ENV === 'production' }
       })()
-
-      nextResponse.headers.set('Cache-Control', 'no-store')
-      nextResponse.headers.set('Pragma', 'no-cache')
 
       if (data.accessToken) {
         nextResponse.cookies.set('accessToken', data.accessToken, {
@@ -268,21 +267,21 @@ export async function POST(request: NextRequest) {
     // エラーの種類に応じて適切なメッセージを返す
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        return NextResponse.json(
+        return createNoCacheResponse(
           { success: false, message: 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。' },
           { status: 408 }
         )
       }
 
       if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           { success: false, message: 'サーバーに接続できません。ネットワーク接続を確認してください。' },
           { status: 503 }
         )
       }
     }
 
-    return NextResponse.json(
+    return createNoCacheResponse(
       {
         success: false,
         message: 'リクエストの処理に失敗しました。しばらくしてから再度お試しください。',

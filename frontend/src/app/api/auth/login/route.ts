@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +11,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = body
     const fullUrl = buildApiUrl('/login')
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
 
       // バリデーションエラーの場合
       if (response.status === 400) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           { error: errorMessage },
           { status: response.status }
         )
@@ -41,14 +43,14 @@ export async function POST(request: NextRequest) {
 
       // 認証エラー（401）の場合
       if (response.status === 401) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           { error: errorMessage },
           { status: response.status }
         )
       }
 
       // その他のエラー
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: errorMessage },
         { status: response.status }
       )
@@ -59,12 +61,11 @@ export async function POST(request: NextRequest) {
     // トークンをクッキーに保存するなどの処理が必要な場合はここで実行
     // 現時点では単純にレスポンスを返す
 
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
   } catch {
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'ログイン処理中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-

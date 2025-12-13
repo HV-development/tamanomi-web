@@ -45,6 +45,14 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=31536000; includeSubDomains; preload'
       },
+      {
+        key: 'Cache-Control',
+        value: 'no-store, no-cache, must-revalidate, private',
+      },
+      {
+        key: 'Pragma',
+        value: 'no-cache',
+      },
     ]
 
     if (process.env.VERCEL_ENV === 'preview') {
@@ -56,7 +64,13 @@ const nextConfig = {
 
     return [
       {
+        // 全てのルートに適用（静的ファイルを除く）
         source: '/(.*)',
+        headers: securityHeaders,
+      },
+      {
+        // APIルートにも明示的に適用
+        source: '/api/:path*',
         headers: securityHeaders,
       },
     ]
