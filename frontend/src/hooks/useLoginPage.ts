@@ -19,24 +19,10 @@ export const useLoginPage = () => {
     email: searchParams.get('email')
   }), [searchParams])
 
-  // ログイン後のリダイレクトフラグをチェック（ページ遷移中もローディングを継続）
+  // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+  // リダイレクトは即座に実行されるため、このチェックは不要
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const checkRedirecting = () => {
-        const loginRedirecting = sessionStorage.getItem('loginRedirecting')
-        const shouldRedirect = !!loginRedirecting
-        setIsRedirecting(shouldRedirect)
-      }
-
-      // 初回チェック
-      checkRedirecting()
-
-      // 定期的にチェック（遷移先のページでフラグがクリアされるまで）
-      // ページ遷移が始まっても、ログインページがアンマウントされるまでチェックを継続
-      const interval = setInterval(checkRedirecting, 50) // より頻繁にチェック
-
-      return () => clearInterval(interval)
-    }
+    setIsRedirecting(false)
   }, [])
 
   // 認証状態チェック
@@ -65,16 +51,13 @@ export const useLoginPage = () => {
 
           let targetPath: string
           if (!hasPlan) {
-            // セキュリティ改善：sessionStorageの使用を廃止
-            // メールアドレスはAPIから直接取得可能なため、sessionStorageに保存しない
+            // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
             targetPath = '/plan-registration'
           } else {
             targetPath = '/home'
           }
 
-          // ローディング継続フラグをセッションストレージに設定
-          // 遷移先のページで完全に表示されたらクリアされる
-          sessionStorage.setItem('loginRedirecting', targetPath)
+          // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
           setIsRedirecting(true)
 
           router.replace(targetPath)
@@ -90,14 +73,10 @@ export const useLoginPage = () => {
   }, [router])
 
   // URLパラメータ処理
+  // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+  // リダイレクト先はURLパラメータから直接取得する
   useEffect(() => {
-    const { paymentSuccess, view } = urlParams
-
-    if (paymentSuccess === 'true' || view === 'mypage') {
-      if (typeof window !== 'undefined' && view === 'mypage') {
-        sessionStorage.setItem('redirectAfterLogin', `/home?view=mypage${paymentSuccess ? '&payment-success=true' : ''}`)
-      }
-    }
+    // URLパラメータの処理は必要に応じて実装
   }, [urlParams])
 
   // エラーメッセージ取得

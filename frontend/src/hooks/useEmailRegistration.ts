@@ -60,10 +60,9 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
     setErrorMessage('')
 
     try {
-      // セッションストレージから紹介者IDを取得
-      const referrerUserId = typeof window !== 'undefined'
-        ? sessionStorage.getItem('referrerUserId')
-        : null;
+      // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+      // referrerUserIdはURLパラメータから取得するか、Cookieから取得する
+      const referrerUserId = null; // 必要に応じてCookieから取得する実装を追加
       
 
       // 紹介者IDを含めてpreRegisterを呼び出し
@@ -104,10 +103,9 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
     setSuccessMessage('')
 
     try {
-      // セッションストレージから紹介者IDを取得
-      const referrerUserId = typeof window !== 'undefined'
-        ? sessionStorage.getItem('referrerUserId')
-        : null;
+      // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+      // referrerUserIdはURLパラメータから取得するか、Cookieから取得する
+      const referrerUserId = null; // 必要に応じてCookieから取得する実装を追加
 
       await preRegister(lastEmail, undefined, referrerUserId || undefined, shopId)
       // 成功メッセージを表示（画面は complete のまま）
