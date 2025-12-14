@@ -21,21 +21,9 @@ export default function PlanRegistrationPage() {
 
   const fetchUserInfo = useCallback(async () => {
     try {
-      // Cookieからもトークンを取得できるようにする（credentials: 'include'を使用）
-      // localStorageとCookieの両方からトークンを取得できるようにする
-      const accessToken = localStorage.getItem('accessToken')
-
-      // Cookieからトークンを取得できるようにcredentials: 'include'を使用
-      // localStorageのトークンがない場合でも、Cookieから取得できる
-      const headers: HeadersInit = {}
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`
-      }
-
-      // Cookieからもトークンを取得できるようにcredentials: 'include'を使用
-      // localStorageにトークンがなくても、Cookieから取得できるため、常にリクエストを送信
+      // Cookieからトークンを取得（credentials: 'include'を使用）
+      // Cookieベースの認証のみを使用（localStorageは廃止）
       const response = await fetch('/api/user/me', {
-        headers,
         cache: 'no-store',
         credentials: 'include', // Cookieを送信
       })
@@ -53,26 +41,7 @@ export default function PlanRegistrationPage() {
           sessionStorage.setItem('userEmail', userData.email)
         } else {
           console.error('❌ [fetchUserInfo] No email found in user data')
-
-          // JWTトークンから直接メールアドレスを取得するフォールバック処理
-          try {
-            const token = localStorage.getItem('accessToken')
-            if (token) {
-              const payload = JSON.parse(atob(token.split('.')[1]))
-              if (payload.email) {
-                console.log('🔍 [fetchUserInfo] Fallback: Setting email from JWT token:', payload.email)
-                setEmail(payload.email)
-                sessionStorage.setItem('userEmail', payload.email)
-              } else {
-                setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
-              }
-            } else {
-              setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
-            }
-          } catch (error) {
-            console.error('❌ [fetchUserInfo] Failed to parse JWT token:', error)
-            setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
-          }
+          setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
         }
 
         const newLinkedState = userData.saitamaAppLinked === true
@@ -404,17 +373,10 @@ export default function PlanRegistrationPage() {
 
   const handleSaitamaAppLinked = async () => {
     try {
-      const accessToken = localStorage.getItem('accessToken')
-
-      if (!accessToken) {
-        return
-      }
-
+      // Cookieベースの認証のみを使用（localStorageは廃止）
       const response = await fetch('/api/user/me', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
         cache: 'no-store',
+        credentials: 'include', // Cookieを送信
       })
 
       if (response.ok) {
