@@ -22,6 +22,7 @@ interface RegisterSessionData {
 
 /**
  * GET: セッションデータを取得
+ * セキュリティ改善：メールアドレス関連のフィールドはレスポンスに含めない
  */
 export async function GET(request: NextRequest) {
   try {
@@ -34,7 +35,17 @@ export async function GET(request: NextRequest) {
     try {
       const decrypted = decrypt(sessionCookie.value)
       const data = JSON.parse(decrypted) as RegisterSessionData
-      return createNoCacheResponse({ data })
+      
+      // セキュリティ改善：メールアドレス関連のフィールドをレスポンスから除外
+      // これにより、APIレスポンスやHTMLソース上にメールアドレスが出力されることを防止
+      const sanitizedData: Partial<Omit<RegisterSessionData, 'registerEmail' | 'userEmail' | 'otpEmail'>> = {
+        registerFormData: data.registerFormData,
+        referrerUserId: data.referrerUserId,
+        editFormData: data.editFormData,
+        otpRequestId: data.otpRequestId,
+      }
+      
+      return createNoCacheResponse({ data: sanitizedData })
     } catch {
       // 復号化に失敗した場合は空のデータを返す
       return createNoCacheResponse({ data: null })
@@ -81,7 +92,10 @@ export async function POST(request: NextRequest) {
     if (value === null || value === undefined) {
       delete existingData[key]
     } else {
-      existingData[key] = value as RegisterSessionData[typeof key]
+      // 型安全性のため、型アサーションを使用（セッションデータは動的なため）
+      const typedKey = key as keyof RegisterSessionData
+      const typedValue = value as RegisterSessionData[typeof typedKey]
+      existingData[typedKey] = typedValue
     }
     
     // 暗号化してCookieに保存

@@ -25,8 +25,31 @@ export const useVerifyOtpPage = () => {
       }
 
       try {
-        const sessionEmail = await getRegisterSessionItem<string>('otpEmail')
+        // セキュリティ改善：otpEmailは専用エンドポイントから取得（requestId検証付き）
+        // 通常のセッションAPIからはメールアドレスを返さないため、専用エンドポイントを使用
+        let sessionEmail: string | null = null
         const sessionRequestId = await getRegisterSessionItem<string>('otpRequestId')
+        
+        if (sessionRequestId === requestId) {
+          // requestIdが一致する場合のみ、専用エンドポイントからotpEmailを取得
+          try {
+            const url = new URL('/api/auth/register/session/email', window.location.origin)
+            url.searchParams.set('key', 'otpEmail')
+            url.searchParams.set('requestId', requestId)
+            
+            const response = await fetch(url.toString(), {
+              method: 'GET',
+              credentials: 'include',
+            })
+            
+            if (response.ok) {
+              const result = await response.json()
+              sessionEmail = result.data || null
+            }
+          } catch (error) {
+            console.error('Failed to get otpEmail from dedicated endpoint:', error)
+          }
+        }
 
         // デバッグログ：セッション取得結果を確認
         console.log('🔍 [useVerifyOtpPage] Session check:', {

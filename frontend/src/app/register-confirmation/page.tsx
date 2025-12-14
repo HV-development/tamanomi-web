@@ -245,8 +245,8 @@ export default function RegisterConfirmationPage() {
 
   const handleModalClose = async () => {
     setShowSuccessModal(false)
-    // モーダルを閉じた後、プラン登録画面に遷移（サーバーサイドセッションにメールアドレスを保存）
-    await setRegisterSessionItem('userEmail', email)
+    // セキュリティ改善：メールアドレスをセッションに保存しない
+    // プラン登録画面では、認証トークンから /api/user/me で取得する
     // window.location.hrefを使用して強制的に遷移
     if (typeof window !== 'undefined') {
       window.location.href = '/plan-registration?saitamaAppLinked=true'
@@ -257,8 +257,9 @@ export default function RegisterConfirmationPage() {
 
   const handleSaitamaFailedModalClose = async () => {
     setShowSaitamaFailedModal(false)
+    // セキュリティ改善：メールアドレスをセッションに保存しない
+    // プラン登録画面では、認証トークンから /api/user/me で取得する
     // さいたま市アプリ連携なしでプラン登録画面に遷移
-    await setRegisterSessionItem('userEmail', email)
     if (typeof window !== 'undefined') {
       window.location.href = '/plan-registration'
     } else {

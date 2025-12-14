@@ -12,7 +12,7 @@ import {
   PlanListResponseSchema
 } from '@hv-development/schemas'
 import type { PayPayPaymentRequest } from '@hv-development/schemas'
-import { getRegisterSessionItem, removeRegisterSessionItem } from '@/lib/register-session'
+// セキュリティ改善：メールアドレスは認証トークンから /api/user/me で取得するため、セッション関連のimportは不要
 
 export default function PlanRegistrationPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -120,14 +120,8 @@ export default function PlanRegistrationPage() {
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
 
-      // サーバーサイドセッションからメールアドレスを取得（登録フローからの遷移用）
-      // セキュリティ改善：sessionStorageの代わりにhttpOnly Cookieベースのセッションを使用
-      const serverSessionEmail = await getRegisterSessionItem<string>('userEmail')
-      if (serverSessionEmail) {
-        setEmail(serverSessionEmail)
-        // 使用後にサーバーサイドセッションからクリア
-        await removeRegisterSessionItem('userEmail')
-      }
+      // セキュリティ改善：メールアドレスをセッションに保存しない
+      // 認証トークンから /api/user/me で取得する（fetchUserInfo関数で実装済み）
 
       // 支払い方法変更のみの場合はフラグを設定
       if (paymentMethodChangeParam === 'true') {
