@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     const fullUrl = buildApiUrl(`/payment/paypay/transactions/${encodeURIComponent(transactionId)}`)
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -24,22 +26,19 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: errorData.message || 'PayPay取引情報の取得に失敗しました' },
         { status: response.status },
       )
     }
 
     const data = await response.json()
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
   } catch (error) {
     console.error('PayPay transaction status API error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'PayPay取引情報の取得中にエラーが発生しました' },
       { status: 500 },
     )
   }
 }
-
-
-

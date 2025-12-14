@@ -1,9 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getAuthHeader } from '@/lib/auth-header'
+import { secureFetchWithAuth } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
-const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'
+// api-config.tsから変換済みのAPI_BASE_URLをインポート（Dockerネットワーク内の`api`ホスト名を`localhost`に変換済み）
+import { API_BASE_URL } from '@/lib/api-config'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     // バリデーション
     if (!body.currentPassword || !body.newEmail || !body.confirmEmail) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: { message: '現在のパスワード、新しいメールアドレス、確認メールアドレスは必須です' } },
         { status: 400 }
       )
@@ -20,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     // メールアドレスの一致確認
     if (body.newEmail !== body.confirmEmail) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: { message: '新しいメールアドレスと確認メールアドレスが一致しません' } },
         { status: 400 }
       )
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest) {
     // 認証トークンを取得
     const authHeader = getAuthHeader(request)
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: { message: '認証トークンが必要です' } },
         { status: 401 }
       )
@@ -43,12 +46,8 @@ export async function POST(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 10000)
 
     try {
-      const response = await fetch(fullUrl, {
+      const response = await secureFetchWithAuth(fullUrl, `Bearer ${token}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify({
           currentPassword: body.currentPassword,
           newEmail: body.newEmail,
@@ -62,18 +61,18 @@ export async function POST(request: NextRequest) {
       const responseData = await response.json()
 
       if (!response.ok) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           { error: responseData.error || { message: 'メールアドレス変更に失敗しました' } },
           { status: response.status }
         )
       }
 
-      return NextResponse.json(responseData)
+      return createNoCacheResponse(responseData)
     } catch (fetchError) {
       clearTimeout(timeoutId)
 
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        return NextResponse.json(
+        return createNoCacheResponse(
           { error: { message: 'リクエストがタイムアウトしました' } },
           { status: 408 }
         )
@@ -83,10 +82,9 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Email change error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: { message: 'メールアドレス変更に失敗しました' } },
       { status: 500 }
     )
   }
 }
-

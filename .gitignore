@@ -129,6 +129,10 @@ storybook-static
 tmp/
 temp/
 
+# Playwright test results
+frontend/playwright-report/
+frontend/test-results/
+
 # Editor directories and files
 .vscode/
 .idea/

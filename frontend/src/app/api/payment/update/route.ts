@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // amountもendScheduledも指定されていない場合はエラー
     if (amount === undefined && endScheduled === undefined) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: 'amount（プラン変更時）またはendScheduled（退会時）のいずれかを指定してください。' },
         { status: 400 }
       )
@@ -30,13 +32,13 @@ export async function POST(request: NextRequest) {
 
     // runningIdまたはtradingIdのいずれかが必要
     if (!runningId && !tradingId) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: 'runningIdまたはtradingIdのいずれかが必要です。' },
         { status: 400 }
       )
     }
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,7 +59,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('Payment update API error:', errorData)
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: errorData.message || errorData.error || '継続課金変更に失敗しました' },
         { status: response.status }
       )
@@ -65,14 +67,12 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json()
 
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
   } catch (error) {
     console.error('Payment update API fetch error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: '継続課金変更中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-
-

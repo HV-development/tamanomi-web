@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { getAuthHeader } from '@/lib/auth-header'
+import { secureFetchWithAuth } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,32 +16,25 @@ export async function POST(
     const { shopId } = await params
     
     if (!authHeader) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: '認証が必要です' },
         { status: 401 }
       )
     }
 
     if (!shopId) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: '店舗IDが必要です' },
         { status: 400 }
       )
     }
 
-
     const fullUrl = buildApiUrl(`/users/favorites/${shopId}`)
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetchWithAuth(fullUrl, authHeader, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
       body: JSON.stringify({}), // 空のJSONオブジェクトを送信してFastifyのエラーを回避
-      cache: 'no-store',
     })
-
 
     const data = await response.json()
 
@@ -48,23 +43,23 @@ export async function POST(
       
       // 403エラーの場合（アカウントタイプ不一致）は特別に処理
       if (response.status === 403) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           { error: 'この機能はユーザーアカウント専用です' },
           { status: 403 }
         )
       }
       
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: data.message || data.error?.message || 'お気に入りの登録/削除に失敗しました' },
         { status: response.status }
       )
     }
     
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
 
   } catch (error) {
     console.error('❌ [favorites] Route error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'お気に入りの登録/削除中にエラーが発生しました' },
       { status: 500 }
     )
@@ -81,32 +76,25 @@ export async function DELETE(
     const { shopId } = await params
     
     if (!authHeader) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: '認証が必要です' },
         { status: 401 }
       )
     }
 
     if (!shopId) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: '店舗IDが必要です' },
         { status: 400 }
       )
     }
 
-
     const fullUrl = buildApiUrl(`/users/favorites/${shopId}`)
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetchWithAuth(fullUrl, authHeader, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
       body: JSON.stringify({}), // 空のJSONオブジェクトを送信してFastifyのエラーを回避
-      cache: 'no-store',
     })
-
 
     const data = await response.json()
 
@@ -115,26 +103,25 @@ export async function DELETE(
       
       // 403エラーの場合（アカウントタイプ不一致）は特別に処理
       if (response.status === 403) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           { error: 'この機能はユーザーアカウント専用です' },
           { status: 403 }
         )
       }
       
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: data.message || data.error?.message || 'お気に入りの削除に失敗しました' },
         { status: response.status }
       )
     }
     
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
 
   } catch (error) {
     console.error('❌ [favorites] Route error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'お気に入りの削除中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-

@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +16,7 @@ export async function GET(
 
     const fullUrl = buildApiUrl(`/payment/qr/transactions/${transactionId}${recursive ? '?recursive=true' : ''}`)
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -28,19 +30,18 @@ export async function GET(
         status: response.status,
         errorData: responseData,
       })
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: { code: responseData.code || 'API_ERROR', message: responseData.message || '取引情報の取得に失敗しました' } },
         { status: response.status },
       )
     }
 
-    return NextResponse.json(responseData)
+    return createNoCacheResponse(responseData)
   } catch (error) {
     console.error('QR transaction get API error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: { code: 'NETWORK_ERROR', message: '取引情報の取得中にエラーが発生しました' } },
       { status: 500 },
     )
   }
 }
-

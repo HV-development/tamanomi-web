@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { encrypt, decrypt, COOKIE_NAME, SESSION_MAX_AGE } from '@/lib/session-encryption'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +15,7 @@ export async function POST(request: NextRequest) {
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const fullUrl = buildApiUrl('/otp/send')
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('Send OTP API error:', errorData)
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: errorData.message || 'OTP送信に失敗しました' },
         { status: response.status }
       )
@@ -34,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // セキュリティ改善：メールアドレスをURLパラメータで送信しないため、サーバーサイドセッションに保存
     // OTP検証時にrequestIdからメールアドレスを取得できるようにする
-    const res = NextResponse.json(data)
+    const res = createNoCacheResponse(data)
 
     // セッションにメールアドレスとrequestIdを保存（OTP検証用）
     // 共通のセッション暗号化ユーティリティを使用
@@ -85,10 +87,9 @@ export async function POST(request: NextRequest) {
     return res
   } catch (error) {
     console.error('Send OTP API fetch error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'OTP送信処理中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-

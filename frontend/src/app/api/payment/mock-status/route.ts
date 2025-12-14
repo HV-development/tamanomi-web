@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -7,18 +9,17 @@ export async function GET(_request: NextRequest) {
     try {
         const fullUrl = buildApiUrl('/payment/mock-status')
 
-        const response = await fetch(fullUrl, {
+        const response = await secureFetch(fullUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            cache: 'no-store',
         })
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}))
             console.error('Mock status API error:', errorData)
-            return NextResponse.json(
+            return createNoCacheResponse(
                 { error: errorData.message || errorData.error || 'モックモード状態の取得に失敗しました' },
                 { status: response.status }
             )
@@ -26,13 +27,12 @@ export async function GET(_request: NextRequest) {
 
         const data = await response.json()
 
-        return NextResponse.json(data)
+        return createNoCacheResponse(data)
     } catch (error) {
         console.error('Mock status API fetch error:', error)
-        return NextResponse.json(
+        return createNoCacheResponse(
             { error: 'モックモード状態の取得中にエラーが発生しました' },
             { status: 500 }
         )
     }
 }
-

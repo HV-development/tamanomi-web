@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { getRefreshToken } from '@/lib/auth-header'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,7 +12,7 @@ export async function POST(request: NextRequest) {
     const refreshToken = getRefreshToken(request)
 
     if (!refreshToken) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: 'リフレッシュトークンが必要です' },
         { status: 400 }
       )
@@ -18,29 +20,26 @@ export async function POST(request: NextRequest) {
 
     const fullUrl = buildApiUrl('/auth/refresh')
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ refreshToken }),
-      cache: 'no-store',
     })
-
 
     const data = await response.json()
 
     if (!response.ok) {
       console.error('❌ [refresh] Backend API error:', data)
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: data.message || data.error?.message || 'トークンのリフレッシュに失敗しました' },
         { status: response.status }
       )
     }
 
-
     // トークンをhttpOnly Cookieに保存し、ボディでは返却しない
-    const res = NextResponse.json({ message: 'Token refresh successful' })
+    const res = createNoCacheResponse({ message: 'Token refresh successful' })
     const isSecure = (() => {
       try { return new URL(request.url).protocol === 'https:'; } catch { return process.env.NODE_ENV === 'production'; }
     })()
@@ -92,10 +91,9 @@ export async function POST(request: NextRequest) {
     return res
   } catch (error) {
     console.error('❌ [refresh] Route error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'トークンのリフレッシュ中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-

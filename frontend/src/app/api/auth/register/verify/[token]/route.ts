@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { secureFetch } from '@/lib/fetch-utils'
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
+// api-config.tsから変換済みのAPI_BASE_URLをインポート（Dockerネットワーク内の`api`ホスト名を`localhost`に変換済み）
+import { API_BASE_URL } from '@/lib/api-config'
 
 export async function GET(
     request: NextRequest,
@@ -16,7 +18,7 @@ export async function GET(
         // トークンはUUIDのみで、メールアドレスなどの個人情報は含まれない（セキュリティ改善）
         // バックエンドAPIでトークンを検証（POSTメソッドでトークンをボディ送信）
         try {
-            const response = await fetch(`${API_BASE_URL}/api/v1/register/token-info`, {
+            const response = await secureFetch(`${API_BASE_URL}/api/v1/register/token-info`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

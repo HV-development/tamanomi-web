@@ -1,14 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 // サーバーサイドなのでNEXT_PUBLIC_プレフィックスなしの環境変数を使用
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002';
+// api-config.tsから変換済みのAPI_BASE_URLをインポート（Dockerネットワーク内の`api`ホスト名を`localhost`に変換済み）
+import { API_BASE_URL } from '@/lib/api-config'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
     // tamanomi-apiにプロキシ
-    const response = await fetch(`${API_BASE_URL}/api/v1/contact`, {
+    const response = await secureFetch(`${API_BASE_URL}/api/v1/contact`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -20,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       console.error('❌ お問い合わせAPI エラー:', data);
-      return NextResponse.json(
+      return createNoCacheResponse(
         {
           success: false,
           message: data.message || 'お問い合わせの送信に失敗しました',
@@ -30,11 +33,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(data);
+    return createNoCacheResponse(data);
   } catch (error: unknown) {
     console.error('❌ お問い合わせAPI 例外エラー:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
+    return createNoCacheResponse(
       {
         success: false,
         message: 'お問い合わせの送信中にエラーが発生しました',
@@ -44,4 +47,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

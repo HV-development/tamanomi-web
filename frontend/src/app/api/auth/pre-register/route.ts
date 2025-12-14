@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { buildApiUrl } from '@/lib/api-config';
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     // バリデーション
     if (!body.email) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { success: false, message: 'メールアドレスは必須です' },
         { status: 400 }
       );
@@ -30,16 +32,14 @@ export async function POST(request: NextRequest) {
       // 紹介者IDがある場合は追加
       if (body.referrerUserId && body.referrerUserId.trim() !== '') {
         requestBody.referrerUserId = body.referrerUserId.trim();
-      } else {
       }
 
       // shopIdがある場合は追加
       if (body.shopId && body.shopId.trim() !== '') {
         requestBody.shopId = body.shopId.trim();
-      } else {
       }
 
-      const response = await fetch(fullUrl, {
+      const response = await secureFetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,14 +50,13 @@ export async function POST(request: NextRequest) {
 
       clearTimeout(timeoutId);
 
-
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
 
         // 409エラー（メールアドレス重複）の場合は特別な処理
         if (response.status === 409) {
-          return NextResponse.json(
+          return createNoCacheResponse(
             {
               success: false,
               message: 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
@@ -68,7 +67,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: errorData.error?.message || errorData.message || `サーバーエラーが発生しました (${response.status})`,
@@ -79,7 +78,7 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      return NextResponse.json(data, { status: response.status });
+      return createNoCacheResponse(data, { status: response.status });
     } catch (fetchError) {
       clearTimeout(timeoutId);
       throw fetchError;
@@ -95,7 +94,7 @@ export async function POST(request: NextRequest) {
     // エラーの種類に応じて適切なメッセージを返す
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。',
@@ -105,7 +104,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: 'サーバーに接続できません。ネットワーク接続を確認してください。',
@@ -115,7 +114,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(
+    return createNoCacheResponse(
       {
         success: false,
         message: 'リクエストの処理に失敗しました。しばらくしてから再度お試しください。',
@@ -125,4 +124,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

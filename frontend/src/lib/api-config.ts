@@ -7,7 +7,17 @@
  */
 
 // ビルド時はダミー値を使用し、ランタイムで実際の値を使用
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002';
+// Dockerコンテナ内で実行されている場合は`api`ホスト名を使用、ホストマシンで実行されている場合は`localhost`を使用
+// Dockerコンテナ内で実行されているかどうかは、環境変数`DOCKER_ENV`で判定
+// 注意: `CI=true`はCI環境でも設定される可能性があるため、`DOCKER_ENV`を優先
+const isDockerEnv = process.env.DOCKER_ENV === 'true';
+const rawApiBaseUrl = process.env.API_BASE_URL || 'http://localhost:3002';
+
+// Docker環境でない場合、`http://api:`を`http://localhost:`に変換
+// Docker環境の場合はそのまま使用（`http://api:3002`のまま）
+const API_BASE_URL = isDockerEnv 
+  ? rawApiBaseUrl 
+  : rawApiBaseUrl.replace('http://api:', 'http://localhost:');
 const API_VERSION = '/api/v1';
 
 // ランタイムで環境変数が未設定の場合のみ警告
@@ -39,4 +49,10 @@ export const API_CONFIG = {
   version: API_VERSION,
   fullUrl: FULL_API_URL,
 } as const;
+
+/**
+ * 変換済みのAPI_BASE_URLをエクスポート
+ * Dockerネットワーク内の`api`ホスト名を`localhost`に変換済み
+ */
+export { API_BASE_URL };
 

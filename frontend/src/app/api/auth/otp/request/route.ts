@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { otpRequestSchema } from '@/schemas/auth'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 const TAMAYOI_API_URL = process.env.TAMAYOI_API_URL || 'http://localhost:3001'
 
@@ -8,7 +10,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         const validatedData = otpRequestSchema.parse(body)
 
-        const response = await fetch(`${TAMAYOI_API_URL}/api/auth/otp/request`, {
+        const response = await secureFetch(`${TAMAYOI_API_URL}/api/auth/otp/request`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -17,9 +19,9 @@ export async function POST(request: NextRequest) {
         })
 
         const data = await response.json()
-        return NextResponse.json(data, { status: response.status })
+        return createNoCacheResponse(data, { status: response.status })
     } catch {
-        return NextResponse.json(
+        return createNoCacheResponse(
             { success: false, message: 'OTPリクエストの処理に失敗しました' },
             { status: 500 }
         )

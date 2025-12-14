@@ -73,6 +73,10 @@ export async function middleware(request: NextRequest) {
     // 検証通過後は通常の処理へ
     const response = NextResponse.next();
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    // 画像リクエストにもキャッシュ無効化ヘッダーを設定
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
     return response;
   }
 
@@ -91,7 +95,12 @@ export async function middleware(request: NextRequest) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
       url.searchParams.set('session', 'expired')
-      return NextResponse.redirect(url)
+      const redirectResponse = NextResponse.redirect(url)
+      // リダイレクトレスポンスにもキャッシュ無効化ヘッダーを設定
+      redirectResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+      redirectResponse.headers.set('Pragma', 'no-cache')
+      redirectResponse.headers.set('Expires', '0')
+      return redirectResponse
     }
     // 署名検証はAPI層で実施。ここではCookieの存在のみでガード。
   }
@@ -101,23 +110,14 @@ export async function middleware(request: NextRequest) {
   // HSTS: HTTPSの接続を強制（1年間）
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
 
-  // キャッシュ制御: 全てのAPIレスポンスでキャッシュを無効化（セキュリティ対応）
+  // キャッシュ制御: 全てのページでキャッシュを無効化して機密情報の漏洩を防止
   // ユーザー固有情報（お気に入り状態など）が含まれる可能性があるため、
   // 共有キャッシュによる情報漏洩を防止
-  if (pathname.startsWith('/api/')) {
-    // 全てのAPIはキャッシュ無効化
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
-    response.headers.set('Pragma', 'no-cache')
-    response.headers.set('Expires', '0')
-  } else {
-    // 保護されたページ（認証が必要なページ）はキャッシュ無効化
-    // 機密情報を含む可能性があるため、キャッシュから情報が漏洩することを防止
-    if (protectedPaths.some(p => pathname === p || pathname.startsWith(`${p}/`))) {
-      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
-      response.headers.set('Pragma', 'no-cache')
-      response.headers.set('Expires', '0')
-    }
-  }
+  // Next.jsのデフォルトのCache-Controlヘッダーを削除してから設定
+  response.headers.delete('Cache-Control')
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+  response.headers.set('Pragma', 'no-cache')
+  response.headers.set('Expires', '0')
 
   return response
 }

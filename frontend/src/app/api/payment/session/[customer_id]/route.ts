@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetch } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +16,7 @@ export async function GET(
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const fullUrl = buildApiUrl(`/payment/session/${customerId}`)
     
-    const response = await fetch(fullUrl, {
+    const response = await secureFetch(fullUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -24,7 +26,7 @@ export async function GET(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('Payment session API error:', errorData)
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: errorData.error || 'セッション情報の取得に失敗しました' },
         { status: response.status }
       )
@@ -32,13 +34,12 @@ export async function GET(
     
     const data = await response.json()
     
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
   } catch (error) {
     console.error('Payment session API fetch error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: 'セッション情報の取得中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-

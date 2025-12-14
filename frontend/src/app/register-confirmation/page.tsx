@@ -127,12 +127,8 @@ export default function RegisterConfirmationPage() {
         address: formData.address,
         birthDate: formData.birthDate,
         gender: formData.gender,
+        phone: formData.phone ? formData.phone.trim() : '',
         token: token,
-      }
-
-      // phoneはオプショナルなので、空文字列の場合は送信しない
-      if (formData.phone && formData.phone.trim() !== '') {
-        requestData.phone = formData.phone.trim()
       }
 
       // 空文字列の場合はundefinedとして送信しない
