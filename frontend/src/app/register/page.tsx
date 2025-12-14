@@ -12,7 +12,7 @@ export default function RegisterPage() {
   const [token, setToken] = useState<string | undefined>(undefined)
   const [shopId, setShopId] = useState<string | undefined>(undefined)
   const [isClient, setIsClient] = useState(false)
-  const [initialFormData, setInitialFormData] = useState<UserRegistrationComplete | null>(null)
+  const [initialFormData, _setInitialFormData] = useState<UserRegistrationComplete | null>(null)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
@@ -26,8 +26,8 @@ export default function RegisterPage() {
       const urlParams = new URLSearchParams(window.location.search)
       const tokenParam = urlParams.get('token') || undefined
       const shop_id = urlParams.get('shop_id') || undefined
-      const ref = urlParams.get('ref') // 紹介者IDを取得
-      const isEdit = urlParams.get('edit') === 'true'
+      // const ref = urlParams.get('ref') // 紹介者IDを取得（将来使用予定）
+      // const isEdit = urlParams.get('edit') === 'true' // 編集モード（将来使用予定）
 
       // トークンが存在しない場合はメール登録画面にリダイレクト
       if (!tokenParam || tokenParam.trim() === '') {
@@ -72,14 +72,13 @@ export default function RegisterPage() {
     initializePage()
   }, [router])
 
-  const handleRegisterSubmit = async (data: UserRegistrationComplete) => {
-    setIsLoading(true)
-
-    // shop_idを追加
-    const dataWithShopId = {
-      ...data,
-      shop_id: shopId || undefined,
+  const handleRegisterSubmit = async (_data: UserRegistrationComplete) => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
     }
+
+    setIsLoading(true)
 
     // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
     // フォームデータは確認画面で再入力してもらうか、Cookieに保存する

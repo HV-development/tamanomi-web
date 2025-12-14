@@ -31,8 +31,7 @@ export const useVerifyOtpPage = () => {
         })
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          console.warn('❌ [useVerifyOtpPage] Failed to get session:', errorData)
+          await response.json().catch(() => ({}))
           setError('セッションが無効です。再度ログインしてください。')
           router.replace('/login?skip-auth-check=true')
           return
@@ -42,40 +41,15 @@ export const useVerifyOtpPage = () => {
         const sessionEmail = sessionData.email as string | undefined
         const sessionRequestId = sessionData.requestId as string | undefined
 
-        // デバッグログ：セッション取得結果を確認
-        console.log('🔍 [useVerifyOtpPage] Session check:', {
-          urlRequestId: requestId,
-          sessionEmail: sessionEmail,
-          sessionEmailType: typeof sessionEmail,
-          sessionEmailExists: !!sessionEmail,
-          sessionRequestId: sessionRequestId,
-          sessionRequestIdType: typeof sessionRequestId,
-          sessionRequestIdExists: !!sessionRequestId,
-          requestIdMatch: sessionRequestId === requestId,
-          requestIdMatchStrict: sessionRequestId === requestId ? 'true' : 'false',
-          bothExist: !!sessionEmail && !!sessionRequestId,
-          conditionResult: sessionEmail && sessionRequestId === requestId
-        })
-
         // requestIdが一致する場合のみメールアドレスを使用
         if (sessionEmail && sessionRequestId === requestId) {
-          console.log('✅ [useVerifyOtpPage] Session validation passed, setting email:', sessionEmail)
           setEmail(sessionEmail)
         } else {
           // セッションにメールアドレスがない、またはrequestIdが一致しない場合はエラー
-          console.warn('❌ [useVerifyOtpPage] Session validation failed:', {
-            hasEmail: !!sessionEmail,
-            hasRequestId: !!sessionRequestId,
-            requestIdMatch: sessionRequestId === requestId,
-            urlRequestId: requestId,
-            sessionRequestId: sessionRequestId,
-            emailValue: sessionEmail
-          })
           setError('セッションが無効です。再度ログインしてください。')
           router.replace('/login?skip-auth-check=true')
         }
-      } catch (error) {
-        console.error('Failed to get email from session:', error)
+      } catch {
         setError('セッション情報の取得に失敗しました。再度ログインしてください。')
         router.replace('/login?skip-auth-check=true')
       }
@@ -110,6 +84,11 @@ export const useVerifyOtpPage = () => {
 
   // OTP認証
   const handleOtpVerify = useCallback(async (otp: string) => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
+    }
+
     setIsLoading(true)
     setError("")
 
@@ -163,14 +142,18 @@ export const useVerifyOtpPage = () => {
       return
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'ワンタイムパスワードの認証に失敗しました'
-      console.error('OTP verification error:', errorMessage)
       setError(errorMessage)
       setIsLoading(false)
     }
-  }, [email, requestId, router])
+  }, [email, requestId, router, isLoading])
 
   // OTP再送信
   const handleResendOtp = useCallback(async () => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
+    }
+
     setIsLoading(true)
     setError("")
 
@@ -205,7 +188,7 @@ export const useVerifyOtpPage = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [email, router])
+  }, [email, router, isLoading])
 
   // ログイン画面に戻る
   const handleBackToLogin = useCallback(() => {

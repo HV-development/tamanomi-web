@@ -172,6 +172,11 @@ export default function PlanRegistrationPage() {
   }, [isClient, saitamaAppLinked, fetchPlans])
 
   const handlePaymentMethodRegister = async (planId: string) => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
+    }
+
     try {
       setIsLoading(true)
       setError('')

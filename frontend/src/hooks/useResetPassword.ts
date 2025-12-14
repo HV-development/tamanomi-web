@@ -12,6 +12,11 @@ export function useResetPassword(token: string | null) {
 
   const handleSubmit = useCallback(
     async (currentPassword: string, newPassword: string) => {
+      // 連続押下を防ぐ
+      if (isLoading) {
+        return;
+      }
+
       // トークンがない場合はエラー
       if (!token) {
         setErrorMessage('リセットトークンが見つかりません。メール内のリンクから再度アクセスしてください。');
@@ -34,7 +39,7 @@ export function useResetPassword(token: string | null) {
         setIsLoading(false);
       }
     },
-    [token]
+    [token, isLoading]
   );
 
   const handleCancel = useCallback(() => {

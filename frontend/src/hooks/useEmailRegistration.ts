@@ -56,6 +56,11 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
    * メールアドレス送信処理
    */
   const handleEmailSubmit = async (data: UserRegistrationRequest) => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
+    }
+
     setIsLoading(true)
     setErrorMessage('')
 
@@ -93,6 +98,11 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
    * 再送信処理（画面遷移せずにメールを再送信）
    */
   const handleResend = async () => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
+    }
+
     if (!lastEmail) {
       setErrorMessage('メールアドレスが見つかりません')
       return

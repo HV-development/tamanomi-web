@@ -72,7 +72,7 @@ export const usePaymentReturn = () => {
             // PaymentSessionが取得できない場合はエラー
             throw new Error('セッション情報が見つかりません')
           }
-        } catch (_error) {
+        } catch {
           // PaymentSessionから取得できない場合はエラー
           throw new Error('セッション情報の取得に失敗しました')
         }

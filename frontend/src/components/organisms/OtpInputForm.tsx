@@ -142,6 +142,11 @@ export function OtpInputForm({
   }
 
   const handleSubmit = (otpArray: string[] = otp) => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
+    }
+
     const otpError = validateOtp(otpArray)
     if (otpError) {
       setError(otpError)

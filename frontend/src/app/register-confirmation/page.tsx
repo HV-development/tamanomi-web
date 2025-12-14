@@ -10,7 +10,7 @@ import { Button } from '@/components/atoms/Button'
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingEmail, setIsLoadingEmail] = useState(true)
-  const [formData, setFormData] = useState<UserRegistrationComplete | null>(null)
+  const [formData, _setFormData] = useState<UserRegistrationComplete | null>(null)
   const [email, setEmail] = useState<string>('')
   const [token, setToken] = useState<string>('')
   const [isClient, setIsClient] = useState(false)
@@ -80,6 +80,11 @@ export default function RegisterConfirmationPage() {
   }, [router])
 
   const handleRegister = async () => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
+    }
+
     if (!formData || !token) return
 
     setIsLoading(true)

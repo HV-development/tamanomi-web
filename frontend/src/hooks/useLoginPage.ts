@@ -90,6 +90,11 @@ export const useLoginPage = () => {
 
   // パスワード認証
   const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {
+    // 連続押下を防ぐ
+    if (isLoading) {
+      return
+    }
+
     setIsLoading(true)
     setError("")
 
@@ -135,7 +140,7 @@ export const useLoginPage = () => {
       setError(errorMessage)
       setIsLoading(false)
     }
-  }, [])
+  }, [isLoading])
 
   // 新規登録画面へ
   const handleSignup = useCallback(() => {
