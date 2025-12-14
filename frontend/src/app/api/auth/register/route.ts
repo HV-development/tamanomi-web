@@ -83,6 +83,21 @@ export async function POST(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/register/complete');
+    console.log('[api/auth/register] Backend URL:', fullUrl)
+    console.log('[api/auth/register] API_BASE_URL:', process.env.API_BASE_URL)
+    console.log('[api/auth/register] DOCKER_ENV:', process.env.DOCKER_ENV)
+    console.log('[api/auth/register] Request data:', {
+      hasToken: !!validatedData.token,
+      hasPassword: !!validatedData.password,
+      hasNickname: !!validatedData.nickname,
+      hasPostalCode: !!validatedData.postalCode,
+      hasAddress: !!validatedData.address,
+      hasBirthDate: !!validatedData.birthDate,
+      hasGender: !!validatedData.gender,
+      hasPhone: !!validatedData.phone,
+      phoneLength: validatedData.phone?.length || 0,
+      postalCodeLength: validatedData.postalCode?.length || 0
+    })
 
     // #region agent log
     fetch('http://127.0.0.1:7243/ingest/3e7657cf-d90c-47dc-87dc-00ee22e9e998',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:93',message:'Request body before sending',data:{validatedData,bodyKeys:Object.keys(validatedData),phoneValue:validatedData.phone,postalCodeValue:validatedData.postalCode},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
