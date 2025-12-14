@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { secureFetch } from '@/lib/fetch-utils'
+import { getAuthHeader } from '@/lib/auth-header'
+import { secureFetch, secureFetchWithAuth } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -46,11 +47,18 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 [Next.js API Route] Backend request body:', backendRequestBody)
 
-    const response = await secureFetch(fullUrl, {
+    // 認証ヘッダーを取得（Cookieから）
+    const authHeader = getAuthHeader(request)
+    
+    if (!authHeader) {
+      return createNoCacheResponse(
+        { error: '認証が必要です' },
+        { status: 401 }
+      )
+    }
+
+    const response = await secureFetchWithAuth(fullUrl, authHeader, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(backendRequestBody),
     })
 
