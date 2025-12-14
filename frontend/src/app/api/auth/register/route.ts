@@ -220,6 +220,7 @@ export async function POST(request: NextRequest) {
       nextResponse.headers.set('Pragma', 'no-cache')
 
       if (data.accessToken) {
+        // 通常のCookie（開発環境・本番環境の両方で動作）
         nextResponse.cookies.set('accessToken', data.accessToken, {
           httpOnly: true,
           secure: isSecure,
@@ -227,15 +228,20 @@ export async function POST(request: NextRequest) {
           path: '/',
           maxAge: 60 * 15, // 15分
         })
-        nextResponse.cookies.set('__Host-accessToken', data.accessToken, {
-          httpOnly: true,
-          secure: isSecure,
-          sameSite: 'strict',
-          path: '/',
-          maxAge: 60 * 15,
-        })
+        // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
+        // 開発環境（HTTP）ではsecure: falseのため設定されないが、エラーにはならない
+        if (isSecure) {
+          nextResponse.cookies.set('__Host-accessToken', data.accessToken, {
+            httpOnly: true,
+            secure: true, // __Host-プレフィックスにはsecure: trueが必須
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 60 * 15,
+          })
+        }
       }
       if (data.refreshToken) {
+        // 通常のCookie（開発環境・本番環境の両方で動作）
         nextResponse.cookies.set('refreshToken', data.refreshToken, {
           httpOnly: true,
           secure: isSecure,
@@ -243,14 +249,23 @@ export async function POST(request: NextRequest) {
           path: '/',
           maxAge: 60 * 60 * 24 * 30, // 30日
         })
-        nextResponse.cookies.set('__Host-refreshToken', data.refreshToken, {
-          httpOnly: true,
-          secure: isSecure,
-          sameSite: 'strict',
-          path: '/',
-          maxAge: 60 * 60 * 24 * 30,
-        })
+        // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
+        if (isSecure) {
+          nextResponse.cookies.set('__Host-refreshToken', data.refreshToken, {
+            httpOnly: true,
+            secure: true, // __Host-プレフィックスにはsecure: trueが必須
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 60 * 60 * 24 * 30,
+          })
+        }
       }
+      
+      console.log('🔐 [register] Set access token cookies', {
+        isSecure,
+        hasAccessToken: !!data.accessToken,
+        hasRefreshToken: !!data.refreshToken,
+      })
 
       return nextResponse
     } catch (fetchError) {
