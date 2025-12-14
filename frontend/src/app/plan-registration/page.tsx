@@ -255,20 +255,7 @@ export default function PlanRegistrationPage() {
       setIsLoading(true)
       setError('')
 
-      // セキュリティ改善：sessionStorageの使用を廃止し、APIから直接取得
-      let currentEmail = email?.trim() ?? ''
-
-      // メールアドレスの検証（stateにない場合はAPIから再取得）
-      if (!currentEmail) {
-        await fetchUserInfo()
-        currentEmail = email?.trim() || ''
-      }
-
-      if (!currentEmail) {
-        setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
-        setIsLoading(false)
-        return
-      }
+      // セキュリティ改善：メールアドレスはバックエンドで認証トークンから取得するため、フロントエンドから送信しない
 
       // 支払い方法ごとの分岐
 
@@ -495,34 +482,13 @@ export default function PlanRegistrationPage() {
       }
 
       // クレジットカード: カード登録APIを呼び出し
-      // customerId: 既存のpaygentCustomerIdがある場合はそれを使用、なければメールアドレスのハッシュ値を使用
-      let customerId: string
+      // customerId: 既存のpaygentCustomerIdがある場合はそれを使用、なければバックエンドで認証トークンから取得したメールアドレスのハッシュ値を使用
+      // セキュリティ改善：userEmailはバックエンドで認証トークンから取得するため、フロントエンドから送信しない
+      const requestBody: Record<string, string> = {}
 
+      // 既存のpaygentCustomerIdがある場合は送信（バックエンドで使用される）
       if (existingPaygentCustomerId) {
-        // 既にpaygentCustomerIdが設定されている場合はそれを使用
-        customerId = existingPaygentCustomerId
-      } else {
-        // 新規登録の場合はメールアドレスのハッシュ値を使用して25文字以内に収める
-        const generateCustomerId = (email: string): string => {
-          // メールアドレスのハッシュ値を生成（簡易版）
-          let hash = 0
-          for (let i = 0; i < email.length; i++) {
-            const char = email.charCodeAt(i)
-            hash = ((hash << 5) - hash) + char
-            hash = hash & hash // Convert to 32bit integer
-          }
-          // 絶対値を取得して16進数に変換（最大8文字）
-          const hashStr = Math.abs(hash).toString(16).padStart(8, '0')
-          // "cust_" + ハッシュ値 = 最大13文字
-          return `cust_${hashStr}`
-        }
-        customerId = generateCustomerId(currentEmail)
-      }
-
-      // 支払い方法変更のみの場合はplanIdを送信しない
-      const requestBody: Record<string, string> = {
-        customerId: customerId,
-        userEmail: currentEmail, // セッション管理用
+        requestBody.customerId = existingPaygentCustomerId
       }
 
       if (!isPaymentMethodChangeOnly) {

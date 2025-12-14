@@ -9,11 +9,10 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { customerId, userEmail, planId, customerFamilyName, customerName, companyName } = body
+    const { customerId, planId, customerFamilyName, customerName, companyName } = body
 
     console.log('🔍 [Next.js API Route] Request body:', {
       customerId,
-      userEmail,
       planId,
       bodyKeys: Object.keys(body),
     })
@@ -22,12 +21,11 @@ export async function POST(request: NextRequest) {
     const fullUrl = buildApiUrl('/payment/register')
 
     // undefinedのフィールドを除外してバックエンドに送信
-    const backendRequestBody: Record<string, string> = {
-      customerId,
-    }
+    // セキュリティ改善：userEmailはバックエンドで認証トークンから取得するため、フロントエンドから送信しない
+    const backendRequestBody: Record<string, string> = {}
 
-    if (userEmail) {
-      backendRequestBody.userEmail = userEmail
+    if (customerId) {
+      backendRequestBody.customerId = customerId
     }
 
     if (planId) {

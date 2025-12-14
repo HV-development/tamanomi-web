@@ -201,7 +201,6 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const passwordResetEmail = state.passwordResetEmail
   const emailRegistrationStep = state.emailRegistrationStep
   const emailRegistrationEmail = state.emailRegistrationEmail
-  const emailConfirmationEmail = state.emailConfirmationEmail || ""
 
   // ユーザーの年齢を計算
   const userAge = user ? calculateAge(user.birthDate || '') : null

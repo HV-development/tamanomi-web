@@ -152,7 +152,7 @@ export default function RegisterPage() {
           setIsLoading(false)
           return
         }
-      } catch (sessionError) {
+      } catch (_sessionError) {
         setError('セッションの保存中にエラーが発生しました。再度お試しください。')
         setIsLoading(false)
         return

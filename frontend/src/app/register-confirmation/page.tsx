@@ -23,7 +23,7 @@ export default function RegisterConfirmationPage() {
   const [showSaitamaFailedModal, setShowSaitamaFailedModal] = useState(false)
   const [pointsGranted, setPointsGranted] = useState<number | null>(null)
   const [shopId, setShopId] = useState<string | undefined>(undefined)
-  const [error, setError] = useState<string | null>(null)
+  const [error] = useState<string | null>(null)
   const [referrerUserId, setReferrerUserId] = useState<string | null>(null)
   const router = useRouter()
   // セッションデータを保持するref（handleRegisterで使用）
@@ -158,7 +158,7 @@ export default function RegisterConfirmationPage() {
       let result: any
       try {
         result = await response.json()
-      } catch (jsonError) {
+      } catch (_jsonError) {
         alert('サーバーエラーが発生しました。再度お試しください。')
         setIsLoading(false)
         return

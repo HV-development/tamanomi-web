@@ -9,7 +9,6 @@ import { test, expect, Page } from '@playwright/test';
 test.describe('キャッシュ無効化ヘッダーの検証', () => {
   // Next.js 15の動的レンダリングでは、内部でCache-Control: no-store, must-revalidateが設定される
   // そのため、no-cacheとprivateが含まれているか、またはPragma: no-cacheが設定されているかを確認
-  const expectedCacheControl = 'no-store, no-cache, must-revalidate, private';
   const expectedPragma = 'no-cache';
 
   // ヘッダーが期待値と一致するか、または最小限の要件を満たしているかを確認
