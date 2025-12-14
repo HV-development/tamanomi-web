@@ -38,31 +38,10 @@ export default function RegisterPage() {
       setToken(tokenParam)
       setShopId(shop_id)
 
-      // URLパラメータから紹介者IDを取得してセッションストレージに保存
-      if (ref) {
-        sessionStorage.setItem('referrerUserId', ref)
-      }
-
-      // 編集モードの場合、保存されたフォームデータを取得
-      if (isEdit) {
-        const savedData = sessionStorage.getItem('registerFormData')
-        if (savedData) {
-          try {
-            const parsedData = JSON.parse(savedData) as UserRegistrationComplete
-            setInitialFormData(parsedData)
-            sessionStorage.removeItem('registerFormData')
-          } catch {
-            // エラーを無視
-          }
-        }
-        // 編集モードの場合、セッションストレージからメールアドレスを取得
-        const savedEmail = sessionStorage.getItem('registerEmail')
-        if (savedEmail) {
-          setEmail(savedEmail)
-          setIsLoadingEmail(false)
-          return
-        }
-      }
+      // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+      // referrerUserIdはURLパラメータから直接取得するか、Cookieに保存する
+      // 編集モードの場合、フォームデータはCookieから取得するか、再入力してもらう
+      // メールアドレスは常にAPIから取得する
 
       // トークンからメールアドレスを取得（セキュリティ改善：URLパラメータにメールアドレスを含めない）
       try {
@@ -81,8 +60,7 @@ export default function RegisterPage() {
 
         const data = await response.json()
         setEmail(data.email)
-        // セッションストレージにメールアドレスを保存（確認画面での復元用）
-        sessionStorage.setItem('registerEmail', data.email)
+        // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       } catch {
         setError('エラーが発生しました。再度お試しください。')
         setTimeout(() => router.push('/email-registration'), 3000)
@@ -103,9 +81,8 @@ export default function RegisterPage() {
       shop_id: shopId || undefined,
     }
 
-    // フォームデータをセッションストレージに保存
-    sessionStorage.setItem('registerFormData', JSON.stringify(dataWithShopId))
-
+    // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+    // フォームデータは確認画面で再入力してもらうか、Cookieに保存する
     // 確認画面に遷移（emailパラメータを削除 - セキュリティ改善）
     const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
     router.push(`/register-confirmation?token=${encodeURIComponent(token || '')}${shopIdParam}`)

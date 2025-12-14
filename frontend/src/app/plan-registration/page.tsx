@@ -38,7 +38,7 @@ export default function PlanRegistrationPage() {
         if (userData.email) {
           console.log('🔍 [fetchUserInfo] Setting email from user data:', userData.email)
           setEmail(userData.email)
-          sessionStorage.setItem('userEmail', userData.email)
+          // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
         } else {
           console.error('❌ [fetchUserInfo] No email found in user data')
           setError('メールアドレスが見つかりません。新規登録画面からやり直してください。')
@@ -47,8 +47,9 @@ export default function PlanRegistrationPage() {
         const newLinkedState = userData.saitamaAppLinked === true
         setSaitamaAppLinked(newLinkedState)
 
-        // カード登録状態を確認（sessionStorageにpaygentCustomerCardIdがあれば登録済み）
-        const hasCard = !!sessionStorage.getItem('paygentCustomerCardId')
+        // カード登録状態を確認（userDataから取得）
+        // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+        const hasCard = userData.userCards && Array.isArray(userData.userCards) && userData.userCards.length > 0
         setHasPaymentMethod(hasCard)
       } else {
         const errorData = await response.json().catch(() => ({}))
@@ -78,12 +79,8 @@ export default function PlanRegistrationPage() {
       const refreshParam = urlParams.get('refresh')
       const paymentMethodChangeParam = urlParams.get('payment-method-change')
       
-      // セッションストレージからメールアドレスを取得（一時的に使用）
-      const sessionEmail = sessionStorage.getItem('userEmail')
-      if (sessionEmail) {
-        console.log('🔍 [useEffect] Setting email from session storage:', sessionEmail)
-        setEmail(sessionEmail)
-      }
+      // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+      // メールアドレスはAPIから取得する
 
       // 支払い方法変更のみの場合はフラグを設定
       if (paymentMethodChangeParam === 'true') {
@@ -203,20 +200,14 @@ export default function PlanRegistrationPage() {
         }
       }
 
-      const getEmailFromSession = () => {
-        const storedEmail = sessionStorage.getItem('userEmail')
-        return storedEmail ? storedEmail.trim() : ''
-      }
-
+      // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+      // メールアドレスは常にAPIから取得する
       let currentEmail = email?.trim() ?? ''
-      if (!currentEmail) {
-        currentEmail = getEmailFromSession()
-      }
-
+      
       // メールアドレスの検証
       if (!currentEmail) {
         await fetchUserInfo()
-        currentEmail = getEmailFromSession() || email?.trim() || ''
+        currentEmail = email?.trim() || ''
       }
 
       if (!currentEmail) {
@@ -224,8 +215,6 @@ export default function PlanRegistrationPage() {
         setIsLoading(false)
         return
       }
-
-      sessionStorage.setItem('userEmail', currentEmail)
       
       // カード登録APIを呼び出し
       // customerId: メールアドレスのハッシュ値を使用して25文字以内に収める
@@ -307,8 +296,7 @@ export default function PlanRegistrationPage() {
         customer_id: params?.customer_id
       })
 
-      // プラン登録成功後、セッションストレージからメールアドレスをクリア
-      sessionStorage.removeItem('userEmail')
+      // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       // モック環境の場合はGETパラメータとしてリダイレクト
       if (redirectUrl.includes('/payment-mock')) {
         const url = new URL(redirectUrl)
