@@ -20,6 +20,17 @@ const API_BASE_URL = isDockerEnv
   : rawApiBaseUrl.replace('http://api:', 'http://localhost:');
 const API_VERSION = '/api/v1';
 
+// サーバーサイドでのみログを出力（デバッグ用）
+if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
+  console.log('[api-config] Environment:', {
+    isDockerEnv,
+    rawApiBaseUrl,
+    API_BASE_URL,
+    DOCKER_ENV: process.env.DOCKER_ENV,
+    NODE_ENV: process.env.NODE_ENV
+  });
+}
+
 // ランタイムで環境変数が未設定の場合のみ警告
 if (typeof window !== 'undefined' && !process.env.API_BASE_URL) {
   // API_BASE_URL環境変数が未設定の場合、デフォルト値を使用
@@ -52,7 +63,7 @@ export const API_CONFIG = {
 
 /**
  * 変換済みのAPI_BASE_URLをエクスポート
- * Dockerネットワーク内の`api`ホスト名を`localhost`に変換済み
+ * Docker環境では`http://api:3002`のまま、非Docker環境では`http://localhost:3002`に変換済み
  */
 export { API_BASE_URL };
 

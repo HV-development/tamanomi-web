@@ -89,6 +89,11 @@ export default function RegisterPage() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
+          console.error('[register] Token info API error:', {
+            status: response.status,
+            statusText: response.statusText,
+            errorData
+          })
           if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
             setError('トークンの有効期限が切れています。再度メール登録からやり直してください。')
           } else {
@@ -106,7 +111,15 @@ export default function RegisterPage() {
           // トークンが有効であることを確認
           // メールアドレスの表示は、登録完了時にトークンから取得されるため、ここでは不要
         }
-      } catch {
+      } catch (error) {
+        console.error('[register] Token info fetch error:', error)
+        if (error instanceof Error) {
+          console.error('[register] Error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+          })
+        }
         setError('エラーが発生しました。再度お試しください。')
         setTimeout(() => router.push('/email-registration'), 3000)
       } finally {

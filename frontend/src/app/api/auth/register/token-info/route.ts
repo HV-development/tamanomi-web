@@ -22,7 +22,12 @@ export async function POST(request: NextRequest) {
         }
 
         // バックエンドAPIにPOSTでプロキシ（トークンをボディで送信）
-        const response = await secureFetch(`${API_BASE_URL}/api/v1/register/token-info`, {
+        const backendUrl = `${API_BASE_URL}/api/v1/register/token-info`
+        console.log('[token-info] Backend URL:', backendUrl)
+        console.log('[token-info] API_BASE_URL:', API_BASE_URL)
+        console.log('[token-info] DOCKER_ENV:', process.env.DOCKER_ENV)
+        
+        const response = await secureFetch(backendUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -39,6 +44,14 @@ export async function POST(request: NextRequest) {
         return createNoCacheResponse(data)
     } catch (error) {
         console.error('Token info API error:', error)
+        // エラーの詳細をログに記録（デバッグ用）
+        if (error instanceof Error) {
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            })
+        }
         return createNoCacheResponse(
             { error: { code: 'INTERNAL_ERROR', message: '内部エラーが発生しました' } },
             { status: 500 }
