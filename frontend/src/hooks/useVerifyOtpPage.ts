@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { getRegisterSessionItem } from '@/lib/register-session'
 
 export const useVerifyOtpPage = () => {
   const router = useRouter()
@@ -25,8 +24,9 @@ export const useVerifyOtpPage = () => {
       }
 
       try {
-        const sessionEmail = await getRegisterSessionItem<string>('otpEmail')
-        const sessionRequestId = await getRegisterSessionItem<string>('otpRequestId')
+        // sessionStorageからメールアドレスとrequestIdを取得
+        const sessionEmail = typeof window !== 'undefined' ? sessionStorage.getItem('otpEmail') : null
+        const sessionRequestId = typeof window !== 'undefined' ? sessionStorage.getItem('otpRequestId') : null
 
         // デバッグログ：セッション取得結果を確認
         console.log('🔍 [useVerifyOtpPage] Session check:', {
