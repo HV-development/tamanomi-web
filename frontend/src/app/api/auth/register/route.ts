@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { secureFetch } from '@/lib/fetch-utils'
-import { createNoCacheResponse } from '@/lib/response-utils'
+import { createNoCacheResponse, addNoCacheHeaders } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -83,21 +83,6 @@ export async function POST(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/register/complete');
-    console.log('[api/auth/register] Backend URL:', fullUrl)
-    console.log('[api/auth/register] API_BASE_URL:', process.env.API_BASE_URL)
-    console.log('[api/auth/register] DOCKER_ENV:', process.env.DOCKER_ENV)
-    console.log('[api/auth/register] Request data:', {
-      hasToken: !!validatedData.token,
-      hasPassword: !!validatedData.password,
-      hasNickname: !!validatedData.nickname,
-      hasPostalCode: !!validatedData.postalCode,
-      hasAddress: !!validatedData.address,
-      hasBirthDate: !!validatedData.birthDate,
-      hasGender: !!validatedData.gender,
-      hasPhone: !!validatedData.phone,
-      phoneLength: validatedData.phone?.length || 0,
-      postalCodeLength: validatedData.postalCode?.length || 0
-    })
 
     // #region agent log
     fetch('http://127.0.0.1:7243/ingest/3e7657cf-d90c-47dc-87dc-00ee22e9e998',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:93',message:'Request body before sending',data:{validatedData,bodyKeys:Object.keys(validatedData),phoneValue:validatedData.phone,postalCodeValue:validatedData.postalCode},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
@@ -276,7 +261,6 @@ export async function POST(request: NextRequest) {
       })()
 
       if (data.accessToken) {
-        // 通常のCookie（開発環境・本番環境の両方で動作）
         nextResponse.cookies.set('accessToken', data.accessToken, {
           httpOnly: true,
           secure: isSecure,
@@ -284,20 +268,15 @@ export async function POST(request: NextRequest) {
           path: '/',
           maxAge: 60 * 15, // 15分
         })
-        // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
-        // 開発環境（HTTP）ではsecure: falseのため設定されないが、エラーにはならない
-        if (isSecure) {
-          nextResponse.cookies.set('__Host-accessToken', data.accessToken, {
-            httpOnly: true,
-            secure: true, // __Host-プレフィックスにはsecure: trueが必須
-            sameSite: 'strict',
-            path: '/',
-            maxAge: 60 * 15,
-          })
-        }
+        nextResponse.cookies.set('__Host-accessToken', data.accessToken, {
+          httpOnly: true,
+          secure: isSecure,
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 15,
+        })
       }
       if (data.refreshToken) {
-        // 通常のCookie（開発環境・本番環境の両方で動作）
         nextResponse.cookies.set('refreshToken', data.refreshToken, {
           httpOnly: true,
           secure: isSecure,
@@ -305,23 +284,14 @@ export async function POST(request: NextRequest) {
           path: '/',
           maxAge: 60 * 60 * 24 * 30, // 30日
         })
-        // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
-        if (isSecure) {
-          nextResponse.cookies.set('__Host-refreshToken', data.refreshToken, {
-            httpOnly: true,
-            secure: true, // __Host-プレフィックスにはsecure: trueが必須
-            sameSite: 'strict',
-            path: '/',
-            maxAge: 60 * 60 * 24 * 30,
-          })
-        }
+        nextResponse.cookies.set('__Host-refreshToken', data.refreshToken, {
+          httpOnly: true,
+          secure: isSecure,
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 30,
+        })
       }
-      
-      console.log('🔐 [register] Set access token cookies', {
-        isSecure,
-        hasAccessToken: !!data.accessToken,
-        hasRefreshToken: !!data.refreshToken,
-      })
 
       return nextResponse
     } catch (fetchError) {

@@ -1,16 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { RegisterConfirmationContainer } from '@/components/organisms/RegisterConfirmationContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
 import { Modal } from '@/components/atoms/Modal'
 import { Button } from '@/components/atoms/Button'
-import {
-  getRegisterSession,
-  setRegisterSessionItem,
-  clearRegisterSession
-} from '@/lib/register-session'
 
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -23,16 +18,13 @@ export default function RegisterConfirmationPage() {
   const [showSaitamaFailedModal, setShowSaitamaFailedModal] = useState(false)
   const [pointsGranted, setPointsGranted] = useState<number | null>(null)
   const [shopId, setShopId] = useState<string | undefined>(undefined)
-  const [error] = useState<string | null>(null)
-  const [referrerUserId, setReferrerUserId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  // セッションデータを保持するref（handleRegisterで使用）
-  const sessionDataRef = useRef<{ referrerUserId?: string } | null>(null)
 
   // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
     setIsClient(true)
-
+    
     const initializePage = async () => {
       if (typeof window === 'undefined') return
 
@@ -51,56 +43,79 @@ export default function RegisterConfirmationPage() {
 
       setToken(tokenParam)
 
-      // サーバーサイドセッションからデータを取得
-      const sessionData = await getRegisterSession()
-
-      // 紹介者IDをrefに保存（handleRegisterで使用）
-      if (sessionData?.referrerUserId) {
-        sessionDataRef.current = { referrerUserId: sessionData.referrerUserId }
-        setReferrerUserId(sessionData.referrerUserId)
-      }
-
-      const storedData = sessionData?.registerFormData
-
-      console.log('🔍 [register-confirmation] Session data:', {
-        hasSessionData: !!sessionData,
-        hasRegisterFormData: !!storedData,
-        hasRegisterEmail: !!sessionData?.registerEmail,
-      })
+      // まずsessionStorageからフォームデータを取得
+      const storedData = sessionStorage.getItem('registerFormData')
 
       if (storedData) {
-        // サーバーサイドセッションにデータがある場合（通常フロー）
+        // sessionStorageにデータがある場合（通常フロー）
         try {
-          const parsedData = storedData as UserRegistrationComplete
+          const parsedData = JSON.parse(storedData) as UserRegistrationComplete
           // shop_idがURLパラメータにある場合は上書き
           if (shopIdParam) {
             parsedData.shopId = shopIdParam
           }
           setFormData(parsedData)
 
-          // メールアドレスをサーバーサイドセッションから取得（オプション）
-          // セキュリティ改善：メールアドレスはトークンから取得されるため、セッションにない場合でも問題ない
-          const storedEmail = sessionData?.registerEmail
+          // メールアドレスをセッションストレージから取得（セキュリティ改善：URLパラメータから削除）
+          const storedEmail = sessionStorage.getItem('registerEmail')
           if (storedEmail) {
             setEmail(storedEmail)
+            setIsLoadingEmail(false)
+            return
           }
-          // メールアドレスがセッションにない場合でも処理を続行（トークンから取得されるため）
 
-          console.log('✅ [register-confirmation] Form data loaded from session')
+          // セッションストレージにメールアドレスがない場合、APIから取得
+          try {
+            const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+            if (response.ok) {
+              const data = await response.json()
+              setEmail(data.email)
+              sessionStorage.setItem('registerEmail', data.email)
+            } else {
+              throw new Error('Failed to fetch email')
+            }
+          } catch {
+            // APIからも取得できない場合、登録画面に戻す
+            alert('セッションが切れました。お手数ですが、再度情報を入力してください。')
+            const shopIdParamForRedirect = shopIdParam ? `&shop_id=${encodeURIComponent(shopIdParam)}` : ''
+            router.push(`/register?token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`)
+            return
+          }
+          
           setIsLoadingEmail(false)
           return
         } catch (err) {
-          console.error('❌ [register-confirmation] Session data parse error:', err)
+          console.error('sessionStorage parse error:', err)
           // パースエラーの場合は次の処理へ
         }
       }
 
-      // セッションデータがない場合は登録画面に戻す
-      console.error('❌ [register-confirmation] No session data found')
-      alert('セッションが切れました。お手数ですが、再度情報を入力してください。')
-      const shopIdParamForRedirect = shopIdParam ? `&shop_id=${encodeURIComponent(shopIdParam)}` : ''
-      router.push(`/register?token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`)
-      setIsLoadingEmail(false)
+      // sessionStorageがない場合、APIからメールアドレスを取得して登録画面に戻す
+      try {
+        const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
+            setError('トークンの有効期限が切れています。再度メール登録からやり直してください。')
+          } else {
+            setError('トークンが無効です。再度メール登録からやり直してください。')
+          }
+          setTimeout(() => router.push('/email-registration'), 3000)
+          setIsLoadingEmail(false)
+          return
+        }
+
+        // ユーザーに情報を再入力してもらうため、登録画面に戻す
+        alert('セッションが切れました。お手数ですが、再度情報を入力してください。')
+        const shopIdParamForRedirect = shopIdParam ? `&shop_id=${encodeURIComponent(shopIdParam)}` : ''
+        router.push(`/register?token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`)
+      } catch {
+        setError('エラーが発生しました。再度お試しください。')
+        setTimeout(() => router.push('/email-registration'), 3000)
+      } finally {
+        setIsLoadingEmail(false)
+      }
     }
 
     initializePage()
@@ -113,38 +128,12 @@ export default function RegisterConfirmationPage() {
 
     try {
       const saitamaAppIdValue = formData.saitamaAppId && formData.saitamaAppId.trim() !== '' ? formData.saitamaAppId.trim() : undefined;
-
-      // サーバーサイドセッションから取得した紹介者IDを使用
-      const referrerUserIdValue = sessionDataRef.current?.referrerUserId || referrerUserId;
-
-      // 送信データを準備
-      const requestData: any = {
-        // email: email, // セキュリティ改善：メールアドレスはトークンから取得されるため、リクエストボディに含めない
-        password: formData.password,
-        passwordConfirm: formData.passwordConfirm,
-        nickname: formData.nickname,
-        postalCode: formData.postalCode,
-        address: formData.address,
-        birthDate: formData.birthDate,
-        gender: formData.gender,
-        phone: formData.phone ? formData.phone.trim() : '',
-        token: token,
-      }
-
-      // 空文字列の場合はundefinedとして送信しない
-      if (saitamaAppIdValue) {
-        requestData.saitamaAppId = saitamaAppIdValue
-      }
-
-      // 紹介者IDを追加（空文字列の場合は送信しない）
-      if (referrerUserIdValue && referrerUserIdValue.trim() !== '') {
-        requestData.referrerUserId = referrerUserIdValue.trim()
-      }
-
-      // shopIdを追加（存在する場合のみ）
-      if (shopId) {
-        requestData.shopId = shopId
-      }
+      
+      // セッションストレージから紹介者IDを取得
+      const referrerUserId = typeof window !== 'undefined' 
+        ? sessionStorage.getItem('referrerUserId') 
+        : null;
+      
 
       // バックエンドAPIに登録リクエストを送信
       const response = await fetch('/api/auth/register', {
@@ -152,32 +141,49 @@ export default function RegisterConfirmationPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify({
+          email: email,
+          password: formData.password,
+          passwordConfirm: formData.passwordConfirm,
+          nickname: formData.nickname,
+          postalCode: formData.postalCode,
+          address: formData.address,
+          birthDate: formData.birthDate,
+          gender: formData.gender,
+          phone: formData.phone,
+          // 空文字列の場合はundefinedとして送信しない
+          saitamaAppId: saitamaAppIdValue,
+          // 紹介者IDを追加
+          referrerUserId: referrerUserId && referrerUserId.trim() !== '' ? referrerUserId.trim() : undefined,
+          token: token,
+          shopId: shopId,
+        }),
       })
 
-      let result: any
-      try {
-        result = await response.json()
-      } catch (_jsonError) {
-        alert('サーバーエラーが発生しました。再度お試しください。')
-        setIsLoading(false)
-        return
-      }
+      const result = await response.json()
 
       if (response.ok) {
         // Cookieベースの認証のみを使用（localStorageは廃止）
         // トークンはサーバー側でCookieに設定されるため、フロントエンドでの保存は不要
 
-        // 登録成功後はサーバーサイドセッションをクリア
-        await clearRegisterSession()
+        // 登録成功後はセッションストレージをクリア
+        sessionStorage.removeItem('registerFormData')
+        sessionStorage.removeItem('referrerUserId')
+        sessionStorage.removeItem('registerEmail')
+
+        // さいたま市アプリ連携が失敗した場合（ポイント付与API失敗）
+        if (result.saitamaAppLinkFailed) {
+          setShowSaitamaFailedModal(true)
+          return
+        }
 
         // さいたま市アプリ連携でポイント付与があった場合はモーダルを表示
         if (result.pointsGranted) {
           setPointsGranted(result.pointsGranted)
           setShowSuccessModal(true)
         } else {
-          // セキュリティ改善：メールアドレスをセッションに保存しない
-          // プラン登録画面では、APIから直接メールアドレスを取得する
+          // ポイント付与がない場合は直接プラン登録画面に遷移（セッションストレージにメールアドレスを保存）
+          sessionStorage.setItem('userEmail', email)
           // window.location.hrefを使用して強制的に遷移
           if (typeof window !== 'undefined') {
             window.location.href = '/plan-registration'
@@ -187,41 +193,13 @@ export default function RegisterConfirmationPage() {
         }
       } else {
         // エラーハンドリング
-        const errorCode = result.error?.code || result.errorCode
         const errorMessage = result.message || result.error?.message || '登録に失敗しました'
 
         // 409エラー（既存アカウント）の場合は特別な処理
-        if (response.status === 409 && (errorCode === 'USER_ALREADY_EXISTS' || errorCode === 'SAITAMA_APP_ID_ALREADY_EXISTS')) {
-          if (errorCode === 'USER_ALREADY_EXISTS') {
-            // ログイン画面にリダイレクト
-            router.push(`/?error=already_registered`)
-          } else {
-            // さいたま市アプリID重複の場合は新規登録画面に戻す
-            const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
-            const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
-            const errorParam = `&error=${encodeURIComponent(errorMessage)}`
-            const redirectUrl = `/register${tokenParam}${shopIdParam}${errorParam}`
-            // 強制的にリダイレクト
-            if (typeof window !== 'undefined') {
-              window.location.href = redirectUrl
-            } else {
-              router.push(redirectUrl)
-            }
-          }
-        } else if (response.status === 500 && errorCode === 'POINT_GRANT_FAILED') {
-          // ポイント付与失敗の場合は新規登録画面に戻す
-          const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
-          const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
-          const errorParam = `&error=${encodeURIComponent(errorMessage)}`
-          const redirectUrl = `/register${tokenParam}${shopIdParam}${errorParam}`
-          // 強制的にリダイレクト
-          if (typeof window !== 'undefined') {
-            window.location.href = redirectUrl
-          } else {
-            router.push(redirectUrl)
-          }
+        if (response.status === 409 && result.errorCode === 'USER_ALREADY_EXISTS') {
+          // ログイン画面にリダイレクト
+          router.push(`/?error=already_registered`)
         } else {
-          // その他のエラー
           alert(errorMessage)
         }
       }
@@ -232,10 +210,10 @@ export default function RegisterConfirmationPage() {
     }
   }
 
-  const handleEdit = async () => {
-    // フォームデータをサーバーサイドセッションに保存してから登録画面に戻る（emailパラメータは含めない - セキュリティ改善）
+  const handleEdit = () => {
+    // フォームデータをsessionStorageに保存してから登録画面に戻る（emailパラメータは含めない - セキュリティ改善）
     if (formData) {
-      await setRegisterSessionItem('editFormData', formData)
+      sessionStorage.setItem('editFormData', JSON.stringify(formData))
     }
     const shopIdParam = formData?.shopId ? `&shop_id=${encodeURIComponent(formData?.shopId)}` : ''
     router.push(`/register?token=${encodeURIComponent(token)}&edit=true${shopIdParam}`)
@@ -243,10 +221,10 @@ export default function RegisterConfirmationPage() {
 
   const handleLogoClick = () => router.push('/')
 
-  const handleModalClose = async () => {
+  const handleModalClose = () => {
     setShowSuccessModal(false)
-    // セキュリティ改善：メールアドレスをセッションに保存しない
-    // プラン登録画面では、認証トークンから /api/user/me で取得する
+    // モーダルを閉じた後、プラン登録画面に遷移（セッションストレージにメールアドレスを保存）
+    sessionStorage.setItem('userEmail', email)
     // window.location.hrefを使用して強制的に遷移
     if (typeof window !== 'undefined') {
       window.location.href = '/plan-registration?saitamaAppLinked=true'
@@ -255,11 +233,10 @@ export default function RegisterConfirmationPage() {
     }
   }
 
-  const handleSaitamaFailedModalClose = async () => {
+  const handleSaitamaFailedModalClose = () => {
     setShowSaitamaFailedModal(false)
-    // セキュリティ改善：メールアドレスをセッションに保存しない
-    // プラン登録画面では、認証トークンから /api/user/me で取得する
     // さいたま市アプリ連携なしでプラン登録画面に遷移
+    sessionStorage.setItem('userEmail', email)
     if (typeof window !== 'undefined') {
       window.location.href = '/plan-registration'
     } else {
