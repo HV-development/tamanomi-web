@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
     })()
     
     if (data.accessToken) {
+      // 通常のCookie（開発環境・本番環境の両方で動作）
       res.cookies.set('accessToken', data.accessToken, {
         httpOnly: true,
         secure: isSecure,
@@ -47,15 +48,19 @@ export async function POST(request: NextRequest) {
         path: '/',
         maxAge: 60 * 15, // 15分
       })
-      res.cookies.set('__Host-accessToken', data.accessToken, {
-        httpOnly: true,
-        secure: isSecure,
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 60 * 15,
-      })
+      // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
+      if (isSecure) {
+        res.cookies.set('__Host-accessToken', data.accessToken, {
+          httpOnly: true,
+          secure: true, // __Host-プレフィックスにはsecure: trueが必須
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 15,
+        })
+      }
     }
     if (data.refreshToken) {
+      // 通常のCookie（開発環境・本番環境の両方で動作）
       res.cookies.set('refreshToken', data.refreshToken, {
         httpOnly: true,
         secure: isSecure,
@@ -63,13 +68,16 @@ export async function POST(request: NextRequest) {
         path: '/',
         maxAge: 60 * 60 * 24 * 30, // 30日
       })
-      res.cookies.set('__Host-refreshToken', data.refreshToken, {
-        httpOnly: true,
-        secure: isSecure,
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 30,
-      })
+      // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
+      if (isSecure) {
+        res.cookies.set('__Host-refreshToken', data.refreshToken, {
+          httpOnly: true,
+          secure: true, // __Host-プレフィックスにはsecure: trueが必須
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 30,
+        })
+      }
     }
     
     return res

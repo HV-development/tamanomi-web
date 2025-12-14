@@ -8,6 +8,20 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
+    // デバッグログ: Cookieの存在確認
+    const accessTokenCookie = request.cookies.get('accessToken');
+    const hostAccessTokenCookie = request.cookies.get('__Host-accessToken');
+    const refreshTokenCookie = request.cookies.get('refreshToken');
+    const hostRefreshTokenCookie = request.cookies.get('__Host-refreshToken');
+    
+    console.log('🔍 [user/me] Cookie check:', {
+      hasAccessToken: !!accessTokenCookie?.value,
+      hasHostAccessToken: !!hostAccessTokenCookie?.value,
+      hasRefreshToken: !!refreshTokenCookie?.value,
+      hasHostRefreshToken: !!hostRefreshTokenCookie?.value,
+      cookieHeader: request.headers.get('cookie')?.substring(0, 100) || 'none',
+    });
+
     const authHeader = getAuthHeader(request)
     
     if (!authHeader) {
@@ -24,7 +38,12 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
 
     if (!response.ok) {
-      console.error('❌ [user/me] Backend API error:', data)
+      console.error('❌ [user/me] Backend API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: data,
+        url: fullUrl,
+      })
       
       // 401または403エラーの場合、リフレッシュトークンで再試行
       if (response.status === 401 || response.status === 403) {
@@ -58,6 +77,7 @@ export async function GET(request: NextRequest) {
               
               // 新しいトークンをCookieに設定
               if (refreshData.accessToken) {
+                // 通常のCookie（開発環境・本番環境の両方で動作）
                 res.cookies.set('accessToken', refreshData.accessToken, {
                   httpOnly: true,
                   secure: isSecure,
@@ -65,15 +85,19 @@ export async function GET(request: NextRequest) {
                   path: '/',
                   maxAge: 60 * 15, // 15分
                 })
-                res.cookies.set('__Host-accessToken', refreshData.accessToken, {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: 60 * 15,
-                })
+                // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
+                if (isSecure) {
+                  res.cookies.set('__Host-accessToken', refreshData.accessToken, {
+                    httpOnly: true,
+                    secure: true, // __Host-プレフィックスにはsecure: trueが必須
+                    sameSite: 'strict',
+                    path: '/',
+                    maxAge: 60 * 15,
+                  })
+                }
               }
               if (refreshData.refreshToken) {
+                // 通常のCookie（開発環境・本番環境の両方で動作）
                 res.cookies.set('refreshToken', refreshData.refreshToken, {
                   httpOnly: true,
                   secure: isSecure,
@@ -81,13 +105,16 @@ export async function GET(request: NextRequest) {
                   path: '/',
                   maxAge: 60 * 60 * 24 * 30, // 30日
                 })
-                res.cookies.set('__Host-refreshToken', refreshData.refreshToken, {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: 60 * 60 * 24 * 30,
-                })
+                // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
+                if (isSecure) {
+                  res.cookies.set('__Host-refreshToken', refreshData.refreshToken, {
+                    httpOnly: true,
+                    secure: true, // __Host-プレフィックスにはsecure: trueが必須
+                    sameSite: 'strict',
+                    path: '/',
+                    maxAge: 60 * 60 * 24 * 30,
+                  })
+                }
               }
               
               return res
