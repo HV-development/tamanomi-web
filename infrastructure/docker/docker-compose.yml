@@ -10,6 +10,8 @@ services:
       - "3000:3000"
     env_file:
       - ../../frontend/.env
+    environment:
+      - DOCKER_ENV=true
     volumes:
       - ../../frontend/src:/app/src
       - ../../frontend/public:/app/public

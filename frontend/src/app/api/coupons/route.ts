@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { getAuthHeader } from '@/lib/auth-header'
 import { secureFetch, secureFetchWithAuth } from '@/lib/fetch-utils'

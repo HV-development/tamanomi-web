@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { getAuthHeader, getRefreshToken } from '@/lib/auth-header'
 import { secureFetch, secureFetchWithAuth } from '@/lib/fetch-utils'
-import { createNoCacheResponse, addNoCacheHeaders } from '@/lib/response-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { secureFetch } from '@/lib/fetch-utils'
 import { createNoCacheResponse, addNoCacheHeaders } from '@/lib/response-utils'

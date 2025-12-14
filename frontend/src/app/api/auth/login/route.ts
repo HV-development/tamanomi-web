@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { secureFetch } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
@@ -62,9 +62,11 @@ export async function POST(request: NextRequest) {
     // 現時点では単純にレスポンスを返す
 
     return createNoCacheResponse(data)
-  } catch {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('❌ [auth/login] Route error:', errorMessage, error)
     return createNoCacheResponse(
-      { error: 'ログイン処理中にエラーが発生しました' },
+      { error: 'ログイン処理中にエラーが発生しました', details: errorMessage },
       { status: 500 }
     )
   }

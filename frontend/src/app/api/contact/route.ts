@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { secureFetch } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 // サーバーサイドなのでNEXT_PUBLIC_プレフィックスなしの環境変数を使用
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002';
+// api-config.tsから変換済みのAPI_BASE_URLをインポート（Dockerネットワーク内の`api`ホスト名を`localhost`に変換済み）
+import { API_BASE_URL } from '@/lib/api-config'
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { encrypt, decrypt, COOKIE_NAME, SESSION_MAX_AGE } from '@/lib/session-encryption'
 import { secureFetch } from '@/lib/fetch-utils'

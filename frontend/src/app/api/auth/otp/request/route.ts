@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { otpRequestSchema } from '@/schemas/auth'
 import { secureFetch } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
