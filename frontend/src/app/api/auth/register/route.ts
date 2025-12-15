@@ -29,10 +29,12 @@ export async function POST(request: NextRequest) {
       postalCode?: string;
       address?: string;
       birthDate?: string;
+      gender?: string;
       phone?: string;
       saitamaAppId?: string;
       referrerUserId?: string;
       shopId?: string;
+      token?: string;
     }
     let body: RequestBody
     try {
@@ -73,10 +75,12 @@ export async function POST(request: NextRequest) {
       postalCode?: string;
       address?: string;
       birthDate?: string;
+      gender?: string;
       phone?: string;
       saitamaAppId?: string;
       referrerUserId?: string;
       shopId?: string;
+      token?: string;
     }
     const validatedData: ValidatedData = {
       // emailはスキーマでオプショナルになったため、送信しない（トークンから取得される）

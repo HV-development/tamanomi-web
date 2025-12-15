@@ -5,8 +5,9 @@ import { createNoCacheResponse } from '@/lib/response-utils'
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
 
 /**
- * トークンからメールアドレスを取得するAPIプロキシ
- * URLパラメータにメールアドレスを含めないためのセキュリティ改善
+ * トークン情報を取得するAPIプロキシ
+ * セキュリティ改善：メールアドレスはレスポンスに含めず、トークンの有効性のみを返す
+ * POSTメソッドを使用してトークンをボディで送信（プロキシログへの記録を防止）
  */
 export async function GET(request: NextRequest) {
     try {
@@ -19,15 +20,16 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        // バックエンドAPIにプロキシ
+        // バックエンドAPIにプロキシ（POSTメソッドでトークンをボディで送信）
         const response = await secureFetchWithCommonHeaders(
             request,
-            `${API_BASE_URL}/api/v1/register/token-info?token=${encodeURIComponent(token)}`,
+            `${API_BASE_URL}/api/v1/register/token-info`,
             {
-                method: 'GET',
+                method: 'POST',
                 headerOptions: {
                     requireAuth: false,
                 },
+                body: JSON.stringify({ token }),
             }
         )
 

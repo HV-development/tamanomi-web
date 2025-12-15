@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { getCookie, deleteCookie } from '@/lib/cookie'
 
 /**
  * PayPay決済専用画面（Suspense内で動作する実体コンポーネント）
@@ -16,9 +17,12 @@ export function PayPayCheckoutContent() {
       const decoded = decodeURIComponent(htmlFromParam)
       setRedirectHtml(decoded)
     } else {
-      const stored = typeof window !== 'undefined' ? sessionStorage.getItem('paypayRedirectHtml') : null
+      // Cookieから取得
+      const stored = getCookie('tamanomi_payment_paypayHtml')
       if (stored) {
         setRedirectHtml(stored)
+        // 使用後は削除
+        deleteCookie('tamanomi_payment_paypayHtml')
       }
     }
   }, [searchParams])

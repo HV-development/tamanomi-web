@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Loader2, ArrowLeft, CheckCircle, XCircle, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/atoms/Button'
 import { getQrTransaction } from '@/lib/api-client'
+import { getCookie, deleteCookie } from '@/lib/cookie'
 
 /**
  * イオンペイ決済のQRコード画面
@@ -92,10 +93,10 @@ function AeonPayQrCodeContent() {
       setQrCodeUrl(qrCodeUrlParam)
       setIsLoading(false)
     } else if (paymentTransactionIdParam) {
-      // paymentTransactionIdがある場合は、セッションストレージから取得を試みる
-      const storedQrCodeUrl = sessionStorage.getItem(`qrCodeUrl_${paymentTransactionIdParam}`)
-      const storedTransactionId = sessionStorage.getItem(`transactionId_${paymentTransactionIdParam}`)
-      const storedPlanId = sessionStorage.getItem(`planId_${paymentTransactionIdParam}`)
+      // paymentTransactionIdがある場合は、Cookieから取得を試みる
+      const storedQrCodeUrl = getCookie(`tamanomi_payment_qrCodeUrl_${paymentTransactionIdParam}`)
+      const storedTransactionId = getCookie(`tamanomi_payment_transactionId_${paymentTransactionIdParam}`)
+      const storedPlanId = getCookie(`tamanomi_payment_planId_${paymentTransactionIdParam}`)
       
       if (storedQrCodeUrl) {
         setQrCodeUrl(storedQrCodeUrl)
@@ -148,10 +149,18 @@ function AeonPayQrCodeContent() {
           }
           // 成功画面に遷移（少し遅延を入れてユーザーに確認してもらう）
           setTimeout(() => {
-            const currentPlanId = planId || (typeof window !== 'undefined' && paymentTransactionId ? sessionStorage.getItem(`planId_${paymentTransactionId}`) : null)
+            const currentPlanId = planId || (paymentTransactionId ? getCookie(`tamanomi_payment_planId_${paymentTransactionId}`) : null)
             const successUrl = currentPlanId 
               ? `/plan-registration/success?planId=${currentPlanId}&paymentMethod=AeonPay`
               : `/plan-registration/success?paymentMethod=AeonPay`
+            
+            // 決済完了後、Cookieを削除
+            if (paymentTransactionId) {
+              deleteCookie(`tamanomi_payment_qrCodeUrl_${paymentTransactionId}`)
+              deleteCookie(`tamanomi_payment_transactionId_${paymentTransactionId}`)
+              deleteCookie(`tamanomi_payment_planId_${paymentTransactionId}`)
+            }
+            
             router.push(successUrl)
           }, 2000)
         } else if (data.status === 'FAILED') {

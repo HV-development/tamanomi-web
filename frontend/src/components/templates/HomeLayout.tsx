@@ -364,28 +364,18 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     }
   }, [items, isStoresLoading, dispatch, state.stores])
 
-  // データが完全に読み込まれたら、ログイン後のリダイレクトフラグをクリア
+  // データが完全に読み込まれたら、マウント通知を送信
+  // ログインリダイレクトフラグはhome/page.tsxで管理（メモリ内stateのみ）
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
-      const shouldClearFlag = loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')
-
-      if (shouldClearFlag && state.isDataLoaded && !isStoresLoading) {
-        // レンダリングが完了するのを待つため、複数のフレームでフラグをクリア
+    if (state.isDataLoaded && !isStoresLoading && onMount) {
+      // レンダリングが完了するのを待つため、複数のフレームで通知
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              sessionStorage.removeItem('loginRedirecting')
-              if (onMount) {
-                onMount()
-              }
-            })
+            onMount()
           })
         })
-      } else if (!shouldClearFlag && onMount) {
-        // フラグがない場合でもマウント通知を送る
-        onMount()
-      }
+      })
     }
   }, [state.isDataLoaded, isStoresLoading, onMount])
 
@@ -535,11 +525,9 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
 
     // プラン管理画面の場合
     if (myPageView === "plan-management") {
-      // カード登録状態を確認（sessionStorageのみを使用、localStorageは廃止）
-      const hasPaymentMethod = typeof window !== 'undefined' && (
-        !!sessionStorage.getItem('paygentCustomerCardId') ||
-        !!sessionStorage.getItem('paygentCustomerId')
-      )
+      // カード登録状態を確認（Cookieベースの認証のみを使用、sessionStorageは使用しない）
+      // PaymentSessionから取得するか、APIから直接取得
+      const hasPaymentMethod = false // 一時的にfalse（APIから取得する必要がある）
 
       if (!plan) {
         return (

@@ -1,17 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { RegisterConfirmationContainer } from '@/components/organisms/RegisterConfirmationContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
 import { Modal } from '@/components/atoms/Modal'
 import { Button } from '@/components/atoms/Button'
+import { useRegisterStore } from '@/stores/register-store'
 
 export default function RegisterConfirmationPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingEmail, setIsLoadingEmail] = useState(true)
-  const [formData, _setFormData] = useState<UserRegistrationComplete | null>(null)
-  const [email, setEmail] = useState<string>('')
+  const [formData, setFormData] = useState<UserRegistrationComplete | null>(null)
+  // セキュリティ改善：メールアドレスはAPIから取得せず、表示も不要
+  const [email] = useState<string>('')
   const [token, setToken] = useState<string>('')
   const [isClient, setIsClient] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
@@ -20,9 +22,17 @@ export default function RegisterConfirmationPage() {
   const [shopId, setShopId] = useState<string | undefined>(undefined)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const clearFormData = useRegisterStore((state) => state.clearFormData)
+  const initializedRef = useRef(false)
 
   // クライアントサイドでのみ searchParams を取得
   useEffect(() => {
+    // React Strict Modeでの二重実行を防ぐ
+    if (initializedRef.current) {
+      return
+    }
+    initializedRef.current = true
+    
     setIsClient(true)
     
     const initializePage = async () => {
@@ -43,14 +53,13 @@ export default function RegisterConfirmationPage() {
 
       setToken(tokenParam)
 
-      // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
-      // フォームデータがない場合は登録画面に戻す
-      // メールアドレスはAPIから取得
+      // セキュリティ改善：メールアドレスはAPIから取得せず、トークンの有効性のみをチェック
       try {
-        const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
+        // トークンの有効性をチェック
+        const tokenResponse = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
         
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
+        if (!tokenResponse.ok) {
+          const errorData = await tokenResponse.json().catch(() => ({}))
           if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
             setError('トークンの有効期限が切れています。再度メール登録からやり直してください。')
           } else {
@@ -61,13 +70,44 @@ export default function RegisterConfirmationPage() {
           return
         }
 
-        const data = await response.json()
-        setEmail(data.email)
+        // トークンが有効であることを確認（メールアドレスは取得しない）
+        const tokenData = await tokenResponse.json()
+        if (!tokenData.valid) {
+          setError('トークンが無効です。再度メール登録からやり直してください。')
+          setTimeout(() => router.push('/email-registration'), 3000)
+          setIsLoadingEmail(false)
+          return
+        }
         
-        // フォームデータがない場合は登録画面に戻す
-        alert('セッションが切れました。お手数ですが、再度情報を入力してください。')
-        const shopIdParamForRedirect = shopIdParam ? `&shop_id=${encodeURIComponent(shopIdParam)}` : ''
-        router.push(`/register?token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`)
+        // Zustandストアからフォームデータを取得
+        // 直接インポートしたストアから取得（動的インポートでは異なるインスタンスになる可能性があるため）
+        // 少し待ってから取得することで、前のページからのデータ保存が確実に完了する
+        // 最大3回までリトライ（React Strict Modeでの二重実行に対応）
+        let currentFormData = null
+        for (let i = 0; i < 3; i++) {
+          await new Promise(resolve => setTimeout(resolve, 50 * (i + 1)))
+          currentFormData = useRegisterStore.getState().formData
+          if (currentFormData) {
+            break
+          }
+        }
+        
+        // デバッグ: 取得したデータを確認
+        console.log('[register-confirmation/page] Form data from Zustand store:', currentFormData ? 'Data exists' : 'No data')
+        console.log('[register-confirmation/page] Form data keys:', currentFormData ? Object.keys(currentFormData) : 'No data')
+        
+        if (!currentFormData) {
+          // フォームデータがない場合は登録画面に戻す
+          console.warn('[register-confirmation/page] No form data found in Zustand store, redirecting to register page')
+          const shopIdParamForRedirect = shopIdParam ? `&shop_id=${encodeURIComponent(shopIdParam)}` : ''
+          router.push(`/register?token=${encodeURIComponent(tokenParam)}${shopIdParamForRedirect}`)
+          setIsLoadingEmail(false)
+          return
+        }
+        
+        // ローカルstateに保存してから、セキュリティ: データ取得後、即座にストアから削除（メモリからも削除）
+        setFormData(currentFormData)
+        clearFormData()
       } catch {
         setError('エラーが発生しました。再度お試しください。')
         setTimeout(() => router.push('/email-registration'), 3000)
@@ -77,7 +117,7 @@ export default function RegisterConfirmationPage() {
     }
 
     initializePage()
-  }, [router])
+  }, [router, clearFormData])
 
   const handleRegister = async () => {
     // 連続押下を防ぐ
@@ -94,17 +134,17 @@ export default function RegisterConfirmationPage() {
       
       // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       // referrerUserIdはURLパラメータから取得するか、Cookieから取得する
-      const referrerUserId = undefined; // 必要に応じてCookieから取得する実装を追加
-      
+      // 必要に応じてCookieから取得する実装を追加
+      const referrerUserId: string | undefined = undefined
 
-      // バックエンドAPIに登録リクエストを送信
+        // バックエンドAPIに登録リクエストを送信
+      // セキュリティ改善：メールアドレスはリクエストボディに含めず、トークンから取得される
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: email,
           password: formData.password,
           passwordConfirm: formData.passwordConfirm,
           nickname: formData.nickname,
@@ -116,7 +156,7 @@ export default function RegisterConfirmationPage() {
           // 空文字列の場合はundefinedとして送信しない
           saitamaAppId: saitamaAppIdValue,
           // 紹介者IDを追加
-          referrerUserId: referrerUserId && referrerUserId.trim() !== '' ? referrerUserId.trim() : undefined,
+          referrerUserId: referrerUserId,
           token: token,
           shopId: shopId,
         }),
@@ -125,6 +165,9 @@ export default function RegisterConfirmationPage() {
       const result = await response.json()
 
       if (response.ok) {
+        // セキュリティ: 登録成功後、Zustandストアからフォームデータを削除（既に削除済みだが念のため）
+        clearFormData()
+
         // Cookieベースの認証のみを使用（localStorageは廃止）
         // トークンはサーバー側でCookieに設定されるため、フロントエンドでの保存は不要
         // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない

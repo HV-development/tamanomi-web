@@ -4,17 +4,20 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { RegisterContainer } from '@/components/organisms/RegisterContainer'
 import { UserRegistrationComplete } from "@hv-development/schemas"
+import { useRegisterStore } from '@/stores/register-store'
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingEmail, setIsLoadingEmail] = useState(true)
-  const [email, setEmail] = useState<string | undefined>(undefined)
+  // セキュリティ改善：メールアドレスはAPIから取得せず、表示も不要
+  const [email] = useState<string | undefined>(undefined)
   const [token, setToken] = useState<string | undefined>(undefined)
   const [shopId, setShopId] = useState<string | undefined>(undefined)
   const [isClient, setIsClient] = useState(false)
   const [initialFormData, _setInitialFormData] = useState<UserRegistrationComplete | null>(null)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const { setFormData } = useRegisterStore()
 
   // クライアントサイドでのみ searchParams を取得し、APIからメールアドレスを取得
   useEffect(() => {
@@ -41,9 +44,9 @@ export default function RegisterPage() {
       // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       // referrerUserIdはURLパラメータから直接取得するか、Cookieに保存する
       // 編集モードの場合、フォームデータはCookieから取得するか、再入力してもらう
-      // メールアドレスは常にAPIから取得する
+      // セキュリティ改善：メールアドレスはAPIから取得せず、トークンの有効性のみをチェック
 
-      // トークンからメールアドレスを取得（セキュリティ改善：URLパラメータにメールアドレスを含めない）
+      // トークンの有効性をチェック（セキュリティ改善：メールアドレスはレスポンスに含まれない）
       try {
         const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
         
@@ -58,8 +61,13 @@ export default function RegisterPage() {
           return
         }
 
+        // トークンが有効であることを確認（メールアドレスは取得しない）
         const data = await response.json()
-        setEmail(data.email)
+        if (!data.valid) {
+          setError('トークンが無効です。再度メール登録からやり直してください。')
+          setTimeout(() => router.push('/email-registration'), 3000)
+          return
+        }
         // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       } catch {
         setError('エラーが発生しました。再度お試しください。')
@@ -72,7 +80,7 @@ export default function RegisterPage() {
     initializePage()
   }, [router])
 
-  const handleRegisterSubmit = async (_data: UserRegistrationComplete) => {
+  const handleRegisterSubmit = async (data: UserRegistrationComplete) => {
     // 連続押下を防ぐ
     if (isLoading) {
       return
@@ -80,9 +88,18 @@ export default function RegisterPage() {
 
     setIsLoading(true)
 
-    // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
-    // フォームデータは確認画面で再入力してもらうか、Cookieに保存する
-    // 確認画面に遷移（emailパラメータを削除 - セキュリティ改善）
+    // フォームデータをZustandストアに保存（メモリのみ、ネットワーク経由で送信されない）
+    setFormData(data)
+    
+    // デバッグ: 保存されたデータを確認
+    const savedData = useRegisterStore.getState().formData
+    console.log('[register/page] Form data saved to Zustand store:', savedData ? 'Data exists' : 'No data')
+    console.log('[register/page] Saved data keys:', savedData ? Object.keys(savedData) : 'No data')
+    
+    // 確認画面に遷移（クライアントサイドのみ）
+    // 次のイベントループで遷移することで、Zustandストアへの保存が確実に完了する
+    await new Promise(resolve => setTimeout(resolve, 0))
+    
     const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
     router.push(`/register-confirmation?token=${encodeURIComponent(token || '')}${shopIdParam}`)
     setIsLoading(false)

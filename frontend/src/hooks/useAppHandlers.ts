@@ -193,12 +193,8 @@ export const useAppHandlers = (
                 targetPath = '/home'
             }
 
-            // ローディング継続フラグをセッションストレージに設定
-            // 遷移先のページで完全に表示されたらクリアされる
-            if (typeof window !== 'undefined') {
-                sessionStorage.setItem('loginRedirecting', targetPath)
-            }
-
+            // メモリ内stateのみで管理（sessionStorageは使用しない）
+            // リダイレクト先のページでstateを管理する
             router.replace(targetPath)
 
             dispatch({ type: 'RESET_LOGIN_STATE' })

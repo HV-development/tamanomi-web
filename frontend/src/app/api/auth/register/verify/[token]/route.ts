@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { addNoCacheHeaders } from '@/lib/response-utils'
-
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
+import { API_BASE_URL } from '@/lib/api-config'
 
 export async function GET(
     request: NextRequest,
@@ -16,16 +15,17 @@ export async function GET(
         }
 
         // トークンはUUIDのみで、メールアドレスなどの個人情報は含まれない（セキュリティ改善）
-        // バックエンドAPIでトークンを検証
+        // バックエンドAPIでトークンを検証（POSTメソッドでトークンをボディで送信）
         try {
             const response = await secureFetchWithCommonHeaders(
                 request,
-                `${API_BASE_URL}/api/v1/register/token-info?token=${encodeURIComponent(token)}`,
+                `${API_BASE_URL}/api/v1/register/token-info`,
                 {
-                    method: 'GET',
+                    method: 'POST',
                     headerOptions: {
                         requireAuth: false,
                     },
+                    body: JSON.stringify({ token }),
                 }
             )
 
