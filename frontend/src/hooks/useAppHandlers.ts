@@ -1423,5 +1423,5 @@ export const useAppHandlers = (
         handlePasswordChangeComplete,
         handleStoreIntroduction,
         handleStoreIntroductionSubmit,
-    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: any) => Promise<void> }
+    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: { referrerUserId?: string; shopId?: string }) => Promise<void> }
 }

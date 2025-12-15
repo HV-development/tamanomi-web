@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
 
@@ -16,12 +17,16 @@ export async function GET(
         // トークンはUUIDのみで、メールアドレスなどの個人情報は含まれない（セキュリティ改善）
         // バックエンドAPIでトークンを検証
         try {
-            const response = await fetch(`${API_BASE_URL}/api/v1/register/token-info?token=${encodeURIComponent(token)}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
+            const response = await secureFetchWithCommonHeaders(
+                request,
+                `${API_BASE_URL}/api/v1/register/token-info?token=${encodeURIComponent(token)}`,
+                {
+                    method: 'GET',
+                    headerOptions: {
+                        requireAuth: false,
+                    },
+                }
+            )
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))

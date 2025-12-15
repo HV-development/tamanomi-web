@@ -99,7 +99,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    let data: any = {}
+    interface ShopData {
+      shops?: unknown[];
+      total?: number;
+      error?: unknown;
+    }
+    let data: ShopData = {}
     try {
       const contentType = response.headers.get('content-type')
       if (contentType && contentType.includes('application/json')) {

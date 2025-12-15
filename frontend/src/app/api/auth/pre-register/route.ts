@@ -24,18 +24,24 @@ export async function POST(request: NextRequest) {
     const fullUrl = buildApiUrl('/pre-register');
 
     try {
-      const requestBody: any = {
+      interface RequestBody {
+        email: string;
+        campaignCode?: string;
+        referrerUserId?: string;
+        shopId?: string;
+      }
+      const requestBody: RequestBody = {
         email: body.email,
         campaignCode: body.campaignCode,
       };
       
       // 紹介者IDがある場合は追加
-      if (body.referrerUserId && body.referrerUserId.trim() !== '') {
+      if (body.referrerUserId && typeof body.referrerUserId === 'string' && body.referrerUserId.trim() !== '') {
         requestBody.referrerUserId = body.referrerUserId.trim();
       }
 
       // shopIdがある場合は追加
-      if (body.shopId && body.shopId.trim() !== '') {
+      if (body.shopId && typeof body.shopId === 'string' && body.shopId.trim() !== '') {
         requestBody.shopId = body.shopId.trim();
       }
 

@@ -188,8 +188,15 @@ test.describe('認証フローのテスト', () => {
             const mailhogUrl = 'http://localhost:8025/api/v2/messages';
             const mailResponse = await request.get(mailhogUrl);
             const mailData = await mailResponse.json();
-            const targetMail = mailData.items?.find((item: any) =>
-                item.Content.Headers.To[0].includes(TEST_EMAIL)
+            interface MailItem {
+                Content: {
+                    Headers: {
+                        To?: string[];
+                    };
+                };
+            }
+            const targetMail = (mailData.items as MailItem[] | undefined)?.find((item: MailItem) =>
+                item.Content.Headers.To?.[0]?.includes(TEST_EMAIL)
             );
             if (targetMail) {
                 console.log('MailHogメール本文:', targetMail.Content.Body.substring(0, 500));

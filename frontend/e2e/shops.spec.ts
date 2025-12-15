@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page, APIRequestContext } from '@playwright/test';
 import { getLatestOtp as getLatestOtpFromMailHog } from './utils/mailhog';
 
 // 環境変数からテスト用の認証情報を取得
@@ -8,7 +8,7 @@ const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || 'users123';
 /**
  * 実際のログインを実行して認証済み状態をセットアップするヘルパー関数
  */
-async function setupAuthenticatedState(page: any, request: any) {
+async function setupAuthenticatedState(page: Page, request: APIRequestContext) {
     // ログインページにアクセス
     await page.goto('/login');
     

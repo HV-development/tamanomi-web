@@ -32,6 +32,9 @@ import { HamburgerMenu } from "../molecules/HamburgerMenu"
 import { UsageGuideModal } from "@/components/organisms/UsageGuideModal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
+import type { Coupon } from "@/types/coupon"
+import type { MyPageViewType } from "@/types/navigation"
+import type { AppAction } from '@hv-development/schemas'
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"
 import { useFavorites } from "@/hooks/useFavorites"
 import { calculateAge } from "@/utils/age-calculator"
@@ -265,8 +268,12 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onWithdrawConfirm = handlers.handleWithdrawConfirm
   const onWithdrawCancel = handlers.handleWithdrawCancel
   const onWithdrawComplete = handlers.handleWithdrawComplete
-  const onStoreIntroduction = (handlers as any).handleStoreIntroduction
-  const onStoreIntroductionSubmit = (handlers as any).handleStoreIntroductionSubmit
+  interface ExtendedHandlers {
+    handleStoreIntroduction: () => void;
+    handleStoreIntroductionSubmit: (data: { referrerUserId?: string; shopId?: string }) => Promise<void>;
+  }
+  const onStoreIntroduction = (handlers as ExtendedHandlers).handleStoreIntroduction
+  const onStoreIntroductionSubmit = (handlers as ExtendedHandlers).handleStoreIntroductionSubmit
   const onLogout = handlers.handleLogout
   const onLogin = handlers.handleLogin
   const onSignup = handlers.handleSignup
@@ -353,7 +360,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       || (state.stores?.[0]?.id !== items?.[0]?.id)
     if (needUpdate) {
       // itemsをStore型に変換（型アサーションを使用）
-      dispatch({ type: 'SET_STORES', payload: items as any })
+      dispatch({ type: 'SET_STORES', payload: items } as AppAction)
       dispatch({ type: 'SET_DATA_LOADED', payload: true })
     }
   }, [items, isStoresLoading, dispatch, state.stores])
@@ -435,7 +442,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   if (currentView === "coupon-confirmation") {
     return (
       <CouponConfirmationPage
-        coupon={selectedCoupon as any}
+        coupon={selectedCoupon}
         onConfirm={onConfirmCoupon}
         onCancel={onCancelCoupon}
       />
@@ -581,7 +588,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         usageHistory={usageHistory}
         paymentHistory={paymentHistory}
         currentView={myPageView}
-        onViewChange={(view: string) => onMyPageViewChange(view as any)}
+        onViewChange={(view: string) => onMyPageViewChange(view as MyPageViewType)}
         onEditProfile={onEditProfile}
         onChangeEmail={onChangeEmail}
         onChangePassword={onChangePassword}
@@ -863,8 +870,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
           selectedAreas={selectedAreas}
           isNearbyFilter={isNearbyFilter}
           isFavoritesFilter={isFavoritesFilter}
-          stores={mergedStores as any}
-          onStoreClick={onStoreClick as any}
+          stores={mergedStores}
+          onStoreClick={onStoreClick}
           onFavoriteToggle={onFavoriteToggle}
           onCouponsClick={onCouponsClick}
           isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
@@ -880,7 +887,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       {/* お気に入り一覧ポップアップ */}
       <HistoryPopup
         isOpen={isFavoritesOpen}
-        stores={favoriteStores as any}
+        stores={favoriteStores}
         onClose={onFavoritesClose}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
@@ -911,7 +918,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       <CouponListPopup
         isOpen={isCouponListOpen}
         storeName={selectedStore?.name || ""}
-        coupons={storeCoupons as any}
+        coupons={storeCoupons}
         onClose={onCouponListClose}
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
@@ -930,7 +937,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       {/* クーポン使用成功モーダル */}
       <CouponUsedSuccessModal
         isOpen={isSuccessModalOpen}
-        coupon={selectedCoupon as any}
+        coupon={selectedCoupon}
         onClose={onSuccessModalClose ?? (() => { })}
       />
 
