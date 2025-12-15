@@ -14,6 +14,7 @@ export const usePaymentMethodChange = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const fromPlanChange = searchParams.get('from') === 'plan-change'
+  const planId = searchParams.get('planId') // プラン変更時のplanId
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -63,26 +64,32 @@ export const usePaymentMethodChange = () => {
       // モックモードの判定
       const isMockMode = useMockPayment || !paymentCard
 
-      // モックモードの場合
+      // モックモードの場合も、カード登録API（/api/payment/register）を使用
+      // /api/payment/updateは継続課金の更新（amount/endScheduledが必要）に使用するため、支払い方法変更には不適切
       if (isMockMode) {
         const mockCustomerId = paymentCard?.paygentCustomerId || `cust_${Date.now()}`
-        const mockCustomerCardId = paymentCard?.paygentCustomerCardId || 'mock_initial'
 
-        const response = await fetch('/api/payment/update', {
+        const requestBody: Record<string, string> = {
+          customerId: mockCustomerId,
+          // userEmailはバックエンドで認証トークンから取得するため、送信しない
+        }
+
+        // プラン変更時の場合はplanIdを送信
+        if (fromPlanChange && planId) {
+          requestBody.planId = planId
+        }
+
+        const response = await fetch('/api/payment/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            customerId: mockCustomerId,
-            customerCardId: mockCustomerCardId,
-            // userEmailはバックエンドで認証トークンから取得するため、送信しない
-          })
+          body: JSON.stringify(requestBody)
         })
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.error || 'PaymentSession作成に失敗しました')
+          throw new Error(errorData.error || errorData.message || 'PaymentSession作成に失敗しました')
         }
 
         await response.json()
@@ -102,10 +109,14 @@ export const usePaymentMethodChange = () => {
 
       // PayGentへのカード変更申込（リンクタイプ方式）
       // customerIdを送信（userEmailはバックエンドで認証トークンから取得）
-      // planIdは送信しない（planIdがない場合、バックエンドで支払い方法変更と判定される）
       const requestBody: Record<string, string> = {
         customerId: paymentCard.paygentCustomerId,
         // userEmailはバックエンドで認証トークンから取得するため、送信しない
+      }
+
+      // プラン変更時の場合はplanIdを送信（プラン変更と同時に支払い方法を変更する場合）
+      if (fromPlanChange && planId) {
+        requestBody.planId = planId
       }
 
       const response = await fetch('/api/payment/register', {
