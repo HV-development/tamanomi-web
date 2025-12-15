@@ -888,6 +888,7 @@ export const useAppHandlers = (
             const endScheduled = formatDate(nextBillingDate)
 
             // 退会処理APIを呼び出し（Paygent継続課金ありの場合）
+            // userEmailはバックエンドで認証トークンから取得するため、送信しない
             const response = await fetch('/api/payment/update', {
                 method: 'POST',
                 headers: {
@@ -896,7 +897,6 @@ export const useAppHandlers = (
                 body: JSON.stringify({
                     customerId: user.paymentCard?.paygentCustomerId,
                     customerCardId: user.paymentCard?.paygentCustomerCardId,
-                    userEmail: user.email,
                     runningId: runningId,
                     endScheduled: endScheduled,
                     description: '退会処理',

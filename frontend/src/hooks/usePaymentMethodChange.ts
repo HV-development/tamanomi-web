@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 export const usePaymentMethodChange = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [userEmail, setUserEmail] = useState('')
   const [paymentCard, setPaymentCard] = useState<{
     paygentCustomerId: string
     paygentCustomerCardId: string
@@ -39,7 +38,6 @@ export const usePaymentMethodChange = () => {
 
         if (response.ok) {
           const userData = await response.json()
-          setUserEmail(userData.email)
           setPaymentCard(userData.paymentCard)
 
           // モックモードでない場合のみ、カード情報がないことをエラーとする
@@ -62,12 +60,6 @@ export const usePaymentMethodChange = () => {
       setIsLoading(true)
       setError('')
 
-      if (!userEmail || userEmail.trim() === '') {
-        setError('メールアドレスが見つかりません。')
-        setIsLoading(false)
-        return
-      }
-
       // モックモードの判定
       const isMockMode = useMockPayment || !paymentCard
 
@@ -84,7 +76,7 @@ export const usePaymentMethodChange = () => {
           body: JSON.stringify({
             customerId: mockCustomerId,
             customerCardId: mockCustomerCardId,
-            userEmail: userEmail,
+            // userEmailはバックエンドで認証トークンから取得するため、送信しない
           })
         })
 
@@ -109,11 +101,11 @@ export const usePaymentMethodChange = () => {
       }
 
       // PayGentへのカード変更申込（リンクタイプ方式）
-      // customerIdとuserEmailを送信
+      // customerIdを送信（userEmailはバックエンドで認証トークンから取得）
       // planIdは送信しない（planIdがない場合、バックエンドで支払い方法変更と判定される）
       const requestBody: Record<string, string> = {
         customerId: paymentCard.paygentCustomerId,
-        userEmail: userEmail,
+        // userEmailはバックエンドで認証トークンから取得するため、送信しない
       }
 
       const response = await fetch('/api/payment/register', {
@@ -168,7 +160,6 @@ export const usePaymentMethodChange = () => {
   return {
     isLoading,
     error,
-    userEmail,
     paymentCard,
     fromPlanChange,
     handleChangePaymentMethod,

@@ -11,7 +11,6 @@ export async function POST(request: NextRequest) {
     const {
       customerId,
       customerCardId,
-      userEmail,
       planId,
       runningId,
       tradingId,
@@ -38,22 +37,48 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // undefinedのフィールドを除外してバックエンドに送信
+    // セキュリティ改善：userEmailはバックエンドで認証トークンから取得するため、フロントエンドから送信しない
+    const backendRequestBody: Record<string, unknown> = {}
+
+    if (customerId) {
+      backendRequestBody.customerId = customerId
+    }
+
+    if (customerCardId) {
+      backendRequestBody.customerCardId = customerCardId
+    }
+
+    if (planId) {
+      backendRequestBody.planId = planId
+    }
+
+    if (runningId) {
+      backendRequestBody.runningId = runningId
+    }
+
+    if (tradingId) {
+      backendRequestBody.tradingId = tradingId
+    }
+
+    if (amount !== undefined) {
+      backendRequestBody.amount = amount
+    }
+
+    if (endScheduled) {
+      backendRequestBody.endScheduled = endScheduled
+    }
+
+    if (description) {
+      backendRequestBody.description = description
+    }
+
     const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
       headerOptions: {
         requireAuth: true, // 認証が必要
       },
-      body: JSON.stringify({
-        customerId,
-        customerCardId,
-        userEmail,
-        planId,
-        runningId,
-        tradingId,
-        amount, // プラン変更時のみ設定
-        endScheduled, // 退会時のみ設定
-        description,
-      }),
+      body: JSON.stringify(backendRequestBody),
     })
 
     if (!response.ok) {
