@@ -3,6 +3,7 @@ import type {
   PayPayTransactionStatusResponse,
 } from '@/types/payment'
 import type { PayPayPaymentRequest, QrPaymentRequest, QrPaymentResponse, QrGetTransactionResponse } from '@hv-development/schemas'
+import { buildClientHeaders } from './client-header-utils'
 
 /**
  * API呼び出しの共通処理
@@ -44,9 +45,12 @@ export class ApiClient {
     // credentials: 'include'でCookieから自動的に認証される
 
     try {
+      // 共通ヘッダーを生成
+      const commonHeaders = buildClientHeaders()
+      
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         headers: {
-          'Content-Type': 'application/json',
+          ...commonHeaders,
           ...headers,
         },
         credentials: 'include', // Cookieを送信
