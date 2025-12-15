@@ -75,14 +75,14 @@ export async function GET(request: NextRequest) {
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 15, // 15分
+                  maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
                 })
                 res.cookies.set('__Host-accessToken', refreshData.accessToken, {
                   httpOnly: true,
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 15,
+                  maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
                 })
               }
               if (refreshData.refreshToken) {
@@ -91,14 +91,14 @@ export async function GET(request: NextRequest) {
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 60 * 24 * 30, // 30日
+                  maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
                 })
                 res.cookies.set('__Host-refreshToken', refreshData.refreshToken, {
                   httpOnly: true,
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 60 * 24 * 30,
+                  maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
                 })
               }
               

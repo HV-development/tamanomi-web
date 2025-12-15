@@ -97,6 +97,7 @@ export const useAppHandlers = (
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Cookieを送信
                 body: JSON.stringify({ email: loginData.email, password: loginData.password }),
             })
 
@@ -112,6 +113,7 @@ export const useAppHandlers = (
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Cookieを送信
                 body: JSON.stringify({ email: loginData.email }),
             })
 
@@ -160,7 +162,9 @@ export const useAppHandlers = (
             // ログイン成功 - トークンはCookieに保存されているため、プラン登録状況を確認してauth状態を更新
             let hasPlan = false
             try {
-                const userResponse = await fetch('/api/user/me')
+                const userResponse = await fetch('/api/user/me', {
+                    credentials: 'include', // Cookieを送信
+                })
 
                 if (userResponse.ok) {
                     const userData = await userResponse.json()

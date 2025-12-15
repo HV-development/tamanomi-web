@@ -32,7 +32,6 @@ import { HamburgerMenu } from "../molecules/HamburgerMenu"
 import { UsageGuideModal } from "@/components/organisms/UsageGuideModal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
-import type { Coupon } from "@/types/coupon"
 import type { MyPageViewType } from "@/types/navigation"
 import type { AppAction } from '@hv-development/schemas'
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"

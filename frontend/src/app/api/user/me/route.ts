@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { getRefreshToken } from '@/lib/auth-header'
-import { secureFetchWithCommonHeaders, secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 15, // 15分
+                  maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
                 })
                 // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
                 if (isSecure) {
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
                     secure: true, // __Host-プレフィックスにはsecure: trueが必須
                     sameSite: 'strict',
                     path: '/',
-                    maxAge: 60 * 15,
+                    maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
                   })
                 }
               }
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 60 * 24 * 30, // 30日
+                  maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
                 })
                 // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
                 if (isSecure) {
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
                     secure: true, // __Host-プレフィックスにはsecure: trueが必須
                     sameSite: 'strict',
                     path: '/',
-                    maxAge: 60 * 60 * 24 * 30,
+                    maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
                   })
                 }
               }

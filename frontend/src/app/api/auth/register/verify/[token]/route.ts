@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { addNoCacheHeaders } from '@/lib/response-utils'
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
 
@@ -11,7 +12,7 @@ export async function GET(
         const { token } = await params
 
         if (!token) {
-            return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
+            return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url)))
         }
 
         // トークンはUUIDのみで、メールアドレスなどの個人情報は含まれない（セキュリティ改善）
@@ -34,9 +35,9 @@ export async function GET(
                 
                 // エラーコードに応じてリダイレクト
                 if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
-                    return NextResponse.redirect(new URL('/email-registration?error=token_expired', request.url))
+                    return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=token_expired', request.url)))
                 }
-                return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
+                return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url)))
             }
 
             // 検証成功 - 新規登録画面にリダイレクト（emailパラメータは含めない - セキュリティ改善）
@@ -55,11 +56,11 @@ export async function GET(
               registerUrl.searchParams.set('shop_id', shopIdFromQuery)
             }
 
-            return NextResponse.redirect(registerUrl)
+            return addNoCacheHeaders(NextResponse.redirect(registerUrl))
         } catch {
-            return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
+            return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url)))
         }
     } catch {
-        return NextResponse.redirect(new URL('/email-registration?error=verification_failed', request.url))
+        return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=verification_failed', request.url)))
     }
 }
