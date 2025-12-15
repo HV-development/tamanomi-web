@@ -32,6 +32,8 @@ import { HamburgerMenu } from "../molecules/HamburgerMenu"
 import { UsageGuideModal } from "@/components/organisms/UsageGuideModal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
+import type { MyPageViewType } from "@/types/navigation"
+import type { AppAction } from '@hv-development/schemas'
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"
 import { useFavorites } from "@/hooks/useFavorites"
 import { calculateAge } from "@/utils/age-calculator"
@@ -265,8 +267,12 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onWithdrawConfirm = handlers.handleWithdrawConfirm
   const onWithdrawCancel = handlers.handleWithdrawCancel
   const onWithdrawComplete = handlers.handleWithdrawComplete
-  const onStoreIntroduction = (handlers as any).handleStoreIntroduction
-  const onStoreIntroductionSubmit = (handlers as any).handleStoreIntroductionSubmit
+  interface ExtendedHandlers {
+    handleStoreIntroduction: () => void;
+    handleStoreIntroductionSubmit: (data: { referrerUserId?: string; shopId?: string }) => Promise<void>;
+  }
+  const onStoreIntroduction = (handlers as ExtendedHandlers).handleStoreIntroduction
+  const onStoreIntroductionSubmit = (handlers as ExtendedHandlers).handleStoreIntroductionSubmit
   const onLogout = handlers.handleLogout
   const onLogin = handlers.handleLogin
   const onSignup = handlers.handleSignup
@@ -353,33 +359,23 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       || (state.stores?.[0]?.id !== items?.[0]?.id)
     if (needUpdate) {
       // itemsをStore型に変換（型アサーションを使用）
-      dispatch({ type: 'SET_STORES', payload: items as any })
+      dispatch({ type: 'SET_STORES', payload: items } as AppAction)
       dispatch({ type: 'SET_DATA_LOADED', payload: true })
     }
   }, [items, isStoresLoading, dispatch, state.stores])
 
-  // データが完全に読み込まれたら、ログイン後のリダイレクトフラグをクリア
+  // データが完全に読み込まれたら、マウント通知を送信
+  // ログインリダイレクトフラグはhome/page.tsxで管理（メモリ内stateのみ）
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const loginRedirecting = sessionStorage.getItem('loginRedirecting')
-      const shouldClearFlag = loginRedirecting === '/home' || loginRedirecting?.startsWith('/home')
-
-      if (shouldClearFlag && state.isDataLoaded && !isStoresLoading) {
-        // レンダリングが完了するのを待つため、複数のフレームでフラグをクリア
+    if (state.isDataLoaded && !isStoresLoading && onMount) {
+      // レンダリングが完了するのを待つため、複数のフレームで通知
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              sessionStorage.removeItem('loginRedirecting')
-              if (onMount) {
-                onMount()
-              }
-            })
+            onMount()
           })
         })
-      } else if (!shouldClearFlag && onMount) {
-        // フラグがない場合でもマウント通知を送る
-        onMount()
-      }
+      })
     }
   }, [state.isDataLoaded, isStoresLoading, onMount])
 
@@ -435,7 +431,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   if (currentView === "coupon-confirmation") {
     return (
       <CouponConfirmationPage
-        coupon={selectedCoupon as any}
+        coupon={selectedCoupon}
         onConfirm={onConfirmCoupon}
         onCancel={onCancelCoupon}
       />
@@ -529,11 +525,9 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
 
     // プラン管理画面の場合
     if (myPageView === "plan-management") {
-      // カード登録状態を確認（sessionStorageのみを使用、localStorageは廃止）
-      const hasPaymentMethod = typeof window !== 'undefined' && (
-        !!sessionStorage.getItem('paygentCustomerCardId') ||
-        !!sessionStorage.getItem('paygentCustomerId')
-      )
+      // カード登録状態を確認（Cookieベースの認証のみを使用、sessionStorageは使用しない）
+      // PaymentSessionから取得するか、APIから直接取得
+      const hasPaymentMethod = false // 一時的にfalse（APIから取得する必要がある）
 
       if (!plan) {
         return (
@@ -581,7 +575,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         usageHistory={usageHistory}
         paymentHistory={paymentHistory}
         currentView={myPageView}
-        onViewChange={(view: string) => onMyPageViewChange(view as any)}
+        onViewChange={(view: string) => onMyPageViewChange(view as MyPageViewType)}
         onEditProfile={onEditProfile}
         onChangeEmail={onChangeEmail}
         onChangePassword={onChangePassword}
@@ -863,8 +857,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
           selectedAreas={selectedAreas}
           isNearbyFilter={isNearbyFilter}
           isFavoritesFilter={isFavoritesFilter}
-          stores={mergedStores as any}
-          onStoreClick={onStoreClick as any}
+          stores={mergedStores}
+          onStoreClick={onStoreClick}
           onFavoriteToggle={onFavoriteToggle}
           onCouponsClick={onCouponsClick}
           isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
@@ -880,7 +874,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       {/* お気に入り一覧ポップアップ */}
       <HistoryPopup
         isOpen={isFavoritesOpen}
-        stores={favoriteStores as any}
+        stores={favoriteStores}
         onClose={onFavoritesClose}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
@@ -911,7 +905,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       <CouponListPopup
         isOpen={isCouponListOpen}
         storeName={selectedStore?.name || ""}
-        coupons={storeCoupons as any}
+        coupons={storeCoupons}
         onClose={onCouponListClose}
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
@@ -930,7 +924,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       {/* クーポン使用成功モーダル */}
       <CouponUsedSuccessModal
         isOpen={isSuccessModalOpen}
-        coupon={selectedCoupon as any}
+        coupon={selectedCoupon}
         onClose={onSuccessModalClose ?? (() => { })}
       />
 

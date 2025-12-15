@@ -1,12 +1,14 @@
 /**
- * お気に入り情報のセッションストレージ管理
+ * お気に入り情報のCookie管理
  * 未認証ユーザー向けに一時的なお気に入り情報を保存
  */
+
+import { getCookie, setCookie, deleteCookie } from './cookie'
 
 const FAVORITES_STORAGE_KEY = 'tamanomi_favorites'
 
 /**
- * セッションストレージからお気に入り一覧を取得
+ * Cookieからお気に入り一覧を取得
  */
 export function getFavoritesFromStorage(): string[] {
   if (typeof window === 'undefined') {
@@ -14,7 +16,7 @@ export function getFavoritesFromStorage(): string[] {
   }
 
   try {
-    const stored = sessionStorage.getItem(FAVORITES_STORAGE_KEY)
+    const stored = getCookie(FAVORITES_STORAGE_KEY)
     if (!stored) {
       return []
     }
@@ -27,7 +29,7 @@ export function getFavoritesFromStorage(): string[] {
 }
 
 /**
- * セッションストレージにお気に入り一覧を保存
+ * Cookieにお気に入り一覧を保存
  */
 export function saveFavoritesToStorage(shopIds: string[]): void {
   if (typeof window === 'undefined') {
@@ -35,7 +37,14 @@ export function saveFavoritesToStorage(shopIds: string[]): void {
   }
 
   try {
-    sessionStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(shopIds))
+    const value = JSON.stringify(shopIds)
+    // セキュリティ設定: httpOnly: false, secure: true, sameSite: 'lax', maxAge: 7日
+    setCookie(FAVORITES_STORAGE_KEY, value, {
+      maxAge: 60 * 60 * 24 * 7, // 7日間
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+    })
   } catch (error) {
     console.error('お気に入り情報の保存エラー:', error)
   }
@@ -78,7 +87,7 @@ export function toggleFavoriteInStorage(shopId: string): boolean {
 }
 
 /**
- * セッションストレージのお気に入りをクリア
+ * Cookieのお気に入りをクリア
  */
 export function clearFavoritesFromStorage(): void {
   if (typeof window === 'undefined') {
@@ -86,7 +95,7 @@ export function clearFavoritesFromStorage(): void {
   }
 
   try {
-    sessionStorage.removeItem(FAVORITES_STORAGE_KEY)
+    deleteCookie(FAVORITES_STORAGE_KEY)
   } catch (error) {
     console.error('お気に入り情報のクリアエラー:', error)
   }

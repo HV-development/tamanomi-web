@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { buildApiUrl } from '@/lib/api-config';
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -24,25 +24,31 @@ export async function POST(request: NextRequest) {
     const fullUrl = buildApiUrl('/pre-register');
 
     try {
-      const requestBody: any = {
+      interface RequestBody {
+        email: string;
+        campaignCode?: string;
+        referrerUserId?: string;
+        shopId?: string;
+      }
+      const requestBody: RequestBody = {
         email: body.email,
         campaignCode: body.campaignCode,
       };
       
       // 紹介者IDがある場合は追加
-      if (body.referrerUserId && body.referrerUserId.trim() !== '') {
+      if (body.referrerUserId && typeof body.referrerUserId === 'string' && body.referrerUserId.trim() !== '') {
         requestBody.referrerUserId = body.referrerUserId.trim();
       }
 
       // shopIdがある場合は追加
-      if (body.shopId && body.shopId.trim() !== '') {
+      if (body.shopId && typeof body.shopId === 'string' && body.shopId.trim() !== '') {
         requestBody.shopId = body.shopId.trim();
       }
 
-      const response = await secureFetch(fullUrl, {
+      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+        headerOptions: {
+          requireAuth: false, // 事前登録は認証不要
         },
         body: JSON.stringify(requestBody),
         signal: controller.signal,

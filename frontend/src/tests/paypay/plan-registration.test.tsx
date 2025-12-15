@@ -12,7 +12,7 @@ const createPlans = (): PlanListResponse['plans'] => ([
     status: 'active',
     description: '単発利用プラン',
     plan_content: { features: [] },
-  } as any,
+  } as PlanListResponse['plans'][0],
 ])
 
 describe('PlanRegistrationForm - 支払い方法選択', () => {

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -19,10 +19,10 @@ export async function GET(request: NextRequest) {
 
     const fullUrl = buildApiUrl(`/email/change/confirm?token=${encodeURIComponent(token)}`)
 
-    const response = await secureFetch(fullUrl, {
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+      headerOptions: {
+        requireAuth: false, // メールアドレス変更確認は認証不要
       },
     })
 

@@ -41,9 +41,14 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
   // フィルターが変更されたときに再取得するためのキー
   const filterKeyRef = useRef<string>('')
 
-  const mapShopToStore = useCallback((shop: any): Store => {
+  interface ShopData {
+    paymentCredit?: string | { brands?: string[]; other?: string };
+    paymentCode?: string | { services?: string[]; other?: string };
+    [key: string]: unknown;
+  }
+  const mapShopToStore = useCallback((shop: ShopData): Store => {
     // paymentCreditとpaymentCodeの構造を解析
-    const parsePaymentCredit = (paymentCredit: any): string[] => {
+    const parsePaymentCredit = (paymentCredit: string | { brands?: string[]; other?: string } | undefined): string[] => {
       if (!paymentCredit) return []
       let brands: string[] = []
       let other: string | undefined
@@ -68,7 +73,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       return brands
     }
 
-    const parsePaymentCode = (paymentCode: any): string[] => {
+    const parsePaymentCode = (paymentCode: string | { services?: string[]; other?: string } | undefined): string[] => {
       if (!paymentCode) return []
       let services: string[] = []
       let other: string | undefined
@@ -136,7 +141,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       usageScenes: (() => {
         // 利用シーンの配列を構築
         const scenes: string[] = (shop.scenes || shop.sceneIds || [])
-          .map((s: any) => (typeof s === 'string' ? s : s?.name))
+          .map((s: string | { name?: string } | undefined) => (typeof s === 'string' ? s : s?.name))
           .filter(Boolean)
         
         // customSceneTextがある場合は「その他：customSceneText」の形式で追加
@@ -235,7 +240,14 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         }
         
         if (!res.ok) {
-          let data: any = {}
+          interface ErrorData {
+            error?: {
+              message?: string;
+              code?: string;
+            };
+            message?: string;
+          }
+          let data: ErrorData | string = {}
           let errorMessage = ''
           
           if (responseText.trim()) {

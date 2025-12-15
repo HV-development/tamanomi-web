@@ -43,7 +43,9 @@ export const useLoginPage = () => {
 
       // Cookieから自動的に認証チェック
       try {
-        const response = await fetch('/api/user/me')
+        const response = await fetch('/api/user/me', {
+          credentials: 'include', // Cookieを送信
+        })
 
         if (response.ok) {
           const userData = await response.json()
@@ -104,6 +106,7 @@ export const useLoginPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Cookieを送信
         body: JSON.stringify({ email: loginData.email, password: loginData.password }),
       })
 
@@ -120,6 +123,7 @@ export const useLoginPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Cookieを送信
         body: JSON.stringify({ email: loginData.email }),
       })
 
@@ -131,7 +135,8 @@ export const useLoginPage = () => {
 
       // セキュリティ改善：メールアドレスをURLパラメータで送信しない
       // requestIdのみをURLパラメータで送信（メールアドレスはサーバーサイドセッションに保存済み）
-      const targetUrl = `/login/verify-otp?requestId=${encodeURIComponent(otpData.requestId)}`
+      // skip-auth-checkパラメータを追加して、OTP入力画面での認証チェックをスキップ
+      const targetUrl = `/login/verify-otp?requestId=${encodeURIComponent(otpData.requestId)}&skip-auth-check=true`
 
       // window.location.hrefを使って強制的にページ遷移
       window.location.href = targetUrl

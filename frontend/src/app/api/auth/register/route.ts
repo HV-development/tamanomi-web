@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -22,9 +22,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let body: any
+    interface RequestBody {
+      password?: string;
+      passwordConfirm?: string;
+      nickname?: string;
+      postalCode?: string;
+      address?: string;
+      birthDate?: string;
+      gender?: string;
+      phone?: string;
+      saitamaAppId?: string;
+      referrerUserId?: string;
+      shopId?: string;
+      token?: string;
+    }
+    let body: RequestBody
     try {
-      body = JSON.parse(rawBody)
+      body = JSON.parse(rawBody) as RequestBody
     } catch (parseError) {
       console.error('Register API: JSON parse error', parseError)
       return createNoCacheResponse(
@@ -54,7 +68,21 @@ export async function POST(request: NextRequest) {
       return postalCode.replace(/[-\s]/g, '')
     }
 
-    const validatedData: any = {
+    interface ValidatedData {
+      password?: string;
+      passwordConfirm?: string;
+      nickname?: string;
+      postalCode?: string;
+      address?: string;
+      birthDate?: string;
+      gender?: string;
+      phone?: string;
+      saitamaAppId?: string;
+      referrerUserId?: string;
+      shopId?: string;
+      token?: string;
+    }
+    const validatedData: ValidatedData = {
       // emailはスキーマでオプショナルになったため、送信しない（トークンから取得される）
       password: body.password,
       passwordConfirm: body.passwordConfirm,
@@ -85,14 +113,15 @@ export async function POST(request: NextRequest) {
     const fullUrl = buildApiUrl('/register/complete');
 
     // #region agent log
+    // eslint-disable-next-line no-restricted-syntax
     fetch('http://127.0.0.1:7243/ingest/3e7657cf-d90c-47dc-87dc-00ee22e9e998',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:93',message:'Request body before sending',data:{validatedData,bodyKeys:Object.keys(validatedData),phoneValue:validatedData.phone,postalCodeValue:validatedData.postalCode},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
     // #endregion
 
     try {
-      const response = await secureFetch(fullUrl, {
+      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+        headerOptions: {
+          requireAuth: false, // 登録エンドポイントは認証不要
         },
         body: JSON.stringify(validatedData),
         signal: controller.signal,
@@ -102,7 +131,18 @@ export async function POST(request: NextRequest) {
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
-        let errorData: any = {}
+        interface ErrorData {
+          error?: {
+            code?: string;
+            message?: string;
+            details?: unknown;
+            errors?: unknown;
+          };
+          errorCode?: string;
+          message?: string;
+          errors?: unknown;
+        }
+        let errorData: ErrorData = {}
         let responseText: string = ''
         try {
           // まずテキストとして取得（JSONパースに失敗する可能性があるため）
@@ -193,6 +233,7 @@ export async function POST(request: NextRequest) {
         if (errorCode === 'VALIDATION_ERROR' && errorDetails) {
           // #region agent log
           console.error('[DEBUG] Validation error details:', { errorCode, errorMessage, errorDetails, errorData, validatedData });
+          // eslint-disable-next-line no-restricted-syntax
           fetch('http://127.0.0.1:7243/ingest/3e7657cf-d90c-47dc-87dc-00ee22e9e998',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:167',message:'Validation error details from API',data:{errorCode,errorMessage,errorDetails,errorData,validatedData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
           // #endregion
           // バリデーションエラーの詳細を返す
@@ -226,6 +267,7 @@ export async function POST(request: NextRequest) {
           fullErrorData: errorData,
           validatedData
         });
+        // eslint-disable-next-line no-restricted-syntax
         fetch('http://127.0.0.1:7243/ingest/3e7657cf-d90c-47dc-87dc-00ee22e9e998',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:190',message:'Final error response',data:{status:response.status,errorCode:finalErrorCode,errorMessage:finalErrorMessage,errorDetails:finalErrorDetails,fullErrorData:errorData,validatedData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
         // #endregion
 
@@ -266,14 +308,14 @@ export async function POST(request: NextRequest) {
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: 60 * 15, // 15分
+          maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
         })
         nextResponse.cookies.set('__Host-accessToken', data.accessToken, {
           httpOnly: true,
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: 60 * 15,
+          maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
         })
       }
       if (data.refreshToken) {
@@ -282,14 +324,14 @@ export async function POST(request: NextRequest) {
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: 60 * 60 * 24 * 30, // 30日
+          maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
         })
         nextResponse.cookies.set('__Host-refreshToken', data.refreshToken, {
           httpOnly: true,
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: 60 * 60 * 24 * 30,
+          maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
         })
       }
 

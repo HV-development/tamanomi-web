@@ -93,6 +93,7 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
         const loginResponse = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // Cookieを送信
           body: JSON.stringify(formData),
         })
         const loginData = await loginResponse.json()
@@ -104,6 +105,7 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
         const otpResponse = await fetch('/api/auth/send-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // Cookieを送信
           body: JSON.stringify({ email: formData.email }),
         })
         const otpData = await otpResponse.json()
@@ -114,7 +116,8 @@ export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = fal
 
         // セキュリティ改善：メールアドレスをURLパラメータで送信しない
         // requestIdのみをURLパラメータで送信（メールアドレスはサーバーサイドセッションに保存済み）
-        const targetUrl = `/login/verify-otp?requestId=${encodeURIComponent(otpData.requestId)}`
+        // skip-auth-checkパラメータを追加して、OTP入力画面での認証チェックをスキップ
+        const targetUrl = `/login/verify-otp?requestId=${encodeURIComponent(otpData.requestId)}&skip-auth-check=true`
         window.location.href = targetUrl
       } catch {
         // エラーは親コンポーネントに渡す

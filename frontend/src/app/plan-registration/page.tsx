@@ -188,7 +188,7 @@ export default function PlanRegistrationPage() {
         const selectedPlan = plans.find(p => p.id === planId)
         if (selectedPlan) {
           const isLinked = saitamaAppLinked === true
-          const discountPrice = (selectedPlan as any).discountPrice ?? null
+          const discountPrice = selectedPlan.discountPrice ?? null
           const rawAmount = isLinked && discountPrice != null
             ? discountPrice
             : selectedPlan.price

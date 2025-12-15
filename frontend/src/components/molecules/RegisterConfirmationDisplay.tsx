@@ -37,8 +37,9 @@ export function RegisterConfirmationDisplay({
     { label: "生年月日", value: formatDate(data.birthDate) },
     { label: "性別", value: genderLabels[data.gender as keyof typeof genderLabels] },
     { label: "さいたま市みんなのアプリID", value: data.saitamaAppId },
-    { label: "パスワード", value: "●".repeat(data.password.length) },
-    { label: "パスワード確認", value: "●".repeat(data.passwordConfirm.length) },
+    // セキュリティ: パスワードはセッションに保存されないため、存在する場合のみ表示
+    ...(data.password ? [{ label: "パスワード", value: "●".repeat(data.password.length) }] : []),
+    ...(data.passwordConfirm ? [{ label: "パスワード確認", value: "●".repeat(data.passwordConfirm.length) }] : []),
   ]
 
   return (

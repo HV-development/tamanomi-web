@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page, APIRequestContext } from '@playwright/test';
 import { getLatestOtp as getLatestOtpFromMailHog } from './utils/mailhog';
 
 // 環境変数からテスト用の認証情報を取得
@@ -10,7 +10,7 @@ const NO_PLAN_PASSWORD = process.env.E2E_NO_PLAN_PASSWORD || 'Lala0810';
 /**
  * 実際のログインを実行して認証済み状態をセットアップするヘルパー関数
  */
-async function setupAuthenticatedState(page: any, request: any, email: string = TEST_EMAIL, password: string = TEST_PASSWORD) {
+async function setupAuthenticatedState(page: Page, request: APIRequestContext, email: string = TEST_EMAIL, password: string = TEST_PASSWORD) {
     // ログインページにアクセス
     await page.goto('/login');
     
@@ -111,7 +111,7 @@ async function setupAuthenticatedState(page: any, request: any, email: string = 
 /**
  * 店舗一覧からクーポン一覧を開くヘルパー関数
  */
-async function openCouponList(page: any) {
+async function openCouponList(page: Page) {
     // 店舗カードが表示されるまで待機
     const storeCards = page.locator('h3').filter({ hasText: /./ });
     await expect(storeCards.first()).toBeVisible({ timeout: 15000 });
@@ -319,19 +319,25 @@ test.describe('クーポン使用のテスト', () => {
         // 音声再生を監視するためのリスナーを設定
         await page.evaluate(() => {
             // グローバル変数として音声再生フラグを設定
-            (window as any).audioPlayed = false;
-            (window as any).audioInitialized = false;
+            interface WindowWithAudio extends Window {
+                audioPlayed?: boolean;
+                audioInitialized?: boolean;
+                Howl?: new (options: unknown) => { play: (...args: unknown[]) => unknown };
+            }
+            const win = window as unknown as WindowWithAudio;
+            win.audioPlayed = false;
+            win.audioInitialized = false;
             
             // Howlが読み込まれるまで待機
             const checkHowl = setInterval(() => {
-                if (typeof (window as any).Howl !== 'undefined') {
+                if (typeof win.Howl !== 'undefined') {
                     clearInterval(checkHowl);
-                    const Howl = (window as any).Howl;
+                    const Howl = win.Howl;
                     const originalPlay = Howl.prototype.play;
                     
                     // playメソッドをオーバーライド
-                    Howl.prototype.play = function(...args: any[]) {
-                        (window as any).audioPlayed = true;
+                    Howl.prototype.play = function(...args: unknown[]) {
+                        win.audioPlayed = true;
                         console.log('音声が再生されました');
                         return originalPlay.apply(this, args);
                     };
@@ -354,9 +360,14 @@ test.describe('クーポン使用のテスト', () => {
         
         // 音声ファイルが読み込まれていることを確認（/audio/tama_voice_export.mp3）
         const audioInfo = await page.evaluate(() => {
+            interface WindowWithAudio extends Window {
+                audioPlayed?: boolean;
+                Howl?: new (options: unknown) => { play: (...args: unknown[]) => unknown };
+            }
+            const win = window as unknown as WindowWithAudio;
             return {
-                hasHowl: typeof (window as any).Howl !== 'undefined',
-                audioPlayed: (window as any).audioPlayed === true,
+                hasHowl: typeof win.Howl !== 'undefined',
+                audioPlayed: win.audioPlayed === true,
             };
         });
         

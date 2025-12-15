@@ -9,8 +9,8 @@ export interface GmailConfig {
 }
 
 export class GmailOtpRetriever {
-  private oauth2Client: any;
-  private gmail: any;
+  private oauth2Client: ReturnType<typeof google.auth.OAuth2Client>;
+  private gmail: ReturnType<typeof google.gmail>;
   private config: GmailConfig;
 
   constructor(config: GmailConfig) {
@@ -83,12 +83,14 @@ export class GmailOtpRetriever {
 
         console.log(`[Gmail] OTPが見つかりません (試行 ${i + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, interval));
-      } catch (error: any) {
-        console.error(`[Gmail] エラー (試行 ${i + 1}/${maxRetries}):`, error.message);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorCode = error && typeof error === 'object' && 'code' in error ? error.code : undefined;
+        console.error(`[Gmail] エラー (試行 ${i + 1}/${maxRetries}):`, errorMessage);
         
         // 認証エラーの場合は再試行しない
-        if (error.code === 401 || error.code === 403) {
-          throw new Error(`Gmail API認証エラー: ${error.message}`);
+        if (errorCode === 401 || errorCode === 403) {
+          throw new Error(`Gmail API認証エラー: ${errorMessage}`);
         }
         
         await new Promise(resolve => setTimeout(resolve, interval));
@@ -98,7 +100,19 @@ export class GmailOtpRetriever {
     throw new Error(`OTP not found for email: ${email} after ${maxRetries} retries`);
   }
 
-  private extractEmailBody(message: any): string {
+  private extractEmailBody(message: {
+    payload?: {
+      body?: { data?: string };
+      parts?: Array<{
+        mimeType?: string;
+        body?: { data?: string };
+        parts?: Array<{
+          mimeType?: string;
+          body?: { data?: string };
+        }>;
+      }>;
+    };
+  }): string {
     let body = '';
     
     if (message.payload) {
@@ -106,7 +120,7 @@ export class GmailOtpRetriever {
       if (message.payload.parts) {
         for (const part of message.payload.parts) {
           if (part.mimeType === 'text/plain' || part.mimeType === 'text/html') {
-            const data = part.body.data;
+            const data = part.body?.data;
             if (data) {
               body += Buffer.from(data, 'base64').toString('utf-8');
             }
@@ -115,7 +129,7 @@ export class GmailOtpRetriever {
           if (part.parts) {
             for (const nestedPart of part.parts) {
               if (nestedPart.mimeType === 'text/plain' || nestedPart.mimeType === 'text/html') {
-                const data = nestedPart.body.data;
+                const data = nestedPart.body?.data;
                 if (data) {
                   body += Buffer.from(data, 'base64').toString('utf-8');
                 }

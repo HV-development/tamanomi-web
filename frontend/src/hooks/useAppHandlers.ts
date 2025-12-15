@@ -97,6 +97,7 @@ export const useAppHandlers = (
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Cookieを送信
                 body: JSON.stringify({ email: loginData.email, password: loginData.password }),
             })
 
@@ -112,6 +113,7 @@ export const useAppHandlers = (
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Cookieを送信
                 body: JSON.stringify({ email: loginData.email }),
             })
 
@@ -160,7 +162,9 @@ export const useAppHandlers = (
             // ログイン成功 - トークンはCookieに保存されているため、プラン登録状況を確認してauth状態を更新
             let hasPlan = false
             try {
-                const userResponse = await fetch('/api/user/me')
+                const userResponse = await fetch('/api/user/me', {
+                    credentials: 'include', // Cookieを送信
+                })
 
                 if (userResponse.ok) {
                     const userData = await userResponse.json()
@@ -189,12 +193,8 @@ export const useAppHandlers = (
                 targetPath = '/home'
             }
 
-            // ローディング継続フラグをセッションストレージに設定
-            // 遷移先のページで完全に表示されたらクリアされる
-            if (typeof window !== 'undefined') {
-                sessionStorage.setItem('loginRedirecting', targetPath)
-            }
-
+            // メモリ内stateのみで管理（sessionStorageは使用しない）
+            // リダイレクト先のページでstateを管理する
             router.replace(targetPath)
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
@@ -1423,5 +1423,5 @@ export const useAppHandlers = (
         handlePasswordChangeComplete,
         handleStoreIntroduction,
         handleStoreIntroductionSubmit,
-    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: any) => Promise<void> }
+    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: { referrerUserId?: string; shopId?: string }) => Promise<void> }
 }

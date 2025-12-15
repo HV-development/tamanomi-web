@@ -1,10 +1,9 @@
 'use client'
 
-import { Suspense, useEffect } from 'react'
+import { Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { EmailRegistrationContainer } from '@/components/organisms/EmailRegistrationContainer'
 import { useEmailRegistration } from '@/hooks/useEmailRegistration'
-import { setRegisterSessionItem } from '@/lib/register-session'
 
 function EmailRegistrationContent() {
   const router = useRouter()
@@ -17,20 +16,6 @@ function EmailRegistrationContent() {
     handleEmailSubmit,
     handleResend,
   } = useEmailRegistration()
-
-  // URLパラメータから紹介者IDを取得してサーバーサイドセッションに保存
-  useEffect(() => {
-    const saveReferrer = async () => {
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search)
-        const ref = urlParams.get('ref')
-        if (ref) {
-          await setRegisterSessionItem('referrerUserId', ref)
-        }
-      }
-    }
-    saveReferrer()
-  }, [])
 
   const handleBack = () => router.push('/')
   const handleLogoClick = () => router.push('/')

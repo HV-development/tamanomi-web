@@ -9,16 +9,26 @@ export async function getLatestOtp(request: APIRequestContext, email: string): P
         const response = await request.get(mailhogUrl);
         const data = await response.json();
 
+        interface MailItem {
+            Created?: string;
+            Content: {
+                Headers: {
+                    Date?: string[];
+                    To?: string[];
+                };
+                Body?: string;
+            };
+        }
         // items配列から最新のメールを探す（受信時刻でソート）
-        const items = (data.items || []).sort((a: any, b: any) => {
-            const timeA = new Date(a.Created || a.Content.Headers.Date?.[0] || 0).getTime();
-            const timeB = new Date(b.Created || b.Content.Headers.Date?.[0] || 0).getTime();
+        const items = ((data.items as MailItem[] | undefined) || []).sort((a: MailItem, b: MailItem) => {
+            const timeA = new Date(a.Created || a.Content.Headers.Date?.[0] || '0').getTime();
+            const timeB = new Date(b.Created || b.Content.Headers.Date?.[0] || '0').getTime();
             return timeB - timeA; // 新しい順
         });
         
         // 指定されたメールアドレス宛の最新のメールを探す
         // 並列実行時の競合を避けるため、最新のメールを優先的に取得
-        const targetMails = items.filter((item: any) =>
+        const targetMails = items.filter((item: MailItem) =>
             item.Content.Headers.To?.[0]?.includes(email)
         );
         

@@ -87,11 +87,7 @@ export function useAuth() {
     };
 
     const logout = async () => {
-        // セッション関連データをクリア
-        if (typeof window !== 'undefined') {
-            sessionStorage.clear();
-            // Cookieベースの認証のみを使用（localStorageは廃止）
-        }
+        // Cookieベースの認証のみを使用（sessionStorageは使用しない）
         
         // Cookieからトークンをクリア（APIエンドポイント経由）
         try {

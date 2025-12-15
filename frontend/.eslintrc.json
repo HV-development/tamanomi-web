@@ -2,5 +2,98 @@
   "extends": [
     "next/core-web-vitals",
     "next/typescript"
+  ],
+  "plugins": ["@typescript-eslint"],
+  "ignorePatterns": ["next-env.d.ts"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "sessionStorage",
+        "message": "sessionStorageの使用は禁止されています。セキュリティ上の理由により、Cookieベースのセッション管理を使用してください。"
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "MemberExpression[object.name='window'][property.name='sessionStorage']",
+        "message": "window.sessionStorageの使用は禁止されています。セキュリティ上の理由により、Cookieベースのセッション管理を使用してください。"
+      },
+      {
+        "selector": "MemberExpression[object.name='sessionStorage']",
+        "message": "sessionStorageの使用は禁止されています。セキュリティ上の理由により、Cookieベースのセッション管理を使用してください。"
+      },
+      {
+        "selector": "CallExpression[callee.object.name='sessionStorage']",
+        "message": "sessionStorageのメソッド（getItem、setItem、removeItem、clearなど）の使用は禁止されています。セキュリティ上の理由により、Cookieベースのセッション管理を使用してください。"
+      },
+      {
+        "selector": "CallExpression[callee.object.object.name='window'][callee.object.property.name='sessionStorage']",
+        "message": "window.sessionStorageのメソッドの使用は禁止されています。セキュリティ上の理由により、Cookieベースのセッション管理を使用してください。"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/app/api/**/route.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "CallExpression[callee.name='fetch']",
+            "message": "APIルートではsecureFetchWithCommonHeadersを使用してください。直接fetch()の使用は禁止されています。"
+          },
+          {
+            "selector": "CallExpression[callee.object.name='Response'][callee.property.name='json']",
+            "message": "APIルートではcreateNoCacheResponseを使用してください。Response.json()の直接使用は禁止されています。"
+          },
+          {
+            "selector": "CallExpression[callee.object.name='NextResponse'][callee.property.name='json']",
+            "message": "APIルートではcreateNoCacheResponseを使用してください。NextResponse.json()の直接使用は禁止されています。"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app/api/auth/register/**/*.ts", "src/app/api/auth/register/**/*.tsx", "src/app/register-confirmation/**/*.tsx"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "CallExpression[callee.name='JSON.stringify'] > ObjectExpression > Property[key.name='email']",
+            "message": "セキュリティ違反: ユーザ本登録時のリクエストボディにemailを含めることは禁止されています。メールアドレスはトークンから取得されるため、リクエストボディに含めないでください。"
+          },
+          {
+            "selector": "CallExpression[callee.object.name='JSON'][callee.property.name='stringify'] > ObjectExpression > Property[key.name='email']",
+            "message": "セキュリティ違反: ユーザ本登録時のリクエストボディにemailを含めることは禁止されています。メールアドレスはトークンから取得されるため、リクエストボディに含めないでください。"
+          },
+          {
+            "selector": "CallExpression[callee.name='fetch'] > ObjectExpression > Property[key.name='body'] > CallExpression[callee.name='JSON.stringify'] > ObjectExpression > Property[key.name='email']",
+            "message": "セキュリティ違反: ユーザ本登録時のリクエストボディにemailを含めることは禁止されています。メールアドレスはトークンから取得されるため、リクエストボディに含めないでください。"
+          },
+          {
+            "selector": "Property[key.name='email'][parent.type='ObjectExpression'][parent.parent.type='CallExpression'][parent.parent.callee.name='JSON.stringify']",
+            "message": "セキュリティ違反: ユーザ本登録時のリクエストボディにemailを含めることは禁止されています。メールアドレスはトークンから取得されるため、リクエストボディに含めないでください。"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app/api/auth/register/token-info/**/*.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "Property[key.name='email'][parent.type='ObjectExpression'][parent.parent.type='CallExpression'][parent.parent.callee.property.name='send']",
+            "message": "セキュリティ違反: token-infoエンドポイントのレスポンスにemailを含めることは禁止されています。トークンの有効性のみを返してください（valid: true/false）。"
+          },
+          {
+            "selector": "Property[key.name='email'][parent.type='ObjectExpression'][parent.parent.type='CallExpression'][parent.parent.callee.name='createNoCacheResponse']",
+            "message": "セキュリティ違反: token-infoエンドポイントのレスポンスにemailを含めることは禁止されています。トークンの有効性のみを返してください（valid: true/false）。"
+          }
+        ]
+      }
+    }
   ]
 }

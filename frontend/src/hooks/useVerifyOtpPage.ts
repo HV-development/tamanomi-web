@@ -70,6 +70,17 @@ export const useVerifyOtpPage = () => {
   // 認証状態チェック（OTP入力画面ではスキップ）
   // パスワード認証成功時にトークンが発行されるため、OTP認証完了まで認証チェックをスキップする
   useEffect(() => {
+    // skip-auth-check パラメータがある場合は認証チェックをスキップ
+    const urlParams = new URLSearchParams(window.location.search)
+    const skipAuthCheck = urlParams.get('skip-auth-check')
+
+    if (skipAuthCheck === 'true') {
+      // URLパラメータをクリア
+      const newUrl = new URL(window.location.href)
+      newUrl.searchParams.delete('skip-auth-check')
+      window.history.replaceState({}, '', newUrl.toString())
+    }
+
     // OTP入力画面では認証チェックをスキップ
     // パスワード認証成功時にトークンが発行されるが、OTP認証が完了するまではログインを完了させない
     setIsCheckingAuth(false)

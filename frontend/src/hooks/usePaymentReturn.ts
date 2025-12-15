@@ -24,7 +24,7 @@ export const usePaymentReturn = () => {
     const processPaymentReturn = async () => {
       try {
         const customerId = searchParams.get('customer_id')
-        const customerCardId = searchParams.get('customer_card_id')
+        const _customerCardId = searchParams.get('customer_card_id') // 未使用だが、将来の拡張のために保持
         const errorCode = searchParams.get('error_code')
         const responseCode = searchParams.get('response_code')
 
@@ -50,13 +50,7 @@ export const usePaymentReturn = () => {
           throw new Error('顧客IDが見つかりません')
         }
 
-        // カード情報をsessionStorageに保存
-        if (customerCardId) {
-          sessionStorage.setItem('paygentCustomerId', customerId)
-          sessionStorage.setItem('paygentCustomerCardId', customerCardId)
-        }
-
-        // PaymentSessionから情報を取得
+        // カード情報はPaymentSessionに保存される（sessionStorageは使用しない）
         // セキュリティ改善：sessionStorageの使用を廃止し、PaymentSessionから取得
         let selectedPlanId: string | null = null
         let userEmail: string | null = null
