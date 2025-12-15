@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -25,9 +25,15 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // zipcloud APIを呼び出し（外部APIなのでsecureFetchを使用）
+    // zipcloud APIを呼び出し（外部APIなのでsecureFetchWithCommonHeadersを使用）
     const apiUrl = `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${cleanedZipcode}`
-    const response = await secureFetch(apiUrl)
+    const response = await secureFetchWithCommonHeaders(request, apiUrl, {
+      method: 'GET',
+      headerOptions: {
+        requireAuth: false, // 外部APIなので認証不要
+        setContentType: false, // 外部APIなのでContent-Typeは設定しない
+      },
+    })
     const data = await response.json()
 
     if (data.status === 200 && data.results && data.results.length > 0) {

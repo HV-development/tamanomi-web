@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 // サーバーサイド用ベースURL
@@ -10,10 +10,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const response = await secureFetch(`${API_BASE_URL}/api/v1/merchants/apply`, {
+    const response = await secureFetchWithCommonHeaders(request, `${API_BASE_URL}/api/v1/merchants/apply`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+      headerOptions: {
+        requireAuth: false, // 事業者申し込みは認証不要
       },
       body: JSON.stringify(body),
     })

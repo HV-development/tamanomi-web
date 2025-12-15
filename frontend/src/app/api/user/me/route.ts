@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { getAuthHeader, getRefreshToken } from '@/lib/auth-header'
-import { secureFetch, secureFetchWithAuth } from '@/lib/fetch-utils'
+import { getRefreshToken } from '@/lib/auth-header'
+import { secureFetchWithCommonHeaders, secureFetch } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -22,18 +22,22 @@ export async function GET(request: NextRequest) {
       cookieHeader: request.headers.get('cookie')?.substring(0, 100) || 'none',
     });
 
-    const authHeader = getAuthHeader(request)
-    
-    if (!authHeader) {
+    const fullUrl = buildApiUrl('/users/me')
+
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+      method: 'GET',
+      headerOptions: {
+        requireAuth: true, // 認証が必要
+      },
+    })
+
+    // 認証エラーの場合は401を返す
+    if (response.status === 401) {
       return createNoCacheResponse(
         { error: '認証が必要です' },
         { status: 401 }
       )
     }
-
-    const fullUrl = buildApiUrl('/users/me')
-
-    const response = await secureFetchWithAuth(fullUrl, authHeader, { method: 'GET' })
 
     const data = await response.json()
 
@@ -52,10 +56,10 @@ export async function GET(request: NextRequest) {
         if (refreshToken) {
           // リフレッシュトークンでトークン更新（直接backend APIを呼び出す）
           const refreshUrl = buildApiUrl('/auth/refresh')
-          const refreshResponse = await secureFetch(refreshUrl, {
+          const refreshResponse = await secureFetchWithCommonHeaders(request, refreshUrl, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
+            headerOptions: {
+              requireAuth: false, // リフレッシュトークンは認証不要
             },
             body: JSON.stringify({ refreshToken }),
           })
@@ -65,7 +69,15 @@ export async function GET(request: NextRequest) {
             
             // リフレッシュ成功、新しいトークンで元のリクエストを再試行
             const newAuthHeader = `Bearer ${refreshData.accessToken}`
-            const retryResponse = await secureFetchWithAuth(fullUrl, newAuthHeader, { method: 'GET' })
+            const retryResponse = await secureFetchWithCommonHeaders(request, fullUrl, {
+              method: 'GET',
+              headerOptions: {
+                requireAuth: true,
+                customHeaders: {
+                  'Authorization': newAuthHeader,
+                },
+              },
+            })
             
             if (retryResponse.ok) {
               const retryData = await retryResponse.json()

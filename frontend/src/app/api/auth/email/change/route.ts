@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server'
-import { getAuthHeader } from '@/lib/auth-header'
-import { secureFetchWithAuth } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -29,16 +28,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 認証トークンを取得
-    const authHeader = getAuthHeader(request)
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return createNoCacheResponse(
-        { error: { message: '認証トークンが必要です' } },
-        { status: 401 }
-      )
-    }
-    const token = authHeader.substring(7)
-
     // バックエンドAPIに転送
     const fullUrl = `${baseUrl}/api/v1/email/change`
 
@@ -46,8 +35,11 @@ export async function POST(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 10000)
 
     try {
-      const response = await secureFetchWithAuth(fullUrl, `Bearer ${token}`, {
+      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
         method: 'POST',
+        headerOptions: {
+          requireAuth: true, // 認証が必要
+        },
         body: JSON.stringify({
           currentPassword: body.currentPassword,
           newEmail: body.newEmail,
@@ -55,6 +47,14 @@ export async function POST(request: NextRequest) {
         }),
         signal: controller.signal,
       })
+
+      // 認証エラーの場合は401を返す
+      if (response.status === 401) {
+        return createNoCacheResponse(
+          { error: { message: '認証トークンが必要です' } },
+          { status: 401 }
+        )
+      }
 
       clearTimeout(timeoutId)
 

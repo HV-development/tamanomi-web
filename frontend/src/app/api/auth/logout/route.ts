@@ -1,24 +1,19 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { getAuthHeader } from '@/lib/auth-header'
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = getAuthHeader(request)
-    
-    const headers: HeadersInit = {}
-    if (authHeader) {
-      headers['Authorization'] = authHeader
-    }
-
     const fullUrl = buildApiUrl('/logout')
-    const response = await secureFetch(fullUrl, {
+    // ログアウトは認証がオプショナル（認証されていない場合でもログアウト処理を実行）
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
-      headers,
+      headerOptions: {
+        requireAuth: false, // 認証がオプショナル
+      },
     })
 
     const ok = response.ok

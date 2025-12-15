@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 // サーバーサイドなのでNEXT_PUBLIC_プレフィックスなしの環境変数を使用
@@ -11,10 +11,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // tamanomi-apiにプロキシ
-    const response = await secureFetch(`${API_BASE_URL}/api/v1/contact`, {
+    const response = await secureFetchWithCommonHeaders(request, `${API_BASE_URL}/api/v1/contact`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+      headerOptions: {
+        requireAuth: false, // お問い合わせは認証不要
       },
       body: JSON.stringify(body),
     });

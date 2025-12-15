@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { getAuthHeader } from '@/lib/auth-header'
-import { secureFetchWithAuth } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -11,15 +10,6 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = getAuthHeader(request)
-    
-    if (!authHeader) {
-      return createNoCacheResponse(
-        { error: '認証が必要です' },
-        { status: 401 }
-      )
-    }
-
     const { id } = await params
     const body = await request.json()
     const { shopId } = body
@@ -33,10 +23,21 @@ export async function POST(
 
     const fullUrl = buildApiUrl(`/coupons/${id}/use`)
 
-    const response = await secureFetchWithAuth(fullUrl, authHeader, {
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
+      headerOptions: {
+        requireAuth: true, // 認証が必要
+      },
       body: JSON.stringify({ shopId }),
     })
+
+    // 認証エラーの場合は401を返す
+    if (response.status === 401) {
+      return createNoCacheResponse(
+        { error: '認証が必要です' },
+        { status: 401 }
+      )
+    }
 
     const data = await response.json()
 

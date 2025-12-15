@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { getAuthHeader } from '@/lib/auth-header'
-import { secureFetchWithAuth } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -14,15 +13,6 @@ interface RouteParams {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const authHeader = getAuthHeader(request)
-
-    if (!authHeader) {
-      return createNoCacheResponse(
-        { success: false, message: '認証が必要です' },
-        { status: 401 }
-      )
-    }
-
     const { id: userPlanId } = await params
     if (!userPlanId) {
       return createNoCacheResponse(
@@ -33,7 +23,20 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const fullUrl = buildApiUrl(`/plans/user-plans/${userPlanId}`)
 
-    const response = await secureFetchWithAuth(fullUrl, authHeader, { method: 'DELETE' })
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+      method: 'DELETE',
+      headerOptions: {
+        requireAuth: true, // 認証が必要
+      },
+    })
+
+    // 認証エラーの場合は401を返す
+    if (response.status === 401) {
+      return createNoCacheResponse(
+        { success: false, message: '認証が必要です' },
+        { status: 401 }
+      )
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))

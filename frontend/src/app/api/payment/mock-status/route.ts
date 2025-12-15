@@ -1,18 +1,18 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
     try {
         const fullUrl = buildApiUrl('/payment/mock-status')
 
-        const response = await secureFetch(fullUrl, {
+        const response = await secureFetchWithCommonHeaders(request, fullUrl, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
+            headerOptions: {
+                requireAuth: false, // モックステータスは認証不要
             },
         })
 

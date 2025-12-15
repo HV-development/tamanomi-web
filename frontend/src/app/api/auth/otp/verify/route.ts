@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { otpVerifySchema } from '@/schemas/auth'
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 const TAMAYOI_API_URL = process.env.TAMAYOI_API_URL || 'http://localhost:3001'
@@ -10,10 +10,10 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         const validatedData = otpVerifySchema.parse(body)
 
-        const response = await secureFetch(`${TAMAYOI_API_URL}/api/auth/otp/verify`, {
+        const response = await secureFetchWithCommonHeaders(request, `${TAMAYOI_API_URL}/api/auth/otp/verify`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+            headerOptions: {
+                requireAuth: false, // OTP認証は認証不要
             },
             body: JSON.stringify(validatedData),
         })

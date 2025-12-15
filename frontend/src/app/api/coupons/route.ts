@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { getAuthHeader } from '@/lib/auth-header'
-import { secureFetch, secureFetchWithAuth } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -34,17 +34,13 @@ export async function GET(request: NextRequest) {
     
     const fullUrl = `${buildApiUrl('/coupons')}?${queryParams.toString()}`
 
-    let response: Response
-    if (authHeader) {
-      response = await secureFetchWithAuth(fullUrl, authHeader, { method: 'GET' })
-    } else {
-      response = await secureFetch(fullUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-    }
+    // 認証がオプショナルなので、authorizationがあるかどうかでrequireAuthを設定
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+      method: 'GET',
+      headerOptions: {
+        requireAuth: !!authHeader, // 認証ヘッダーがある場合のみ認証が必要
+      },
+    })
 
     const data = await response.json()
 

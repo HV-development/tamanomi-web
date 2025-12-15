@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { secureFetch } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse, addNoCacheHeaders } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -11,11 +11,13 @@ export async function POST(request: NextRequest) {
     
     const fullUrl = buildApiUrl('/payment/webhook')
     
-    const response = await secureFetch(fullUrl, {
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Host': request.headers.get('host') || 'localhost:3000',
+      headerOptions: {
+        requireAuth: false, // Webhookは認証不要
+        customHeaders: {
+          'Host': request.headers.get('host') || 'localhost:3000',
+        },
       },
       body: JSON.stringify(body),
     })

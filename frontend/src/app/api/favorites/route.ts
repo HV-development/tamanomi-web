@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { getAuthHeader } from '@/lib/auth-header'
-import { secureFetchWithAuth } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -9,18 +8,22 @@ export const dynamic = 'force-dynamic'
 // お気に入り一覧取得
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = getAuthHeader(request)
-    
-    if (!authHeader) {
+    const fullUrl = buildApiUrl('/users/favorites')
+
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+      method: 'GET',
+      headerOptions: {
+        requireAuth: true, // 認証が必要
+      },
+    })
+
+    // 認証エラーの場合は401を返す
+    if (response.status === 401) {
       return createNoCacheResponse(
         { error: '認証が必要です' },
         { status: 401 }
       )
     }
-
-    const fullUrl = buildApiUrl('/users/favorites')
-
-    const response = await secureFetchWithAuth(fullUrl, authHeader, { method: 'GET' })
 
     const data = await response.json()
 

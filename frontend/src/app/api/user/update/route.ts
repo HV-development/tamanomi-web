@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { getAuthHeader } from '@/lib/auth-header'
-import { secureFetchWithAuth } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -9,15 +8,6 @@ export const dynamic = 'force-dynamic'
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    
-    // 認証トークンを取得
-    const authHeader = getAuthHeader(request)
-    if (!authHeader) {
-      return createNoCacheResponse(
-        { success: false, message: '認証が必要です' },
-        { status: 401 }
-      )
-    }
 
     // バリデーション
     if (!body.nickname || !body.postalCode || !body.address || !body.birthDate || !body.gender) {
@@ -34,11 +24,22 @@ export async function PUT(request: NextRequest) {
     const fullUrl = buildApiUrl('/users/me')
 
     try {
-      const response = await secureFetchWithAuth(fullUrl, authHeader, {
+      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
         method: 'PUT',
+        headerOptions: {
+          requireAuth: true, // 認証が必要
+        },
         body: JSON.stringify(body),
         signal: controller.signal,
       })
+
+      // 認証エラーの場合は401を返す
+      if (response.status === 401) {
+        return createNoCacheResponse(
+          { success: false, message: '認証が必要です' },
+          { status: 401 }
+        )
+      }
 
       clearTimeout(timeoutId)
 

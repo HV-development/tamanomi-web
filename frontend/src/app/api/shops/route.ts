@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from 'next/server'
 import { getAuthHeader } from '@/lib/auth-header'
-import { secureFetch, secureFetchWithAuth } from '@/lib/fetch-utils'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 // サーバーサイドなので NEXT_PUBLIC_ なしの環境変数を使用
@@ -53,20 +53,14 @@ export async function GET(request: NextRequest) {
         ? AbortSignal.timeout(30000)
         : createTimeoutSignal(30000)
       
-      if (authorization) {
-        response = await secureFetchWithAuth(backendUrl, authorization, {
-          method: 'GET',
-          signal: timeoutSignal,
-        })
-      } else {
-        response = await secureFetch(backendUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          signal: timeoutSignal,
-        })
-      }
+      // 認証がオプショナルなので、authorizationがあるかどうかでrequireAuthを設定
+      response = await secureFetchWithCommonHeaders(request, backendUrl, {
+        method: 'GET',
+        headerOptions: {
+          requireAuth: !!authorization, // 認証ヘッダーがある場合のみ認証が必要
+        },
+        signal: timeoutSignal,
+      })
       
     } catch (fetchError: unknown) {
       const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError)

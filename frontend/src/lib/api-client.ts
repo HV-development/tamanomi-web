@@ -210,11 +210,11 @@ export async function preRegister(
       ...(shopId && shopId.trim() !== '' ? { shopId: shopId.trim() } : {}),
     };
 
+    const headers = buildClientHeaders()
+    
     const response = await fetch('/api/auth/pre-register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(requestBody),
     })
 
@@ -270,11 +270,11 @@ export async function confirmPasswordReset(
   newPassword: string
 ): Promise<ConfirmPasswordResetResponse> {
   try {
+    const headers = buildClientHeaders()
+    
     const response = await fetch('/api/auth/reset-password/confirm', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         token,
         newPassword,
