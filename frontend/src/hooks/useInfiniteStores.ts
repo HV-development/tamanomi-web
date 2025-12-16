@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Store } from '@/types/store'
+import type { ShopData } from '@hv-development/schemas'
 import { isFavoriteInStorage } from '@/lib/favorites-storage'
 import { mapAreasToCities } from '@/utils/area-mapping'
 import { mapGenresToIds } from '@/utils/genre-mapping'
@@ -37,22 +38,17 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
   const sentinelElementRef = useRef<Element | null>(null)
   const isFirstLoadRef = useRef(true)
   const [items, setItems] = useState<Store[]>([])
-  
+
   // フィルターが変更されたときに再取得するためのキー
   const filterKeyRef = useRef<string>('')
 
-  interface ShopData {
-    paymentCredit?: string | { brands?: string[]; other?: string };
-    paymentCode?: string | { services?: string[]; other?: string };
-    [key: string]: unknown;
-  }
   const mapShopToStore = useCallback((shop: ShopData): Store => {
     // paymentCreditとpaymentCodeの構造を解析
     const parsePaymentCredit = (paymentCredit: string | { brands?: string[]; other?: string } | undefined): string[] => {
       if (!paymentCredit) return []
       let brands: string[] = []
       let other: string | undefined
-      
+
       if (typeof paymentCredit === 'string') {
         try {
           const parsed = JSON.parse(paymentCredit)
@@ -65,7 +61,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         brands = Array.isArray(paymentCredit.brands) ? paymentCredit.brands : []
         other = paymentCredit.other
       }
-      
+
       // otherがある場合は配列に追加
       if (other && other.trim()) {
         return [...brands, other]
@@ -77,7 +73,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       if (!paymentCode) return []
       let services: string[] = []
       let other: string | undefined
-      
+
       if (typeof paymentCode === 'string') {
         try {
           const parsed = JSON.parse(paymentCode)
@@ -90,7 +86,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         services = Array.isArray(paymentCode.services) ? paymentCode.services : []
         other = paymentCode.other
       }
-      
+
       // otherがある場合は配列に追加
       if (other && other.trim()) {
         return [...services, other]
@@ -107,25 +103,47 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     let isFavorite = shop.isFavorite || false
     if (!isFavorite && typeof window !== 'undefined') {
       try {
-        isFavorite = isFavoriteInStorage(shop.id)
+        isFavorite = isFavoriteInStorage(shop.id as string)
       } catch {
         // セッションストレージのチェックに失敗した場合はAPIの値をそのまま使用
       }
     }
 
+    // genreの型を安全に取得
+    const genre = shop.genre as { id?: string; name?: string } | undefined
+
+    // 型安全にプロパティを取得
+    const fulladdress = shop.fulladdress as string | undefined
+    const prefecture = shop.prefecture as string | undefined
+    const city = shop.city as string | undefined
+    const address1 = shop.address1 as string | undefined
+    const address2 = shop.address2 as string | undefined
+    const phone = shop.phone as string | undefined
+    const description = shop.description as string | undefined
+    const images = shop.images as string[] | undefined
+    const scenes = shop.scenes as (string | { name?: string })[] | undefined
+    const sceneIds = shop.sceneIds as (string | { name?: string })[] | undefined
+    const customSceneText = shop.customSceneText as string | undefined
+    const status = shop.status as string | undefined
+    const merchantId = shop.merchantId as string | undefined
+    const merchant = shop.merchant as { account?: { email?: string } } | undefined
+    const accountEmail = shop.accountEmail as string | undefined
+    const createdAt = shop.createdAt as string | undefined
+    const updatedAt = shop.updatedAt as string | undefined
+
     return {
-      id: shop.id,
-      name: shop.name,
-      genre: shop.genre?.id || '',
-      genreLabel: shop.genre?.name || '',
+      id: shop.id as string,
+      name: shop.name as string,
+      genre: genre?.id || '',
+      genreLabel: genre?.name || '',
       address:
-        shop.fulladdress ||
-        [shop.prefecture, shop.city, shop.address1, shop.address2].filter(Boolean).join(' '),
-      prefecture: shop.prefecture || undefined,
-      city: shop.city || undefined,
-      phone: shop.phone || '',
-      description: shop.description || '',
-      thumbnailUrl: shop.images?.[0] || '',
+        fulladdress ||
+        [prefecture, city, address1, address2].filter(Boolean).join(' '),
+      prefecture: prefecture || undefined,
+      city: city || undefined,
+      phone: phone || '',
+      description: description || '',
+      thumbnailUrl: images?.[0] || '',
       isFavorite,
       latitude: shop.latitude ? Number(shop.latitude) : undefined,
       longitude: shop.longitude ? Number(shop.longitude) : undefined,
@@ -140,16 +158,16 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       smokingPolicy: shop.smokingType || shop.smokingPolicy || undefined,
       usageScenes: (() => {
         // 利用シーンの配列を構築
-        const scenes: string[] = (shop.scenes || shop.sceneIds || [])
+        const sceneArray: string[] = (scenes || sceneIds || [])
           .map((s: string | { name?: string } | undefined) => (typeof s === 'string' ? s : s?.name))
-          .filter(Boolean)
-        
+          .filter(Boolean) as string[]
+
         // customSceneTextがある場合は「その他：customSceneText」の形式で追加
-        if (shop.customSceneText && shop.customSceneText.trim()) {
-          scenes.push(`その他：${shop.customSceneText.trim()}`)
+        if (customSceneText && typeof customSceneText === 'string' && customSceneText.trim()) {
+          sceneArray.push(`その他：${customSceneText.trim()}`)
         }
-        
-        return scenes
+
+        return sceneArray
       })(),
       paymentMethods: hasPaymentMethods ? {
         saicoin: !!shop.paymentSaicoin,
@@ -158,14 +176,14 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         creditCards,
         digitalPayments,
       } : undefined,
-      status: shop.status || 'active',
-      merchantId: shop.merchantId,
-      email: shop.merchant?.account?.email || shop.accountEmail || '',
+      status: status || 'active',
+      merchantId: merchantId,
+      email: merchant?.account?.email || accountEmail || '',
       paymentSaicoin: !!shop.paymentSaicoin,
       paymentTamapon: !!shop.paymentTamapon,
       paymentCash: !!shop.paymentCash,
-      createdAt: shop.createdAt,
-      updatedAt: shop.updatedAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     }
   }, [])
 
@@ -179,13 +197,13 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
         }
-        
+
         // フィルターパラメータを構築
         const queryParams = new URLSearchParams({
           page: targetPage.toString(),
           limit: limit.toString(),
         })
-        
+
         // エリアフィルターを追加（複数エリアの場合はOR条件で処理）
         if (selectedAreas.length > 0) {
           const cities = mapAreasToCities(selectedAreas)
@@ -196,7 +214,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
             queryParams.append('city', cities[0])
           }
         }
-        
+
         // ジャンルフィルターを追加
         if (selectedGenres.length > 0) {
           const genreIds = await mapGenresToIds(selectedGenres)
@@ -207,9 +225,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
             queryParams.append('genreId', genreIds[0])
           }
         }
-        
+
         const url = `/api/shops?${queryParams.toString()}`
-        
+
         let res: Response
         try {
           res = await fetch(url, {
@@ -229,7 +247,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           throw new Error(`ネットワークエラーが発生しました: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`)
         }
 
-        
+
         // レスポンスをテキストとして取得（成功・失敗どちらの場合でも使用）
         let responseText = ''
         try {
@@ -238,7 +256,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           console.error('[useInfiniteStores] Failed to read response text:', textError)
           responseText = ''
         }
-        
+
         if (!res.ok) {
           interface ErrorData {
             error?: {
@@ -247,12 +265,12 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
             };
             message?: string;
           }
-          let data: ErrorData | string = {}
+          let data: ErrorData | string | null = null
           let errorMessage = ''
-          
+
           if (responseText.trim()) {
             try {
-              data = JSON.parse(responseText)
+              data = JSON.parse(responseText) as ErrorData
             } catch (jsonError) {
               console.error('[useInfiniteStores] Failed to parse JSON:', jsonError)
               console.error('[useInfiniteStores] Response text (first 500 chars):', responseText.substring(0, 500))
@@ -264,13 +282,13 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
             console.error('[useInfiniteStores] Empty response body')
             data = { message: `レスポンスが空です (${res.status})` }
           }
-          
+
           // エラーメッセージの抽出（複数の形式に対応）
-          if (data?.error?.message) {
+          if (typeof data === 'object' && data !== null && 'error' in data && data.error?.message) {
             errorMessage = data.error.message
-          } else if (data?.error?.code) {
+          } else if (typeof data === 'object' && data !== null && 'error' in data && data.error?.code) {
             errorMessage = data.error.code
-          } else if (data?.message) {
+          } else if (typeof data === 'object' && data !== null && 'message' in data && data.message) {
             errorMessage = data.message
           } else if (typeof data === 'string') {
             errorMessage = data
@@ -280,7 +298,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           } else {
             errorMessage = `店舗情報の取得に失敗しました (${res.status})`
           }
-          
+
           console.error('[useInfiniteStores] Response error:', {
             status: res.status,
             statusText: res.statusText,
@@ -309,7 +327,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           console.error('[useInfiniteStores] Empty success response body')
           throw new Error('レスポンスが空です')
         }
-        
+
         const items: Store[] = (data?.shops || []).map(mapShopToStore)
         const pagination = data?.pagination || {}
         const totalPages = typeof pagination.totalPages === 'number' ? pagination.totalPages : targetPage
@@ -327,7 +345,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     },
     [limit, mapShopToStore, selectedAreas, selectedGenres]
   )
-  
+
   // fetchPageが変更されたらrefを更新
   useEffect(() => {
     fetchPageRef.current = fetchPage
@@ -366,11 +384,11 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     if (filterKeyRef.current !== '' || initialLoadCompletedRef.current || initialLoadInProgressRef.current) {
       return
     }
-    
+
     const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}`
     filterKeyRef.current = currentFilterKey
     initialLoadInProgressRef.current = true
-    
+
     const fetchInitialData = async () => {
       setIsLoading(true)
       setError(null)
@@ -403,9 +421,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         }
       }
     }
-    
+
     fetchInitialData()
-    
+
     // クリーンアップ関数は不要（refで管理しているため）
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -416,13 +434,13 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     if (filterKeyRef.current === '') {
       return
     }
-    
+
     const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}`
-    
+
     // フィルターが変更された場合のみ再取得
     if (filterKeyRef.current !== currentFilterKey) {
       filterKeyRef.current = currentFilterKey
-      
+
       // 状態をリセット
       setPage(1)
       setHasMore(true)
@@ -430,29 +448,29 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       setError(null)
       setItems([])
       isFirstLoadRef.current = true
-      
+
       // 再取得を実行
       let aborted = false
-      ;(async () => {
-        try {
-          const currentFetchPage = fetchPageRef.current || fetchPage
-          const result = await currentFetchPage(1)
-          if (aborted) {
-            return
+        ; (async () => {
+          try {
+            const currentFetchPage = fetchPageRef.current || fetchPage
+            const result = await currentFetchPage(1)
+            if (aborted) {
+              return
+            }
+            setPage(result.page)
+            setHasMore(result.hasMore)
+            setItems(result.items)
+          } catch (e) {
+            if (aborted) return
+            const message = e instanceof Error ? e.message : 'エラーが発生しました'
+            console.error('[useInfiniteStores] Fetch error:', message, e)
+            setError(message)
+          } finally {
+            if (!aborted) setIsLoading(false)
           }
-          setPage(result.page)
-          setHasMore(result.hasMore)
-          setItems(result.items)
-        } catch (e) {
-          if (aborted) return
-          const message = e instanceof Error ? e.message : 'エラーが発生しました'
-          console.error('[useInfiniteStores] Fetch error:', message, e)
-          setError(message)
-        } finally {
-          if (!aborted) setIsLoading(false)
-        }
-      })()
-      
+        })()
+
       return () => {
         aborted = true
       }

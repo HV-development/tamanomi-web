@@ -12,11 +12,11 @@ interface StoreDetailPopupProps {
   onCouponsClick: (storeId: string) => void
 }
 
-export function StoreDetailPopup({ 
-  isOpen, 
-  store, 
-  onClose, 
-  onCouponsClick 
+export function StoreDetailPopup({
+  isOpen,
+  store,
+  onClose,
+  onCouponsClick
 }: StoreDetailPopupProps) {
   if (!isOpen || !store) return null
 
@@ -65,8 +65,8 @@ export function StoreDetailPopup({
             <div className="flex items-center justify-between">
               <div className="w-8"></div>
               <h3 className="text-xl font-bold text-white">店舗詳細</h3>
-              <button 
-                onClick={onClose} 
+              <button
+                onClick={onClose}
                 className="p-2 hover:bg-green-700 rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -158,24 +158,24 @@ export function StoreDetailPopup({
                     <div className="text-base text-gray-700">
                       さいコイン：{store.paymentMethods.saicoin ? '可' : '不可'}
                     </div>
-                    
+
                     {/* たまポン */}
                     <div className="text-base text-gray-700">
                       たまポン：{store.paymentMethods.tamapon ? '可' : '不可'}
                     </div>
-                    
+
                     {/* 現金 */}
                     <div className="text-base text-gray-700">
                       現金：{store.paymentMethods.cash ? '可' : '不可'}
                     </div>
-                    
+
                     {/* クレジットカード */}
                     {store.paymentMethods.creditCards && store.paymentMethods.creditCards.length > 0 && (
                       <div className="text-base text-gray-700">
                         クレジットカード：可　{store.paymentMethods.creditCards.join('、')}
                       </div>
                     )}
-                    
+
                     {/* コード決済 */}
                     {store.paymentMethods.digitalPayments && store.paymentMethods.digitalPayments.length > 0 && (
                       <div className="text-base text-gray-700">
@@ -190,16 +190,12 @@ export function StoreDetailPopup({
               {store.couponUsageStart && store.couponUsageEnd && (
                 <div className="space-y-2">
                   <div className="text-base font-bold text-gray-900">利用時間</div>
-                  <div className="text-base text-gray-700">{`${store.couponUsageStart}〜${store.couponUsageEnd}`}</div>
-                </div>
-              )}
-
-              {/* クーポン利用可能曜日 */}
-              {store.couponUsageDays && store.couponUsageDays.length > 0 && (
-                <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">利用可能曜日</div>
                   <div className="text-base text-gray-700">
-                    {store.couponUsageDays.split(',').map(d => `${d}曜日`).join('、')}
+                    {/* クーポン利用可能曜日 */}
+                    {store.couponUsageDays && store.couponUsageDays.length > 0 && (
+                      <span>{store.couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')} </span>
+                    )}
+                    {`${store.couponUsageStart}〜${store.couponUsageEnd}`}
                   </div>
                 </div>
               )}
