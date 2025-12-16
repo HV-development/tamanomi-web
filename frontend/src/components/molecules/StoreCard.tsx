@@ -13,7 +13,7 @@ interface StoreCardProps {
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
   onStoreClick: (store: Store) => void
-   showDistance?: boolean
+  showDistance?: boolean
   className?: string
 }
 
@@ -78,7 +78,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
   const handleTouchEnd = (e: React.TouchEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     if (touchStartX.current === null || touchEndX.current === null) {
       return
     }
@@ -129,7 +129,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
     if (target.closest('button')) {
       return
     }
-    
+
     // デフォルトで店舗詳細を表示
     onStoreClick(store)
   }
@@ -158,7 +158,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             className="flex-shrink-0"
           />
         </div>
-        
+
         {/* ジャンルバッジと連絡先アイコン */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -170,23 +170,23 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             )}
           </div>
           <div className="flex items-center gap-1">
-              <button
-                onClick={handlePhoneClick}
-                className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
-                aria-label="電話をかける"
-              >
-                <Phone className="w-4 h-4 text-green-600 hover:text-green-700 fill-current" />
-              </button>
-              <button
-                onClick={handleMapClick}
-                className="px-3 py-1.5 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200 text-green-600 text-xs font-semibold"
-                aria-label="Googleマップで表示"
-              >
-                MAP
-              </button>
+            <button
+              onClick={handlePhoneClick}
+              className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
+              aria-label="電話をかける"
+            >
+              <Phone className="w-4 h-4 text-green-600 hover:text-green-700 fill-current" />
+            </button>
+            <button
+              onClick={handleMapClick}
+              className="px-3 py-1.5 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200 text-green-600 text-xs font-semibold"
+              aria-label="Googleマップで表示"
+            >
+              MAP
+            </button>
           </div>
         </div>
-        
+
         {/* アクセス情報 */}
         {(store.prefecture || store.city) && (
           <div className="mt-2 flex items-center gap-2 text-gray-600 text-sm">
@@ -194,12 +194,16 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             <span>{[store.prefecture, store.city].filter(Boolean).join(' ')}</span>
           </div>
         )}
-        
+
         {/* 時間限定クーポン情報 */}
         {store.couponUsageStart && store.couponUsageEnd && (
           <div className="mt-1 flex items-center gap-2 text-green-600 text-sm">
             <Clock className="w-5 h-5" />
             <span className="font-medium">時間限定クーポン</span>
+            {/* クーポン利用可能曜日 */}
+            {store.couponUsageDays && store.couponUsageDays.length > 0 && (
+              <span>{store.couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')}</span>
+            )}
             <span>{store.couponUsageStart}〜{store.couponUsageEnd}</span>
           </div>
         )}
@@ -217,8 +221,8 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           </button>
         ) : (
           <>
-            <div 
-              className="w-full aspect-[4/3] md:aspect-[16/9] cursor-pointer select-none relative rounded-lg overflow-hidden" 
+            <div
+              className="w-full aspect-[4/3] md:aspect-[16/9] cursor-pointer select-none relative rounded-lg overflow-hidden"
               onClick={handleImageAreaClick}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
@@ -238,9 +242,8 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
                 {images.map((_, index) => (
                   <div
                     key={index}
-                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                      index === currentImageIndex ? "bg-white" : "bg-white/60"
-                    }`}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex ? "bg-white" : "bg-white/60"
+                      }`}
                   ></div>
                 ))}
               </div>
@@ -261,7 +264,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           >
             <span>今すぐクーポンGET</span>
           </button>
-          
+
           <button
             onClick={() => onStoreClick(store)}
             className="flex items-center justify-center gap-1 bg-white hover:bg-gray-50 text-gray-700 py-3 px-3 rounded-2xl transition-all duration-300 border border-gray-300 hover:border-gray-400 font-medium whitespace-nowrap"
