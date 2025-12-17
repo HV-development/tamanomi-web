@@ -17,3 +17,4 @@ export const useRegisterStore = create<RegisterStore>((set) => ({
   setFormData: (data: UserRegistrationComplete) => set({ formData: data }),
   clearFormData: () => set({ formData: null }),
 }))
+
