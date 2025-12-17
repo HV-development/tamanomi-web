@@ -12,22 +12,19 @@ export async function GET(request: NextRequest) {
     const shopId = searchParams.get('shopId')
     const page = searchParams.get('page') || '1'
     const limit = searchParams.get('limit') || '100'
-    const status = searchParams.get('status') || 'active'
-    const isPublic = searchParams.get('isPublic')
+    const status = searchParams.get('status') || 'pending'  // デフォルトを申請中に
+    const isPublic = searchParams.get('isPublic') || 'false'  // デフォルトを非公開に
 
     // クエリパラメータを構築
     const queryParams = new URLSearchParams({
       page,
       limit,
       status,
+      isPublic,
     })
     
     if (shopId) {
       queryParams.append('shopId', shopId)
-    }
-    
-    if (isPublic) {
-      queryParams.append('isPublic', isPublic)
     }
 
     const authHeader = getAuthHeader(request)
