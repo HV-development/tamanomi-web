@@ -46,6 +46,7 @@ export interface Store {
   smokingPolicy?: 'NON_SMOKING' | 'SMOKING' | 'SEPARATED' | 'HEATED_TOBACCO' | 'UNKNOWN' | 'UNSPECIFIED' | string
   paymentMethods?: StorePaymentMethods
   usageScenes?: string[]
+  customSceneText?: string
 
   // メタ情報（任意）
   status?: string

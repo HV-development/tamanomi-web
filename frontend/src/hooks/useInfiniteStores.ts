@@ -157,18 +157,16 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       holidays: shop.holidays || undefined,
       smokingPolicy: shop.smokingType || shop.smokingPolicy || undefined,
       usageScenes: (() => {
-        // 利用シーンの配列を構築
+        // 利用シーンの配列を構築（「その他」は除外）
         const sceneArray: string[] = (scenes || sceneIds || [])
           .map((s: string | { name?: string } | undefined) => (typeof s === 'string' ? s : s?.name))
           .filter(Boolean) as string[]
 
-        // customSceneTextがある場合は「その他：customSceneText」の形式で追加
-        if (customSceneText && typeof customSceneText === 'string' && customSceneText.trim()) {
-          sceneArray.push(`その他：${customSceneText.trim()}`)
-        }
-
         return sceneArray
       })(),
+      customSceneText: customSceneText && typeof customSceneText === 'string' && customSceneText.trim()
+        ? customSceneText.trim()
+        : undefined,
       paymentMethods: hasPaymentMethods ? {
         saicoin: !!shop.paymentSaicoin,
         tamapon: !!shop.paymentTamapon,

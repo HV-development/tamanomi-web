@@ -13,21 +13,23 @@ export interface Genre {
  * ジャンル値（GenrePopupで使用）からジャンル名へのマッピング
  */
 const GENRE_VALUE_TO_NAME_MAP: Record<string, string> = {
-  event: "イベント",
-  izakaya: "居酒屋",
-  creative: "創作料理",
   japanese: "和食",
   western: "洋食",
-  italian: "イタリアン",
-  french: "フレンチ",
   chinese: "中華",
-  yakiniku: "焼肉",
+  italian: "イタリア料理",
   korean: "韓国料理",
-  asian: "アジアン",
-  bar: "バー",
+  french: "フランス料理",
+  ethnic: "エスニック",
+  sushi: "寿司",
+  curry: "カレー",
+  yakiniku: "焼肉",
+  nabe: "鍋",
+  izakaya: "居酒屋",
   ramen: "ラーメン",
-  soba: "そば",
-  udon: "うどん",
+  bar: "バー",
+  cafe: "カフェ",
+  shokudo: "食堂",
+  event: "イベント出店",
 }
 
 /**
@@ -46,11 +48,11 @@ async function buildGenreMapping(): Promise<Map<string, string>> {
 
   try {
     // クライアントサイドではNext.jsのAPIルート経由で取得
-    const apiUrl = typeof window !== 'undefined' 
+    const apiUrl = typeof window !== 'undefined'
       ? '/api/genres'
       : `${process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || 'http://localhost:3002'}/api/v1/public/genres`
-    
-    
+
+
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
@@ -65,7 +67,7 @@ async function buildGenreMapping(): Promise<Map<string, string>> {
     }
 
     const data = await response.json()
-    
+
     const genres: Genre[] = data.genres || []
 
     const mapping = new Map<string, string>()

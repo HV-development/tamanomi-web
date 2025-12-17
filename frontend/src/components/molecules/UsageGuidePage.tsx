@@ -24,7 +24,7 @@ export function UsageGuidePage({ onBack, onLogoClick }: UsageGuidePageProps) {
     },
     {
       step: 2,
-      title: "店員さんに確定ボタンを押してもらう",
+      title: "利用者ご自身で「確定」ボタンを押下してください",
       description: "店員さんに「確定する」ボタンを押してもらってください。",
       details: [
         "お客様ご自身では押さないでください",
@@ -35,17 +35,16 @@ export function UsageGuidePage({ onBack, onLogoClick }: UsageGuidePageProps) {
     {
       step: 3,
       title: "クーポン適用完了",
-      description: "クーポンが正常に適用され、割引が反映されます。",
+      description: "クーポンが正常に適用され、ドリンクが一杯無料になります​。",
       details: [
         "使用完了画面が表示されます",
-        "レシートで割引内容をご確認ください",
         "利用履歴に記録されます"
       ]
     }
   ]
 
   const importantNotes = [
-    "クーポンは1日1件につき1回まで利用可能です",
+    "毎日1店につき1回まで利用可能です",
     "クーポンは翌日の0:00にリセットされます",
     "20歳未満の方はアルコールは飲めません",
     "一度使用したクーポンはキャンセルできません",

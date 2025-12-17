@@ -58,8 +58,8 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
             <div className="flex items-center justify-between">
               <div className="w-8"></div>
               <h3 className="text-xl font-bold">クーポン一覧</h3>
-              <button 
-                onClick={onClose} 
+              <button
+                onClick={onClose}
                 className="p-2 hover:bg-green-700 rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -77,12 +77,12 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
                   本日のクーポンは使用済みです
                 </p>
               )}
-             <button 
-               onClick={onUsageGuideClick}
-               className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
-             >
-               使用方法、注意事項についてはこちら
-             </button>
+              <button
+                onClick={onUsageGuideClick}
+                className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
+              >
+                使用方法、注意事項についてはこちら
+              </button>
             </div>
           </div>
 
@@ -128,34 +128,33 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
                           />
                         </div>
                       )}
-                    
+
                       {/* クーポン情報 */}
                       <div className="p-4">
                         <h4 className="font-bold text-lg text-gray-900 mb-2 text-center">
                           {coupon.name}
                         </h4>
-                        <p className="text-sm text-gray-600 leading-relaxed mb-4 text-center">
+                        <p className="text-base text-gray-900 leading-relaxed mb-4 text-center font-medium">
                           {coupon.description}
                         </p>
-                        
+
                         {/* 利用条件 */}
                         {coupon.conditions && (
                           <div className="mb-4 pt-3 border-t border-gray-200">
-                            <p className="text-xs text-gray-600 text-center">
+                            <p className="text-sm text-gray-900 text-center font-medium">
                               利用条件：{coupon.conditions}
                             </p>
                           </div>
                         )}
-                        
+
                         {/* 利用ボタン */}
                         <button
                           onClick={() => onUseCoupon(coupon.id)}
                           disabled={isUsedToday}
-                          className={`w-full text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md ${
-                            isUsedToday
+                          className={`w-full text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-md ${isUsedToday
                               ? 'bg-gray-400 cursor-not-allowed'
                               : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-[1.02]'
-                          }`}
+                            }`}
                         >
                           このクーポンで乾杯！
                         </button>

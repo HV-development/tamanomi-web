@@ -21,7 +21,7 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
     },
     {
       step: 2,
-      title: "店員さんに確定ボタンを押してもらう",
+      title: "利用者ご自身で「確定」ボタンを押下してください",
       description: "店員さんに「確定する」ボタンを押してもらってください。",
       details: [
         "お客様ご自身では押さないでください",
@@ -32,17 +32,16 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
     {
       step: 3,
       title: "クーポン適用完了",
-      description: "クーポンが正常に適用され、割引が反映されます。",
+      description: "クーポンが正常に適用され、ドリンクが一杯無料になります​。",
       details: [
         "使用完了画面が表示されます",
-        "レシートで割引内容をご確認ください",
         "利用履歴に記録されます"
       ]
     }
   ]
 
   const importantNotes = [
-    "クーポンは1日1件につき1回まで利用可能です",
+    "毎日1店につき1回まで利用可能です",
     "クーポンは翌日の0:00にリセットされます",
     "20歳未満の方はアルコールは飲めません",
     "一度使用したクーポンはキャンセルできません",
@@ -60,7 +59,7 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
   return (
     <>
       {/* オーバーレイ */}
-      <div 
+      <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[10001] animate-in fade-in-0 duration-300"
         onClick={handleOverlayClick}
       ></div>
@@ -76,8 +75,8 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
                 <h3 className="text-xl font-bold">クーポン使用方法</h3>
                 <p className="text-green-100 text-sm">正しい使用手順をご確認ください</p>
               </div>
-              <button 
-                onClick={onClose} 
+              <button
+                onClick={onClose}
                 className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-110 hover:rotate-90"
                 aria-label="閉じる"
               >
@@ -91,7 +90,7 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
             <div className="space-y-6">
               {/* 使用手順 */}
               {usageSteps.map((step, index) => (
-                <div 
+                <div
                   key={step.step}
                   className="bg-white rounded-2xl border border-gray-200 p-6 animate-in slide-in-from-left-4 duration-300"
                   style={{ animationDelay: `${index * 100}ms` }}

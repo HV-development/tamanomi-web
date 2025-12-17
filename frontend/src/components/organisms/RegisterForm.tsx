@@ -451,15 +451,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       />
 
       {/* さいたま市みんなのアプリID */}
-      <Input
-        type="text"
-        label="さいたま市みんなのアプリ（任意）"
-        placeholder="さいたま市みんなのアプリIDを入力"
-        value={formData.saitamaAppId || ""}
-        onChange={(value) => updateFormData("saitamaAppId", value)}
-        onBlur={() => handleFieldBlur("saitamaAppId")}
-        error={errors.saitamaAppId || undefined}
-      />
+      <div>
+        <Input
+          type="text"
+          label="さいたま市みんなのアプリ（任意）"
+          placeholder="さいたま市みんなのアプリIDを入力"
+          value={formData.saitamaAppId || ""}
+          onChange={(value) => updateFormData("saitamaAppId", value)}
+          onBlur={() => handleFieldBlur("saitamaAppId")}
+          error={errors.saitamaAppId || undefined}
+        />
+        <p className="mt-1 text-sm text-gray-500">
+          さいたま市みんなのアプリユーザー特典をご利用の方は、アプリのユーザーIDをコピーして貼り付けてください
+        </p>
+      </div>
 
       {/* パスワード */}
       <Input
