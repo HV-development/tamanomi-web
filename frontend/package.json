@@ -5,8 +5,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
-    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx",
     "setup:env": "bash ../scripts/setup-env.sh",
     "secret:generate": "tsx ../scripts/generate-secret.ts"
   },
