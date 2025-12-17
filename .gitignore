@@ -155,3 +155,5 @@ frontend/out/
 frontend/build/
 infrastructure/docker/ssl/
 .env
+frontend/playwright-report/
+frontend/test-results/

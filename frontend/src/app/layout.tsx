@@ -1,14 +1,19 @@
 import type { Metadata } from 'next'
+import { Noto_Sans_JP } from 'next/font/google'
 import './globals.css'
 
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-noto-sans-jp',
+})
+
 export const metadata: Metadata = {
-  title: 'たまのみ - さいたま市のお得なサービス',
-  description: 'さいたま市のお店で使える便利でお得なサービス「たまのみ」。会員登録でポイントが貯まる、クーポンが使えるなど、お得な特典がいっぱい！',
+  title: 'たまのみ | 公開準備中',
+  description: 'たまのみは現在公開準備中です。しばらくお待ちください。',
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
-      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon.png', sizes: '16x16', type: 'image/png' },
     ],
     apple: '/favicon.png',
     shortcut: '/favicon.png',
@@ -22,9 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>
+      <body className={notoSansJP.variable}>
         {children}
       </body>
     </html>
   )
 }
+
