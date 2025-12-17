@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { ArrowLeft, Ticket, CheckCircle, AlertTriangle, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -60,24 +61,21 @@ export default function UsageGuidePage() {
     <div className={`min-h-screen ${backgroundColorClass}`}>
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
-          <button 
-            onClick={handleBack} 
-            className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
+        <div className="relative flex items-center justify-center">
+          <button
+            onClick={handleBack}
+            className="absolute left-0 flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             戻る
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 text-green-600">
-              🍷
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-green-700 text-lg leading-tight">TAMAYOI</span>
-              <span className="text-xs text-green-600 font-medium -mt-1">たまよい</span>
-            </div>
-          </div>
-          <div className="w-12"></div>
+          <Image
+            src="/logo.svg"
+            alt="TAMAYOI"
+            width={144}
+            height={32}
+            className="h-8 object-contain"
+          />
         </div>
       </div>
 
@@ -94,7 +92,7 @@ export default function UsageGuidePage() {
         {/* 使用手順 */}
         <div className="space-y-6 mb-8">
           {usageSteps.map((step, index) => (
-            <div 
+            <div
               key={step.step}
               className="bg-white rounded-2xl border border-gray-200 p-6 animate-in slide-in-from-left-4 duration-300"
               style={{ animationDelay: `${index * 100}ms` }}
