@@ -46,8 +46,8 @@ export function TeaserPage() {
           className="opacity-0 animate-fade-in"
           style={{ animationDelay: '0.8s' }}
         >
-          <h1 className="text-2xl md:text-3xl font-medium text-[#007D4F] mb-4 tracking-wide">
-            公開までしばらくお待ちください。
+          <h1 className="text-base md:text-3xl font-medium text-[#007D4F] mb-4 tracking-wide">
+            公開までしばらくお待ちください
           </h1>
           
           {/* 装飾的なライン */}
