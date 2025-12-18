@@ -25,6 +25,7 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [successMessage, setSuccessMessage] = useState<string>('')
   const [lastEmail, setLastEmail] = useState<string>('')
+  const [lastCampaignCode, setLastCampaignCode] = useState<string>('')
   const [shopId, setShopId] = useState<string | undefined>(undefined)
 
   const searchParams = useSearchParams()
@@ -68,7 +69,7 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       // referrerUserIdはURLパラメータから取得するか、Cookieから取得する
       const referrerUserId = null; // 必要に応じてCookieから取得する実装を追加
-      
+
 
       // 紹介者IDを含めてpreRegisterを呼び出し
       const registrationData: UserRegistrationRequest = {
@@ -78,13 +79,14 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       };
 
       await preRegister(registrationData.email, registrationData.campaignCode, referrerUserId || undefined, shopId)
-      // メールアドレスを保存
+      // メールアドレスとキャンペーンコードを保存
       setLastEmail(data.email)
+      setLastCampaignCode(data.campaignCode)
       // 送信完了画面に遷移
       setCurrentStep('complete')
     } catch (error) {
-      const message = error instanceof Error 
-        ? error.message 
+      const message = error instanceof Error
+        ? error.message
         : '認証メールの送信に失敗しました'
       setErrorMessage(message)
       // エラー時はフォーム画面に留まる
@@ -108,6 +110,11 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       return
     }
 
+    if (!lastCampaignCode) {
+      setErrorMessage('キャンペーンコードが見つかりません')
+      return
+    }
+
     setIsLoading(true)
     setErrorMessage('')
     setSuccessMessage('')
@@ -117,17 +124,17 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       // referrerUserIdはURLパラメータから取得するか、Cookieから取得する
       const referrerUserId = null; // 必要に応じてCookieから取得する実装を追加
 
-      await preRegister(lastEmail, undefined, referrerUserId || undefined, shopId)
+      await preRegister(lastEmail, lastCampaignCode, referrerUserId || undefined, shopId)
       // 成功メッセージを表示（画面は complete のまま）
       setSuccessMessage('認証メールを再送信しました')
-      
+
       // 5秒後に成功メッセージを消す
       setTimeout(() => {
         setSuccessMessage('')
       }, 5000)
     } catch (error) {
-      const message = error instanceof Error 
-        ? error.message 
+      const message = error instanceof Error
+        ? error.message
         : '認証メールの再送信に失敗しました'
       setErrorMessage(message)
     } finally {

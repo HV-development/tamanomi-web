@@ -84,6 +84,29 @@ export function StoreDetailPopup({
           {/* コンテンツ */}
           <div className="flex-1 overflow-y-auto p-4">
             <div className="space-y-4">
+              {/* ホームページURL（一番上） */}
+              {(store.homepageUrl || store.website) && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">ホームページURL</div>
+                  <a
+                    href={store.homepageUrl || store.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-base text-green-700 hover:text-green-800 underline break-all"
+                  >
+                    {store.homepageUrl || store.website}
+                  </a>
+                </div>
+              )}
+
+              {/* 店舗詳細（ホームページURLの下） */}
+              {store.details && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">店舗詳細</div>
+                  <div className="text-base text-gray-700 whitespace-pre-line">{store.details}</div>
+                </div>
+              )}
+
               {/* 住所 */}
               {store.address && (
                 <div className="space-y-2">
@@ -110,29 +133,6 @@ export function StoreDetailPopup({
                 </div>
               )}
 
-              {/* ホームページURL */}
-              {(store.homepageUrl || store.website) && (
-                <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">ホームページURL</div>
-                  <a
-                    href={store.homepageUrl || store.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-base text-green-700 hover:text-green-800 underline break-all"
-                  >
-                    {store.homepageUrl || store.website}
-                  </a>
-                </div>
-              )}
-
-              {/* 詳細情報 */}
-              {store.details && (
-                <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">詳細情報</div>
-                  <div className="text-base text-gray-700 whitespace-pre-line">{store.details}</div>
-                </div>
-              )}
-
               {/* 定休日 */}
               {(store.closedDays || store.holidays) && (
                 <div className="space-y-2">
@@ -141,50 +141,73 @@ export function StoreDetailPopup({
                 </div>
               )}
 
-              {/* 禁煙・分煙 */}
-              {store.smokingPolicy && (
-                <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">禁煙・分煙</div>
-                  <div className="text-base text-gray-700">{getSmokingPolicyText(store.smokingPolicy)}</div>
-                </div>
-              )}
-
               {/* 支払い方法 */}
-              {store.paymentMethods && (
-                <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">支払方法</div>
-                  <div className="space-y-1">
-                    {/* さいコイン */}
-                    <div className="text-base text-gray-700">
-                      さいコイン：{store.paymentMethods.saicoin ? '可' : '不可'}
+              {store.paymentMethods && (() => {
+                const hasSaicoin = store.paymentMethods.saicoin
+                const hasTamapon = store.paymentMethods.tamapon
+                const hasDigitalCurrency = hasSaicoin || hasTamapon
+                const hasCreditCards = store.paymentMethods.creditCards && store.paymentMethods.creditCards.length > 0
+                const hasDigitalPayments = store.paymentMethods.digitalPayments && store.paymentMethods.digitalPayments.length > 0
+                const hasOther = hasDigitalPayments
+
+                // クレジットカードの表示名マッピング
+                const creditCardNames: Record<string, string> = {
+                  'VISA': 'VISA',
+                  'Master': 'Master',
+                  'JCB': 'JCB',
+                  'AMEX': 'AMEX',
+                  'Diners': 'Diners',
+                }
+
+                // デジタル決済の表示名マッピング
+                const digitalPaymentNames: Record<string, string> = {
+                  '交通系マネー': '交通系マネー',
+                  'PayPay': 'PayPay',
+                  '楽天Pay': '楽天Pay',
+                  'イオンPay': 'イオンPay',
+                  'd払い': 'd払い',
+                  'au Pay': 'au Pay',
+                }
+
+                if (!hasDigitalCurrency && !hasCreditCards && !hasOther) {
+                  return null
+                }
+
+                return (
+                  <div className="space-y-2">
+                    <div className="text-base font-bold text-gray-900">支払方法</div>
+                    <div className="space-y-1">
+                      {/* さいたま市デジタル地域通貨 */}
+                      {hasDigitalCurrency && (
+                        <div className="text-base text-gray-700">
+                          さいたま市デジタル地域通貨（{[
+                            hasSaicoin && 'さいコイン',
+                            hasTamapon && 'たまポン'
+                          ].filter(Boolean).join('　')}）
+                        </div>
+                      )}
+
+                      {/* クレジットカード */}
+                      {hasCreditCards && (
+                        <div className="text-base text-gray-700">
+                          クレジットカード（{store.paymentMethods.creditCards!
+                            .map(card => creditCardNames[card] || card)
+                            .join('　')}）
+                        </div>
+                      )}
+
+                      {/* その他 */}
+                      {hasOther && (
+                        <div className="text-base text-gray-700">
+                          その他（{store.paymentMethods.digitalPayments!
+                            .map(payment => digitalPaymentNames[payment] || payment)
+                            .join('　')}）
+                        </div>
+                      )}
                     </div>
-
-                    {/* たまポン */}
-                    <div className="text-base text-gray-700">
-                      たまポン：{store.paymentMethods.tamapon ? '可' : '不可'}
-                    </div>
-
-                    {/* 現金 */}
-                    <div className="text-base text-gray-700">
-                      現金：{store.paymentMethods.cash ? '可' : '不可'}
-                    </div>
-
-                    {/* クレジットカード */}
-                    {store.paymentMethods.creditCards && store.paymentMethods.creditCards.length > 0 && (
-                      <div className="text-base text-gray-700">
-                        クレジットカード：可　{store.paymentMethods.creditCards.join('、')}
-                      </div>
-                    )}
-
-                    {/* コード決済 */}
-                    {store.paymentMethods.digitalPayments && store.paymentMethods.digitalPayments.length > 0 && (
-                      <div className="text-base text-gray-700">
-                        コード決済：可　{store.paymentMethods.digitalPayments.join('、')}
-                      </div>
-                    )}
                   </div>
-                </div>
-              )}
+                )
+              })()}
 
               {/* 利用時間 */}
               {store.couponUsageStart && store.couponUsageEnd && (
@@ -204,7 +227,27 @@ export function StoreDetailPopup({
               {store.usageScenes && store.usageScenes.length > 0 && (
                 <div className="space-y-2">
                   <div className="text-base font-bold text-gray-900">利用シーン</div>
-                  <div className="text-base text-gray-700">{store.usageScenes.join('、')}</div>
+                  <div className="text-base text-gray-700">
+                    {store.usageScenes.join('　')}
+                  </div>
+                </div>
+              )}
+
+              {/* 具体的な利用シーン */}
+              {store.customSceneText && store.customSceneText.trim() && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">具体的な利用シーン</div>
+                  <div className="text-base text-gray-700">
+                    {store.customSceneText}
+                  </div>
+                </div>
+              )}
+
+              {/* 喫煙タイプ（利用シーンの下） */}
+              {store.smokingPolicy && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">喫煙タイプ</div>
+                  <div className="text-base text-gray-700">{getSmokingPolicyText(store.smokingPolicy)}</div>
                 </div>
               )}
 
