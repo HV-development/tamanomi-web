@@ -29,10 +29,22 @@ export function TeaserPage() {
           />
         </div>
         
+        {/* サービス説明 */}
+        <div 
+          className="opacity-0 animate-fade-in mb-8"
+          style={{ animationDelay: '0.5s' }}
+        >
+          <p className="text-base md:text-lg text-[#007D4F]/80 leading-relaxed">
+            たまのみは さいたま市内の飲食店で<br />
+            毎日1軒1杯無料で ドリンクを飲める<br />
+            クーポンサービスです
+          </p>
+        </div>
+        
         {/* メッセージ */}
         <div 
           className="opacity-0 animate-fade-in"
-          style={{ animationDelay: '0.5s' }}
+          style={{ animationDelay: '0.8s' }}
         >
           <h1 className="text-2xl md:text-3xl font-medium text-[#007D4F] mb-4 tracking-wide">
             公開までしばらくお待ちください。
@@ -49,7 +61,7 @@ export function TeaserPage() {
         {/* サブテキスト */}
         <p 
           className="mt-8 text-sm text-[#007D4F]/60 opacity-0 animate-fade-in"
-          style={{ animationDelay: '0.8s' }}
+          style={{ animationDelay: '1.1s' }}
         >
           Coming Soon
         </p>
@@ -58,7 +70,7 @@ export function TeaserPage() {
       {/* フッター */}
       <footer 
         className="absolute bottom-8 text-xs text-[#007D4F]/40 opacity-0 animate-fade-in"
-        style={{ animationDelay: '1s' }}
+        style={{ animationDelay: '1.3s' }}
       >
         © {new Date().getFullYear()} たまのみ
       </footer>
