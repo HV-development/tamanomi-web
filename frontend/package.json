@@ -6,6 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint . --ext .ts,.tsx",
+    "lint": "eslint . --ext .ts,.tsx",
+    "start": "next start",
     "setup:env": "bash ../scripts/setup-env.sh",
     "secret:generate": "tsx ../scripts/generate-secret.ts"
   },
