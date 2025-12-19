@@ -45,18 +45,10 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
 
   const fetchUserInfo = useCallback(async () => {
     try {
-      const accessToken = localStorage.getItem('accessToken')
-      
-      if (!accessToken) {
-        setSaitamaAppLinked(false)
-        return
-      }
-
+      // Cookieベースの認証のみを使用（localStorageは廃止）
       const response = await fetch('/api/user/me', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
         cache: 'no-store',
+        credentials: 'include', // Cookieを送信
       })
 
       if (response.ok) {
@@ -484,7 +476,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
           {/* アプリ説明とダウンロードリンク */}
           <div className="bg-white rounded-lg p-4 space-y-3">
             <div>
-              <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリについて</h4>
+              <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリ</h4>
               <p className="text-xs text-gray-700 leading-relaxed">
                 さいたま市が提供する公式アプリです。<br />
                 アプリと連携することで、特別な割引価格でご利用いただけます。
@@ -516,7 +508,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
                   href="/saitama-app-guide"
                   className="text-xs text-blue-600 hover:text-blue-800 underline"
                 >
-                  アプリの使い方とユーザーID取得手順はこちら
+                  ユーザーID取得手順はこちら
                 </a>
               </div>
             </div>
@@ -551,7 +543,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
             <button 
               onClick={handleLinkSaitamaApp}
               disabled={isLinking || !saitamaAppId}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white p-3 text-sm font-bold flex items-center justify-center gap-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               {isLinking ? (
                 <>

@@ -1,64 +1,77 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { planId } = body
+    const { planId, alsoChangePaymentMethod } = body
 
-    // アクセストークンを取得
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader) {
-      return NextResponse.json(
-        { success: false, message: '認証が必要です' },
-        { status: 401 }
-      )
-    }
+    console.log('🔍 [user-plans/update] リクエスト受信:', {
+      body,
+      planId,
+      alsoChangePaymentMethod,
+      alsoChangePaymentMethodType: typeof alsoChangePaymentMethod,
+    });
 
     // バリデーション
     if (!planId) {
-      return NextResponse.json(
+      console.warn('⚠️ [user-plans/update] planIdなし');
+      return createNoCacheResponse(
         { success: false, message: 'プランIDは必須です' },
         { status: 400 }
       )
     }
 
-    console.log('🔍 [user-plans/change] Changing plan:', { planId })
+    const requestBody = {
+      planId: planId,
+      alsoChangePaymentMethod: alsoChangePaymentMethod || false,
+    };
+    console.log('🔍 [user-plans/update] バックエンドAPIに送信:', requestBody);
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/plans/user-plans/change')
-    console.log('🔍 [user-plans/change] Request URL:', fullUrl)
 
     try {
-      const response = await fetch(fullUrl, {
+      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
+        headerOptions: {
+          requireAuth: true, // 認証が必要
         },
-        body: JSON.stringify({
-          planId: planId,
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       })
 
+      // 認証エラーの場合は401を返す
+      if (response.status === 401) {
+        console.warn('⚠️ [user-plans/update] 認証ヘッダーなし');
+        return createNoCacheResponse(
+          { success: false, message: '認証が必要です' },
+          { status: 401 }
+        )
+      }
+
       clearTimeout(timeoutId)
 
-      console.log('🔍 [user-plans/change] Response status:', response.status)
+      console.log('🔍 [user-plans/update] バックエンドAPIレスポンス:', {
+        status: response.status,
+        ok: response.ok,
+      });
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.log('🔍 [user-plans/change] Error data:', errorData)
+        console.error('❌ [user-plans/update] バックエンドAPIエラー:', errorData);
 
         // エラーメッセージを返す
         let errorMessage = 'プラン変更に失敗しました'
-        
+
         if (response.status === 401) {
           errorMessage = '認証エラー: ログインしてください'
         } else if (response.status === 404) {
@@ -69,7 +82,7 @@ export async function POST(request: NextRequest) {
           errorMessage = errorData.error.message
         }
 
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: errorMessage,
@@ -80,15 +93,15 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json()
-      console.log('🔍 [user-plans/change] Success:', data)
-      return NextResponse.json(data, { status: response.status })
+      console.log('🔍 [user-plans/update] バックエンドAPIレスポンスdata:', data);
+      return createNoCacheResponse(data, { status: response.status })
     } catch (fetchError) {
       clearTimeout(timeoutId)
       throw fetchError
     }
   } catch (error) {
     console.error('❌ [user-plans/change] Error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { success: false, message: 'プラン変更中にエラーが発生しました' },
       { status: 500 }
     )

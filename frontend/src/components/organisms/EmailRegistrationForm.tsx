@@ -82,10 +82,9 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
   }
 
   const handleCampaignCodeChange = (value: string) => {
-    const upperValue = value.toUpperCase()
-    setFormData(prev => ({ ...prev, campaignCode: upperValue }))
-    if (upperValue.trim()) {
-      validateField('campaignCode', upperValue)
+    setFormData(prev => ({ ...prev, campaignCode: value }))
+    if (value.trim()) {
+      validateField('campaignCode', value)
     } else {
       setErrors(prev => {
         const newErrors = { ...prev }

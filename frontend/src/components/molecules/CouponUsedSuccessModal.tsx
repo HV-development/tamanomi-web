@@ -76,6 +76,13 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
                 <p className="text-green-700 font-medium">{coupon.name}</p>
                 <p className="text-sm text-gray-600">{coupon.storeName}</p>
               </div>
+
+              {/* リセット情報 */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <p className="text-xs text-gray-500">
+                  翌日の0:00にリセットされます
+                </p>
+              </div>
             </div>
 
             {/* 閉じるボタン */}
@@ -89,6 +96,11 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
             >
               閉じる
             </button>
+
+            {/* VOICEVOXクレジット表記 */}
+            <div className="mt-3 text-center">
+              <p className="text-xs text-gray-400">VOICEVOX:ずんだもん</p>
+            </div>
           </div>
         </div>
       </div>

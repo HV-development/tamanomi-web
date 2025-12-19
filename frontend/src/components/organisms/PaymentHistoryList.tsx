@@ -16,7 +16,7 @@ interface PaymentHistoryListProps {
 
 export function PaymentHistoryList({
   history,
-  // onBackToMyPage, onBackToTop は無料キャンペーン中は未使用（将来のために型定義のみ保持）
+  onBackToMyPage,
   className = ""
 }: PaymentHistoryListProps) {
   // 全ての背景色をブロンズ・非会員色に統一
@@ -46,25 +46,22 @@ export function PaymentHistoryList({
       <div className={`min-h-screen ${backgroundColorClass} ${className}`}>
         {/* ヘッダー */}
         <div className="bg-white border-b border-gray-200 px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
-            {/* <button
+          <div className="relative flex items-center justify-center">
+            {onBackToMyPage && (
+              <button
               onClick={onBackToMyPage}
-              className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
+                className="absolute left-0 flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
             >
               ← 戻る
-            </button> */}
-            <div className="w-12"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 text-green-600">
-                🍷
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-green-700 text-lg leading-tight">TAMAYOI</span>
-                <span className="text-xs text-green-600 font-medium -mt-1">たまよい</span>
-              </div>
-            </div>
-            <div className="w-12"></div>
+              </button>
+            )}
+            <Image
+              src="/logo.svg"
+              alt="TAMAYOI"
+              width={144}
+              height={32}
+              className="h-8 object-contain"
+            />
           </div>
         </div>
 
@@ -89,15 +86,15 @@ export function PaymentHistoryList({
     <div className={`min-h-screen ${backgroundColorClass} ${className}`}>
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
-          {/* <button
+        <div className="relative flex items-center justify-center">
+          {onBackToMyPage && (
+            <button
             onClick={onBackToMyPage}
-            className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
+              className="absolute left-0 flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
           >
             ← 戻る
-          </button> */}
-          <div className="w-12"></div>
+            </button>
+          )}
           <Image
             src="/logo.svg"
             alt="TAMAYOI"
@@ -105,7 +102,6 @@ export function PaymentHistoryList({
             height={32}
             className="h-8 object-contain"
           />
-          <div className="w-12"></div>
         </div>
       </div>
 

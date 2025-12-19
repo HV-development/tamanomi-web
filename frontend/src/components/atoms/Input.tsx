@@ -1,14 +1,15 @@
 "use client"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
+import type { ReactNode } from "react"
 
 interface InputProps {
-  type?: "text" | "email" | "password"
+  type?: "text" | "email" | "password" | "tel"
   placeholder?: string
   value: string
   onChange: (value: string) => void
   onBlur?: () => void
-  label?: string
+  label?: string | ReactNode
   error?: string
   required?: boolean
   disabled?: boolean

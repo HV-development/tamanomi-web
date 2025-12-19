@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { ArrowLeft, Ticket, CheckCircle, AlertTriangle, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -26,7 +27,7 @@ export default function UsageGuidePage() {
     },
     {
       step: 2,
-      title: "店員さんに確定ボタンを押してもらう",
+      title: "利用者ご自身で「確定」ボタンを押下してください",
       description: "店員さんに「確定する」ボタンを押してもらってください。",
       details: [
         "お客様ご自身では押さないでください",
@@ -37,17 +38,18 @@ export default function UsageGuidePage() {
     {
       step: 3,
       title: "クーポン適用完了",
-      description: "クーポンが正常に適用され、割引が反映されます。",
+      description: "クーポンが正常に適用され、ドリンクが一杯無料になります​。",
       details: [
         "使用完了画面が表示されます",
-        "レシートで割引内容をご確認ください",
         "利用履歴に記録されます"
       ]
     }
   ]
 
   const importantNotes = [
-    "クーポンは1日1回まで利用可能です",
+    "毎日1店につき1回まで利用可能です",
+    "クーポンは翌日の0:00にリセットされます",
+    "20歳未満の方はアルコールは飲めません",
     "一度使用したクーポンはキャンセルできません",
     "他のクーポンとの併用はできません",
     "有効期限内にご利用ください",
@@ -58,24 +60,21 @@ export default function UsageGuidePage() {
     <div className={`min-h-screen ${backgroundColorClass}`}>
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
-          <button 
-            onClick={handleBack} 
-            className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
+        <div className="relative flex items-center justify-center">
+          <button
+            onClick={handleBack}
+            className="absolute left-0 flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             戻る
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 text-green-600">
-              🍷
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-green-700 text-lg leading-tight">TAMAYOI</span>
-              <span className="text-xs text-green-600 font-medium -mt-1">たまよい</span>
-            </div>
-          </div>
-          <div className="w-12"></div>
+          <Image
+            src="/logo.svg"
+            alt="TAMAYOI"
+            width={144}
+            height={32}
+            className="h-8 object-contain"
+          />
         </div>
       </div>
 
@@ -92,7 +91,7 @@ export default function UsageGuidePage() {
         {/* 使用手順 */}
         <div className="space-y-6 mb-8">
           {usageSteps.map((step, index) => (
-            <div 
+            <div
               key={step.step}
               className="bg-white rounded-2xl border border-gray-200 p-6 animate-in slide-in-from-left-4 duration-300"
               style={{ animationDelay: `${index * 100}ms` }}

@@ -32,4 +32,5 @@ export type MyPageViewType =
   | "plan-change"
   | "withdrawal"
   | "withdrawal-complete"
+  | "store-introduction"
 

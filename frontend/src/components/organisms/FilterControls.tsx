@@ -3,9 +3,9 @@
 import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 import { Logo } from "@/components/atoms/Logo"
-import { HamburgerMenu } from "./HamburgerMenu"
-import { GenrePopup } from "./GenrePopup"
-import { AreaPopup } from "./AreaPopup"
+import { HamburgerMenu } from "../molecules/HamburgerMenu"
+import { GenrePopup } from "../molecules/GenrePopup"
+import { AreaPopup } from "../molecules/AreaPopup"
 import { calculateUserRank } from "@/utils/rank-calculator"
 import type { User as UserType } from "@/types/user"
 
@@ -200,7 +200,7 @@ export function FilterControls({
       <AreaPopup
         isOpen={isAreaPopupOpen}
         selectedAreas={[selectedArea]}
-        onAreaToggle={(area) => {
+        onAreaToggle={(area: string) => {
           if (area === selectedArea) {
             handleAreaClear()
           } else {

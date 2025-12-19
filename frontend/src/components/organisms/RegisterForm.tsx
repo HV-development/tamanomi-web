@@ -1,12 +1,13 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { Input } from "@/components/atoms/Input"
 import { Button } from "@/components/atoms/Button"
 import { RadioButton } from "@/components/atoms/RadioButton"
 import { DateSelect } from "@/components/atoms/DateSelect"
 import { UseRregistrationCompleteSchema, type UserRegistrationComplete } from "@hv-development/schemas"
+import { calculateAge } from "@/utils/age-calculator"
 
 interface RegisterFormProps {
   email?: string
@@ -30,6 +31,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     address: "",
     birthDate: "",
     gender: "male",
+    phone: "",
     saitamaAppId: "",
     password: "",
     passwordConfirm: "",
@@ -40,9 +42,30 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const [touchedFields, setTouchedFields] = useState<Set<keyof UserRegistrationComplete>>(new Set())
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [termsError, setTermsError] = useState("")
+  const [agreedToAlcoholRestriction, setAgreedToAlcoholRestriction] = useState(false)
+  const [alcoholRestrictionError, setAlcoholRestrictionError] = useState("")
 
   // 住所フィールドへの参照を追加
   const addressInputRef = useRef<HTMLInputElement>(null)
+
+  // 生年月日から年齢を計算し、20歳未満かどうかを判定
+  const isUnder20 = useMemo(() => {
+    if (!formData.birthDate) return false
+    try {
+      const age = calculateAge(formData.birthDate)
+      return age < 20
+    } catch {
+      return false
+    }
+  }, [formData.birthDate])
+
+  // 生年月日が変更されて20歳以上になった場合、チェックボックスの状態をリセット
+  useEffect(() => {
+    if (!isUnder20) {
+      setAgreedToAlcoholRestriction(false)
+      setAlcoholRestrictionError("")
+    }
+  }, [isUnder20])
 
   // initialFormDataが変更された時にフォームデータを設定
   useEffect(() => {
@@ -70,9 +93,19 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       return
     }
 
+    // emailフィールドはバリデーションしない（トークンから取得されるため）
+    if (fieldName === 'email') {
+      return
+    }
+
     try {
       // 個別フィールドのバリデーション（フォーム全体をパースして該当フィールドのエラーのみを抽出）
-      const testData = { ...formData, [fieldName]: value }
+      // emailは一時的な値を設定（トークンから取得されるため）
+      const testData = {
+        ...formData,
+        [fieldName]: value,
+        email: formData.email || 'temp@example.com' // バリデーション用の一時的な値
+      }
       UseRregistrationCompleteSchema.parse(testData)
 
       // バリデーション成功時はエラーをクリア
@@ -102,8 +135,15 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   const validateForm = () => {
     try {
+      // emailが空の場合は、バリデーション用に一時的な値を設定
+      // （実際の送信時にはemailは除外され、サーバー側でトークンから取得される）
+      const validationData = {
+        ...formData,
+        email: formData.email || 'temp@example.com', // バリデーション用の一時的な値
+      }
+
       // スキーマを使用してバリデーション
-      UseRregistrationCompleteSchema.parse(formData)
+      UseRregistrationCompleteSchema.parse(validationData)
       setErrors({})
       return true
     } catch (error) {
@@ -115,7 +155,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
         zodError.errors.forEach((err) => {
           const field = err.path?.[0] as keyof UserRegistrationComplete
-          if (field) {
+          // emailフィールドのエラーは無視（トークンから取得されるため）
+          if (field && field !== 'email') {
             newErrors[field] = err.message
           }
         })
@@ -136,10 +177,32 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     }
     setTermsError("")
 
+    // 20歳未満の場合のアルコール制限チェック
+    if (isUnder20 && !agreedToAlcoholRestriction) {
+      setAlcoholRestrictionError("20歳未満の方はアルコールは飲めませんに同意してください")
+      return
+    }
+    setAlcoholRestrictionError("")
+
     const isValid = validateForm()
 
     if (isValid) {
       onSubmit(formData)
+    } else {
+      // すべてのフィールドをタッチ済みとしてマーク（エラーを表示するため）
+      const allFields: (keyof UserRegistrationComplete)[] = [
+        'email',
+        'nickname',
+        'postalCode',
+        'address',
+        'birthDate',
+        'gender',
+        'phone',
+        'saitamaAppId',
+        'password',
+        'passwordConfirm',
+      ]
+      setTouchedFields(new Set(allFields))
     }
   }
 
@@ -170,6 +233,34 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       const response = await fetch(apiUrl)
+
+      // レスポンスのステータスコードをチェック
+      if (!response.ok) {
+        // エラーレスポンスの場合
+        let errorMessage = '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。'
+        try {
+          const errorData = await response.json()
+          if (errorData.message) {
+            errorMessage = errorData.message
+          }
+        } catch {
+          // JSONパースに失敗した場合はデフォルトメッセージを使用
+        }
+
+        setErrors(prev => ({
+          ...prev,
+          postalCode: errorMessage
+        }))
+
+        // 住所フィールドにフォーカス
+        setTimeout(() => {
+          if (addressInputRef.current) {
+            addressInputRef.current.focus()
+          }
+        }, 100)
+        return
+      }
+
       const data = await response.json()
 
       if (data.success && data.address) {
@@ -187,9 +278,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }))
       } else {
         // 住所が見つからない場合はエラーメッセージを表示
+        const errorMessage = data.message || '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。'
         setErrors(prev => ({
           ...prev,
-          postalCode: '該当する住所が見つかりませんでした。郵便番号を確認するか、住所を直接入力してください。'
+          postalCode: errorMessage
         }))
 
         // 住所フィールドにフォーカスを移す
@@ -200,8 +292,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }, 100)
       }
 
-    } catch {
-      // ネットワークエラーなどの場合
+    } catch (error) {
+      // ネットワークエラーやJSONパースエラーなどの場合
+      console.error('住所検索エラー:', error)
       setErrors(prev => ({
         ...prev,
         postalCode: '住所検索中にエラーが発生しました。しばらくしてから再度お試しください。'
@@ -238,19 +331,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* メールアドレス表示 */}
-      {email && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            メールアドレス
-          </label>
-          <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
-            {email}
-          </div>
-          <p className="mt-1 text-xs text-gray-500">※認証済みのメールアドレスです</p>
-        </div>
-      )}
-
       {/* ニックネーム */}
       <Input
         type="text"
@@ -300,7 +380,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         <input
           ref={addressInputRef}
           type="text"
-          placeholder="住所を入力するか、上記の住所検索ボタンをご利用ください"
+          placeholder="住所を入力してください"
           value={formData.address}
           onChange={(e) => updateFormData("address", e.target.value)}
           onBlur={() => handleFieldBlur("address")}
@@ -310,11 +390,54 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       </div>
 
       {/* 生年月日 */}
-      <DateSelect
-        label="生年月日"
-        value={formData.birthDate}
-        onChange={(value) => updateFormData("birthDate", value)}
-        error={errors.birthDate}
+      <div className="w-full">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          生年月日
+          <span className="ml-2 text-xs text-gray-500 font-normal">※登録後の変更はできません</span>
+        </label>
+        <DateSelect
+          value={formData.birthDate}
+          onChange={(value) => updateFormData("birthDate", value)}
+          error={errors.birthDate}
+        />
+      </div>
+
+      {/* 20歳未満の場合のアルコール制限チェックボックス */}
+      {isUnder20 && (
+        <div className="space-y-2">
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="alcoholRestriction"
+              checked={agreedToAlcoholRestriction}
+              onChange={(e) => {
+                setAgreedToAlcoholRestriction(e.target.checked)
+                if (e.target.checked) {
+                  setAlcoholRestrictionError("")
+                }
+              }}
+              className="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
+            />
+            <label htmlFor="alcoholRestriction" className="ml-2 text-sm text-gray-700 cursor-pointer">
+              20歳未満の方はアルコールは飲めません
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+          </div>
+          {alcoholRestrictionError && (
+            <p className="text-sm text-red-600 ml-6">{alcoholRestrictionError}</p>
+          )}
+        </div>
+      )}
+
+      {/* 電話番号 */}
+      <Input
+        type="tel"
+        label="電話番号"
+        placeholder="09012345678（ハイフンなし）"
+        value={formData.phone || ""}
+        onChange={(value) => updateFormData("phone", value)}
+        onBlur={() => handleFieldBlur("phone")}
+        error={errors.phone || undefined}
       />
 
       {/* 性別 */}
@@ -328,15 +451,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       />
 
       {/* さいたま市みんなのアプリID */}
-      <Input
-        type="text"
-        label="さいたま市みんなのアプリ（任意）"
-        placeholder="さいたま市みんなのアプリIDを入力"
-        value={formData.saitamaAppId || ""}
-        onChange={(value) => updateFormData("saitamaAppId", value)}
-        onBlur={() => handleFieldBlur("saitamaAppId")}
-        error={errors.saitamaAppId || undefined}
-      />
+      <div>
+        <Input
+          type="text"
+          label="さいたま市みんなのアプリ（任意）"
+          placeholder="さいたま市みんなのアプリIDを入力"
+          value={formData.saitamaAppId || ""}
+          onChange={(value) => updateFormData("saitamaAppId", value)}
+          onBlur={() => handleFieldBlur("saitamaAppId")}
+          error={errors.saitamaAppId || undefined}
+        />
+        <p className="mt-1 text-sm text-gray-500">
+          さいたま市みんなのアプリユーザー特典をご利用の方は、アプリのユーザーIDをコピーして貼り付けてください
+        </p>
+      </div>
 
       {/* パスワード */}
       <Input

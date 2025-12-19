@@ -92,7 +92,6 @@ export default function DrinkAnimation({
           onClick={() => {
             setCurrentImage('drink1');
             setIsAnimating(false);
-            setAnimationPhase('idle');
             setHasAnimated(false);
           }}
           className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"

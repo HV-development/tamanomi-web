@@ -1,41 +1,66 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { addNoCacheHeaders } from '@/lib/response-utils'
+import { API_BASE_URL } from '@/lib/api-config'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { token: string } }
+    { params }: { params: Promise<{ token: string }> }
 ) {
     try {
-        const { token } = params
+        const { token } = await params
 
         if (!token) {
-            return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
+            return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url)))
         }
 
-        // トークンをデコードして検証
+        // トークンはUUIDのみで、メールアドレスなどの個人情報は含まれない（セキュリティ改善）
+        // バックエンドAPIでトークンを検証（POSTメソッドでトークンをボディで送信）
         try {
-            // Base64URLデコード
-            const paddedToken = token + '='.repeat((4 - token.length % 4) % 4)
-                .replace(/-/g, '+')
-                .replace(/_/g, '/')
+            const response = await secureFetchWithCommonHeaders(
+                request,
+                `${API_BASE_URL}/api/v1/register/token-info`,
+                {
+                    method: 'POST',
+                    headerOptions: {
+                        requireAuth: false,
+                    },
+                    body: JSON.stringify({ token }),
+                }
+            )
 
-            const decodedToken = Buffer.from(paddedToken, 'base64').toString('utf-8')
-            const tokenData = JSON.parse(decodedToken)
-
-            // 有効期限チェック
-            if (tokenData.expiresAt && Date.now() > tokenData.expiresAt) {
-                return NextResponse.redirect(new URL('/email-registration?error=token_expired', request.url))
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                console.error('Token verification failed:', errorData)
+                
+                // エラーコードに応じてリダイレクト
+                if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
+                    return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=token_expired', request.url)))
+                }
+                return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url)))
             }
 
-            // メールアドレスとトークンを含むクエリパラメータで新規登録画面にリダイレクト
+            // 検証成功 - 新規登録画面にリダイレクト（emailパラメータは含めない - セキュリティ改善）
             const registerUrl = new URL('/register', request.url)
-            registerUrl.searchParams.set('email', tokenData.email)
             registerUrl.searchParams.set('token', token)
+            
+            // URLパラメータから紹介者IDを取得して含める
+            const ref = request.nextUrl.searchParams.get('ref')
+            if (ref) {
+              registerUrl.searchParams.set('ref', ref)
+            }
 
-            return NextResponse.redirect(registerUrl)
+            // shop_idがURLパラメータに含まれている場合は追加
+            const shopIdFromQuery = request.nextUrl.searchParams.get('shop_id')
+            if (shopIdFromQuery) {
+              registerUrl.searchParams.set('shop_id', shopIdFromQuery)
+            }
+
+            return addNoCacheHeaders(NextResponse.redirect(registerUrl))
         } catch {
-            return NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url))
+            return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=invalid_token', request.url)))
         }
     } catch {
-        return NextResponse.redirect(new URL('/email-registration?error=verification_failed', request.url))
+        return addNoCacheHeaders(NextResponse.redirect(new URL('/email-registration?error=verification_failed', request.url)))
     }
 }

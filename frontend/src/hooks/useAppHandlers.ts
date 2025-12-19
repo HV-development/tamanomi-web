@@ -1,12 +1,14 @@
 "use client"
 
 import React, { useCallback, useState, useRef, useEffect } from "react"
-import type { AppAction, AppState, AppHandlers, Store } from '../../tamanomi-schemas/src/frontend/types'
+import type { AppAction, AppState, AppHandlers, Store } from '@hv-development/schemas'
 import { appConfig } from '@/config/appConfig'
 import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
 import type { useFilters } from './useFilters'
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import { getCurrentPosition } from '@/utils/location'
+import { toast } from 'sonner'
 
 // ハンドラー作成フック
 export const useAppHandlers = (
@@ -28,9 +30,35 @@ export const useAppHandlers = (
     // OTP requestIdを管理するローカルstate
     const [otpRequestId, setOtpRequestId] = useState<string>("")
 
-    const handleCurrentLocationClick = useCallback(() => {
-        filters.toggleNearbyFilter()
-    }, [filters])
+    const handleCurrentLocationClick = useCallback(async () => {
+        const newFilterState = !filters.isNearbyFilter
+        filters.setIsNearbyFilter(newFilterState)
+
+        if (newFilterState) {
+            // フィルターをONにする場合、位置情報を取得
+            dispatch({ type: 'SET_LOCATION_LOADING', payload: true })
+            dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
+
+            try {
+                const location = await getCurrentPosition()
+                dispatch({ type: 'SET_CURRENT_LOCATION', payload: location })
+                dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
+            } catch (error) {
+                // 位置情報取得に失敗した場合
+                const errorMessage = error instanceof Error ? error.message : '位置情報の取得に失敗しました'
+                dispatch({ type: 'SET_LOCATION_ERROR', payload: errorMessage })
+                dispatch({ type: 'SET_CURRENT_LOCATION', payload: null })
+                // エラーをユーザーに通知（後で実装）
+                alert(errorMessage)
+            } finally {
+                dispatch({ type: 'SET_LOCATION_LOADING', payload: false })
+            }
+        } else {
+            // フィルターをOFFにする場合、位置情報をクリア
+            dispatch({ type: 'SET_CURRENT_LOCATION', payload: null })
+            dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
+        }
+    }, [filters, dispatch])
 
     const handleTabChange = useCallback((tab: string) => {
         if (tab === "home" && appConfig.restrictTopPageAccess && auth.isAuthenticated) {
@@ -69,6 +97,7 @@ export const useAppHandlers = (
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Cookieを送信
                 body: JSON.stringify({ email: loginData.email, password: loginData.password }),
             })
 
@@ -84,6 +113,7 @@ export const useAppHandlers = (
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // Cookieを送信
                 body: JSON.stringify({ email: loginData.email }),
             })
 
@@ -129,28 +159,17 @@ export const useAppHandlers = (
                 throw new Error(data.error || 'ワンタイムパスワードの認証に失敗しました')
             }
 
-            // ログイン成功
-            // トークンをlocalStorageに保存
-            if (data.accessToken) {
-                localStorage.setItem('accessToken', data.accessToken)
-            }
-            if (data.refreshToken) {
-                localStorage.setItem('refreshToken', data.refreshToken)
-            }
-
-            // プラン登録状況を確認してauth状態を更新
+            // ログイン成功 - トークンはCookieに保存されているため、プラン登録状況を確認してauth状態を更新
             let hasPlan = false
             try {
                 const userResponse = await fetch('/api/user/me', {
-                    headers: {
-                        'Authorization': `Bearer ${data.accessToken}`,
-                    },
+                    credentials: 'include', // Cookieを送信
                 })
 
                 if (userResponse.ok) {
                     const userData = await userResponse.json()
                     hasPlan = userData.plan !== null && userData.plan !== undefined
-                    
+
                     // auth状態を更新
                     auth.login(userData, userData.plan, [], [])
                 }
@@ -158,20 +177,25 @@ export const useAppHandlers = (
                 // エラー処理
             }
 
-        // メールアドレス変更成功モーダルが表示されている場合は遷移を停止
-        if (state.isEmailChangeSuccessModalOpen) {
-            dispatch({ type: 'RESET_LOGIN_STATE' })
-            return
-        }
+            // メールアドレス変更成功モーダルが表示されている場合は遷移を停止
+            if (state.isEmailChangeSuccessModalOpen) {
+                dispatch({ type: 'RESET_LOGIN_STATE' })
+                return
+            }
 
-            // プラン登録状況によって遷移先を変更
+            // プラン登録状況によって遷移先を変更（router.replaceでブラウザ履歴を置き換えて、ログイン画面を経由しないようにする）
+            let targetPath: string
             if (!hasPlan) {
                 // プラン未登録の場合はプラン登録画面へ（独立したページ）
-                router.push('/plan-registration')
+                targetPath = '/plan-registration'
             } else {
                 // プラン登録済みの場合はhome画面へ遷移
-                router.push('/home')
+                targetPath = '/home'
             }
+
+            // メモリ内stateのみで管理（sessionStorageは使用しない）
+            // リダイレクト先のページでstateを管理する
+            router.replace(targetPath)
 
             dispatch({ type: 'RESET_LOGIN_STATE' })
         } catch (error) {
@@ -323,6 +347,21 @@ export const useAppHandlers = (
             dispatch({ type: 'SET_PASSWORD_RESET_STEP', payload: "complete" })
             auth.setIsLoading(false)
         }, 1500)
+        try {
+            const response = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            })
+            if (!response.ok) {
+                throw new Error('パスワードリセットに失敗しました')
+            }
+        } catch (error) {
+            console.error('パスワードリセットエラー:', error)
+            toast.error(error instanceof Error ? error.message : 'パスワードリセットに失敗しました')
+        }
     }, [auth, dispatch])
 
     const handlePasswordResetCancel = useCallback(() => {
@@ -386,15 +425,238 @@ export const useAppHandlers = (
         dispatch({ type: 'MARK_ALL_NOTIFICATIONS_READ' })
     }, [dispatch])
 
-    const handleFavoriteToggle = useCallback((storeId: string) => {
-        dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
-    }, [dispatch])
+    const handleFavoriteToggle = useCallback(async (storeId: string) => {
+        // Cookieの存在を確認
+        const hasCookie = typeof document !== 'undefined' && document.cookie.includes('accessToken')
 
-    const handleCouponsClick = useCallback((storeId: string) => {
-        const store = state.stores.find((s) => s.id === storeId)
+        // 現在の状態を確認（UIの状態ではなく、データの状態を確認）
+        const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
+        const currentIsFavorite = currentStore?.isFavorite ?? false
+
+        // Cookieが存在する場合は認証済みとして扱い、API呼び出しを試みる
+        // 未認証かつCookieもない場合はセッションストレージに保存
+        if (!auth.isAuthenticated && !hasCookie) {
+            try {
+                // セッションストレージの状態も確認
+                const { isFavoriteInStorage, addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
+                const storageIsFavorite = isFavoriteInStorage(storeId)
+
+                // 現在の状態の逆にする（登録されている場合は削除、削除されている場合は登録）
+                if (storageIsFavorite) {
+                    removeFavoriteFromStorage(storeId)
+                } else {
+                    addFavoriteToStorage(storeId)
+                }
+
+                // UIを更新（現在の状態の逆にする）
+                dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+            } catch (error) {
+                console.error('セッションストレージへの保存エラー:', error)
+            }
+            return
+        }
+
+        // 認証済みまたはCookieが存在する場合は楽観的更新：UIを先に更新
+        dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+
+        // 認証済みまたはCookieが存在する場合はAPI呼び出し
+        try {
+            // API呼び出し
+            let response: Response
+            let data: { isFavorite?: boolean; error?: { message?: string }; message?: string }
+            try {
+                response = await fetch(`/api/favorites/${storeId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({}),
+                    credentials: 'include', // Cookieを送信
+                })
+
+                data = await response.json()
+
+                if (!response.ok) {
+                    // トークン期限切れの場合（401/403エラー）- セッションストレージに保存
+                    if (response.status === 401 || response.status === 403) {
+                        // ログアウト（Cookieはサーバーサイドでクリアされる）
+                        auth.logout()
+
+                        // セッションストレージにお気に入りを保存
+                        // 楽観的更新で既にUIが反転しているが、元の状態（currentIsFavorite）の逆に保存する
+                        try {
+                            const { addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
+                            // 元の状態の逆にする（登録されていた場合は削除、削除されていた場合は登録）
+                            if (currentIsFavorite) {
+                                removeFavoriteFromStorage(storeId)
+                            } else {
+                                addFavoriteToStorage(storeId)
+                            }
+                        } catch (storageError) {
+                            console.error('セッションストレージへの保存エラー:', storageError)
+                        }
+
+                        // UIは既に楽観的更新で更新済みなので、そのまま維持
+                        // 403エラーは正常処理なので、エラーとして扱わない（早期リターン）
+                        return
+                    }
+
+                    // その他のエラー時はロールバック（再度トグル）
+                    dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+                    throw new Error(data.error?.message || data.message || 'お気に入りの登録/削除に失敗しました')
+                }
+            } catch {
+                // ネットワークエラーなどの場合は、トークン期限切れの可能性があるのでセッションストレージに保存
+                // ログアウト（Cookieはサーバーサイドでクリアされる）
+                auth.logout()
+
+                // セッションストレージにお気に入りを保存
+                // 楽観的更新で既にUIが反転しているが、元の状態（currentIsFavorite）の逆に保存する
+                try {
+                    const { addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
+                    // 元の状態の逆にする（登録されていた場合は削除、削除されていた場合は登録）
+                    if (currentIsFavorite) {
+                        removeFavoriteFromStorage(storeId)
+                    } else {
+                        addFavoriteToStorage(storeId)
+                    }
+                } catch (storageError) {
+                    console.error('セッションストレージへの保存エラー:', storageError)
+                }
+
+                // UIは既に楽観的更新で更新済みなので、そのまま維持
+                // fetchErrorは無視（早期リターン）
+                return
+            }
+
+            // APIから返された状態を反映
+            // 楽観的更新で既にUIをトグルしているが、APIの結果が期待と異なる場合は調整
+            if (data.isFavorite !== undefined) {
+                const currentStore = state.stores.find((s: { id: string; isFavorite?: boolean }) => s.id === storeId)
+                const currentUIState = currentStore?.isFavorite ?? false
+
+                // 楽観的更新後の状態（元の状態の逆）とAPIの結果を比較
+                // 元の状態（currentIsFavorite）の逆が期待値
+                const expectedState = !currentIsFavorite
+
+                // APIの結果が期待値と異なる場合は調整（通常は一致するはず）
+                if (data.isFavorite !== expectedState) {
+                    // APIの結果が正しいので、UIをAPIの結果に合わせる
+                    if (currentUIState !== data.isFavorite) {
+                        dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+                    }
+                }
+            }
+
+            // お気に入り一覧を再取得して状態を同期
+            try {
+                const syncResponse = await fetch('/api/favorites', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    cache: 'no-store',
+                    credentials: 'include',
+                })
+
+                if (syncResponse.ok) {
+                    const syncData = await syncResponse.json()
+                    const favoriteShopIds = (syncData.shops || []).map((shop: { id: string }) => shop.id) as string[]
+
+                    dispatch({
+                        type: 'SYNC_FAVORITES',
+                        payload: favoriteShopIds
+                    })
+                }
+            } catch (syncError) {
+                console.error('お気に入り一覧の同期エラー:', syncError)
+            }
+        } catch (error) {
+            // トークン期限切れエラー（403など）は既に処理済みなので、ここでは処理しない
+            // その他のエラーのみ処理
+            const errorMessage = error instanceof Error ? error.message : 'お気に入りの登録/削除に失敗しました'
+
+            // 認証関連のエラーは既に処理済みなので、エラーログを出力しない
+            if (errorMessage.includes('無効なトークン') || errorMessage.includes('認証')) {
+                return
+            }
+
+            // その他のエラー時はロールバック（再度トグル）
+            dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
+            console.error('お気に入り登録/削除エラー:', errorMessage)
+
+            // TODO: トーストやアラートでエラーを表示
+        }
+    }, [auth, dispatch, state.stores])
+
+    const handleCouponsClick = useCallback(async (storeId: string) => {
+        const store = state.stores.find((s: { id: string }) => s.id === storeId)
+
         if (store) {
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
             dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
+            // クーポン取得開始時にローディング状態を設定（ローカル状態として管理）
+            // 注意: AppStateにisLoadingCouponsを追加する必要があるが、今回は簡易的にstoreCouponsが空の場合はローディング中と判断
+
+            // クーポンを取得
+            try {
+                const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    cache: 'no-store',
+                    credentials: 'include', // Cookieを送信
+                })
+
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}))
+                    console.error('❌ Failed to fetch coupons:', response.status, errorData)
+                    dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
+                    return
+                }
+
+                const data = await response.json()
+
+                if (data.coupons && data.coupons.length > 0) {
+                    // APIからのクーポンをfrontend用の形式に変換
+                    const storeCoupons = data.coupons.map((coupon: {
+                        id: string;
+                        title: string;
+                        description?: string;
+                        conditions?: string;
+                        imageUrl?: string;
+                        drinkType?: string;
+                        status: string;
+                        shopId: string;
+                        shop?: { name: string };
+                        createdAt?: string;
+                        updatedAt?: string;
+                    }) => ({
+                        id: coupon.id,
+                        name: coupon.title,
+                        description: coupon.description || '',
+                        conditions: coupon.conditions || null,
+                        imageUrl: coupon.imageUrl || '',
+                        drinkType: coupon.drinkType || null,
+                        status: coupon.status,
+                        shopId: coupon.shopId,
+                        storeName: coupon.shop?.name || store.name,
+                        uuid: coupon.id,
+                        createdAt: coupon.createdAt,
+                        updatedAt: coupon.updatedAt,
+                    }))
+                    dispatch({ type: 'SET_STORE_COUPONS', payload: storeCoupons })
+                } else {
+                    dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
+                }
+            } catch (error) {
+                console.error('❌ Error fetching coupons:', error)
+                dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
+            }
         }
     }, [state.stores, dispatch])
 
@@ -414,8 +676,17 @@ export const useAppHandlers = (
     }, [navigation, dispatch])
 
     const handleViewPlan = useCallback(() => {
-        navigation.navigateToMyPage("plan-management")
-    }, [navigation])
+        // プラン有無に応じて遷移先を分岐
+        const hasPlan = auth.plan !== null && auth.plan !== undefined
+
+        if (!hasPlan) {
+            // プラン未登録の場合は独立したプラン登録ページへ遷移
+            router.push('/plan-registration')
+        } else {
+            // プラン登録済みの場合は既存のプラン管理画面へ
+            navigation.navigateToMyPage("plan-management")
+        }
+    }, [navigation, router, auth])
 
     const handleChangePlan = useCallback(() => {
         navigation.navigateToMyPage("plan-change")
@@ -423,62 +694,83 @@ export const useAppHandlers = (
 
     const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
         try {
+            console.log('🔍 [handlePlanChangeSubmit] プラン変更開始:', {
+                planId,
+                alsoChangePaymentMethod,
+                alsoChangePaymentMethodType: typeof alsoChangePaymentMethod,
+            });
+
             auth.setIsLoading(true)
-            
-            // アクセストークンを取得
-            const accessToken = localStorage.getItem('accessToken')
-            if (!accessToken) {
-                throw new Error('認証情報が見つかりません。ログインしてください。')
-            }
+
+            const requestBody = {
+                planId: planId,
+                alsoChangePaymentMethod: alsoChangePaymentMethod || false,
+            };
+            console.log('🔍 [handlePlanChangeSubmit] APIリクエストbody:', requestBody);
 
             // プラン変更APIを呼び出し
             const response = await fetch('/api/user-plans/update', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
                 },
-                body: JSON.stringify({
-                    planId: planId,
-                }),
+                body: JSON.stringify(requestBody),
+                credentials: 'include', // Cookieを送信
             })
+
+            console.log('🔍 [handlePlanChangeSubmit] APIレスポンスstatus:', response.status);
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
+                console.error('❌ [handlePlanChangeSubmit] APIエラー:', errorData);
                 throw new Error(errorData.message || 'プラン変更に失敗しました')
             }
 
-            await response.json()
+            const responseData = await response.json();
+            console.log('🔍 [handlePlanChangeSubmit] APIレスポンスdata:', responseData);
 
             // プラン変更後、新しいユーザー情報を取得してauth状態を更新
             try {
                 const userResponse = await fetch('/api/user/me', {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                    },
+                    credentials: 'include', // Cookieを送信
                 })
 
                 if (userResponse.ok) {
                     const updatedUserData = await userResponse.json()
-                    
+
                     // auth状態を更新
                     auth.login(updatedUserData, updatedUserData.plan, updatedUserData.usageHistory || [], updatedUserData.paymentHistory || [])
                 }
-            } catch {
+            } catch (userError) {
+                console.error('❌ [handlePlanChangeSubmit] ユーザー情報取得エラー:', userError);
                 // プラン変更は成功しているので、エラーでも続行
             }
 
-            // 支払い方法も変更する場合は、支払い方法変更画面へ遷移
+            // 支払い方法も変更する場合は、支払い方法変更確認画面へ遷移
+            console.log('🔍 [handlePlanChangeSubmit] 遷移判定:', {
+                alsoChangePaymentMethod,
+                alsoChangePaymentMethodValue: alsoChangePaymentMethod,
+                isTrue: alsoChangePaymentMethod === true,
+                isTruthy: !!alsoChangePaymentMethod,
+            });
+
             if (alsoChangePaymentMethod) {
+                console.log('✅ [handlePlanChangeSubmit] 支払い方法変更確認画面へ遷移します');
                 if (typeof window !== 'undefined') {
-                    window.location.href = '/payment-method-change?from=plan-change'
+                    // 支払い方法変更確認画面へ遷移（カード登録APIは、確認画面で「カード情報を変更する」ボタンをクリックしたときに呼び出される）
+                    // プラン変更時の新しいplanIdをURLパラメータとして渡す
+                    window.location.href = `/payment-method-change?from=plan-change&planId=${encodeURIComponent(planId)}`;
+                } else {
+                    console.warn('⚠️ [handlePlanChangeSubmit] windowが定義されていません');
                 }
             } else {
+                console.log('ℹ️ [handlePlanChangeSubmit] マイページに戻ります');
                 // 成功時はマイページに戻る
                 navigation.navigateToMyPage("main")
             }
-            
-        } catch {
+
+        } catch (error) {
+            console.error('❌ [handlePlanChangeSubmit] エラー発生:', error);
             // エラー時もマイページに戻る（エラーメッセージは別途表示）
             navigation.navigateToMyPage("main")
         } finally {
@@ -506,31 +798,150 @@ export const useAppHandlers = (
         navigation.navigateToMyPage("withdrawal")
     }, [navigation])
 
-    const handleWithdrawConfirm = useCallback(() => {
-        navigation.navigateToMyPage("withdrawal-complete")
-    }, [navigation])
+    const handleWithdrawConfirm = useCallback(async () => {
+        try {
+            auth.setIsLoading(true)
+
+            // Cookieベースの認証のみを使用（localStorageは廃止）
+
+            // ユーザー情報を取得（プラン情報は必須ではない）
+            const user = auth.user
+
+            if (!user) {
+                throw new Error('ユーザー情報が見つかりません')
+            }
+
+            // プラン情報からrunningIdとnextBillingDateを取得
+            // 最新のユーザー情報を取得（planにpaygentRunningIdとnextBillingDateが含まれているか確認）
+            // Cookieベースの認証のみを使用（localStorageは廃止）
+            const userMeResponse = await fetch('/api/user/me', {
+                credentials: 'include', // Cookieを送信
+            })
+
+            if (!userMeResponse.ok) {
+                throw new Error('ユーザー情報の取得に失敗しました')
+            }
+
+            const userData = await userMeResponse.json()
+
+            // デバッグログ
+
+            // userPlanまたはplanからrunningIdを取得（userPlanを優先）
+            const runningId = userData.userPlan?.paygentRunningId || userData.plan?.paygentRunningId
+            const userPlanId = userData.userPlan?.id
+
+            if (!runningId) {
+                if (!userPlanId) {
+                    // プラン登録していない場合は、アカウントのstatusを直接suspendedに更新
+                    console.log('🔄 [handleWithdrawConfirm] No userPlan found, withdrawing account directly')
+                    const withdrawResponse = await fetch('/api/user/withdraw', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({}),
+                        credentials: 'include',
+                    })
+
+                    if (!withdrawResponse.ok) {
+                        const errorData = await withdrawResponse.json().catch(() => ({}))
+                        throw new Error(errorData.error?.message || errorData.message || '退会処理に失敗しました')
+                    }
+
+                    navigation.navigateToMyPage("withdrawal-complete")
+                    return
+                }
+
+                // PAYGENT未連携（または単発決済）の場合は、ユーザープランを直接削除して退会扱いとする
+                const deleteResponse = await fetch(`/api/user-plans/${userPlanId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+
+                if (!deleteResponse.ok) {
+                    const errorData = await deleteResponse.json().catch(() => ({}))
+                    throw new Error(errorData.message || errorData.error?.message || '退会処理に失敗しました')
+                }
+
+                navigation.navigateToMyPage("withdrawal-complete")
+                return
+            }
+
+            // 次回課金日を取得（userPlanまたはplanから、userPlanを優先）
+            const nextBillingDate = userData.userPlan?.nextBillingDate || userData.plan?.nextBillingDate
+
+            if (!nextBillingDate) {
+                throw new Error('次回課金日が見つかりません')
+            }
+
+            // 日付をYYYYMMDD形式に変換
+            const formatDate = (date: Date | string): string => {
+                const d = typeof date === 'string' ? new Date(date) : date
+                const year = d.getFullYear()
+                const month = String(d.getMonth() + 1).padStart(2, '0')
+                const day = String(d.getDate()).padStart(2, '0')
+                return `${year}${month}${day}`
+            }
+
+            const endScheduled = formatDate(nextBillingDate)
+
+            // 退会処理APIを呼び出し（Paygent継続課金ありの場合）
+            // userEmailはバックエンドで認証トークンから取得するため、送信しない
+            const response = await fetch('/api/payment/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    customerId: user.paymentCard?.paygentCustomerId,
+                    customerCardId: user.paymentCard?.paygentCustomerCardId,
+                    runningId: runningId,
+                    endScheduled: endScheduled,
+                    description: '退会処理',
+                }),
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.error || errorData.message || '退会処理に失敗しました')
+            }
+
+            await response.json()
+
+            // 成功時は退会完了画面へ
+            navigation.navigateToMyPage("withdrawal-complete")
+        } catch (error) {
+            console.error('退会処理エラー:', error)
+            // エラーメッセージを表示（必要に応じてモーダルなどで表示）
+            alert(error instanceof Error ? error.message : '退会処理に失敗しました')
+        } finally {
+            auth.setIsLoading(false)
+        }
+    }, [auth, navigation])
 
     const handleWithdrawCancel = useCallback(() => {
         navigation.navigateToMyPage("profile-edit")
     }, [navigation])
 
-    const handleWithdrawComplete = useCallback(() => {
-        // まず認証状態をクリア
-        auth.logout()
+    const handleWithdrawComplete = useCallback(async () => {
+        // まず認証状態をクリア（cookieの削除も含む）
+        await auth.logout()
         navigation.resetNavigation()
-        
-        // 即座にログイン画面に遷移（home画面を表示しない）
+
+        // ログアウト完了後にログイン画面に遷移（home画面を表示しない）
         if (typeof window !== 'undefined') {
             window.location.href = '/'
         }
     }, [auth, navigation])
 
-    const handleLogout = useCallback(() => {
-        // まず認証状態をクリア
-        auth.logout()
+    const handleLogout = useCallback(async () => {
+        // まず認証状態をクリア（cookieの削除も含む）
+        await auth.logout()
         navigation.resetNavigation()
-        
-        // 即座にログイン画面に遷移（home画面を表示しない）
+
+        // ログアウト完了後にログイン画面に遷移（home画面を表示しない）
         if (typeof window !== 'undefined') {
             window.location.href = '/'
         }
@@ -568,22 +979,69 @@ export const useAppHandlers = (
             return
         }
 
-        // 動的インポートでクーポンデータを取得
-        import("../data/mock-coupons").then(({ mockCoupons }) => {
-            const storeCoupons = state.selectedStore ? mockCoupons[state.selectedStore.id] || [] : []
-            const coupon = storeCoupons.find((c) => c.id === couponId)
-            if (coupon) {
-                dispatch({ type: 'SET_SELECTED_COUPON', payload: coupon })
-                navigation.navigateToView("coupon-confirmation")
-                dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
-            }
-        })
-    }, [auth.isAuthenticated, state.selectedStore, navigation, dispatch])
+        // プラン未契約チェック
+        if (!auth.plan) {
+            dispatch({ type: 'SET_PLAN_REQUIRED_MODAL_OPEN', payload: true })
+            return
+        }
 
-    const handleConfirmCoupon = useCallback(() => {
-        dispatch({ type: 'SET_SUCCESS_MODAL_OPEN', payload: true })
-        navigation.navigateToView("home")
-    }, [navigation, dispatch])
+        // storeCouponsからクーポンを取得
+        const coupon = state.storeCoupons.find((c) => c.id === couponId)
+        if (coupon) {
+            dispatch({ type: 'SET_SELECTED_COUPON', payload: coupon })
+            navigation.navigateToView("coupon-confirmation")
+            dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
+        }
+    }, [auth.isAuthenticated, auth.plan, state.storeCoupons, navigation, dispatch])
+
+    const handleConfirmCoupon = useCallback(async () => {
+        if (!state.selectedCoupon || !state.selectedStore) {
+            return
+        }
+
+        try {
+            const response = await fetch(`/api/coupons/${state.selectedCoupon.id}/use`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    shopId: state.selectedStore.id
+                }),
+                credentials: 'include', // Cookieを送信
+            })
+
+            if (!response.ok) {
+                let errorMessage = 'クーポンの使用に失敗しました'
+                try {
+                    const error = await response.json()
+
+                    // エラーレスポンスの構造に応じてメッセージを取得
+                    if (error.error?.message) {
+                        errorMessage = error.error.message
+                    } else if (error.message) {
+                        errorMessage = error.message
+                    } else if (error.error) {
+                        errorMessage = error.error
+                    }
+                } catch {
+                    errorMessage = `クーポンの使用に失敗しました (HTTP ${response.status})`
+                }
+
+                alert(errorMessage)
+                return
+            }
+
+            await response.json()
+
+            // 成功時
+            dispatch({ type: 'SET_SUCCESS_MODAL_OPEN', payload: true })
+            navigation.navigateToView("home")
+        } catch (error) {
+            console.error('クーポン使用エラー:', error)
+            alert(error instanceof Error ? error.message : 'クーポンの使用中にエラーが発生しました')
+        }
+    }, [navigation, dispatch, state.selectedCoupon, state.selectedStore])
 
     const handleSuccessModalClose = useCallback(() => {
         dispatch({ type: 'SET_SUCCESS_MODAL_OPEN', payload: false })
@@ -600,6 +1058,15 @@ export const useAppHandlers = (
         dispatch({ type: 'RESET_LOGIN_STATE' })
         navigation.navigateToView("login")
     }, [navigation, dispatch])
+
+    const handlePlanRequiredModalClose = useCallback(() => {
+        dispatch({ type: 'SET_PLAN_REQUIRED_MODAL_OPEN', payload: false })
+    }, [dispatch])
+
+    const handlePlanRequiredModalRegister = useCallback(() => {
+        dispatch({ type: 'SET_PLAN_REQUIRED_MODAL_OPEN', payload: false })
+        router.push('/plan-registration')
+    }, [dispatch, router])
 
     const handleCancelCoupon = useCallback(() => {
         navigation.navigateToView("home")
@@ -627,7 +1094,7 @@ export const useAppHandlers = (
 
     const handleProfileEditSubmit = useCallback(async (data: Record<string, string>) => {
         auth.setIsLoading(true)
-        
+
         try {
             // 開発環境での認証バイパス機能
             const isDevelopment = process.env.NODE_ENV === 'development'
@@ -639,13 +1106,8 @@ export const useAppHandlers = (
 
             if (isDevelopment && bypassAuth) {
                 headers['Authorization'] = 'Bearer dev-bypass-token'
-            } else {
-                const token = localStorage.getItem('accessToken')
-                if (!token) {
-                    throw new Error('認証トークンが見つかりません。再度ログインしてください。')
-                }
-                headers['Authorization'] = `Bearer ${token}`
             }
+            // Cookieは自動的に送信されるため、ヘッダーは不要
 
             // saitamaAppIdは別テーブル管理のため、更新データから除外
             // 日付フォーマットをISO形式に変換 (yyyy/MM/dd → yyyy-MM-dd)
@@ -655,7 +1117,7 @@ export const useAppHandlers = (
                 ...restData,
                 birthDate: restData.birthDate ? restData.birthDate.replace(/\//g, '-') : restData.birthDate
             }
-            
+
             const response = await fetch('/api/user/update', {
                 method: 'PUT',
                 headers,
@@ -674,37 +1136,34 @@ export const useAppHandlers = (
 
                 throw new Error(result.message || 'プロフィールの更新に失敗しました')
             }
-            
+
             // 成功時はユーザー情報を再取得
             try {
-                const token = localStorage.getItem('accessToken')
-                if (token) {
-                    const userResponse = await fetch('/api/user/me', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                        cache: 'no-store',
-                    })
-                    
-                    if (userResponse.ok) {
-                        const userData = await userResponse.json()
-                        // authの状態を更新
-                        auth.login(userData, userData.plan, [], [])
-                    }
+                const userResponse = await fetch('/api/user/me', {
+                    cache: 'no-store',
+                })
+
+                if (userResponse.ok) {
+                    const userData = await userResponse.json()
+                    // authの状態を更新
+                    auth.login(userData, userData.plan, [], [])
                 }
             } catch {
                 // エラー処理
             }
-            
+
+            // トースターで成功メッセージを表示
+            toast.success('プロフィールを更新しました')
+
             // マイページに戻る
             navigation.navigateToView("mypage", "mypage")
             navigation.navigateToMyPage("main")
-            
+
             auth.setIsLoading(false)
         } catch (error) {
             auth.setIsLoading(false)
             // エラー表示（必要に応じてトーストやモーダルで通知）
-            alert(error instanceof Error ? error.message : 'プロフィールの更新に失敗しました')
+            toast.error(error instanceof Error ? error.message : 'プロフィールの更新に失敗しました')
         }
     }, [auth, dispatch, navigation])
 
@@ -723,14 +1182,8 @@ export const useAppHandlers = (
             if (isDevelopment && bypassAuth) {
                 // 開発環境で認証バイパスが有効な場合、ダミートークンを使用
                 headers['Authorization'] = 'Bearer dev-bypass-token';
-            } else {
-                // 本番環境または認証バイパスが無効な場合、通常の認証処理
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    throw new Error('認証トークンが見つかりません。再度ログインしてください。');
-                }
-                headers['Authorization'] = `Bearer ${token}`;
             }
+            // Cookieは自動的に送信されるため、本番環境ではヘッダーは不要
 
             const response = await fetch('/api/auth/email/change', {
                 method: 'POST',
@@ -740,6 +1193,7 @@ export const useAppHandlers = (
                     newEmail: data.newEmail,
                     confirmEmail: data.confirmEmail,
                 }),
+                credentials: 'include', // Cookieを送信
             })
 
             const result = await response.json()
@@ -748,8 +1202,6 @@ export const useAppHandlers = (
                 // トークン期限切れの場合（403エラー）
                 if (response.status === 403) {
                     // トークンをクリア
-                    localStorage.removeItem('accessToken')
-                    localStorage.removeItem('refreshToken')
                     // ログアウト
                     auth.logout()
                     // ルートURL（ログイン画面）に遷移
@@ -764,7 +1216,7 @@ export const useAppHandlers = (
             dispatch({ type: 'SET_NEW_EMAIL', payload: data.newEmail })
             dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "complete" })
             dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: true })
-            
+
             // 少し待ってからログアウト処理を実行（モーダルが表示されるまで待つ）
             setTimeout(() => {
                 auth.logout()
@@ -786,21 +1238,16 @@ export const useAppHandlers = (
 
     const handleEmailChangeSuccessModalClose = useCallback(() => {
         dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: false })
-        
-        // 確実にトークンを削除
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        sessionStorage.clear()
-        
+
         // ログイン状態をリセット
         dispatch({ type: 'RESET_LOGIN_STATE' })
-        
-        // authのログアウトも実行
+
+        // authのログアウトも実行（Cookieはサーバーサイドでクリアされる）
         auth.logout()
-        
+
         // ブラウザのタブを閉じる
         window.close()
-        
+
         // window.close()が失敗する場合（ユーザーが開いたタブでない場合）は、ログイン画面に遷移
         // タブが閉じられた場合、以下のコードは実行されない
         setTimeout(() => {
@@ -813,41 +1260,22 @@ export const useAppHandlers = (
         // エラー状態をクリア
         dispatch({ type: 'SET_PASSWORD_CHANGE_ERROR', payload: null })
         try {
-            // 開発環境での認証バイパス機能
-            const isDevelopment = process.env.NODE_ENV === 'development';
-            const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
-
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-            };
-
-            if (isDevelopment && bypassAuth) {
-                // 開発環境で認証バイパスが有効な場合、ダミートークンを使用
-                headers['Authorization'] = 'Bearer dev-bypass-token';
-            } else {
-                // 本番環境または認証バイパスが無効な場合、通常の認証処理
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    throw new Error('認証トークンが見つかりません。再度ログインしてください。');
-                }
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-
             const response = await fetch('/api/auth/password/change', {
                 method: 'POST',
-                headers,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
                     currentPassword,
                     newPassword
                 }),
+                credentials: 'include', // Cookieを送信
             })
             const result = await response.json()
             if (!response.ok) {
                 // トークン期限切れの場合（403エラー）
                 if (response.status === 403) {
                     // トークンをクリア
-                    localStorage.removeItem('accessToken')
-                    localStorage.removeItem('refreshToken')
                     // ログアウト
                     auth.logout()
                     // ルートURL（ログイン画面）に遷移
@@ -868,6 +1296,46 @@ export const useAppHandlers = (
         }
     }, [auth, dispatch, router])
 
+    // 店舗紹介画面に遷移
+    const handleStoreIntroduction = useCallback(() => {
+        navigation.navigateToMyPage("store-introduction")
+    }, [navigation])
+
+    // 店舗紹介登録
+    const handleStoreIntroductionSubmit = useCallback(async (data: {
+        storeName1: string
+        recommendedMenu1: string
+        storeName2: string
+        recommendedMenu2: string
+        storeName3: string
+        recommendedMenu3: string
+    }) => {
+        try {
+            const response = await fetch('/api/store-introductions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Cookieを含める
+                body: JSON.stringify(data),
+            })
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                toast.error(result.error?.message || '店舗紹介の登録に失敗しました')
+                return
+            }
+
+            toast.success('店舗紹介を登録しました')
+            // マイページのメイン画面に戻る（状態はHomeLayoutのuseEffectで自動更新される）
+            navigation.navigateToMyPage("main")
+        } catch (error) {
+            console.error('店舗紹介登録エラー:', error)
+            toast.error('店舗紹介の登録に失敗しました')
+        }
+    }, [navigation])
+
     const handlePasswordChangeComplete = useCallback(() => {
         // ログアウト処理
         auth.logout()
@@ -878,9 +1346,9 @@ export const useAppHandlers = (
         // ログイン状態をリセット（パスワード入力画面に戻す）
         dispatch({ type: 'RESET_LOGIN_STATE' })
 
-        // ルートURL（ログイン画面）に遷移
-        router.push('/')
-    }, [auth, dispatch, router])
+        // ログイン画面に遷移（ビューを切り替える）
+        navigation.navigateToView("login")
+    }, [auth, dispatch, navigation])
 
     return {
         handleCurrentLocationClick,
@@ -940,6 +1408,8 @@ export const useAppHandlers = (
         handleSuccessModalClose,
         handleLoginRequiredModalClose,
         handleLoginRequiredModalLogin,
+        handlePlanRequiredModalClose,
+        handlePlanRequiredModalRegister,
         handleCancelCoupon,
         handleUsageGuideClick,
         handleUsageGuideBack,
@@ -951,5 +1421,7 @@ export const useAppHandlers = (
         handleEmailChangeSuccessModalClose,
         handlePasswordChangeSubmit,
         handlePasswordChangeComplete,
-    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void }
+        handleStoreIntroduction,
+        handleStoreIntroductionSubmit,
+    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: { referrerUserId?: string; shopId?: string }) => Promise<void> }
 }

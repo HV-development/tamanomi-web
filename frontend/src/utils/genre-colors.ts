@@ -61,11 +61,29 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     border: "border-purple-300",
     hover: "hover:bg-purple-300"
   },
-  asian: {
+  ethnic: {
     bg: "bg-amber-200",
     text: "text-amber-800",
     border: "border-amber-300",
     hover: "hover:bg-amber-300"
+  },
+  sushi: {
+    bg: "bg-emerald-200",
+    text: "text-emerald-800",
+    border: "border-emerald-300",
+    hover: "hover:bg-emerald-300"
+  },
+  curry: {
+    bg: "bg-yellow-300",
+    text: "text-yellow-900",
+    border: "border-yellow-400",
+    hover: "hover:bg-yellow-400"
+  },
+  nabe: {
+    bg: "bg-red-300",
+    text: "text-red-900",
+    border: "border-red-400",
+    hover: "hover:bg-red-400"
   },
   bar: {
     bg: "bg-indigo-200",
@@ -79,17 +97,17 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     border: "border-orange-400",
     hover: "hover:bg-orange-400"
   },
-  soba: {
+  cafe: {
+    bg: "bg-rose-200",
+    text: "text-rose-800",
+    border: "border-rose-300",
+    hover: "hover:bg-rose-300"
+  },
+  shokudo: {
     bg: "bg-gray-200",
     text: "text-gray-800",
     border: "border-gray-300",
     hover: "hover:bg-gray-300"
-  },
-  udon: {
-    bg: "bg-teal-200",
-    text: "text-teal-800",
-    border: "border-teal-300",
-    hover: "hover:bg-teal-300"
   },
   default: {
     bg: "bg-gray-100",

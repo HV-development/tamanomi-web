@@ -10,6 +10,7 @@ interface HeaderLogoProps {
   onHomeClick?: () => void
   title?: string
   className?: string
+  logoSize?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
 }
 
 export function HeaderLogo({
@@ -20,27 +21,28 @@ export function HeaderLogo({
   onHomeClick,
   title,
   className = "",
+  logoSize = "lg",
 }: HeaderLogoProps) {
   return (
     <div className={`bg-white border-b border-gray-200 px-4 py-4 ${className}`}>
       <div className="relative flex items-center justify-center">
         {/* 左側の戻るボタン */}
         {showBackButton && onBackClick && (
-          <button 
-            onClick={onBackClick} 
+          <button
+            onClick={onBackClick}
             className="absolute left-0 text-green-600 hover:text-green-700 transition-colors"
           >
             ← 戻る
           </button>
         )}
-        
+
         {/* 中央のロゴ */}
-        <Logo size="lg" onClick={onLogoClick} />
-        
+        <Logo size={logoSize} onClick={onLogoClick} />
+
         {/* 右側のhomeボタンまたはタイトル */}
         {showHomeButton && onHomeClick ? (
-          <button 
-            onClick={onHomeClick} 
+          <button
+            onClick={onHomeClick}
             className="absolute right-0 text-green-600 hover:text-green-700 transition-colors text-sm font-medium"
           >
             Home

@@ -1,57 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    
-    // 認証トークンを取得
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader) {
-      return NextResponse.json(
-        { success: false, message: '認証が必要です' },
-        { status: 401 }
-      )
-    }
 
     // バリデーション
     if (!body.nickname || !body.postalCode || !body.address || !body.birthDate || !body.gender) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { success: false, message: '必須項目を入力してください' },
         { status: 400 }
       )
     }
-
-    console.log('🔍 [user/update] Updating user profile:', body)
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/users/me')
-    console.log('🔍 [user/update] Request URL:', fullUrl)
 
     try {
-      const response = await fetch(fullUrl, {
+      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
+        headerOptions: {
+          requireAuth: true, // 認証が必要
         },
         body: JSON.stringify(body),
         signal: controller.signal,
       })
 
-      clearTimeout(timeoutId)
+      // 認証エラーの場合は401を返す
+      if (response.status === 401) {
+        return createNoCacheResponse(
+          { success: false, message: '認証が必要です' },
+          { status: 401 }
+        )
+      }
 
-      console.log('🔍 [user/update] Response status:', response.status)
+      clearTimeout(timeoutId)
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.log('🔍 [user/update] Error data:', errorData)
 
         // エラーメッセージを返す
         let errorMessage = 'プロフィール更新に失敗しました'
@@ -64,7 +58,7 @@ export async function PUT(request: NextRequest) {
           errorMessage = errorData.error.message
         }
 
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: errorMessage,
@@ -75,18 +69,16 @@ export async function PUT(request: NextRequest) {
       }
 
       const data = await response.json()
-      console.log('🔍 [user/update] Success:', data)
-      return NextResponse.json({ success: true, data }, { status: response.status })
+      return createNoCacheResponse({ success: true, data }, { status: response.status })
     } catch (fetchError) {
       clearTimeout(timeoutId)
       throw fetchError
     }
   } catch (error) {
     console.error('❌ [user/update] Error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { success: false, message: 'プロフィール更新中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-

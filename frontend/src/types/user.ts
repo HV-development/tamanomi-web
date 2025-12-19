@@ -23,6 +23,7 @@ export interface User {
     paygentCustomerId: string
     paygentCustomerCardId: string
   } | null
+  referrerUrl?: string | null
 }
 
 /**

@@ -1,10 +1,11 @@
 "use client"
 
 import Image from "next/image"
-import { Navigation, Phone } from "lucide-react"
+import { Phone, Clock, MapPin } from "lucide-react"
 import { FavoriteButton } from "@/components/atoms/FavoriteButton"
 import type { Store } from "@/types/store"
 import { getGenreColor } from "@/utils/genre-colors"
+import { formatDistance } from "@/utils/location"
 import { useState, useRef } from "react"
 
 interface StoreCardProps {
@@ -12,7 +13,7 @@ interface StoreCardProps {
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
   onStoreClick: (store: Store) => void
-   showDistance?: boolean
+  showDistance?: boolean
   className?: string
 }
 
@@ -44,15 +45,19 @@ const getStoreFoodImage = (genre: string) => {
 
 export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClick, showDistance = false, className = "" }: StoreCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isImageError, setIsImageError] = useState(false)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
 
   // 画像配列を作成
   const images = [
-    store.thumbnailUrl || "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    store.thumbnailUrl || "",
     getStoreInteriorImage(store.genre),
     getStoreFoodImage(store.genre)
   ]
+
+  const hasThumbnail = Boolean(store.thumbnailUrl)
+  const shouldShowPlaceholder = !hasThumbnail || isImageError
 
   const handleImageClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -73,7 +78,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
   const handleTouchEnd = (e: React.TouchEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     if (touchStartX.current === null || touchEndX.current === null) {
       return
     }
@@ -104,7 +109,15 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
   }
 
   const handleMapClick = () => {
-    // Googleマップで店舗を検索
+    // 座標がある場合は緯度経度クエリで開く（精度が高い）
+    if (typeof store.latitude === 'number' && typeof store.longitude === 'number') {
+      const lat = store.latitude.toFixed(7)
+      const lng = store.longitude.toFixed(7)
+      const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+      window.open(googleMapsUrl, "_blank")
+      return
+    }
+    // 座標が無い場合は名称+住所で検索
     const query = encodeURIComponent(`${store.name} ${store.address}`)
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`
     window.open(googleMapsUrl, "_blank")
@@ -116,7 +129,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
     if (target.closest('button')) {
       return
     }
-    
+
     // デフォルトで店舗詳細を表示
     onStoreClick(store)
   }
@@ -145,70 +158,102 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
             className="flex-shrink-0"
           />
         </div>
-        
+
         {/* ジャンルバッジと連絡先アイコン */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
               {store.genreLabel}
             </span>
-            {showDistance && (
-              <span className="text-black text-sm">現在位置から350m</span>
+            {showDistance && store.distance !== undefined && (
+              <span className="text-black text-sm">現在位置から{formatDistance(store.distance)}</span>
             )}
           </div>
           <div className="flex items-center gap-1">
-              <button
-                onClick={handlePhoneClick}
-                className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
-                aria-label="電話をかける"
-              >
-                <Phone className="w-4 h-4 text-green-600 hover:text-green-700 fill-current" />
-              </button>
-              <button
-                onClick={handleMapClick}
-                className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
-                aria-label="Googleマップで表示"
-              >
-                <Navigation className="w-4 h-4 text-green-600 hover:text-green-700 fill-current transition-colors" />
-              </button>
+            <button
+              onClick={handlePhoneClick}
+              className="p-2 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
+              aria-label="電話をかける"
+            >
+              <Phone className="w-4 h-4 text-green-600 hover:text-green-700 fill-current" />
+            </button>
+            <button
+              onClick={handleMapClick}
+              className="px-3 py-1.5 bg-white hover:bg-gray-50 rounded-full transition-colors border border-gray-200 text-green-600 text-xs font-semibold"
+              aria-label="Googleマップで表示"
+            >
+              MAP
+            </button>
           </div>
         </div>
+
+        {/* アクセス情報 */}
+        {(store.prefecture || store.city) && (
+          <div className="mt-2 flex items-center gap-2 text-gray-600 text-sm">
+            <MapPin className="w-5 h-5 flex-shrink-0" />
+            <span>{[store.prefecture, store.city].filter(Boolean).join(' ')}</span>
+          </div>
+        )}
+
+        {/* 時間限定クーポン情報 */}
+        {store.couponUsageStart && store.couponUsageEnd && (
+          <div className="mt-1 flex items-center gap-2 text-green-600 text-sm">
+            <Clock className="w-5 h-5" />
+            <span className="font-medium">時間限定クーポン</span>
+            {/* クーポン利用可能曜日 */}
+            {store.couponUsageDays && store.couponUsageDays.length > 0 && (
+              <span>{store.couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')}</span>
+            )}
+            <span>{store.couponUsageStart}〜{store.couponUsageEnd}</span>
+          </div>
+        )}
       </div>
 
-      {/* 店舗写真カルーセル */}
+      {/* 店舗写真カルーセル / 画像なしプレースホルダ */}
       <div className="relative overflow-hidden">
-        <div 
-          className="w-full aspect-[3/1] cursor-pointer select-none relative rounded-lg overflow-hidden" 
-          onClick={handleImageAreaClick}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <Image
-            src={images[currentImageIndex]}
-            alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
-            fill
-            className="object-cover transition-opacity duration-300 pointer-events-none"
-          />
-        </div>
-        
-        {/* インジケーター */}
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-          <div className="flex gap-1">
-            {images.map((_, index) => (
-              <div
-                key={index}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  index === currentImageIndex ? "bg-white" : "bg-white/60"
-                }`}
-              ></div>
-            ))}
-          </div>
-        </div>
+        {shouldShowPlaceholder ? (
+          <button
+            onClick={handleImageAreaClick}
+            className="w-full aspect-[4/3] md:aspect-[16/9] rounded-lg border border-gray-300 bg-gray-200 flex items-center justify-center cursor-pointer"
+            aria-label="画像なし"
+          >
+            <span className="text-black text-sm">no image</span>
+          </button>
+        ) : (
+          <>
+            <div
+              className="w-full aspect-[4/3] md:aspect-[16/9] cursor-pointer select-none relative rounded-lg overflow-hidden"
+              onClick={handleImageAreaClick}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <Image
+                src={images[currentImageIndex] || store.thumbnailUrl!}
+                alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
+                fill
+                className="object-cover transition-opacity duration-300 pointer-events-none"
+                onError={() => setIsImageError(true)}
+              />
+            </div>
+            {/* インジケーター */}
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+              <div className="flex gap-1">
+                {images.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex ? "bg-white" : "bg-white/60"
+                      }`}
+                  ></div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* 店舗紹介 */}
-      <div className="text-sm text-gray-700 leading-relaxed">{store.description}</div>
+      <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{store.description}</div>
 
       {/* クーポンボタン */}
       <div className="pt-2">
@@ -219,7 +264,7 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           >
             <span>今すぐクーポンGET</span>
           </button>
-          
+
           <button
             onClick={() => onStoreClick(store)}
             className="flex items-center justify-center gap-1 bg-white hover:bg-gray-50 text-gray-700 py-3 px-3 rounded-2xl transition-all duration-300 border border-gray-300 hover:border-gray-400 font-medium whitespace-nowrap"

@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import Image from "next/image"
-import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut } from "lucide-react"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard, Share2, Copy, Check, Store } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
@@ -37,6 +37,7 @@ interface MyPageContainerProps {
   | "plan-management"
   | "withdrawal"
   | "withdrawal-complete"
+  | "store-introduction"
   onViewChange: (view: string) => void
   onEditProfile: () => void
   onChangeEmail: () => void
@@ -44,6 +45,8 @@ interface MyPageContainerProps {
   onViewPlan: () => void
   onViewUsageHistory: () => void
   onViewPaymentHistory: () => void
+  onStoreIntroduction?: () => void
+  hasStoreIntroduction?: boolean
   onCancelSubscription: () => void
   onWithdraw: () => void
   onWithdrawConfirm: () => void
@@ -68,6 +71,8 @@ interface MyPageContainerProps {
 }
 
 // ランク計算用のカスタムフック
+// TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const useRankCalculations = (user: UserType | undefined, currentUserRank: string | null | undefined) => {
   return useMemo(() => {
     if (!user) {
@@ -141,6 +146,76 @@ const ProfileCard = React.memo(({ user, onEditProfile }: { user?: UserType, onEd
 })
 ProfileCard.displayName = 'ProfileCard'
 
+// 紹介用URLカードコンポーネント
+const ReferrerUrlCard = React.memo(({ user }: { user?: UserType }) => {
+  const [copied, setCopied] = React.useState(false)
+  
+  if (!user) {
+    return null
+  }
+
+  // 紹介用URLを生成（APIから取得できない場合はフロントエンドで生成）
+  const referrerUrl = user.referrerUrl || (typeof window !== 'undefined' 
+    ? `${window.location.origin}/email-registration?ref=${user.id}` 
+    : null)
+
+  const handleCopy = async () => {
+    if (!referrerUrl) return
+
+    try {
+      await navigator.clipboard.writeText(referrerUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error('コピーに失敗しました:', error)
+    }
+  }
+
+  if (!referrerUrl) {
+    return null
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-green-200 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+          <Share2 className="w-5 h-5 text-green-600" />
+        </div>
+        <span className="text-lg font-bold text-gray-500">友達紹介</span>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="text-sm text-gray-600 mb-2 block">紹介用URL</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={referrerUrl}
+              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none"
+            />
+            <button
+              onClick={handleCopy}
+              className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center"
+              title={copied ? 'コピーしました' : 'クリップボードにコピー'}
+            >
+              {copied ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                <Copy className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500">
+          このURLを友達に共有すると、友達が登録した際に紹介として記録されます。
+        </p>
+      </div>
+    </div>
+  );
+})
+ReferrerUrlCard.displayName = 'ReferrerUrlCard'
+
 // ランク画像コンポーネント
 const RankImage = React.memo(({ rank, alt, className }: { rank: string, alt: string, className: string }) => (
   <div className="relative w-8 h-8">
@@ -157,6 +232,8 @@ const RankImage = React.memo(({ rank, alt, className }: { rank: string, alt: str
 RankImage.displayName = 'RankImage'
 
 // ランクカードコンポーネント
+// TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const RankCard = React.memo(({ rankCalculations }: { rankCalculations: ReturnType<typeof useRankCalculations> }) => {
   const { nextRank, monthsToNext, currentRankInfo } = rankCalculations
 
@@ -216,6 +293,7 @@ const RankCard = React.memo(({ rankCalculations }: { rankCalculations: ReturnTyp
     </div>
   )
 })
+/* eslint-enable @typescript-eslint/no-unused-vars */
 RankCard.displayName = 'RankCard'
 
 // メニューボタンコンポーネント
@@ -223,24 +301,33 @@ const MenuButton = React.memo(({
   onClick,
   icon: Icon,
   label,
-  isRed = false
+  isRed = false,
+  disabled = false
 }: {
-  onClick: () => void,
+  onClick?: () => void,
   icon: React.ComponentType<{ className?: string }>,
   label: string,
-  isRed?: boolean
+  isRed?: boolean,
+  disabled?: boolean
 }) => (
   <button
-    onClick={onClick}
-    className={`w-full bg-white rounded-2xl border ${isRed ? 'border-red-200 hover:bg-red-50' : 'border-green-200 hover:bg-green-50'} p-4 flex items-center justify-between transition-colors`}
+    onClick={disabled ? undefined : onClick}
+    disabled={disabled}
+    className={`w-full bg-white rounded-2xl border p-4 flex items-center justify-between transition-colors ${
+      disabled 
+        ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60' 
+        : isRed 
+          ? 'border-red-200 hover:bg-red-50' 
+          : 'border-green-200 hover:bg-green-50'
+    }`}
   >
     <div className="flex items-center gap-3">
-      <div className={`w-8 h-8 ${isRed ? 'bg-red-100' : 'bg-green-100'} rounded-lg flex items-center justify-center`}>
-        <Icon className={`w-5 h-5 ${isRed ? 'text-red-600' : 'text-green-600'}`} />
+      <div className={`w-8 h-8 ${disabled ? 'bg-gray-100' : isRed ? 'bg-red-100' : 'bg-green-100'} rounded-lg flex items-center justify-center`}>
+        <Icon className={`w-5 h-5 ${disabled ? 'text-gray-400' : isRed ? 'text-red-600' : 'text-green-600'}`} />
       </div>
-      <span className="text-lg font-medium text-gray-500">{label}</span>
+      <span className={`text-lg font-medium ${disabled ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
     </div>
-    <div className="text-gray-400">›</div>
+    <div className={disabled ? 'text-gray-300' : 'text-gray-400'}>›</div>
   </button>
 ))
 MenuButton.displayName = 'MenuButton'
@@ -251,42 +338,64 @@ const MenuButtons = React.memo(({
   onViewPlan,
   onChangeEmail,
   onChangePassword,
-  onLogout
+  onViewUsageHistory,
+  onViewPaymentHistory,
+  onStoreIntroduction,
+  onLogout,
+  plan,
+  hasStoreIntroduction
 }: {
   onEditProfile: () => void
   onViewPlan: () => void
   onChangeEmail: () => void
   onChangePassword: () => void
+  onViewUsageHistory: () => void
+  onViewPaymentHistory: () => void
+  onStoreIntroduction?: () => void
   onLogout: () => void
-}) => (
-  <div className="space-y-3">
-    {appConfig.myPageSettings.showProfile && (
-      <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
-    )}
-    {appConfig.myPageSettings.showPlanManagement && (
-      <MenuButton onClick={onViewPlan} icon={RefreshCw} label="プランの変更" />
-    )}
-    {appConfig.myPageSettings.showEmailChange && (
-      <MenuButton onClick={onChangeEmail} icon={Mail} label="メールアドレスの変更" />
-    )}
-    {appConfig.myPageSettings.showPasswordChange && (
-      <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
-    )}
-    {/* ★一時的にコメントアウト：正式リリースまで利用履歴と決済履歴を非表示 */}
-    {/* {appConfig.myPageSettings.showUsageHistory && (
-      <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
-    )}
-    {appConfig.myPageSettings.showPaymentHistory && (
-      <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
-    )} */}
-    <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
-  </div>
-))
+  plan?: Plan
+  hasStoreIntroduction?: boolean
+}) => {
+  // プラン有無に応じてラベルを決定
+  const planMenuLabel = plan ? "プランの変更" : "プラン登録"
+  
+  return (
+    <div className="space-y-3">
+      {onStoreIntroduction && (
+        <MenuButton 
+          onClick={hasStoreIntroduction ? undefined : onStoreIntroduction} 
+          icon={Store} 
+          label={hasStoreIntroduction ? "店舗紹介（紹介済み）" : "店舗紹介"} 
+          disabled={hasStoreIntroduction}
+        />
+      )}
+      {appConfig.myPageSettings.showProfile && (
+        <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
+      )}
+      {appConfig.myPageSettings.showPlanManagement && (
+        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={planMenuLabel} />
+      )}
+      {appConfig.myPageSettings.showEmailChange && (
+        <MenuButton onClick={onChangeEmail} icon={Mail} label="メールアドレスの変更" />
+      )}
+      {appConfig.myPageSettings.showPasswordChange && (
+        <MenuButton onClick={onChangePassword} icon={Lock} label="パスワードの変更" />
+      )}
+      {appConfig.myPageSettings.showUsageHistory && (
+        <MenuButton onClick={onViewUsageHistory} icon={History} label="利用履歴" />
+      )}
+      {appConfig.myPageSettings.showPaymentHistory && (
+        <MenuButton onClick={onViewPaymentHistory} icon={CreditCard} label="決済履歴" />
+      )}
+      <MenuButton onClick={onLogout} icon={LogOut} label="ログアウト" isRed />
+    </div>
+  )
+})
 MenuButtons.displayName = 'MenuButtons'
 
 export const MyPageContainer = React.memo(function MyPageContainer({
   user,
-  plan,
+  plan: _plan, // eslint-disable-line @typescript-eslint/no-unused-vars
   usageHistory,
   paymentHistory,
   currentView,
@@ -297,6 +406,8 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   onViewPlan,
   onViewUsageHistory,
   onViewPaymentHistory,
+  onStoreIntroduction,
+  hasStoreIntroduction,
   onWithdraw,
   onWithdrawConfirm,
   onWithdrawCancel,
@@ -325,11 +436,13 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   )
 
   // ランク計算をメモ化（プリロードデータを使用）
-  const rankCalculations = useRankCalculations(user, currentUserRank)
+  // TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト
+  // const rankCalculations = useRankCalculations(user, currentUserRank)
 
-  // 防御的チェック：userとplanが存在しない場合はスケルトンを表示
+  // 防御的チェック：userが存在しない場合はスケルトンを表示
+  // プラン情報はnullの場合もあるため、チェックしない
   // ただし、メールアドレス変更成功モーダルが表示されている場合は無視
-  if ((!user || !plan) && !isEmailChangeSuccessModalOpen) {
+  if (!user && !isEmailChangeSuccessModalOpen) {
     return <SkeletonMyPage />
   }
 
@@ -406,27 +519,8 @@ export const MyPageContainer = React.memo(function MyPageContainer({
     />
   }
 
-  // ランクが計算されていない場合はローディング表示
-  if (!rankCalculations.currentRankInfo) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-        <div className="bg-white border-b border-gray-200 px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
-            {/* <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
-              ← 戻る
-            </button> */}
-            <div className="w-12"></div>
-            <Logo size="lg" onClick={onLogoClick} />
-            <div className="w-12"></div>
-          </div>
-        </div>
-        <div className="p-4 flex items-center justify-center">
-          <div className="text-gray-500">読み込み中...</div>
-        </div>
-      </div>
-    )
-  }
+  // ランク情報がない場合でもマイページを表示できるようにする
+  // （ランク情報はオプショナルなため、チェックを削除）
 
   return (
     <div className={`min-h-screen ${backgroundColorClass}`}>
@@ -434,11 +528,9 @@ export const MyPageContainer = React.memo(function MyPageContainer({
       <FadeInComponent delay={0}>
         <div className="bg-white border-b border-gray-200 px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
-            {/* <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
+            <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
               ← 戻る
-            </button> */}
-            <div className="w-12"></div>
+            </button>
             <Logo size="lg" onClick={onLogoClick} />
             <div className="w-12"></div>
           </div>
@@ -452,9 +544,14 @@ export const MyPageContainer = React.memo(function MyPageContainer({
             <ProfileCard user={user} onEditProfile={onEditProfile} />
           </FadeInComponent>
 
-          <FadeInComponent delay={300}>
-            <RankCard rankCalculations={rankCalculations} />
+          <FadeInComponent delay={250}>
+            <ReferrerUrlCard user={user} />
           </FadeInComponent>
+
+          {/* TODO: 将来的にメンバーランク機能を再実装する可能性があるためコメントアウト */}
+          {/* <FadeInComponent delay={300}>
+            <RankCard rankCalculations={rankCalculations} />
+          </FadeInComponent> */}
 
           <FadeInComponent delay={400}>
             <MenuButtons
@@ -464,7 +561,10 @@ export const MyPageContainer = React.memo(function MyPageContainer({
               onChangePassword={onChangePassword}
               onViewUsageHistory={onViewUsageHistory}
               onViewPaymentHistory={onViewPaymentHistory}
+              onStoreIntroduction={onStoreIntroduction}
               onLogout={onLogout}
+              plan={_plan}
+              hasStoreIntroduction={hasStoreIntroduction}
             />
           </FadeInComponent>
         </StaggeredContainer>

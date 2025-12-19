@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +11,7 @@ export async function GET(request: NextRequest) {
     const token = searchParams.get('token')
 
     if (!token) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: { message: 'トークンが必要です' } },
         { status: 400 }
       )
@@ -17,29 +19,28 @@ export async function GET(request: NextRequest) {
 
     const fullUrl = buildApiUrl(`/email/change/confirm?token=${encodeURIComponent(token)}`)
 
-    const response = await fetch(fullUrl, {
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+      headerOptions: {
+        requireAuth: false, // メールアドレス変更確認は認証不要
       },
     })
 
     const data = await response.json()
 
     if (!response.ok) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { error: data.error || { message: 'メールアドレス変更の確認に失敗しました' } },
         { status: response.status }
       )
     }
 
-    return NextResponse.json(data)
+    return createNoCacheResponse(data)
   } catch (error) {
     console.error('Email change confirmation error:', error)
-    return NextResponse.json(
+    return createNoCacheResponse(
       { error: { message: 'メールアドレス変更の確認に失敗しました' } },
       { status: 500 }
     )
   }
 }
-

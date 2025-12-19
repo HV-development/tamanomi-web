@@ -76,8 +76,8 @@ export function BannerCarousel({ className = "" }: BannerCarouselProps) {
 
   return (
     <div className={`relative overflow-hidden rounded-none ${className}`}>
-      {/* バナー表示エリア */}
-      <div className="relative h-32 overflow-hidden">
+      {/* バナー表示エリア（横長 3:1 固定） */}
+      <div className="relative w-full aspect-[3/1] overflow-hidden">
         {/* バナー画像とコンテンツ */}
         <div 
           className={`absolute inset-0 ${currentBanner.backgroundColor} transition-all duration-500`}

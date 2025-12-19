@@ -13,11 +13,13 @@ interface UsageHistoryListProps {
   className?: string
 }
 
-export function UsageHistoryList({
-  history,
-  // onBackToMyPage, onBackToTop は無料キャンペーン中は未使用（将来のために型定義のみ保持）
-  className = ""
-}: UsageHistoryListProps) {
+export function UsageHistoryList(props: UsageHistoryListProps) {
+  const {
+    history,
+    onBackToMyPage,
+    className = "",
+  } = props
+  // props.onBackToTop は無料キャンペーン終了後に利用予定
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   const formatDate = (date: Date) => {
@@ -33,15 +35,13 @@ export function UsageHistoryList({
       <div className={`min-h-screen ${backgroundColorClass} ${className}`}>
         {/* ヘッダー */}
         <div className="bg-white border-b border-gray-200 px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
-            {/* <button
+          <div className="relative flex items-center justify-center">
+            <button
               onClick={onBackToMyPage}
-              className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
+              className="absolute left-0 flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
             >
               ← 戻る
-            </button> */}
-            <div className="w-12"></div>
+            </button>
             <Image
               src="/logo.svg"
               alt="TAMAYOI"
@@ -49,7 +49,6 @@ export function UsageHistoryList({
               height={32}
               className="h-8 object-contain"
             />
-            <div className="w-12"></div>
           </div>
         </div>
 
@@ -74,15 +73,13 @@ export function UsageHistoryList({
     <div className={`min-h-screen ${backgroundColorClass} ${className}`}>
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* 無料キャンペーン中は戻るボタンを一時的に無効化 */}
-          {/* <button
+        <div className="relative flex items-center justify-center">
+          <button
             onClick={onBackToMyPage}
-            className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
+            className="absolute left-0 flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
           >
             ← 戻る
-          </button> */}
-          <div className="w-12"></div>
+          </button>
           <Image
             src="/logo.svg"
             alt="TAMAYOI"
@@ -90,7 +87,6 @@ export function UsageHistoryList({
             height={32}
             className="h-8 object-contain"
           />
-          <div className="w-12"></div>
         </div>
       </div>
 

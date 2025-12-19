@@ -27,7 +27,7 @@ export function MenuDropdown({ isOpen, onClose, items, className = "" }: MenuDro
             <button
               key={item.id}
               onClick={() => {
-                item.onClick()
+                item.onClick?.()
                 onClose()
               }}
               className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between group"

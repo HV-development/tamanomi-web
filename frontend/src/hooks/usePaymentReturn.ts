@@ -24,7 +24,7 @@ export const usePaymentReturn = () => {
     const processPaymentReturn = async () => {
       try {
         const customerId = searchParams.get('customer_id')
-        const customerCardId = searchParams.get('customer_card_id')
+        const _customerCardId = searchParams.get('customer_card_id') // 未使用だが、将来の拡張のために保持
         const errorCode = searchParams.get('error_code')
         const responseCode = searchParams.get('response_code')
 
@@ -50,13 +50,8 @@ export const usePaymentReturn = () => {
           throw new Error('顧客IDが見つかりません')
         }
 
-        // カード情報をsessionStorageに保存
-        if (customerCardId) {
-          sessionStorage.setItem('paygentCustomerId', customerId)
-          sessionStorage.setItem('paygentCustomerCardId', customerCardId)
-        }
-
-        // PaymentSessionから情報を取得
+        // カード情報はPaymentSessionに保存される（sessionStorageは使用しない）
+        // セキュリティ改善：sessionStorageの使用を廃止し、PaymentSessionから取得
         let selectedPlanId: string | null = null
         let userEmail: string | null = null
 
@@ -68,12 +63,12 @@ export const usePaymentReturn = () => {
             selectedPlanId = sessionData.planId || null
             userEmail = sessionData.userEmail
           } else {
-            selectedPlanId = sessionStorage.getItem('selectedPlanId')
-            userEmail = sessionStorage.getItem('userEmail')
+            // PaymentSessionが取得できない場合はエラー
+            throw new Error('セッション情報が見つかりません')
           }
         } catch {
-          selectedPlanId = sessionStorage.getItem('selectedPlanId')
-          userEmail = sessionStorage.getItem('userEmail')
+          // PaymentSessionから取得できない場合はエラー
+          throw new Error('セッション情報の取得に失敗しました')
         }
 
         if (!userEmail) {
@@ -85,18 +80,13 @@ export const usePaymentReturn = () => {
         setIsPaymentMethodChangeOnly(isPaymentMethodChange)
         
         if (selectedPlanId) {
-          const accessToken = localStorage.getItem('accessToken')
-          
-          if (!accessToken) {
-            throw new Error('認証情報が見つかりません。ログインしてください。')
-          }
-
+          // Cookieベースの認証のみを使用（localStorageは廃止）
           const createPlanResponse = await fetch('/api/user-plans/create', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
             },
+            credentials: 'include', // Cookieを送信
             body: JSON.stringify({
               planId: selectedPlanId,
             }),
@@ -104,7 +94,23 @@ export const usePaymentReturn = () => {
 
           if (!createPlanResponse.ok) {
             const errorData = await createPlanResponse.json().catch(() => ({}))
-            throw new Error(errorData.message || 'プラン登録に失敗しました')
+            console.error('❌ [usePaymentReturn] Plan creation failed:', {
+              status: createPlanResponse.status,
+              errorData,
+            })
+            
+            let errorMessage = 'プラン登録に失敗しました'
+            if (errorData.message) {
+              errorMessage = errorData.message
+            } else if (createPlanResponse.status === 401) {
+              errorMessage = '認証エラー: ログインしてください'
+            } else if (createPlanResponse.status === 404) {
+              errorMessage = '指定されたプランが見つかりません'
+            } else if (createPlanResponse.status === 409) {
+              errorMessage = 'このプランは既に登録されています'
+            }
+            
+            throw new Error(errorMessage)
           }
 
           await createPlanResponse.json()
@@ -119,9 +125,7 @@ export const usePaymentReturn = () => {
           // クリーンアップ失敗
         }
 
-        // sessionStorageをクリア
-        sessionStorage.removeItem('selectedPlanId')
-        sessionStorage.removeItem('userEmail')
+        // セキュリティ改善：sessionStorageの使用を廃止（削除処理も不要）
 
         // 処理完了
         setIsProcessing(false)

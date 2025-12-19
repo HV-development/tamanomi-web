@@ -161,7 +161,7 @@ export default function SaitamaAppGuidePage() {
                   setSaitamaAppId(e.target.value)
                   setLinkError("")
                 }}
-                placeholder="ユーザーIDを入力してください"
+                placeholder="saitamacity_xxxxxx"
                 disabled={isLinking}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
@@ -169,7 +169,7 @@ export default function SaitamaAppGuidePage() {
             <button 
               onClick={handleLinkSaitamaApp}
               disabled={isLinking || !saitamaAppId}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white p-3 text-sm font-bold flex items-center justify-center gap-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               {isLinking ? (
                 <>

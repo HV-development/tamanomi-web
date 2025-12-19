@@ -1,63 +1,56 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { buildApiUrl } from '@/lib/api-config';
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic';
 
-console.log('🔍 [user-plans/create] Route loaded');
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { planId, validUntil } = body;
 
-    // アクセストークンを取得
-    const authHeader = request.headers.get('Authorization');
-    if (!authHeader) {
-      return NextResponse.json(
-        { success: false, message: '認証が必要です' },
-        { status: 401 }
-      );
-    }
-
     // バリデーション
     if (!planId) {
-      return NextResponse.json(
+      return createNoCacheResponse(
         { success: false, message: 'プランIDは必須です' },
         { status: 400 }
       );
     }
-
-    console.log('🔍 [user-plans/create] Creating user plan:', { planId, validUntil });
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
 
     const fullUrl = buildApiUrl('/plans/user-plans');
-    console.log('🔍 [user-plans/create] Request URL:', fullUrl);
 
     try {
-      const response = await fetch(fullUrl, {
+      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
+        headerOptions: {
+          requireAuth: true, // 認証が必要
         },
         body: JSON.stringify({
           plan_id: planId,
           ...(validUntil && { valid_until: validUntil }),
         }),
         signal: controller.signal,
-      });
+      })
+
+      // 認証エラーの場合は401を返す
+      if (response.status === 401) {
+        return createNoCacheResponse(
+          { success: false, message: '認証が必要です' },
+          { status: 401 }
+        );
+      };
 
       clearTimeout(timeoutId);
-
-      console.log('🔍 [user-plans/create] Response status:', response.status);
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.log('🔍 [user-plans/create] Error data:', errorData);
 
         // エラーメッセージを返す
         let errorMessage = 'プラン登録に失敗しました';
@@ -70,7 +63,7 @@ export async function POST(request: NextRequest) {
           errorMessage = errorData.error.message;
         }
 
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: errorMessage,
@@ -81,8 +74,7 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      console.log('🔍 [user-plans/create] Success:', data);
-      return NextResponse.json(data, { status: response.status });
+      return createNoCacheResponse(data, { status: response.status });
     } catch (fetchError) {
       clearTimeout(timeoutId);
       throw fetchError;
@@ -98,7 +90,7 @@ export async function POST(request: NextRequest) {
     // エラーの種類に応じて適切なメッセージを返す
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。',
@@ -108,7 +100,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
-        return NextResponse.json(
+        return createNoCacheResponse(
           {
             success: false,
             message: 'サーバーに接続できません。ネットワーク接続を確認してください。',
@@ -118,7 +110,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(
+    return createNoCacheResponse(
       {
         success: false,
         message: 'プラン登録の処理に失敗しました。しばらくしてから再度お試しください。',
@@ -128,4 +120,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

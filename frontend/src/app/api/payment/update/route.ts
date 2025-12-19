@@ -1,65 +1,103 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { customerId, customerCardId, userEmail, planId } = body
-    
+    const {
+      customerId,
+      customerCardId,
+      planId,
+      runningId,
+      tradingId,
+      amount, // プラン変更時の金額
+      endScheduled, // 退会時の課金終了日（YYYYMMDD形式）
+      description
+    } = body
+
     const fullUrl = buildApiUrl('/payment/update')
-    
-    console.log('Payment update API request:', {
+
+    // amountもendScheduledも指定されていない場合はエラー
+    if (amount === undefined && endScheduled === undefined) {
+      return createNoCacheResponse(
+        { error: 'amount（プラン変更時）またはendScheduled（退会時）のいずれかを指定してください。' },
+        { status: 400 }
+      )
+    }
+
+    // runningIdまたはtradingIdのいずれかが必要
+    if (!runningId && !tradingId) {
+      return createNoCacheResponse(
+        { error: 'runningIdまたはtradingIdのいずれかが必要です。' },
+        { status: 400 }
+      )
+    }
+
+    // undefinedのフィールドを除外してバックエンドに送信
+    // セキュリティ改善：userEmailはバックエンドで認証トークンから取得するため、フロントエンドから送信しない
+    const backendRequestBody: Record<string, unknown> = {}
+
+    if (customerId) {
+      backendRequestBody.customerId = customerId
+    }
+
+    if (customerCardId) {
+      backendRequestBody.customerCardId = customerCardId
+    }
+
+    if (planId) {
+      backendRequestBody.planId = planId
+    }
+
+    if (runningId) {
+      backendRequestBody.runningId = runningId
+    }
+
+    if (tradingId) {
+      backendRequestBody.tradingId = tradingId
+    }
+
+    if (amount !== undefined) {
+      backendRequestBody.amount = amount
+    }
+
+    if (endScheduled) {
+      backendRequestBody.endScheduled = endScheduled
+    }
+
+    if (description) {
+      backendRequestBody.description = description
+    }
+
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
-      url: fullUrl,
-      body: {
-        customerId,
-        customerCardId,
-        userEmail,
-        planId,
-      }
-    })
-    
-    const response = await fetch(fullUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+      headerOptions: {
+        requireAuth: true, // 認証が必要
       },
-      body: JSON.stringify({
-        customerId,
-        customerCardId,
-        userEmail,
-        planId,
-      }),
+      body: JSON.stringify(backendRequestBody),
     })
-    
-    console.log('Payment update API response:', {
-      status: response.status,
-      ok: response.ok,
-      statusText: response.statusText
-    })
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('Payment update API error:', errorData)
-      return NextResponse.json(
-        { error: errorData.message || 'カード変更の準備に失敗しました' },
+      return createNoCacheResponse(
+        { error: errorData.message || errorData.error || '継続課金変更に失敗しました' },
         { status: response.status }
       )
     }
-    
+
     const data = await response.json()
-    console.log('Payment update data received:', data)
-    
-    return NextResponse.json(data)
+
+    return createNoCacheResponse(data)
   } catch (error) {
     console.error('Payment update API fetch error:', error)
-    return NextResponse.json(
-      { error: 'カード変更の準備中にエラーが発生しました' },
+    return createNoCacheResponse(
+      { error: '継続課金変更中にエラーが発生しました' },
       { status: 500 }
     )
   }
 }
-
-

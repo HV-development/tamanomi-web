@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import Image from "next/image"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { HomeContainer } from "../organisms/HomeContainer"
 import { LoginLayout } from "./LoginLayout"
 import { EmailRegistrationContainer } from "../organisms/EmailRegistrationContainer"
@@ -14,9 +13,11 @@ import { HistoryPopup } from "../molecules/HistoryPopup"
 import { MyPageLayout } from "./MypageLayout"
 import { PlanManagementContainer } from "../organisms/PlanManagementContainer"
 import { PlanChangeContainer } from "../organisms/PlanChangeContainer"
+import { StoreIntroductionForm } from "../organisms/StoreIntroductionForm"
 import { CouponListPopup } from "../molecules/CouponListPopup"
 import { CouponUsedSuccessModal } from "../molecules/CouponUsedSuccessModal"
 import { LoginRequiredModal } from "../molecules/LoginRequiredModal"
+import { PlanRequiredModal } from "../molecules/PlanRequiredModal"
 import { EmailChangeSuccessModal } from "../organisms/EmailChangeSuccessModal"
 import { StoreDetailPopup } from "@/components/organisms/StoreDetailPopup"
 import { Logo } from "../atoms/Logo"
@@ -31,16 +32,31 @@ import { HamburgerMenu } from "../molecules/HamburgerMenu"
 import { UsageGuideModal } from "@/components/organisms/UsageGuideModal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
+import type { MyPageViewType } from "@/types/navigation"
+import type { AppAction } from '@hv-development/schemas'
+import { useInfiniteStores } from "@/hooks/useInfiniteStores"
+import { useFavorites } from "@/hooks/useFavorites"
+import { calculateAge } from "@/utils/age-calculator"
+import { checkTodayUsage } from "@/utils/coupon-usage-check"
 
 
-export function HomeLayout() {
+interface HomeLayoutProps {
+  onMount?: () => void
+}
+
+export function HomeLayout({ onMount }: HomeLayoutProps) {
   // Context から必要な値を取得
-  const { state, handlers, auth, navigation, filters, computedValues } = useAppContext()
+  const { state, dispatch, handlers, auth, navigation, filters, computedValues } = useAppContext()
+
 
   // ポップアップとモーダルの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
+  const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
+  const [isCheckingUsage, setIsCheckingUsage] = useState(false)
+  const [isLoadingCoupons, setIsLoadingCoupons] = useState(false)
+  const [hasStoreIntroduction, setHasStoreIntroduction] = useState(false)
 
   // 必要な値をローカル変数として定義
   const selectedGenres = filters.selectedGenres
@@ -53,10 +69,127 @@ export function HomeLayout() {
   const isAuthenticated = auth.isAuthenticated
   const isLoading = auth.isLoading
   const signupData = state.signupData
-  const favoriteStores = computedValues.favoriteStores
+  const isFavoritesOpen = state.isFavoritesOpen
   const historyStores: Store[] = [] // TODO: 履歴データの実装
   const isHistoryOpen = state.isHistoryOpen
-  const isFavoritesOpen = state.isFavoritesOpen
+
+  // お気に入り一覧をAPIから取得、またはセッションストレージから取得
+  const { favoriteStores: apiFavoriteStores } = useFavorites(isFavoritesOpen, isAuthenticated, { allStores: stores })
+  // ローカルフィルタリングによるお気に入り一覧（フィルター表示用）
+  const favoriteStores = isFavoritesOpen ? apiFavoriteStores : computedValues.favoriteStores
+
+  // 認証済みユーザーの場合、お気に入り状態を同期する
+  useEffect(() => {
+    if (!isAuthenticated || !stores.length) return
+
+    const syncFavorites = async () => {
+      try {
+        const response = await fetch('/api/favorites', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store',
+          credentials: 'include', // Cookieを送信
+        })
+
+        if (!response.ok) {
+          return
+        }
+
+        const data = await response.json()
+        const favoriteShopIds = (data.shops || []).map((shop: { id: string }) => shop.id) as string[]
+
+        // 各店舗のisFavorite状態を同期
+        dispatch({
+          type: 'SYNC_FAVORITES',
+          payload: favoriteShopIds
+        })
+      } catch (error) {
+        console.error('❌ [HomeLayout] Error syncing favorites:', error)
+      }
+    }
+
+    // 初回ロード時とログイン時に同期
+    syncFavorites()
+  }, [isAuthenticated, stores.length, dispatch])
+
+  // 店舗紹介登録状態を取得（マイページ表示時のみ）
+  useEffect(() => {
+    const checkStoreIntroduction = async () => {
+      // マイページ表示中かつ認証済みの場合のみチェック
+      if (!isAuthenticated || currentView !== 'mypage') {
+        setHasStoreIntroduction(false)
+        return
+      }
+
+      try {
+        // /api/store-introductionsのGETエンドポイントを使用
+        const response = await fetch('/api/store-introductions', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store',
+          credentials: 'include',
+        })
+
+        // 200ならデータがあるかチェック、404なら未登録
+        if (response.ok) {
+          const data = await response.json()
+          // データがオブジェクトで、idが存在すれば登録済み
+          setHasStoreIntroduction(data && typeof data === 'object' && 'id' in data)
+        } else {
+          // 401, 404などのエラーは未登録として扱う
+          setHasStoreIntroduction(false)
+        }
+      } catch {
+        // ネットワークエラーなども未登録として扱う
+        setHasStoreIntroduction(false)
+      }
+    }
+
+    checkStoreIntroduction()
+  }, [isAuthenticated, currentView])
+
+  // storesが変更されたときにも同期する（店舗データが読み込まれた後）
+  useEffect(() => {
+    if (!isAuthenticated || !stores.length) return
+
+    // 少し遅延してから同期（店舗データが完全に読み込まれた後）
+    const timer = setTimeout(() => {
+      const syncFavorites = async () => {
+        try {
+          const response = await fetch('/api/favorites', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            cache: 'no-store',
+            credentials: 'include', // Cookieを送信
+          })
+
+          if (!response.ok) return
+
+          const data = await response.json()
+          const favoriteShopIds = (data.shops || []).map((shop: { id: string }) => shop.id) as string[]
+
+          // 各店舗のisFavorite状態を同期
+          dispatch({
+            type: 'SYNC_FAVORITES',
+            payload: favoriteShopIds
+          })
+        } catch (error) {
+          console.error('❌ [HomeLayout] Error syncing favorites:', error)
+        }
+      }
+
+      syncFavorites()
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [stores.length, isAuthenticated, dispatch])
+
   const user = auth.user
   const plan = auth.plan
   const usageHistory = auth.usageHistory || []
@@ -65,12 +198,44 @@ export function HomeLayout() {
   const isCouponListOpen = state.isCouponListOpen
   const selectedStore = state.selectedStore
   const selectedCoupon = state.selectedCoupon
-  const storeCoupons = state.storeCoupons || []
+  const storeCoupons = state.storeCoupons
   const passwordResetStep = state.passwordResetStep
   const passwordResetEmail = state.passwordResetEmail
   const emailRegistrationStep = state.emailRegistrationStep
   const emailRegistrationEmail = state.emailRegistrationEmail
-  const emailConfirmationEmail = state.emailConfirmationEmail || ""
+
+  // ユーザーの年齢を計算
+  const userAge = user ? calculateAge(user.birthDate || '') : null
+
+  // クーポン使用履歴のチェック
+  useEffect(() => {
+    const checkUsage = async () => {
+      if (!isCouponListOpen || !selectedStore) {
+        setIsCouponUsedToday(false)
+        setIsCheckingUsage(false)
+        return
+      }
+
+      if (!isAuthenticated) {
+        setIsCouponUsedToday(false)
+        setIsCheckingUsage(false)
+        return
+      }
+
+      setIsCheckingUsage(true)
+      try {
+        const hasUsedToday = await checkTodayUsage(selectedStore.id)
+        setIsCouponUsedToday(hasUsedToday)
+      } catch (error) {
+        console.error('使用履歴チェックエラー:', error)
+        setIsCouponUsedToday(false)
+      } finally {
+        setIsCheckingUsage(false)
+      }
+    }
+
+    checkUsage()
+  }, [isCouponListOpen, selectedStore, isAuthenticated])
 
   // イベントハンドラーを Context から取得
   const onGenresChange = filters.setSelectedGenres
@@ -80,7 +245,15 @@ export function HomeLayout() {
   const onFavoritesClose = handlers.handleFavoritesClose
   const onHistoryClose = handlers.handleHistoryClose
   const onFavoriteToggle = handlers.handleFavoriteToggle
-  const onCouponsClick = handlers.handleCouponsClick
+  // クーポン取得中のローディング状態を管理するラッパー
+  const onCouponsClick = useCallback(async (storeId: string) => {
+    setIsLoadingCoupons(true)
+    try {
+      await handlers.handleCouponsClick(storeId)
+    } finally {
+      setIsLoadingCoupons(false)
+    }
+  }, [handlers])
   const onMyPageViewChange = navigation.navigateToMyPage
   const onEditProfile = handlers.handleEditProfile
   const onChangeEmail = handlers.handleChangeEmail
@@ -94,9 +267,14 @@ export function HomeLayout() {
   const onWithdrawConfirm = handlers.handleWithdrawConfirm
   const onWithdrawCancel = handlers.handleWithdrawCancel
   const onWithdrawComplete = handlers.handleWithdrawComplete
+  interface ExtendedHandlers {
+    handleStoreIntroduction: () => void;
+    handleStoreIntroductionSubmit: (data: { referrerUserId?: string; shopId?: string }) => Promise<void>;
+  }
+  const onStoreIntroduction = (handlers as ExtendedHandlers).handleStoreIntroduction
+  const onStoreIntroductionSubmit = (handlers as ExtendedHandlers).handleStoreIntroductionSubmit
   const onLogout = handlers.handleLogout
   const onLogin = handlers.handleLogin
-  const onVerifyOtp = handlers.handleVerifyOtp
   const onSignup = handlers.handleSignup
   const onForgotPassword = handlers.handleForgotPassword
   const onBackToHome = handlers.handleBackToHome
@@ -116,23 +294,21 @@ export function HomeLayout() {
   const onPlanChangeBack = handlers.handlePlanChangeBack
   const onLogoClick = handlers.handleLogoClick
   const onStoreClick = handlers.handleStoreClick
-  const loginStep = state.loginStep
-  const loginEmail = state.loginEmail
-  const onResendOtp = handlers.handleResendOtp
-  const onBackToEmailLogin = handlers.handleBackToEmailLogin
   const onCouponListClose = handlers.handleCouponListClose
   const onCouponListBack = handlers.handleCouponListBack
   const onUseCoupon = handlers.handleUseCoupon
   const onConfirmCoupon = handlers.handleConfirmCoupon
   const onCancelCoupon = handlers.handleCancelCoupon
   const onUseSameCoupon = handlers.handleUseSameCoupon
-  const onUsageGuideClick = handlers.handleUsageGuideClick
   const onUsageGuideBack = handlers.handleUsageGuideBack
   const isSuccessModalOpen = state.isSuccessModalOpen
   const onSuccessModalClose = handlers.handleSuccessModalClose
   const isLoginRequiredModalOpen = state.isLoginRequiredModalOpen
   const onLoginRequiredModalClose = handlers.handleLoginRequiredModalClose
   const onLoginRequiredModalLogin = handlers.handleLoginRequiredModalLogin
+  const isPlanRequiredModalOpen = state.isPlanRequiredModalOpen
+  const onPlanRequiredModalClose = handlers.handlePlanRequiredModalClose
+  const onPlanRequiredModalRegister = handlers.handlePlanRequiredModalRegister
   const onProfileEditSubmit = handlers.handleProfileEditSubmit
   const onEmailChangeSubmit = handlers.handleEmailChangeSubmit
   const onPasswordChangeSubmit = handlers.handlePasswordChangeSubmit
@@ -144,6 +320,92 @@ export function HomeLayout() {
   const onStoreDetailClose = handlers.handleStoreDetailPopupClose
   const isStoreDetailPopupOpen = state.isStoreDetailPopupOpen
   const currentUserRank = computedValues.currentUserRank
+
+  // 無限スクロール: 初回ロードと追加ロード
+  const { isLoading: isStoresLoading, isLoadingMore, error, sentinelRef, items } = useInfiniteStores({
+    limit: 5,
+    selectedAreas: selectedAreas ?? [],
+    selectedGenres: selectedGenres ?? [],
+  })
+
+  // itemsとstate.storesをマージして、isFavorite状態を同期
+  const mergedStores = useMemo(() => {
+    if (items.length === 0) {
+      return stores
+    }
+
+    // state.storesからisFavorite状態のマップを作成
+    const favoriteMap = new Map<string, boolean>()
+    stores.forEach(store => {
+      favoriteMap.set(store.id, store.isFavorite)
+    })
+
+    // itemsの各店舗にisFavorite状態を適用
+    return items.map(item => ({
+      ...item,
+      isFavorite: favoriteMap.get(item.id) ?? item.isFavorite
+    }))
+  }, [items, stores])
+
+  // 初回ページの要素を Context の stores に反映するため、監視と反映
+  const initialAppliedRef = useRef(false)
+  useEffect(() => {
+    // フックが管理する items を Context の stores に反映
+    if (!initialAppliedRef.current && !isStoresLoading) {
+      initialAppliedRef.current = true
+    }
+    // 長さが違う or 先頭IDが違う場合に更新（簡易判定）
+    const needUpdate = (state.stores?.length || 0) !== (items?.length || 0)
+      || (state.stores?.[0]?.id !== items?.[0]?.id)
+    if (needUpdate) {
+      // itemsをStore型に変換（型アサーションを使用）
+      dispatch({ type: 'SET_STORES', payload: items } as AppAction)
+      dispatch({ type: 'SET_DATA_LOADED', payload: true })
+    }
+  }, [items, isStoresLoading, dispatch, state.stores])
+
+  // データが完全に読み込まれたら、マウント通知を送信
+  // ログインリダイレクトフラグはhome/page.tsxで管理（メモリ内stateのみ）
+  useEffect(() => {
+    if (state.isDataLoaded && !isStoresLoading && onMount) {
+      // レンダリングが完了するのを待つため、複数のフレームで通知
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            onMount()
+          })
+        })
+      })
+    }
+  }, [state.isDataLoaded, isStoresLoading, onMount])
+
+  // 追加ロード時の stores 追記（セントリネル交差で loadNext 実行済み）
+  // 追加ロードはフック内部の items 更新で反映されるため、ここでの明示的処理は不要
+
+  // 先頭へ戻るフローティングボタンの制御
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    const onScroll = () => {
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current)
+        hideTimerRef.current = null
+      }
+      if (window.scrollY > 200) {
+        setShowBackToTop(true)
+        hideTimerRef.current = setTimeout(() => {
+          setShowBackToTop(false)
+        }, 1500)
+      } else {
+        setShowBackToTop(false)
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+    }
+  }, [])
 
   // ランクに基づく背景色を取得
   const getBackgroundColorByRank = (rank: string | null, isAuth: boolean) => {
@@ -172,7 +434,6 @@ export function HomeLayout() {
         coupon={selectedCoupon}
         onConfirm={onConfirmCoupon}
         onCancel={onCancelCoupon}
-        onUsageGuideClick={onUsageGuideClick}
       />
     )
   }
@@ -196,7 +457,7 @@ export function HomeLayout() {
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-md">
-            <EmailConfirmationComplete email={emailConfirmationEmail} />
+            <EmailConfirmationComplete />
           </div>
         </div>
       </div>
@@ -222,12 +483,12 @@ export function HomeLayout() {
   // マイページの表示
   if (currentView === "mypage") {
     // メールアドレス変更成功モーダルが表示されている場合は、ユーザー情報の読み込み状態を無視
-    // @ts-expect-error - isEmailChangeSuccessModalOpen is not yet in the type definition
     const isEmailChangeSuccessModalOpen = state.isEmailChangeSuccessModalOpen || false
-    
-    // ユーザー情報とプラン情報が読み込まれていない場合はローディング表示
+
+    // ユーザー情報が読み込まれていない場合はローディング表示
+    // プラン情報はnullの場合もあるため、チェックしない
     // ただし、メールアドレス変更成功モーダルが表示されている場合は無視
-    if ((!user || !plan) && !isEmailChangeSuccessModalOpen) {
+    if (!user && !isEmailChangeSuccessModalOpen) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
           <div className="text-center">
@@ -240,6 +501,16 @@ export function HomeLayout() {
 
     // プラン変更画面の場合
     if (myPageView === "plan-change") {
+      if (!plan) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+              <p className="text-green-600 font-medium">プラン情報を読み込み中...</p>
+            </div>
+          </div>
+        )
+      }
       return (
         <PlanChangeContainer
           currentPlan={plan}
@@ -254,14 +525,21 @@ export function HomeLayout() {
 
     // プラン管理画面の場合
     if (myPageView === "plan-management") {
-      // カード登録状態を確認（sessionStorageとlocalStorageの両方をチェック）
-      const hasPaymentMethod = typeof window !== 'undefined' && (
-        !!sessionStorage.getItem('paygentCustomerCardId') || 
-        !!localStorage.getItem('paygentCustomerCardId') ||
-        !!sessionStorage.getItem('paygentCustomerId') ||
-        !!localStorage.getItem('paygentCustomerId')
-      )
-      
+      // カード登録状態を確認（Cookieベースの認証のみを使用、sessionStorageは使用しない）
+      // PaymentSessionから取得するか、APIから直接取得
+      const hasPaymentMethod = false // 一時的にfalse（APIから取得する必要がある）
+
+      if (!plan) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+              <p className="text-green-600 font-medium">プラン情報を読み込み中...</p>
+            </div>
+          </div>
+        )
+      }
+
       return (
         <PlanManagementContainer
           plan={plan}
@@ -279,6 +557,17 @@ export function HomeLayout() {
       )
     }
 
+    // 店舗紹介画面の場合
+    if (myPageView === "store-introduction") {
+      return (
+        <StoreIntroductionForm
+          onSubmit={onStoreIntroductionSubmit}
+          onBack={() => onMyPageViewChange("main")}
+          isLoading={isLoading}
+        />
+      )
+    }
+
     return (
       <MyPageLayout
         user={user}
@@ -286,13 +575,15 @@ export function HomeLayout() {
         usageHistory={usageHistory}
         paymentHistory={paymentHistory}
         currentView={myPageView}
-        onViewChange={onMyPageViewChange}
+        onViewChange={(view: string) => onMyPageViewChange(view as MyPageViewType)}
         onEditProfile={onEditProfile}
         onChangeEmail={onChangeEmail}
         onChangePassword={onChangePassword}
         onViewPlan={onViewPlan}
         onViewUsageHistory={onViewUsageHistory}
         onViewPaymentHistory={onViewPaymentHistory}
+        onStoreIntroduction={onStoreIntroduction}
+        hasStoreIntroduction={hasStoreIntroduction}
         onCancelSubscription={onCancelSubscription}
         onWithdraw={onWithdraw}
         onWithdrawConfirm={onWithdrawConfirm}
@@ -324,9 +615,27 @@ export function HomeLayout() {
 
 
   if (currentView === "confirmation") {
+    if (!signupData) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+          <div className="text-center">
+            <p className="text-green-600 font-medium">登録データが見つかりません</p>
+          </div>
+        </div>
+      )
+    }
     return (
       <ConfirmationContainer
-        data={signupData}
+        data={{
+          nickname: signupData.nickname,
+          password: signupData.password,
+          passwordConfirm: signupData.passwordConfirm,
+          postalCode: signupData.postalCode,
+          address: signupData.address,
+          birthDate: signupData.birthDate,
+          gender: signupData.gender,
+          saitamaAppId: "",
+        }}
         onRegister={onConfirmRegister}
         onEdit={onConfirmEdit}
         onLogoClick={onLogoClick}
@@ -340,15 +649,11 @@ export function HomeLayout() {
     return (
       <LoginLayout
         onLogin={onLogin}
-        onVerifyOtp={onVerifyOtp}
         onSignup={onSignup}
         onForgotPassword={onForgotPassword}
-        onResendOtp={onResendOtp}
-        onBackToPassword={onBackToEmailLogin}
+        onHomeClick={onBackToHome}
         isLoading={isLoading}
-        error={state.loginError}
-        loginStep={loginStep}
-        email={loginEmail}
+        error={state.loginError ?? undefined}
       />
     )
   }
@@ -358,7 +663,12 @@ export function HomeLayout() {
       <EmailRegistrationContainer
         currentStep={emailRegistrationStep ?? "form"}
         email={emailRegistrationEmail}
-        onSubmit={onEmailSubmit}
+        onSubmit={(data) => {
+          // handleEmailSubmitは(email: string, campaignCode?: string) => voidだが、
+          // EmailRegistrationContainerは(data: UserRegistrationRequest) => voidを期待
+          // ラッパー関数で変換
+          onEmailSubmit(data.email, data.campaignCode)
+        }}
         onBack={onBackToHome}
         onBackToLogin={onEmailRegistrationBackToLogin}
         onResend={onEmailRegistrationResend}
@@ -379,11 +689,29 @@ export function HomeLayout() {
           postalCode: signupData.postalCode || "",
           address: signupData.address || "",
           birthDate: signupData.birthDate || "",
-          gender: signupData.gender || "",
+          gender: (signupData.gender === "male" || signupData.gender === "female" || signupData.gender === "other")
+            ? signupData.gender
+            : "male",
+          phone: "",
+          saitamaAppId: "",
           password: "",
           passwordConfirm: "",
         } : null}
-        onSubmit={onSignupSubmit}
+        onSubmit={(data) => {
+          // handleSignupSubmitは(data: Record<string, string>) => voidだが、
+          // RegisterContainerは(data: UserRegistrationComplete) => voidを期待
+          // ラッパー関数で変換
+          onSignupSubmit({
+            nickname: data.nickname,
+            postalCode: data.postalCode,
+            address: data.address,
+            birthDate: data.birthDate,
+            gender: data.gender,
+            password: data.password,
+            passwordConfirm: data.passwordConfirm,
+            email: data.email || "",
+          })
+        }}
         onCancel={onSignupCancel}
         onLogoClick={onLogoClick}
         isLoading={isLoading}
@@ -391,6 +719,9 @@ export function HomeLayout() {
       />
     )
   }
+
+  // 店舗データの初回ロード中かどうか
+  const isInitialStoresLoading = isStoresLoading && items.length === 0
 
   return (
     <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
@@ -409,7 +740,8 @@ export function HomeLayout() {
 
           {/* 右側: ユーザーメニュー（ログイン時のみ） */}
           <div className="flex items-center justify-end w-20">
-            {isAuthenticated ? (
+            {/* TODO: 将来的に解放予定 - ランク表示 */}
+            {/* {isAuthenticated ? (
               user && currentUserRank && (
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
                   <div className="relative w-5 h-5">
@@ -422,7 +754,7 @@ export function HomeLayout() {
                   </div>
                 </div>
               )
-            ) : null}
+            ) : null} */}
           </div>
         </div>
       </div>
@@ -474,6 +806,15 @@ export function HomeLayout() {
             )}
           </button>
         </div>
+        {/* 特定商取引法についてのリンク */}
+        <div className="px-2 pb-2 text-center">
+          <a
+            href="/lp/commercial-law"
+            className="text-xs text-gray-600 hover:text-gray-800 underline"
+          >
+            特定商取引法について
+          </a>
+        </div>
       </div>
 
       {/* エリア選択ポップアップ */}
@@ -513,14 +854,20 @@ export function HomeLayout() {
         <HomeContainer
           selectedGenres={selectedGenres}
           selectedEvents={selectedEvents}
+          selectedAreas={selectedAreas}
           isNearbyFilter={isNearbyFilter}
           isFavoritesFilter={isFavoritesFilter}
-          stores={stores}
+          stores={mergedStores}
           onStoreClick={onStoreClick}
           onFavoriteToggle={onFavoriteToggle}
           onCouponsClick={onCouponsClick}
           isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
+          loadMoreRef={sentinelRef}
+          isLoadingMore={isLoadingMore}
+          bottomError={error}
           backgroundColorClass={backgroundColorClass}
+          currentLocation={state.currentLocation}
+          isInitialLoading={isInitialStoresLoading}
         />
       </div>
 
@@ -563,6 +910,9 @@ export function HomeLayout() {
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
         onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
+        userAge={userAge}
+        isUsedToday={isCouponUsedToday}
+        isCheckingUsage={isCheckingUsage || isLoadingCoupons}
       />
 
       {/* 使用方法ガイドモーダル */}
@@ -585,18 +935,33 @@ export function HomeLayout() {
         onLogin={onLoginRequiredModalLogin}
       />
 
+      {/* プランが必要なモーダル */}
+      <PlanRequiredModal
+        isOpen={isPlanRequiredModalOpen}
+        onClose={onPlanRequiredModalClose}
+        onRegisterPlan={onPlanRequiredModalRegister}
+      />
+
       {/* メールアドレス変更成功モーダル */}
       <EmailChangeSuccessModal
-        // @ts-expect-error - isEmailChangeSuccessModalOpen is not yet in the type definition
         isOpen={state.isEmailChangeSuccessModalOpen || false}
-        // @ts-expect-error - newEmail is not yet in the type definition
         newEmail={state.newEmail || ""}
-        // @ts-expect-error - handleEmailChangeSuccessModalClose is not yet in the type definition
         onClose={handlers.handleEmailChangeSuccessModalClose}
       />
 
       {/* フッターナビゲーション */}
       <FooterNavigation />
+
+      {/* 先頭へ戻るフローティングボタン */}
+      {showBackToTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-20 right-4 z-40 px-4 py-3 rounded-full shadow-lg bg-green-600 text-white text-sm hover:bg-green-700 transition-colors"
+          aria-label="先頭へ戻る"
+        >
+          先頭へ戻る
+        </button>
+      )}
 
     </div>
   )

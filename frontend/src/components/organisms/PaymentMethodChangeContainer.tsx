@@ -6,7 +6,6 @@ import { CreditCard, AlertCircle, Loader2 } from 'lucide-react'
 interface PaymentMethodChangeContainerProps {
   isLoading: boolean
   error: string
-  userEmail: string
   paymentCard: {
     paygentCustomerId: string
     paygentCustomerCardId: string
@@ -19,7 +18,6 @@ interface PaymentMethodChangeContainerProps {
 export function PaymentMethodChangeContainer({
   isLoading,
   error,
-  userEmail,
   paymentCard,
   fromPlanChange,
   onChangePaymentMethod,
@@ -51,15 +49,6 @@ export function PaymentMethodChangeContainer({
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-800">{error}</p>
-          </div>
-        )}
-
-        {/* ユーザー情報表示 */}
-        {userEmail && (
-          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <p className="text-sm text-gray-700">
-              <span className="font-medium">登録メールアドレス:</span> {userEmail}
-            </p>
           </div>
         )}
 

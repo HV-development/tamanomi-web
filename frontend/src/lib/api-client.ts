@@ -1,3 +1,10 @@
+import type {
+  PayPayPaymentStartResponse,
+  PayPayTransactionStatusResponse,
+} from '@/types/payment'
+import type { PayPayPaymentRequest, QrPaymentRequest, QrPaymentResponse, QrGetTransactionResponse } from '@hv-development/schemas'
+import { buildClientHeaders } from './client-header-utils'
+
 /**
  * API呼び出しの共通処理
  * トークン期限切れ時の自動リフレッシュとログイン画面遷移を処理
@@ -17,7 +24,8 @@ interface ApiOptions extends RequestInit {
 }
 
 export class ApiClient {
-  private static baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  // NEXT_PUBLIC_API_BASE_URL は廃止。フロントからは Next API への相対パスを利用する。
+  private static baseUrl = '';
 
   /**
    * API呼び出しの共通処理
@@ -28,51 +36,30 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     const {
       requireAuth = true,
-      autoRefresh = true,
+      autoRefresh: _autoRefresh = true,
       headers = {},
       ...fetchOptions
     } = options;
 
-    // 認証が必要な場合、トークンを追加
-    if (requireAuth) {
-      const accessToken = localStorage.getItem('accessToken');
-      if (accessToken) {
-        (headers as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
-      }
-    }
+    // 認証が必要な場合、Cookieベースの認証を使用（localStorageは廃止）
+    // credentials: 'include'でCookieから自動的に認証される
 
     try {
+      // 共通ヘッダーを生成
+      const commonHeaders = buildClientHeaders()
+      
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         headers: {
-          'Content-Type': 'application/json',
+          ...commonHeaders,
           ...headers,
         },
+        credentials: 'include', // Cookieを送信
         ...fetchOptions,
       });
 
-      // トークン期限切れの場合
-      if (response.status === 403 && requireAuth && autoRefresh) {
-        const refreshResult = await this.refreshToken();
-        if (refreshResult.success) {
-          // リフレッシュ成功時、元のリクエストを再実行
-          const newAccessToken = localStorage.getItem('accessToken');
-          if (newAccessToken) {
-            (headers as Record<string, string>)['Authorization'] = `Bearer ${newAccessToken}`;
-            const retryResponse = await fetch(`${this.baseUrl}${endpoint}`, {
-              headers: {
-                'Content-Type': 'application/json',
-                ...headers,
-              },
-              ...fetchOptions,
-            });
-            
-            if (retryResponse.ok) {
-              return { data: await retryResponse.json() };
-            }
-          }
-        }
-        
-        // リフレッシュ失敗時、ログイン画面に遷移
+      // トークン期限切れの場合（Cookieベースの認証ではリフレッシュは不要）
+      if (response.status === 403 && requireAuth) {
+        // Cookieベースの認証では、403エラー時はログイン画面に遷移
         this.redirectToLogin();
         return { error: { code: 'AUTHENTICATION_FAILED', message: '認証に失敗しました' } };
       }
@@ -89,44 +76,10 @@ export class ApiClient {
   }
 
   /**
-   * リフレッシュトークンを使用してアクセストークンを更新
-   */
-  private static async refreshToken(): Promise<{ success: boolean }> {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        return { success: false };
-      }
-
-      const response = await fetch(`${this.baseUrl}/api/v1/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        return { success: true };
-      }
-
-      return { success: false };
-    } catch {
-      return { success: false };
-    }
-  }
-
-  /**
    * ログイン画面に遷移
+   * Cookieベースの認証では、トークンのクリアは不要（サーバー側でCookieを削除）
    */
   private static redirectToLogin(): void {
-    // トークンをクリア
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    
     // ログイン画面に遷移
     if (typeof window !== 'undefined') {
       window.location.href = '/';
@@ -171,12 +124,67 @@ export class ApiClient {
 }
 
 /**
+ * PayPay決済申込API
+ * - Next API `/api/payment/paypay/pay` を経由してバックエンドのPayPay決済申込エンドポイントを呼び出す
+ */
+export async function requestPayPayPayment(
+  body: PayPayPaymentRequest
+): Promise<ApiResponse<PayPayPaymentStartResponse>> {
+  return ApiClient.post<PayPayPaymentStartResponse>('/api/payment/paypay/pay', body, {
+    requireAuth: true,
+  })
+}
+
+/**
+ * PayPay取引情報取得API
+ * - Next API `/api/payment/paypay/transactions/:transactionId` を経由してバックエンドの取引情報取得エンドポイントを呼び出す
+ */
+export async function getPayPayTransactionStatus(
+  transactionId: string
+): Promise<ApiResponse<PayPayTransactionStatusResponse>> {
+  return ApiClient.get<PayPayTransactionStatusResponse>(
+    `/api/payment/paypay/transactions/${encodeURIComponent(transactionId)}`,
+    { requireAuth: true },
+  )
+}
+
+/**
+ * イオンペイ決済申込API
+ * - Next API `/api/payment/qr/pay` を経由してバックエンドのQRコード決済申込エンドポイントを呼び出す
+ */
+export async function requestQrPayment(
+  body: QrPaymentRequest
+): Promise<ApiResponse<QrPaymentResponse>> {
+  return ApiClient.post<QrPaymentResponse>('/api/payment/qr/pay', body, {
+    requireAuth: true,
+  })
+}
+
+/**
+ * QRコード決済 取引情報取得API
+ * - Next API `/api/payment/qr/transactions/:transactionId` を経由してバックエンドの取引情報取得エンドポイントを呼び出す
+ */
+export async function getQrTransaction(
+  transactionId: string,
+  recursive?: boolean
+): Promise<ApiResponse<QrGetTransactionResponse & { paymentTransactionId?: string; applicationId?: string }>> {
+  const queryParams = recursive ? '?recursive=true' : ''
+  return ApiClient.get<QrGetTransactionResponse & { paymentTransactionId?: string; applicationId?: string }>(
+    `/api/payment/qr/transactions/${transactionId}${queryParams}`,
+    {
+      requireAuth: true,
+    }
+  )
+}
+
+/**
  * 認証関連のAPI関数
  */
 
 export interface PreRegisterRequest {
   email: string
   campaignCode?: string
+  shop_id?: string
 }
 
 export interface PreRegisterResponse {
@@ -190,41 +198,47 @@ export interface PreRegisterResponse {
  */
 export async function preRegister(
   email: string,
-  campaignCode?: string
+  campaignCode?: string,
+  referrerUserId?: string,
+  shopId?: string
 ): Promise<PreRegisterResponse> {
   try {
+    const requestBody = {
+      email,
+      campaignCode,
+      ...(referrerUserId && referrerUserId.trim() !== '' ? { referrerUserId: referrerUserId.trim() } : {}),
+      ...(shopId && shopId.trim() !== '' ? { shopId: shopId.trim() } : {}),
+    };
+
+    const headers = buildClientHeaders()
+    
     const response = await fetch('/api/auth/pre-register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        campaignCode,
-      }),
+      headers,
+      body: JSON.stringify(requestBody),
     })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      
+
       // 409エラー（メールアドレス重複）の場合は特別なメッセージ
       if (response.status === 409) {
         const message = errorData.error?.message || errorData.message || 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。'
         throw new Error(message)
       }
-      
+
       // 400エラー（バリデーションエラー）の場合は詳細なメッセージを表示
       if (response.status === 400) {
         const message = errorData.error?.message || errorData.message || '入力内容に問題があります。確認してから再度お試しください。'
         throw new Error(message)
       }
-      
+
       // 500エラー（サーバーエラー）の場合は一般的なメッセージを表示
       if (response.status === 500) {
         const message = errorData.error?.message || errorData.message || 'システムエラーが発生しました。しばらく時間をおいてから再度お試しください。'
         throw new Error(message)
       }
-      
+
       const message = errorData.error?.message || errorData.message || '認証メールの送信に失敗しました'
       throw new Error(message)
     }
@@ -236,5 +250,74 @@ export async function preRegister(
       throw error
     }
     throw new Error('認証メールの送信中にエラーが発生しました')
+  }
+}
+
+/**
+ * パスワードリセット確認APIのレスポンス型
+ */
+export interface ConfirmPasswordResetResponse {
+  success: boolean
+  message?: string
+}
+
+/**
+ * パスワードリセットを確認し、新しいパスワードを設定する
+ * リセットトークンと新しいパスワードを使用してパスワードをリセットする
+ */
+export async function confirmPasswordReset(
+  token: string,
+  newPassword: string
+): Promise<ConfirmPasswordResetResponse> {
+  try {
+    const headers = buildClientHeaders()
+    
+    const response = await fetch('/api/auth/reset-password/confirm', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        token,
+        newPassword,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+
+      // 400エラー（無効なトークンなど）の場合は特別なメッセージ
+      if (response.status === 400) {
+        const message = errorData.message || errorData.error?.message || '無効なリセットトークンです。リンクの有効期限が切れている可能性があります。'
+        throw new Error(message)
+      }
+
+      // 408エラー（タイムアウト）の場合は特別なメッセージ
+      if (response.status === 408) {
+        const message = errorData.message || errorData.error?.message || 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。'
+        throw new Error(message)
+      }
+
+      // 503エラー（サーバー接続エラー）の場合は特別なメッセージ
+      if (response.status === 503) {
+        const message = errorData.message || errorData.error?.message || 'サーバーに接続できません。ネットワーク接続を確認してください。'
+        throw new Error(message)
+      }
+
+      // 500エラー（サーバーエラー）の場合は一般的なメッセージを表示
+      if (response.status === 500) {
+        const message = errorData.message || errorData.error?.message || 'システムエラーが発生しました。しばらく時間をおいてから再度お試しください。'
+        throw new Error(message)
+      }
+
+      const message = errorData.message || errorData.error?.message || 'パスワードリセットに失敗しました'
+      throw new Error(message)
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('パスワードリセットの処理中にエラーが発生しました')
   }
 }

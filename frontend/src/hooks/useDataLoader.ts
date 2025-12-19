@@ -13,32 +13,16 @@ export const useDataLoader = () => {
     const [error, setError] = useState<string | null>(null)
 
     const loadData = useCallback(async (forceReload = false) => {
+        // モック/フォールバック廃止に伴い、ここでは空データを返す
         if (!forceReload && dataCache.stores && dataCache.notifications) {
             return { stores: dataCache.stores, notifications: dataCache.notifications }
         }
-
         setIsLoading(true)
         setError(null)
-
-        try {
-            const [storesData, notificationsData] = await Promise.all([
-                import("@/data/mock-stores").then(mod => mod.mockStores).catch(() => {
-                    return []
-                }),
-                import("@/data/mock-notifications").then(mod => mod.mockNotifications).catch(() => {
-                    return []
-                })
-            ])
-
-            const newData = { stores: storesData, notifications: notificationsData }
-            setDataCache(newData)
-            setIsLoading(false)
-            return newData
-        } catch {
-            setError('データの読み込みに失敗しました')
-            setIsLoading(false)
-            return { stores: [], notifications: [] }
-        }
+        const newData = { stores: [], notifications: [] }
+        setDataCache(newData)
+        setIsLoading(false)
+        return newData
     }, [dataCache])
 
     return { loadData, isLoading, error, dataCache }

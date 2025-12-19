@@ -14,21 +14,23 @@ interface GenrePopupProps {
 }
 
 const GENRES = [
-  { value: "event", label: "イベント" },
-  { value: "izakaya", label: "居酒屋" },
-  { value: "creative", label: "創作料理" },
   { value: "japanese", label: "和食" },
   { value: "western", label: "洋食" },
-  { value: "italian", label: "イタリアン" },
-  { value: "french", label: "フレンチ" },
   { value: "chinese", label: "中華" },
-  { value: "yakiniku", label: "焼肉" },
+  { value: "italian", label: "イタリア料理" },
   { value: "korean", label: "韓国料理" },
-  { value: "asian", label: "アジアン" },
-  { value: "bar", label: "バー" },
+  { value: "french", label: "フランス料理" },
+  { value: "ethnic", label: "エスニック" },
+  { value: "sushi", label: "寿司" },
+  { value: "curry", label: "カレー" },
+  { value: "yakiniku", label: "焼肉" },
+  { value: "nabe", label: "鍋" },
+  { value: "izakaya", label: "居酒屋" },
   { value: "ramen", label: "ラーメン" },
-  { value: "soba", label: "そば" },
-  { value: "udon", label: "うどん" },
+  { value: "bar", label: "バー" },
+  { value: "cafe", label: "カフェ" },
+  { value: "shokudo", label: "食堂" },
+  { value: "event", label: "イベント出店" },
 ]
 
 export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onClear }: GenrePopupProps) {
@@ -43,8 +45,8 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
   return (
     <>
       {/* オーバーレイ */}
-      <div 
-        className="fixed inset-0 bg-black bg-opacity-20 z-40" 
+      <div
+        className="fixed inset-0 bg-black bg-opacity-20 z-40"
         onClick={handleOverlayClick}
       ></div>
 
@@ -53,8 +55,8 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-gray-900">ジャンルを選択</h3>
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="閉じる"
             >
@@ -69,22 +71,21 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
             <div className="mb-4">
               <h4 className="text-md font-bold text-gray-800 mb-3">ジャンル</h4>
             </div>
-            
+
             {/* ジャンル選択 */}
             <div className="space-y-3">
               {/* イベントボタン（2カラム分） */}
               {GENRES.filter(genre => genre.value === "event").map((genre) => {
                 const isSelected = selectedGenres.includes(genre.value)
-                
+
                 return (
                   <button
                     key={genre.value}
                     onClick={() => onGenreToggle(genre.value)}
-                    className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${
-                      isSelected
+                    className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${isSelected
                         ? `border-orange-500 bg-orange-100 text-orange-800 shadow-md`
                         : `border-orange-300 bg-orange-50 text-orange-700 hover:border-orange-400 hover:bg-orange-100 hover:shadow-sm`
-                    }`}
+                      }`}
                   >
                     {isSelected && (
                       <div className="absolute -top-1 -right-1">
@@ -97,22 +98,21 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                   </button>
                 )
               })}
-              
+
               {/* その他のジャンルは2カラムグリッド */}
               <div className="grid grid-cols-2 gap-3">
                 {GENRES.filter(genre => genre.value !== "event").map((genre) => {
                   const genreColors = getGenreColor(genre.value)
                   const isSelected = selectedGenres.includes(genre.value)
-                  
+
                   return (
                     <button
                       key={genre.value}
                       onClick={() => onGenreToggle(genre.value)}
-                      className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${
-                        isSelected
+                      className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${isSelected
                           ? "border-green-700 bg-green-100 text-green-800 shadow-md"
                           : "border-gray-300 bg-white text-gray-700 hover:border-green-400 hover:bg-green-100 hover:shadow-sm"
-                      }`}
+                        }`}
                     >
                       {isSelected && (
                         <div className="absolute -top-1 -right-1">

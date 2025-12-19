@@ -1,17 +1,14 @@
 "use client"
 
-import { useEffect, useMemo, Suspense, useReducer } from "react"
+import { useMemo, Suspense, useReducer, useEffect, useRef } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useFilters } from "@/hooks/useFilters"
 import { useRouter } from "next/navigation"
-import type { Store } from "@/types/store"
-import type { Notification } from "@/types/notification"
 
 // 分離したコンポーネントとフックをインポート
 import { AppContext } from "@/contexts/AppContext"
 import { initialState, appReducer } from "@/hooks/useAppReducer"
-import { useDataLoader } from "@/hooks/useDataLoader"
 import { useComputedValues } from "@/hooks/useComputedValues"
 import { useAppHandlers } from "@/hooks/useAppHandlers"
 import { HomeLayout } from "@/components/templates/HomeLayout"
@@ -23,38 +20,43 @@ export default function HomePage() {
   const navigation = useNavigation();
   const filters = useFilters();
   const router = useRouter()
+  
+  // 初期化フラグ（初回のみ実行するため）
+  const isInitialized = useRef(false)
+
+  // URLパラメータに応じたビュー遷移処理
+  useEffect(() => {
+    // 初回のみ実行
+    if (isInitialized.current) {
+      return
+    }
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const view = urlParams.get('view')
+      
+      if (view === 'login') {
+        // ログイン画面に遷移
+        navigation.navigateToView("login")
+      }
+      
+      // 初期化完了フラグを立てる
+      isInitialized.current = true
+    }
+  }, [navigation, router])
 
   // useReducerで状態管理を統合
   const [state, dispatch] = useReducer(appReducer, initialState)
 
-  // データ読み込みの最適化
-  const { loadData } = useDataLoader()
-
-  // データの遅延読み込み
-  useEffect(() => {
-    const initializeData = async () => {
-      const data = await loadData()
-      dispatch({ type: 'SET_STORES', payload: data.stores as Store[] })
-      dispatch({ type: 'SET_NOTIFICATIONS', payload: data.notifications as Notification[] })
-      dispatch({ type: 'SET_DATA_LOADED', payload: true })
-    }
-
-    initializeData()
-  }, [loadData])
-
   // デバッグ用のログ（開発環境のみ）
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-    }
-  }, [state.isDataLoaded, state.stores.length, state.notifications.length, navigation.currentView, auth.isAuthenticated])
+  // state.stores は HomeLayout 内の無限スクロールで更新
 
   // 計算値をカスタムフックで分離
-  const computedValues = useComputedValues(
-    state.stores as Store[] || [],
-    state.notifications as Notification[] || [],
-    auth || { isAuthenticated: false, user: undefined },
-    filters || { isFavoritesFilter: false }
-  )
+  const computedValues = useComputedValues({
+    stores: state.stores,
+    notifications: state.notifications,
+    auth,
+    filters
+  })
 
   // ハンドラーを作成
   const handlers = useAppHandlers(dispatch, auth, navigation, filters, router, state)
@@ -75,17 +77,8 @@ export default function HomePage() {
     return "bg-gradient-to-br from-green-50 to-green-100"
   }, [])
 
-  // データが読み込まれるまでローディング表示
-  if (!state.isDataLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-green-600 font-medium">データを読み込み中...</p>
-        </div>
-      </div>
-    )
-  }
+  // データ読み込みはHomeLayout内で部分的に表示するため、ここでのローディング表示は不要
+  // （店舗一覧部分のみローディング表示）
 
   return (
     <AppContext.Provider value={contextValue}>
@@ -179,3 +172,4 @@ export default function HomePage() {
   )
 }
 */
+
