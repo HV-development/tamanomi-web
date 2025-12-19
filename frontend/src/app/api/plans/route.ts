@@ -17,17 +17,26 @@ export async function GET(request: NextRequest) {
       status,
       limit,
     })
-    
+
     if (saitamaAppLinked !== null) {
       queryParams.append('saitamaAppLinked', saitamaAppLinked)
     }
 
     const fullUrl = `${buildApiUrl('/plans')}?${queryParams.toString()}`
 
+    // リクエストヘッダーからhostを取得してx-app-domainヘッダーとして渡す
+    // これによりバックエンドAPIがapplicationIdを解決できる
+    const host = request.headers.get('host') || request.headers.get('x-forwarded-host')
+    const customHeaders: Record<string, string> = {}
+    if (host) {
+      customHeaders['x-app-domain'] = host
+    }
+
     const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'GET',
       headerOptions: {
         requireAuth: false, // プラン一覧は認証不要（公開エンドポイント）
+        customHeaders,
       },
     })
 
