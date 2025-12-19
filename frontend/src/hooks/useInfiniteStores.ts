@@ -97,7 +97,11 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     // paymentMethodsを構築
     const creditCards = parsePaymentCredit(shop.paymentCredit)
     const digitalPayments = parsePaymentCode(shop.paymentCode)
-    const hasPaymentMethods = !!shop.paymentSaicoin || !!shop.paymentTamapon || !!shop.paymentCash || creditCards.length > 0 || digitalPayments.length > 0
+    // paymentAppsから値を取得（後方互換性のためpaymentSaicoin/paymentTamaponも参照）
+    const paymentAppsData = shop.paymentApps as Record<string, boolean> | undefined
+    const hasSaicoin = paymentAppsData?.saicoin ?? !!shop.paymentSaicoin
+    const hasTamapon = paymentAppsData?.tamapon ?? !!shop.paymentTamapon
+    const hasPaymentMethods = hasSaicoin || hasTamapon || !!shop.paymentCash || creditCards.length > 0 || digitalPayments.length > 0
 
     // セッションストレージからお気に入り状態を確認（APIから取得できない場合のフォールバック）
     let isFavorite = shop.isFavorite || false
@@ -168,8 +172,8 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         ? customSceneText.trim()
         : undefined,
       paymentMethods: hasPaymentMethods ? {
-        saicoin: !!shop.paymentSaicoin,
-        tamapon: !!shop.paymentTamapon,
+        saicoin: hasSaicoin,
+        tamapon: hasTamapon,
         cash: !!shop.paymentCash,
         creditCards,
         digitalPayments,
@@ -177,9 +181,10 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       status: status || 'active',
       merchantId: merchantId,
       email: merchant?.account?.email || accountEmail || '',
-      paymentSaicoin: !!shop.paymentSaicoin,
-      paymentTamapon: !!shop.paymentTamapon,
+      paymentSaicoin: hasSaicoin,
+      paymentTamapon: hasTamapon,
       paymentCash: !!shop.paymentCash,
+      paymentApps: paymentAppsData,
       createdAt: createdAt,
       updatedAt: updatedAt,
     }

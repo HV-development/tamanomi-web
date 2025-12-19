@@ -55,6 +55,7 @@ export interface Store {
   paymentSaicoin?: boolean
   paymentTamapon?: boolean
   paymentCash?: boolean
+  paymentApps?: Record<string, boolean> // アプリ別決済方法 { "saicoin": true, "tamapon": false, "mydigi": true }
   createdAt?: string
   updatedAt?: string
 }
