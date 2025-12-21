@@ -51,25 +51,20 @@ export async function getLatestOtp(request: APIRequestContext, email: string): P
                         try {
                             const decoded = Buffer.from(base64Text, 'base64').toString('utf-8');
                             body = decoded;
-                            console.log('base64デコード成功');
                         } catch (e) {
-                            console.log('base64デコード失敗:', e);
                         }
                     }
                 }
             } catch (e) {
-                console.log('base64デコード処理エラー:', e);
             }
             
             // デバッグ用: メール本文の一部をログに出力
-            console.log('MailHogメール本文（最初の500文字）:', body.substring(0, 500));
             
             // OTPコードは通常、大きなフォントサイズや特別なスタイルで表示される
             // テンプレートでは `<div class="otp-code">${data.otp}</div>` の形式で表示される
             // まず、otp-codeクラスを含む部分を探す
             const otpCodeMatch = body.match(/<div[^>]*class="otp-code"[^>]*>(\d{6})<\/div>/i);
             if (otpCodeMatch && otpCodeMatch[1]) {
-                console.log('otp-codeクラスから取得したOTP:', otpCodeMatch[1]);
                 return otpCodeMatch[1];
             }
             
@@ -88,18 +83,15 @@ export async function getLatestOtp(request: APIRequestContext, email: string): P
                     return /(認証|コード|ワンタイム|パスワード|OTP|verification|code|認証コード)/i.test(context);
                 });
                 if (otpCode) {
-                    console.log('コンテキストから取得したOTP:', otpCode);
                     return otpCode;
                 }
                 // 見つからない場合は最初の6桁の数字を返す
-                console.log('最初の6桁の数字をOTPとして使用:', matches[0]);
                 return matches[0];
             }
             
             // HTMLタグ除去後の本文からも検索
             const match = body.match(/\b\d{6}\b/);
             if (match) {
-                console.log('本文から取得したOTP:', match[0]);
                 return match[0];
             }
         }

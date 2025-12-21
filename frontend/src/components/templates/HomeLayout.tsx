@@ -39,7 +39,6 @@ import { useFavorites } from "@/hooks/useFavorites"
 import { calculateAge } from "@/utils/age-calculator"
 import { checkTodayUsage } from "@/utils/coupon-usage-check"
 
-
 interface HomeLayoutProps {
   onMount?: () => void
 }
@@ -47,7 +46,6 @@ interface HomeLayoutProps {
 export function HomeLayout({ onMount }: HomeLayoutProps) {
   // Context から必要な値を取得
   const { state, dispatch, handlers, auth, navigation, filters, computedValues } = useAppContext()
-
 
   // ポップアップとモーダルの状態管理
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
@@ -612,7 +610,6 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   if (currentView === "subscription") {
     return <SubscriptionContainer onSubscribe={onSubscribe} onLogoClick={onLogoClick} isLoading={isLoading} backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100" />
   }
-
 
   if (currentView === "confirmation") {
     if (!signupData) {

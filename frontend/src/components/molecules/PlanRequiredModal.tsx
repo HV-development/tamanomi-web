@@ -61,5 +61,3 @@ export function PlanRequiredModal({ isOpen, onRegisterPlan, onClose }: PlanRequi
   )
 }
 
-
-

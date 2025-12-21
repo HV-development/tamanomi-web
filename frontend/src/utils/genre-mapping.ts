@@ -52,14 +52,12 @@ async function buildGenreMapping(): Promise<Map<string, string>> {
       ? '/api/genres'
       : `${process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || 'http://localhost:3002'}/api/v1/public/genres`
 
-
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     })
-
 
     if (!response.ok) {
       console.warn('[genre-mapping] Failed to fetch genres:', response.status)

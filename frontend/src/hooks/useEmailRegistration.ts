@@ -70,7 +70,6 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       // referrerUserIdはURLパラメータから取得するか、Cookieから取得する
       const referrerUserId = null; // 必要に応じてCookieから取得する実装を追加
 
-
       // 紹介者IDを含めてpreRegisterを呼び出し
       const registrationData: UserRegistrationRequest = {
         email: data.email,

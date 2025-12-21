@@ -35,7 +35,6 @@ async function setupAuthenticatedState(page: Page, request: APIRequestContext) {
                 break;
             }
         } catch (error) {
-            console.log(`OTP取得リトライ ${retryCount + 1}/${maxOtpRetries}:`, error);
             retryCount++;
             if (retryCount < maxOtpRetries) {
                 await page.waitForTimeout(1000); // リトライ前に待機（短縮）
@@ -45,18 +44,15 @@ async function setupAuthenticatedState(page: Page, request: APIRequestContext) {
     
     expect(otp).toBeTruthy();
     expect(otp).toMatch(/^\d{6}$/);
-    console.log('取得したOTP:', otp);
     
     // URLからrequestIdを取得
     const url = new URL(page.url());
     const requestId = url.searchParams.get('requestId');
     expect(requestId).toBeTruthy();
-    console.log('Request ID:', requestId);
     
     // ベースURLを取得
     const baseUrl = page.url().split('/login')[0];
     const apiUrl = `${baseUrl}/api/auth/verify-otp`;
-    console.log('OTP検証API URL:', apiUrl);
     
     // OTP検証を実行（リトライは最小限に）
     const verifyResponse = await page.evaluate(async (params: { url: string; email: string; otp: string; requestId: string }) => {
@@ -80,8 +76,6 @@ async function setupAuthenticatedState(page: Page, request: APIRequestContext) {
         };
     }, { url: apiUrl, email: TEST_EMAIL, otp: otp!, requestId: requestId! });
     
-    console.log('OTP検証レスポンス:', verifyResponse);
-    console.log('OTP検証ステータス:', verifyResponse.status);
     
     if (!verifyResponse.ok || verifyResponse.data.error) {
         throw new Error(`OTP検証が失敗しました: ${JSON.stringify(verifyResponse.data)}`);
@@ -93,17 +87,14 @@ async function setupAuthenticatedState(page: Page, request: APIRequestContext) {
     const accessTokenCookie = cookies.find(c => c.name === 'accessToken' || c.name === '__Host-accessToken');
     expect(accessTokenCookie).toBeTruthy();
     expect(accessTokenCookie?.value).toBeTruthy();
-    console.log('認証Cookieが設定されました');
     
     // ホームページまたはプラン登録ページに遷移
     await page.goto(`${baseUrl}/home`, { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForLoadState('load', { timeout: 20000 }).catch(() => {
         // loadがタイムアウトしても続行
-        console.log('loadの待機がタイムアウトしましたが、続行します');
     });
     await page.waitForTimeout(1500);
     
-    console.log('認証が完了しました。現在のURL:', page.url());
 }
 
 test.describe('店舗一覧・詳細のテスト', () => {
@@ -126,9 +117,7 @@ test.describe('店舗一覧・詳細のテスト', () => {
                 response.url().includes('/api/shops') && response.status() === 200,
                 { timeout: 15000 }
             );
-            console.log('店舗一覧APIレスポンスを正常に受信しました');
         } catch {
-            console.log('APIレスポンスの待機がタイムアウトしました。');
         }
         
         // 追加の待機時間（レンダリング完了を待つ）
@@ -147,11 +136,9 @@ test.describe('店舗一覧・詳細のテスト', () => {
         // 店舗カードの数を取得
         const storeCount = await storeCards.count();
         expect(storeCount).toBeGreaterThan(0);
-        console.log(`表示されている店舗数: ${storeCount}`);
         
         // 最初の店舗名を取得してログに出力
         const firstStoreName = await storeCards.first().textContent();
-        console.log('最初の店舗名:', firstStoreName);
     });
 
     test('店舗一覧から店舗詳細が表示されることを確認', async ({ page }) => {
@@ -163,7 +150,6 @@ test.describe('店舗一覧・詳細のテスト', () => {
         const firstStoreCard = storeCards.first();
         const storeNameText = await firstStoreCard.textContent();
         expect(storeNameText).toBeTruthy();
-        console.log('選択した店舗名:', storeNameText);
         
         // 店舗名を含む親要素（StoreCard）をクリック
         // StoreCardコンポーネントはonClickで店舗詳細を表示する
@@ -175,7 +161,6 @@ test.describe('店舗一覧・詳細のテスト', () => {
         try {
             await page.getByText('店舗詳細').first().waitFor({ state: 'visible', timeout: 10000 });
         } catch {
-            console.log('店舗詳細ポップアップの待機がタイムアウトしました');
         }
         await page.waitForTimeout(1000);
         
@@ -220,7 +205,6 @@ test.describe('店舗一覧・詳細のテスト', () => {
         const firstStoreCard = storeCards.first();
         const storeNameText = await firstStoreCard.textContent();
         expect(storeNameText).toBeTruthy();
-        console.log('選択した店舗名:', storeNameText);
         
         // 最初の店舗カードをクリック
         const storeCard = firstStoreCard.locator('..').locator('..').locator('..');
@@ -262,7 +246,6 @@ test.describe('店舗一覧・詳細のテスト', () => {
         const testCount = Math.min(3, storeCount); // 最大3店舗をテスト
         
         for (let i = 0; i < testCount; i++) {
-            console.log(`店舗 ${i + 1}/${testCount} をテスト中...`);
             
             // 店舗カードを取得
             const storeCardElement = storeCards.nth(i);
@@ -271,7 +254,6 @@ test.describe('店舗一覧・詳細のテスト', () => {
             // 店舗名を取得
             const storeNameText = await storeCardElement.textContent();
             expect(storeNameText).toBeTruthy();
-            console.log(`選択した店舗名: ${storeNameText}`);
             
             // 店舗カードをクリック
             const storeCard = storeCardElement.locator('..').locator('..').locator('..');

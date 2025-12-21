@@ -5,17 +5,11 @@ import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { customerId, planId, customerFamilyName, customerName, companyName } = body
 
-    console.log('🔍 [Next.js API Route] Request body:', {
-      customerId,
-      planId,
-      bodyKeys: Object.keys(body),
-    })
 
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const fullUrl = buildApiUrl('/payment/register')
@@ -43,8 +37,6 @@ export async function POST(request: NextRequest) {
     if (companyName) {
       backendRequestBody.companyName = companyName
     }
-
-    console.log('🔍 [Next.js API Route] Backend request body:', backendRequestBody)
 
     const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',

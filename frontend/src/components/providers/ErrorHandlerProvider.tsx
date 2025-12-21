@@ -50,4 +50,3 @@ export function ErrorHandlerProvider({ children }: { children: React.ReactNode }
   return <>{children}</>
 }
 
-

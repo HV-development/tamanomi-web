@@ -10,12 +10,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { planId, alsoChangePaymentMethod } = body
 
-    console.log('🔍 [user-plans/update] リクエスト受信:', {
-      body,
-      planId,
-      alsoChangePaymentMethod,
-      alsoChangePaymentMethodType: typeof alsoChangePaymentMethod,
-    });
 
     // バリデーション
     if (!planId) {
@@ -30,7 +24,6 @@ export async function POST(request: NextRequest) {
       planId: planId,
       alsoChangePaymentMethod: alsoChangePaymentMethod || false,
     };
-    console.log('🔍 [user-plans/update] バックエンドAPIに送信:', requestBody);
 
     // バックエンドAPIを呼び出し
     const controller = new AbortController()
@@ -59,10 +52,6 @@ export async function POST(request: NextRequest) {
 
       clearTimeout(timeoutId)
 
-      console.log('🔍 [user-plans/update] バックエンドAPIレスポンス:', {
-        status: response.status,
-        ok: response.ok,
-      });
 
       // レスポンスのステータスをチェック
       if (!response.ok) {
@@ -93,7 +82,6 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json()
-      console.log('🔍 [user-plans/update] バックエンドAPIレスポンスdata:', data);
       return createNoCacheResponse(data, { status: response.status })
     } catch (fetchError) {
       clearTimeout(timeoutId)

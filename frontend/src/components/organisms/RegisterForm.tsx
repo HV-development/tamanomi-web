@@ -206,7 +206,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     }
   }
 
-
   const handleAddressSearch = async () => {
     const cleanedPostalCode = formData.postalCode.replace(/-/g, "")
 
@@ -327,7 +326,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     const value = formData[field] as string
     validateField(field, value)
   }
-
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

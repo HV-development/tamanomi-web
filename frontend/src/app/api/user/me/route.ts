@@ -14,13 +14,6 @@ export async function GET(request: NextRequest) {
     const refreshTokenCookie = request.cookies.get('refreshToken');
     const hostRefreshTokenCookie = request.cookies.get('__Host-refreshToken');
     
-    console.log('🔍 [user/me] Cookie check:', {
-      hasAccessToken: !!accessTokenCookie?.value,
-      hasHostAccessToken: !!hostAccessTokenCookie?.value,
-      hasRefreshToken: !!refreshTokenCookie?.value,
-      hasHostRefreshToken: !!hostRefreshTokenCookie?.value,
-      cookieHeader: request.headers.get('cookie')?.substring(0, 100) || 'none',
-    });
 
     const fullUrl = buildApiUrl('/users/me')
 

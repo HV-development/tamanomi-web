@@ -41,7 +41,6 @@ interface FilterControlsProps {
   onLogoClick: () => void
 }
 
-
 export function FilterControls({
   selectedGenres,
   selectedArea,

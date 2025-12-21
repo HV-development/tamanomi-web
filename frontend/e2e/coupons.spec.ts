@@ -37,7 +37,6 @@ async function setupAuthenticatedState(page: Page, request: APIRequestContext, e
                 break;
             }
         } catch (error) {
-            console.log(`OTP取得リトライ ${retryCount + 1}/${maxOtpRetries}:`, error);
             retryCount++;
             if (retryCount < maxOtpRetries) {
                 await page.waitForTimeout(1000); // リトライ前に待機（短縮）
@@ -47,18 +46,15 @@ async function setupAuthenticatedState(page: Page, request: APIRequestContext, e
     
     expect(otp).toBeTruthy();
     expect(otp).toMatch(/^\d{6}$/);
-    console.log('取得したOTP:', otp);
     
     // URLからrequestIdを取得
     const url = new URL(page.url());
     const requestId = url.searchParams.get('requestId');
     expect(requestId).toBeTruthy();
-    console.log('Request ID:', requestId);
     
     // ベースURLを取得
     const baseUrl = page.url().split('/login')[0];
     const apiUrl = `${baseUrl}/api/auth/verify-otp`;
-    console.log('OTP検証API URL:', apiUrl);
     
     // OTP検証を実行（リトライは最小限に）
     const verifyResponse = await page.evaluate(async (params: { url: string; email: string; otp: string; requestId: string }) => {
@@ -82,8 +78,6 @@ async function setupAuthenticatedState(page: Page, request: APIRequestContext, e
         };
     }, { url: apiUrl, email: email, otp: otp!, requestId: requestId! });
     
-    console.log('OTP検証レスポンス:', verifyResponse);
-    console.log('OTP検証ステータス:', verifyResponse.status);
     
     if (!verifyResponse.ok || verifyResponse.data.error) {
         throw new Error(`OTP検証が失敗しました: ${JSON.stringify(verifyResponse.data)}`);
@@ -95,17 +89,14 @@ async function setupAuthenticatedState(page: Page, request: APIRequestContext, e
     const accessTokenCookie = cookies.find(c => c.name === 'accessToken' || c.name === '__Host-accessToken');
     expect(accessTokenCookie).toBeTruthy();
     expect(accessTokenCookie?.value).toBeTruthy();
-    console.log('認証Cookieが設定されました');
     
     // ホームページまたはプラン登録ページに遷移
     await page.goto(`${baseUrl}/home`, { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForLoadState('load', { timeout: 20000 }).catch(() => {
         // loadがタイムアウトしても続行
-        console.log('loadの待機がタイムアウトしましたが、続行します');
     });
     await page.waitForTimeout(1500);
     
-    console.log('認証が完了しました。現在のURL:', page.url());
 }
 
 /**
@@ -138,7 +129,6 @@ async function openCouponList(page: Page) {
     const storeDetailPopup = page.getByText('店舗詳細').first();
     await expect(storeDetailPopup).not.toBeVisible({ timeout: 3000 }).catch(() => {
         // ポップアップが閉じられていない場合でも続行（タイミングの問題の可能性）
-        console.log('店舗詳細ポップアップがまだ表示されていますが、続行します');
     });
     
     // 2. クーポン一覧ポップアップが表示されることを確認
@@ -151,10 +141,8 @@ async function openCouponList(page: Page) {
             page.getByText('クーポンがありません').first().waitFor({ state: 'visible', timeout: 10000 }),
         ]).catch(() => {
             // いずれも表示されない場合は、少し待機してから再確認
-            console.log('クーポン一覧ポップアップの要素が見つかりません。待機します...');
         });
     } catch (error) {
-        console.log('クーポン一覧ポップアップの待機中にエラーが発生:', error);
     }
     
     await page.waitForTimeout(1000); // 追加の待機時間
@@ -171,7 +159,6 @@ async function openCouponList(page: Page) {
     const hasCoupons = await page.getByRole('button', { name: 'このクーポンで乾杯！' }).first().isVisible().catch(() => false);
     if (!hasCoupons) {
         // クーポンが存在しない場合は、エラーメッセージまたは空の状態を確認
-        console.log('クーポンが存在しない可能性があります');
     }
     
     // クーポンが存在するかどうかを返す
@@ -338,7 +325,6 @@ test.describe('クーポン使用のテスト', () => {
                     // playメソッドをオーバーライド
                     Howl.prototype.play = function(...args: unknown[]) {
                         win.audioPlayed = true;
-                        console.log('音声が再生されました');
                         return originalPlay.apply(this, args);
                     };
                 }
@@ -372,7 +358,6 @@ test.describe('クーポン使用のテスト', () => {
         });
         
         expect(audioInfo.hasHowl).toBe(true);
-        console.log('音声システム（Howl）が利用可能です');
         
         // 音声が再生されたか、または音声ファイルのリクエストが発生したことを確認
         // ブラウザの自動再生ポリシーにより、実際に再生されない場合もあるため、
@@ -383,10 +368,8 @@ test.describe('クーポン使用のテスト', () => {
         ).catch(() => null);
         
         if (audioRequest) {
-            console.log('音声ファイルのリクエストが発生しました');
             expect(audioRequest.status()).toBe(200);
         } else {
-            console.log('音声ファイルのリクエストは検出されませんでしたが、音声システムは初期化されています');
         }
     });
 
@@ -432,7 +415,6 @@ test.describe('クーポン使用のテスト', () => {
         // 最初の画像（drink1.svg）が表示されることを確認
         const initialSrc = await animationImage.getAttribute('src');
         expect(initialSrc).toContain('drink');
-        console.log('初期アニメーション画像:', initialSrc);
         
         // アニメーションが進行することを確認（drink1からdrink2に変化する）
         await page.waitForTimeout(1000); // アニメーションの進行を待つ
@@ -444,7 +426,6 @@ test.describe('クーポン使用のテスト', () => {
         // アニメーション要素が存在することを確認
         const hasAnimation = await animationImage.count() > 0;
         expect(hasAnimation).toBe(true);
-        console.log('アニメーションが表示されています');
     });
 });
 

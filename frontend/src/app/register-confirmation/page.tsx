@@ -93,8 +93,6 @@ export default function RegisterConfirmationPage() {
         }
         
         // デバッグ: 取得したデータを確認
-        console.log('[register-confirmation/page] Form data from Zustand store:', currentFormData ? 'Data exists' : 'No data')
-        console.log('[register-confirmation/page] Form data keys:', currentFormData ? Object.keys(currentFormData) : 'No data')
         
         if (!currentFormData) {
           // フォームデータがない場合は登録画面に戻す

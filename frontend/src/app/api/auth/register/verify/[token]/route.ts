@@ -7,10 +7,8 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ token: string }> }
 ) {
-    console.log('🔍 [register/verify] API route called')
     try {
         const { token } = await params
-        console.log('🔍 [register/verify] Token:', token)
 
         if (!token) {
             console.error('🔍 [register/verify] No token provided')
@@ -25,8 +23,6 @@ export async function GET(
             const shopIdParam = shopIdFromQuery ? `?shop_id=${encodeURIComponent(shopIdFromQuery)}` : ''
 
             const verifyUrl = `${API_BASE_URL}/api/v1/register/verify/${token}${shopIdParam}`
-            console.log('🔍 [register/verify] Calling backend API:', verifyUrl)
-            console.log('🔍 [register/verify] API_BASE_URL:', API_BASE_URL)
 
             const response = await secureFetchWithCommonHeaders(
                 request,
@@ -38,8 +34,6 @@ export async function GET(
                     },
                 }
             )
-
-            console.log('🔍 [register/verify] Backend API response status:', response.status)
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
@@ -54,9 +48,7 @@ export async function GET(
 
             // バックエンドAPIから返されたredirectUrlを使用してリダイレクト
             const data = await response.json()
-            console.log('🔍 [register/verify] Backend API response data:', { hasRedirectUrl: !!data.redirectUrl, redirectUrl: data.redirectUrl })
             if (data.redirectUrl) {
-                console.log('🔍 [register/verify] Redirecting to:', data.redirectUrl)
                 return addNoCacheHeaders(NextResponse.redirect(data.redirectUrl))
             }
 
@@ -75,7 +67,6 @@ export async function GET(
                 registerUrl.searchParams.set('shop_id', shopIdFromQuery)
             }
 
-            console.log('🔍 [register/verify] Fallback redirect URL:', registerUrl.toString())
             return addNoCacheHeaders(NextResponse.redirect(registerUrl))
         } catch (error) {
             console.error('🔍 [register/verify] Error calling backend API:', error)

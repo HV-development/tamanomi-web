@@ -22,9 +22,3 @@ export interface RegisterSessionData {
   otpRequestId?: string // OTP認証用のrequestId
 }
 
-
-
-
-
-
-

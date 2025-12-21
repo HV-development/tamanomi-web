@@ -31,5 +31,3 @@ export function addNoCacheHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-
-
