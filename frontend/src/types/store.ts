@@ -60,4 +60,3 @@ export interface Store {
   updatedAt?: string
 }
 
-

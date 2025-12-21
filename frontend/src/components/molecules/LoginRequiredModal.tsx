@@ -1,7 +1,5 @@
 "use client"
 
-
-
 interface LoginRequiredModalProps {
   isOpen: boolean
   onClose: () => void

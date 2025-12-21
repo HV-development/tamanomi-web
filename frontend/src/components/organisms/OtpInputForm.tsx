@@ -203,7 +203,6 @@ export function OtpInputForm({
           ))}
         </div>
 
-
         {/* エラーメッセージ */}
         {error && <p className="text-sm text-red-500 text-center mb-4">{error}</p>}
 

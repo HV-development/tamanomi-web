@@ -376,14 +376,20 @@ export const useAppHandlers = (
     }, [dispatch])
 
     const handleMenuItemClick = useCallback((itemId: string) => {
+        if (typeof window === "undefined") return
+
         switch (itemId) {
             case "terms":
+                window.location.href = "/lp/terms"
                 break
             case "privacy":
+                window.open("/プライバシーポリシー.pdf", "_blank")
                 break
             case "commercial-law":
+                window.open("/特定商取引法.pdf", "_blank")
                 break
             case "contact":
+                window.location.href = "/lp/contact"
                 break
             case "login":
                 navigation.navigateToView("login", "map")
@@ -611,7 +617,6 @@ export const useAppHandlers = (
                     credentials: 'include', // Cookieを送信
                 })
 
-
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}))
                     console.error('❌ Failed to fetch coupons:', response.status, errorData)
@@ -694,11 +699,6 @@ export const useAppHandlers = (
 
     const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
         try {
-            console.log('🔍 [handlePlanChangeSubmit] プラン変更開始:', {
-                planId,
-                alsoChangePaymentMethod,
-                alsoChangePaymentMethodType: typeof alsoChangePaymentMethod,
-            });
 
             auth.setIsLoading(true)
 
@@ -706,7 +706,6 @@ export const useAppHandlers = (
                 planId: planId,
                 alsoChangePaymentMethod: alsoChangePaymentMethod || false,
             };
-            console.log('🔍 [handlePlanChangeSubmit] APIリクエストbody:', requestBody);
 
             // プラン変更APIを呼び出し
             const response = await fetch('/api/user-plans/update', {
@@ -718,8 +717,6 @@ export const useAppHandlers = (
                 credentials: 'include', // Cookieを送信
             })
 
-            console.log('🔍 [handlePlanChangeSubmit] APIレスポンスstatus:', response.status);
-
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
                 console.error('❌ [handlePlanChangeSubmit] APIエラー:', errorData);
@@ -727,7 +724,6 @@ export const useAppHandlers = (
             }
 
             const responseData = await response.json();
-            console.log('🔍 [handlePlanChangeSubmit] APIレスポンスdata:', responseData);
 
             // プラン変更後、新しいユーザー情報を取得してauth状態を更新
             try {
@@ -747,15 +743,8 @@ export const useAppHandlers = (
             }
 
             // 支払い方法も変更する場合は、支払い方法変更確認画面へ遷移
-            console.log('🔍 [handlePlanChangeSubmit] 遷移判定:', {
-                alsoChangePaymentMethod,
-                alsoChangePaymentMethodValue: alsoChangePaymentMethod,
-                isTrue: alsoChangePaymentMethod === true,
-                isTruthy: !!alsoChangePaymentMethod,
-            });
 
             if (alsoChangePaymentMethod) {
-                console.log('✅ [handlePlanChangeSubmit] 支払い方法変更確認画面へ遷移します');
                 if (typeof window !== 'undefined') {
                     // 支払い方法変更確認画面へ遷移（カード登録APIは、確認画面で「カード情報を変更する」ボタンをクリックしたときに呼び出される）
                     // プラン変更時の新しいplanIdをURLパラメータとして渡す
@@ -764,7 +753,6 @@ export const useAppHandlers = (
                     console.warn('⚠️ [handlePlanChangeSubmit] windowが定義されていません');
                 }
             } else {
-                console.log('ℹ️ [handlePlanChangeSubmit] マイページに戻ります');
                 // 成功時はマイページに戻る
                 navigation.navigateToMyPage("main")
             }
@@ -833,7 +821,6 @@ export const useAppHandlers = (
             if (!runningId) {
                 if (!userPlanId) {
                     // プラン登録していない場合は、アカウントのstatusを直接suspendedに更新
-                    console.log('🔄 [handleWithdrawConfirm] No userPlan found, withdrawing account directly')
                     const withdrawResponse = await fetch('/api/user/withdraw', {
                         method: 'POST',
                         headers: {

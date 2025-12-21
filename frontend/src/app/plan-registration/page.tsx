@@ -28,15 +28,11 @@ export default function PlanRegistrationPage() {
         credentials: 'include', // Cookieを送信
       })
 
-      console.log('🔍 [fetchUserInfo] Response status:', response.status)
-
       if (response.ok) {
         const userData = await response.json()
-        console.log('🔍 [fetchUserInfo] User data received:', userData)
 
         // メールアドレスをユーザーデータから取得（常に更新）
         if (userData.email) {
-          console.log('🔍 [fetchUserInfo] Setting email from user data:', userData.email)
           setEmail(userData.email)
           // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
         } else {
@@ -94,12 +90,10 @@ export default function PlanRegistrationPage() {
 
       // refreshパラメータがある場合、ユーザー情報を再取得（ガイドページからの戻り）
       if (refreshParam) {
-        console.log('🔍 [useEffect] Refresh parameter found, fetching user info')
         fetchUserInfo()
       } else {
         // 常にユーザー情報を取得してメールアドレスを確実に取得する
         // （sessionStorageは一時的なものなので、APIから取得した方が確実）
-        console.log('🔍 [useEffect] Fetching user info to get email')
         fetchUserInfo()
       }
     }
@@ -110,7 +104,6 @@ export default function PlanRegistrationPage() {
     const handleFocus = () => {
       // メールアドレスが設定されていない場合のみ再取得
       if (!email) {
-        console.log('🔍 [handleFocus] Page focused, refetching user info')
         fetchUserInfo()
       }
     }
@@ -265,41 +258,17 @@ export default function PlanRegistrationPage() {
       let data
       try {
         data = await response.json()
-        console.log('★11 [fetch] response.json()成功')
       } catch (jsonError) {
         console.error('▲[fetch] response.json()エラー:', jsonError)
         throw jsonError
       }
 
-      console.log('★11.5 Payment register response data:', {
-        redirectUrl: data.redirectUrl,
-        params: data.params,
-        paramsKeys: Object.keys(data.params || {}),
-        hasPaymentAmount: !!data.params?.payment_amount,
-        hasWebhookUrl: !!data.params?.webhook_url,
-        fullData: JSON.stringify(data, null, 2)
-      })
 
       // ペイジェントのカード登録画面にリダイレクト
       // リンクタイプ方式では、redirectUrlにGETパラメータを付与してリダイレクト
       const { redirectUrl, params } = data
 
       // ★1 PAY-GENTに送信するパラメータをログ出力
-      console.log('★12 PAY-GENT送信パラメータ:', {
-        redirectUrl,
-        params: JSON.parse(JSON.stringify(params)), // オブジェクトをコピーして出力
-        paramsCount: Object.keys(params || {}).length,
-        paramKeys: Object.keys(params || {}),
-        hasPaymentParams: {
-          payment_amount: !!params?.payment_amount,
-          payment_type: !!params?.payment_type,
-          order_number: !!params?.order_number,
-          webhook_url: !!params?.webhook_url
-        },
-        operation_type: params?.operation_type,
-        inform_url: params?.inform_url,
-        customer_id: params?.customer_id
-      })
 
       // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       // モック環境の場合はGETパラメータとしてリダイレクト
@@ -308,7 +277,6 @@ export default function PlanRegistrationPage() {
         Object.entries(params).forEach(([key, value]) => {
           url.searchParams.set(key, String(value))
         })
-        console.log('★2 モック環境: リダイレクトURL:', url.toString())
         window.location.href = url.toString()
       } else {
         // 実際のペイジェント環境ではPOSTフォームでリダイレクト
@@ -327,27 +295,8 @@ export default function PlanRegistrationPage() {
           form.appendChild(input)
         })
 
-        console.log('★13 POSTフォームパラメータ:', {
-          action: redirectUrl,
-          method: 'POST',
-          params: formParams,
-          paramsCount: Object.keys(formParams).length,
-          paramKeys: Object.keys(formParams),
-          hasCustomerCardId: !!formParams.customer_card_id,
-          operation_type: formParams.operation_type,
-          customer_id: formParams.customer_id,
-          paymentParamsDetail: {
-            payment_amount: formParams.payment_amount,
-            payment_type: formParams.payment_type,
-            order_number: formParams.order_number,
-            webhook_url: formParams.webhook_url,
-            hc: formParams.hc ? formParams.hc.substring(0, 20) + '...' : undefined
-          },
-          fullParams: JSON.stringify(formParams, null, 2)
-        })
 
         document.body.appendChild(form)
-        console.log('★13.5 PAY-GENTにリダイレクト開始')
         form.submit()
       }
     } catch (error) {

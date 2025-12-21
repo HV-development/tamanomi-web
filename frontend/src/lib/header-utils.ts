@@ -60,6 +60,18 @@ export function buildCommonHeaders(
   const requestId = randomUUID()
   headers['X-Request-ID'] = requestId
 
+  // X-App-Domainヘッダーを追加（バックエンドでのアプリ判定に使用）
+  // env優先。なければ受信したHostヘッダーを転送。
+  const appDomain = process.env.APP_DOMAIN || process.env.NEXT_PUBLIC_APP_DOMAIN
+  if (appDomain) {
+    headers['X-App-Domain'] = appDomain
+  } else {
+    const host = request.headers.get('host')
+    if (host) {
+      headers['X-App-Domain'] = host
+    }
+  }
+
   // カスタムヘッダーをマージ（後から追加されたヘッダーが優先）
   Object.assign(headers, customHeaders)
 
@@ -82,5 +94,4 @@ export function buildCommonHeadersWithoutAuth(
     requireAuth: false,
   })
 }
-
 

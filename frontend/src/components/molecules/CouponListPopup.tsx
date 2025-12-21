@@ -44,7 +44,6 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
 
   if (!isOpen) return null
 
-
   return (
     <>
       {/* オーバーレイ */}

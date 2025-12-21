@@ -5,7 +5,6 @@ import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
-
 export async function POST(request: NextRequest) {
   try {
     // Next.jsのAPIルートはプリフェッチなどで空ボディのまま叩かれることがあるため、

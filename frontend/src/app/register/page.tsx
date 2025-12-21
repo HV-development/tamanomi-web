@@ -93,8 +93,6 @@ export default function RegisterPage() {
     
     // デバッグ: 保存されたデータを確認
     const savedData = useRegisterStore.getState().formData
-    console.log('[register/page] Form data saved to Zustand store:', savedData ? 'Data exists' : 'No data')
-    console.log('[register/page] Saved data keys:', savedData ? Object.keys(savedData) : 'No data')
     
     // 確認画面に遷移（クライアントサイドのみ）
     // 次のイベントループで遷移することで、Zustandストアへの保存が確実に完了する

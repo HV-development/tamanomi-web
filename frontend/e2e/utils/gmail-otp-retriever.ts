@@ -43,7 +43,6 @@ export class GmailOtpRetriever {
 
         const messages = response.data.messages;
         if (!messages || messages.length === 0) {
-          console.log(`[Gmail] 未読メールが見つかりません (試行 ${i + 1}/${maxRetries})`);
           await new Promise(resolve => setTimeout(resolve, interval));
           continue;
         }
@@ -60,12 +59,10 @@ export class GmailOtpRetriever {
         const body = this.extractEmailBody(message.data);
         
         // デバッグ用: メール本文の一部をログに出力
-        console.log('[Gmail] メール本文（最初の500文字）:', body.substring(0, 500));
         
         // OTPを抽出
         const otp = this.extractOtp(body);
         if (otp) {
-          console.log(`[Gmail] OTP取得成功: ${otp}`);
           
           // メールを既読にする（オプション）
           await this.gmail.users.messages.modify({
@@ -81,7 +78,6 @@ export class GmailOtpRetriever {
           return otp;
         }
 
-        console.log(`[Gmail] OTPが見つかりません (試行 ${i + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, interval));
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';

@@ -6,7 +6,6 @@ import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
 
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -74,11 +73,6 @@ export async function POST(request: NextRequest) {
         maxAge: SESSION_MAX_AGE,
       })
 
-      console.log('✅ [send-otp] Session saved:', {
-        email: email,
-        requestId: data.requestId,
-        cookieSet: true
-      })
     } catch (error) {
       console.error('❌ [send-otp] Error saving session:', error)
       // セッション保存に失敗してもOTP送信は成功しているので、エラーを返さない

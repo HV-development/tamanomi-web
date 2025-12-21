@@ -109,6 +109,3 @@ export function isFavoriteInStorage(shopId: string): boolean {
   return favorites.includes(shopId)
 }
 
-
-
-

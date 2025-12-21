@@ -238,4 +238,3 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
   );
 };
 
-

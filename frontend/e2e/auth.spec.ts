@@ -133,7 +133,6 @@ test.describe('認証フローのテスト', () => {
                 if (!response.ok()) {
                     const errorText = await response.text().catch(() => '');
                     loginApiErrors.push(`Status: ${response.status()}, Error: ${errorText}`);
-                    console.log('ログインAPIエラー:', response.status(), errorText);
                 }
             }
         });
@@ -149,15 +148,11 @@ test.describe('認証フローのテスト', () => {
         const loginErrorCount = await loginError.count();
         if (loginErrorCount > 0) {
             const loginErrorText = await loginError.first().textContent();
-            console.log('ログインエラー:', loginErrorText);
             // セッションタイムアウトのエラーメッセージが表示されていないことを確認
             expect(loginErrorText).not.toMatch(/セッション|session|タイムアウト|timeout|期限切れ|expired/);
             // ネットワークエラーの場合は、より詳細な情報をログに出力
             if (loginErrorText?.includes('ログイン処理中にエラーが発生しました')) {
-                console.log('バックエンドAPIへの接続エラーの可能性があります。');
-                console.log('API_BASE_URL環境変数を確認してください。');
                 if (loginApiErrors.length > 0) {
-                    console.log('APIエラー詳細:', loginApiErrors);
                 }
             }
             throw new Error(`ログインが失敗しました: ${loginErrorText}`);
@@ -181,7 +176,6 @@ test.describe('認証フローのテスト', () => {
         const otp = await getLatestOtp(request, TEST_EMAIL);
         expect(otp).toBeTruthy();
         expect(otp).toMatch(/^\d{6}$/); // 6桁の数字であることを確認
-        console.log('取得したOTP:', otp);
         
         // MailHogの場合はデバッグ情報を表示（Gmail APIの場合は不要）
         if (process.env.E2E_OTP_RETRIEVER !== 'gmail') {
@@ -199,7 +193,6 @@ test.describe('認証フローのテスト', () => {
                 item.Content.Headers.To?.[0]?.includes(TEST_EMAIL)
             );
             if (targetMail) {
-                console.log('MailHogメール本文:', targetMail.Content.Body.substring(0, 500));
             }
         }
         
@@ -228,11 +221,9 @@ test.describe('認証フローのテスト', () => {
             inputValues.push(value);
         }
         let enteredOtp = inputValues.join('');
-        console.log('ペースト後のOTP:', enteredOtp);
         
         // ペーストが失敗した場合は、evaluateを使って直接入力イベントを発火させる
         if (enteredOtp !== otp) {
-            console.log('ペーストが失敗したため、evaluateで直接入力します');
             await page.evaluate((otpValue) => {
                 const inputs = document.querySelectorAll('input[type="text"][maxLength="1"]');
                 const otpArray = otpValue.split('');
@@ -260,11 +251,9 @@ test.describe('認証フローのテスト', () => {
                 inputValues.push(value);
             }
             enteredOtp = inputValues.join('');
-            console.log('evaluate後のOTP:', enteredOtp);
             
             // 入力が正しく反映されている場合は、OTP検証APIを直接呼び出す
             if (enteredOtp === otp) {
-                console.log('OTPが正しく入力されました。OTP検証APIを直接呼び出します');
                 // URLからrequestIdを取得
                 const url = new URL(page.url());
                 const requestId = url.searchParams.get('requestId');
@@ -273,10 +262,6 @@ test.describe('認証フローのテスト', () => {
                 // ベースURLを取得
                 const baseUrl = page.url().split('/login')[0];
                 const apiUrl = `${baseUrl}/api/auth/verify-otp`;
-                console.log('API URL:', apiUrl);
-                console.log('Request ID:', requestId);
-                console.log('OTP:', otp);
-                console.log('Email:', TEST_EMAIL);
                 
                 // ページのコンテキストでOTP検証APIを呼び出す（Cookieが自動的に設定される）
                 const verifyResponse = await page.evaluate(async ({ url, data }) => {
@@ -302,8 +287,6 @@ test.describe('認証フローのテスト', () => {
                     }
                 });
                 
-                console.log('OTP検証レスポンス:', verifyResponse.data);
-                console.log('OTP検証ステータス:', verifyResponse.status);
                 
                 if (!verifyResponse.ok) {
                     throw new Error(`OTP検証が失敗しました: ${JSON.stringify(verifyResponse.data)}`);
@@ -320,7 +303,6 @@ test.describe('認証フローのテスト', () => {
                 await page.goto(`${baseUrl}/home`, { waitUntil: 'domcontentloaded', timeout: 45000 });
                 await page.waitForLoadState('load', { timeout: 20000 }).catch(() => {
                     // loadがタイムアウトしても続行
-                    console.log('loadの待機がタイムアウトしましたが、続行します');
                 });
                 await page.waitForTimeout(1500);
             }
@@ -351,14 +333,12 @@ test.describe('認証フローのテスト', () => {
         } catch (error) {
             // リダイレクトが発生しなかった場合、現在のURLとエラーメッセージを確認
             const currentUrl = page.url();
-            console.log('リダイレクトが発生しませんでした。現在のURL:', currentUrl);
             
             // エラーメッセージが表示されているか確認
             const errorAfter = page.locator('.bg-red-50 .text-red-800, .text-red-500');
             const errorAfterCount = await errorAfter.count();
             if (errorAfterCount > 0) {
                 const errorTextAfter = await errorAfter.first().textContent();
-                console.log('エラーメッセージ:', errorTextAfter);
                 // セッションタイムアウトのエラーメッセージが表示されていないことを確認
                 expect(errorTextAfter).not.toMatch(/セッション|session|タイムアウト|timeout|期限切れ|expired/);
             }
@@ -507,7 +487,6 @@ test.describe('OTPバリデーションのテスト', () => {
         // エラーメッセージが表示されない場合は、バリデーションが動作していない可能性がある
         // この場合は、テストをスキップするか、警告を出す
         if (errorCount === 0) {
-            console.log('警告: OTPバリデーションのエラーメッセージが表示されませんでした。バリデーションが動作していない可能性があります。');
             // テストは失敗として扱う（バリデーションが動作していない）
             throw new Error('OTPバリデーションのエラーメッセージが表示されませんでした');
         } else {

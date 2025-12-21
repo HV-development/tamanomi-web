@@ -85,5 +85,3 @@ export function getAuthHeaders(request: Request): Record<string, string> {
   return headers;
 }
 
-
-

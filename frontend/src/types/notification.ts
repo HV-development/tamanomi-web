@@ -10,6 +10,3 @@ export interface Notification {
   imageUrl?: string | null
 }
 
-
-
-

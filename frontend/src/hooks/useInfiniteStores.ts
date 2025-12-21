@@ -250,7 +250,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           throw new Error(`ネットワークエラーが発生しました: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`)
         }
 
-
         // レスポンスをテキストとして取得（成功・失敗どちらの場合でも使用）
         let responseText = ''
         try {
@@ -334,7 +333,6 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         const items: Store[] = (data?.shops || []).map(mapShopToStore)
         const pagination = data?.pagination || {}
         const totalPages = typeof pagination.totalPages === 'number' ? pagination.totalPages : targetPage
-
 
         return {
           items,
@@ -528,5 +526,4 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     items,
   }
 }
-
 

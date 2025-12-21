@@ -45,4 +45,3 @@ export function isValidArea(areaValue: string): boolean {
   return areaValue in AREA_TO_CITY_MAP
 }
 
-
