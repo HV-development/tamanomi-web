@@ -111,11 +111,6 @@ export async function POST(request: NextRequest) {
 
     const fullUrl = buildApiUrl('/register/complete');
 
-    // #region agent log
-    // eslint-disable-next-line no-restricted-syntax
-    fetch('http://127.0.0.1:7243/ingest/3e7657cf-d90c-47dc-87dc-00ee22e9e998',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:93',message:'Request body before sending',data:{validatedData,bodyKeys:Object.keys(validatedData),phoneValue:validatedData.phone,postalCodeValue:validatedData.postalCode},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-
     try {
       const response = await secureFetchWithCommonHeaders(request, fullUrl, {
         method: 'POST',
@@ -147,33 +142,18 @@ export async function POST(request: NextRequest) {
           // まずテキストとして取得（JSONパースに失敗する可能性があるため）
           responseText = await response.text()
 
-          // #region agent log
-          console.error('[DEBUG] Error response text:', responseText);
-          console.error('[DEBUG] Response status:', response.status);
-          console.error('[DEBUG] Response headers:', Object.fromEntries(response.headers.entries()));
-          // #endregion
-
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {
             try {
               errorData = JSON.parse(responseText)
-              // #region agent log
-              console.error('[DEBUG] Parsed error data:', errorData);
-              // #endregion
-            } catch (jsonParseError) {
+            } catch {
               errorData = { message: responseText.substring(0, 200) }
-              // #region agent log
-              console.error('[DEBUG] JSON parse error:', jsonParseError);
-              // #endregion
             }
           } else {
             errorData = { message: responseText.substring(0, 200) }
           }
-        } catch (parseError) {
+        } catch {
           errorData = { message: 'レスポンスの解析に失敗しました' }
-          // #region agent log
-          console.error('[DEBUG] Parse error:', parseError);
-          // #endregion
         }
 
         // エラーコードを取得
@@ -230,11 +210,6 @@ export async function POST(request: NextRequest) {
 
         // バリデーションエラーの場合は特別な処理
         if (errorCode === 'VALIDATION_ERROR' && errorDetails) {
-          // #region agent log
-          console.error('[DEBUG] Validation error details:', { errorCode, errorMessage, errorDetails, errorData, validatedData });
-          // eslint-disable-next-line no-restricted-syntax
-          fetch('http://127.0.0.1:7243/ingest/3e7657cf-d90c-47dc-87dc-00ee22e9e998',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:167',message:'Validation error details from API',data:{errorCode,errorMessage,errorDetails,errorData,validatedData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-          // #endregion
           // バリデーションエラーの詳細を返す
           return createNoCacheResponse(
             {
@@ -256,19 +231,6 @@ export async function POST(request: NextRequest) {
         const finalErrorCode = errorCode || errorData?.error?.code || 'API_ERROR'
         const finalErrorMessage = errorMessage || errorData?.error?.message || `サーバーエラーが発生しました (${response.status})`
         const finalErrorDetails = errorData?.error?.details || errorData?.error?.errors || errorData?.error
-
-        // #region agent log
-        console.error('[DEBUG] Final error response:', {
-          status: response.status,
-          errorCode: finalErrorCode,
-          errorMessage: finalErrorMessage,
-          errorDetails: finalErrorDetails,
-          fullErrorData: errorData,
-          validatedData
-        });
-        // eslint-disable-next-line no-restricted-syntax
-        fetch('http://127.0.0.1:7243/ingest/3e7657cf-d90c-47dc-87dc-00ee22e9e998',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:190',message:'Final error response',data:{status:response.status,errorCode:finalErrorCode,errorMessage:finalErrorMessage,errorDetails:finalErrorDetails,fullErrorData:errorData,validatedData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-        // #endregion
 
         console.error('[api/auth/register] Final error response:', {
           status: response.status,
