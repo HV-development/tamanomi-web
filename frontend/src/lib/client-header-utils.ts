@@ -45,6 +45,14 @@ export function buildClientHeaders(
     headers['X-Request-ID'] = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
   }
 
+  // X-App-Domainヘッダーを追加（バックエンドでのアプリ判定に使用）
+  const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN
+  if (appDomain) {
+    headers['X-App-Domain'] = appDomain
+  } else if (typeof window !== 'undefined' && window.location?.host) {
+    headers['X-App-Domain'] = window.location.host
+  }
+
   // カスタムヘッダーをマージ（後から追加されたヘッダーが優先）
   Object.assign(headers, customHeaders)
 
@@ -65,4 +73,5 @@ export function buildFormDataHeaders(
     setContentType: false, // FormDataの場合はContent-Typeを設定しない
   })
 }
+
 

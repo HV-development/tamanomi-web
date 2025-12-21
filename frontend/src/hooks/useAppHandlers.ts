@@ -376,14 +376,20 @@ export const useAppHandlers = (
     }, [dispatch])
 
     const handleMenuItemClick = useCallback((itemId: string) => {
+        if (typeof window === "undefined") return
+
         switch (itemId) {
             case "terms":
+                window.location.href = "/lp/terms"
                 break
             case "privacy":
+                window.open("/プライバシーポリシー.pdf", "_blank")
                 break
             case "commercial-law":
+                window.open("/特定商取引法.pdf", "_blank")
                 break
             case "contact":
+                window.location.href = "/lp/contact"
                 break
             case "login":
                 navigation.navigateToView("login", "map")
