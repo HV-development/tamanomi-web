@@ -4,6 +4,7 @@ import { useMemo, useEffect, useState } from "react"
 import Image from "next/image"
 import { Ticket, X } from "lucide-react"
 import type { Coupon } from "@/types/coupon"
+import { calculateAge } from "@/utils/age-calculator"
 
 interface CouponListPopupProps {
   isOpen: boolean
@@ -13,21 +14,31 @@ interface CouponListPopupProps {
   onBack: () => void
   onUseCoupon: (couponId: string) => void
   onUsageGuideClick: () => void
-  userAge?: number | null
+  userBirthDate?: string | null
   isUsedToday?: boolean
   isCheckingUsage?: boolean
 }
 
-export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userAge, isUsedToday, isCheckingUsage = false }: CouponListPopupProps) {
+export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userBirthDate, isUsedToday, isCheckingUsage = false }: CouponListPopupProps) {
   // 各クーポンの画像エラー状態を管理
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
+
+  // 生年月日から年齢をリアルタイムで計算
+  const userAge = useMemo(() => {
+    if (!userBirthDate) return null
+    try {
+      return calculateAge(userBirthDate)
+    } catch {
+      return null
+    }
+  }, [userBirthDate])
 
   // フィルタリングされたクーポンリスト
   const filteredCoupons = useMemo(() => {
     let filtered = coupons
 
     // 年齢制限：20歳未満の場合、アルコールクーポンを非表示
-    if (userAge !== null && userAge !== undefined && userAge < 20) {
+    if (userAge !== null && userAge < 20) {
       filtered = filtered.filter(coupon => coupon.drinkType !== "alcohol")
     }
 

@@ -36,7 +36,6 @@ import type { MyPageViewType } from "@/types/navigation"
 import type { AppAction } from '@hv-development/schemas'
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"
 import { useFavorites } from "@/hooks/useFavorites"
-import { calculateAge } from "@/utils/age-calculator"
 import { checkTodayUsage } from "@/utils/coupon-usage-check"
 
 interface HomeLayoutProps {
@@ -201,9 +200,6 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const passwordResetEmail = state.passwordResetEmail
   const emailRegistrationStep = state.emailRegistrationStep
   const emailRegistrationEmail = state.emailRegistrationEmail
-
-  // ユーザーの年齢を計算
-  const userAge = user ? calculateAge(user.birthDate || '') : null
 
   // クーポン使用履歴のチェック
   useEffect(() => {
@@ -907,7 +903,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         onBack={onCouponListBack}
         onUseCoupon={onUseCoupon}
         onUsageGuideClick={() => setIsUsageGuideModalOpen(true)}
-        userAge={userAge}
+        userBirthDate={user?.birthDate}
         isUsedToday={isCouponUsedToday}
         isCheckingUsage={isCheckingUsage || isLoadingCoupons}
       />

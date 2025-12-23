@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           email: body.email,
+          appName: 'tamanomi', // リクエスト元のアプリケーション名（メールブランド決定用）
         }),
         signal: controller.signal,
       });
