@@ -198,6 +198,7 @@ export default function RegisterConfirmationPage() {
         if (response.status === 409 && result.errorCode === 'USER_ALREADY_EXISTS') {
           // ログイン画面にリダイレクト
           router.push(`/?error=already_registered`)
+          return // リダイレクト後は処理を終了
         } else {
           alert(errorMessage)
         }
