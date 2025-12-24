@@ -1,5 +1,11 @@
 import type { Metadata } from 'next'
-import { Limelight, Plaster } from 'next/font/google'
+import {
+  Limelight,
+  Plaster,
+  Zen_Kaku_Gothic_New,
+  Shippori_Antique,
+  Rubik,
+} from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
 import { ErrorHandlerProvider } from '@/components/providers/ErrorHandlerProvider'
@@ -14,6 +20,24 @@ const plaster = Plaster({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-plaster',
+})
+
+const zenKakuGothicNew = Zen_Kaku_Gothic_New({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-zen-kaku-gothic-new',
+})
+
+const shipporiAntique = Shippori_Antique({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-shippori-antique',
+})
+
+const rubik = Rubik({
+  weight: ['400', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-rubik',
 })
 
 export const metadata: Metadata = {
@@ -37,7 +61,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${limelight.variable} ${plaster.variable}`}>
+      <body
+        className={[
+          limelight.variable,
+          plaster.variable,
+          zenKakuGothicNew.variable,
+          shipporiAntique.variable,
+          rubik.variable,
+        ].join(' ')}
+      >
         <ErrorHandlerProvider>
           {children}
           <Toaster position="top-right" richColors />
