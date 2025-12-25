@@ -32,9 +32,9 @@ export default function RegisterConfirmationPage() {
       return
     }
     initializedRef.current = true
-    
+
     setIsClient(true)
-    
+
     const initializePage = async () => {
       if (typeof window === 'undefined') return
 
@@ -57,7 +57,7 @@ export default function RegisterConfirmationPage() {
       try {
         // トークンの有効性をチェック
         const tokenResponse = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
-        
+
         if (!tokenResponse.ok) {
           const errorData = await tokenResponse.json().catch(() => ({}))
           if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
@@ -78,7 +78,7 @@ export default function RegisterConfirmationPage() {
           setIsLoadingEmail(false)
           return
         }
-        
+
         // Zustandストアからフォームデータを取得
         // 直接インポートしたストアから取得（動的インポートでは異なるインスタンスになる可能性があるため）
         // 少し待ってから取得することで、前のページからのデータ保存が確実に完了する
@@ -91,9 +91,9 @@ export default function RegisterConfirmationPage() {
             break
           }
         }
-        
+
         // デバッグ: 取得したデータを確認
-        
+
         if (!currentFormData) {
           // フォームデータがない場合は登録画面に戻す
           console.warn('[register-confirmation/page] No form data found in Zustand store, redirecting to register page')
@@ -102,10 +102,9 @@ export default function RegisterConfirmationPage() {
           setIsLoadingEmail(false)
           return
         }
-        
-        // ローカルstateに保存してから、セキュリティ: データ取得後、即座にストアから削除（メモリからも削除）
+
+        // ローカルstateに保存（編集に戻る際に値を保持するため、ストアは保持）
         setFormData(currentFormData)
-        clearFormData()
       } catch {
         setError('エラーが発生しました。再度お試しください。')
         setTimeout(() => router.push('/email-registration'), 3000)
@@ -129,13 +128,13 @@ export default function RegisterConfirmationPage() {
 
     try {
       const saitamaAppIdValue = formData.saitamaAppId && formData.saitamaAppId.trim() !== '' ? formData.saitamaAppId.trim() : undefined;
-      
+
       // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       // referrerUserIdはURLパラメータから取得するか、Cookieから取得する
       // 必要に応じてCookieから取得する実装を追加
       const referrerUserId: string | undefined = undefined
 
-        // バックエンドAPIに登録リクエストを送信
+      // バックエンドAPIに登録リクエストを送信
       // セキュリティ改善：メールアドレスはリクエストボディに含めず、トークンから取得される
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -212,7 +211,7 @@ export default function RegisterConfirmationPage() {
 
   const handleEdit = () => {
     // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
-    // 編集モードで登録画面に戻る（フォームデータは再入力してもらう）
+    // 編集モードで登録画面に戻る（パスワード等のみ再入力）
     const shopIdParam = formData?.shopId ? `&shop_id=${encodeURIComponent(formData?.shopId)}` : ''
     router.push(`/register?token=${encodeURIComponent(token)}&edit=true${shopIdParam}`)
   }
