@@ -76,6 +76,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         // セキュリティのためパスワードフィールドはクリア
         password: "",
         passwordConfirm: "",
+        // 任意連携IDは再入力してもらう
+        saitamaAppId: "",
       }
       setFormData(newFormData)
     }

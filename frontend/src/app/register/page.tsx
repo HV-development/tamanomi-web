@@ -14,7 +14,7 @@ export default function RegisterPage() {
   const [token, setToken] = useState<string | undefined>(undefined)
   const [shopId, setShopId] = useState<string | undefined>(undefined)
   const [isClient, setIsClient] = useState(false)
-  const [initialFormData, _setInitialFormData] = useState<UserRegistrationComplete | null>(null)
+  const [initialFormData, setInitialFormData] = useState<UserRegistrationComplete | null>(null)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { setFormData } = useRegisterStore()
@@ -22,7 +22,7 @@ export default function RegisterPage() {
   // クライアントサイドでのみ searchParams を取得し、APIからメールアドレスを取得
   useEffect(() => {
     setIsClient(true)
-    
+
     const initializePage = async () => {
       if (typeof window === 'undefined') return
 
@@ -30,7 +30,7 @@ export default function RegisterPage() {
       const tokenParam = urlParams.get('token') || undefined
       const shop_id = urlParams.get('shop_id') || undefined
       // const ref = urlParams.get('ref') // 紹介者IDを取得（将来使用予定）
-      // const isEdit = urlParams.get('edit') === 'true' // 編集モード（将来使用予定）
+      const isEdit = urlParams.get('edit') === 'true' // 編集モード
 
       // トークンが存在しない場合はメール登録画面にリダイレクト
       if (!tokenParam || tokenParam.trim() === '') {
@@ -49,7 +49,7 @@ export default function RegisterPage() {
       // トークンの有効性をチェック（セキュリティ改善：メールアドレスはレスポンスに含まれない）
       try {
         const response = await fetch(`/api/auth/register/token-info?token=${encodeURIComponent(tokenParam)}`)
-        
+
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
           if (errorData.error?.code === 'REGISTRATION_TOKEN_EXPIRED') {
@@ -67,6 +67,20 @@ export default function RegisterPage() {
           setError('トークンが無効です。再度メール登録からやり直してください。')
           setTimeout(() => router.push('/email-registration'), 3000)
           return
+        }
+
+        // 編集モードの場合はZustandに保持しているフォームデータを再適用（パスワードとアプリIDはクリア）
+        if (isEdit) {
+          const storedFormData = useRegisterStore.getState().formData
+          if (storedFormData) {
+            setInitialFormData({
+              ...storedFormData,
+              password: "",
+              passwordConfirm: "",
+              // 任意連携IDは再入力してもらう
+              saitamaAppId: "",
+            })
+          }
         }
         // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
       } catch {
@@ -90,14 +104,14 @@ export default function RegisterPage() {
 
     // フォームデータをZustandストアに保存（メモリのみ、ネットワーク経由で送信されない）
     setFormData(data)
-    
+
     // デバッグ: 保存されたデータを確認
     const savedData = useRegisterStore.getState().formData
-    
+
     // 確認画面に遷移（クライアントサイドのみ）
     // 次のイベントループで遷移することで、Zustandストアへの保存が確実に完了する
     await new Promise(resolve => setTimeout(resolve, 0))
-    
+
     const shopIdParam = shopId ? `&shop_id=${encodeURIComponent(shopId)}` : ''
     router.push(`/register-confirmation?token=${encodeURIComponent(token || '')}${shopIdParam}`)
     setIsLoading(false)

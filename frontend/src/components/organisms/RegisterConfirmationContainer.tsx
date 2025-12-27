@@ -26,7 +26,7 @@ export function RegisterConfirmationContainer({
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {/* ヘッダー */}
-      <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onEdit} logoSize="3xl" />
+      <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onEdit} />
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex items-center justify-center p-4">
