@@ -31,32 +31,29 @@ export const useAppHandlers = (
     const [otpRequestId, setOtpRequestId] = useState<string>("")
 
     const handleCurrentLocationClick = useCallback(async () => {
-        const newFilterState = !filters.isNearbyFilter
-        filters.setIsNearbyFilter(newFilterState)
-
-        if (newFilterState) {
-            // フィルターをONにする場合、位置情報を取得
-            dispatch({ type: 'SET_LOCATION_LOADING', payload: true })
-            dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
-
-            try {
-                const location = await getCurrentPosition()
-                dispatch({ type: 'SET_CURRENT_LOCATION', payload: location })
-                dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
-            } catch (error) {
-                // 位置情報取得に失敗した場合
-                const errorMessage = error instanceof Error ? error.message : '位置情報の取得に失敗しました'
-                dispatch({ type: 'SET_LOCATION_ERROR', payload: errorMessage })
-                dispatch({ type: 'SET_CURRENT_LOCATION', payload: null })
-                // エラーをユーザーに通知（後で実装）
-                alert(errorMessage)
-            } finally {
-                dispatch({ type: 'SET_LOCATION_LOADING', payload: false })
-            }
-        } else {
-            // フィルターをOFFにする場合、位置情報をクリア
+        if (filters.isNearbyFilter) {
+            filters.setIsNearbyFilter(false)
             dispatch({ type: 'SET_CURRENT_LOCATION', payload: null })
             dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
+            return
+        }
+
+        dispatch({ type: 'SET_LOCATION_LOADING', payload: true })
+        dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
+
+        try {
+            const location = await getCurrentPosition()
+            dispatch({ type: 'SET_CURRENT_LOCATION', payload: location })
+            dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
+            filters.setIsNearbyFilter(true)
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : '位置情報の取得に失敗しました'
+            dispatch({ type: 'SET_LOCATION_ERROR', payload: errorMessage })
+            dispatch({ type: 'SET_CURRENT_LOCATION', payload: null })
+            filters.setIsNearbyFilter(false)
+            alert(errorMessage)
+        } finally {
+            dispatch({ type: 'SET_LOCATION_LOADING', payload: false })
         }
     }, [filters, dispatch])
 
