@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Howl } from "howler";
 
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
+
 // グローバルな音声インスタンス（コンポーネントの再レンダリングに影響されない）
-let globalCouponSound: Howl | null = null;
+let globalCouponSound: Howl | null = null as Howl | null;
 let globalAudioContext: AudioContext | null = null;
 let isGlobalAudioReady = false;
 
@@ -19,13 +25,15 @@ export const useCouponAudio = () => {
     try {
       // AudioContextを作成（ユーザーインタラクション内で実行）
       if (!globalAudioContext) {
-        type AudioContextConstructor = typeof AudioContext | typeof webkitAudioContext;
-        const AudioContextClass = (window.AudioContext || (window as typeof window & { webkitAudioContext?: AudioContextConstructor }).webkitAudioContext) as AudioContextConstructor;
+        const AudioContextClass =
+          window.AudioContext ||
+          (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext ||
+          AudioContext;
         globalAudioContext = new AudioContextClass();
       }
       
       // AudioContextを再開
-      if (globalAudioContext.state === 'suspended') {
+      if (globalAudioContext?.state === 'suspended') {
         globalAudioContext.resume();
       }
       
@@ -55,19 +63,35 @@ export const useCouponAudio = () => {
   }, [])
 
   const playCouponSound = useCallback(() => {
+    const playWithRetry = () => {
+      const sound = globalCouponSound
+      if (!sound) return
+      // 再生エラー時は一度だけ再開してリトライ
+      sound.off('playerror')
+      sound.once('playerror', () => {
+        globalAudioContext?.resume().then(() => {
+          sound.play()
+        })
+      })
+      sound.play()
+    }
+
     // オーディオが初期化されていない場合は初期化
     if (!globalCouponSound) {
       initializeAudio()
-      // 初期化直後に再生を試行
-      setTimeout(() => {
-        if (globalCouponSound && isGlobalAudioReady) {
-          globalCouponSound.play()
+      if (globalCouponSound) {
+        if (isGlobalAudioReady) {
+          playWithRetry()
+        } else {
+          (globalCouponSound as Howl).once('load', playWithRetry)
         }
-      }, 100)
+      }
       return
     }
     
     if (!isGlobalAudioReady) {
+      // ロード完了後に一度だけ再生する
+      (globalCouponSound as Howl).once('load', playWithRetry)
       return
     }
     
@@ -75,11 +99,11 @@ export const useCouponAudio = () => {
       // AudioContextの状態を確認
       if (globalAudioContext && globalAudioContext.state === 'suspended') {
         globalAudioContext.resume().then(() => {
-          globalCouponSound!.play()
+          playWithRetry()
         });
       } else {
         // 直接再生
-        globalCouponSound.play()
+        playWithRetry()
       }
     } catch {
     }

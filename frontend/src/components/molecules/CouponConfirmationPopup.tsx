@@ -13,12 +13,13 @@ interface CouponConfirmationPopupProps {
 
 export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }: CouponConfirmationPopupProps) {
 
-  const { playCouponSound } = useCouponAudio()
+  const { playCouponSound, initializeAudio } = useCouponAudio()
 
   if (!isOpen || !coupon) return null
 
   const handleConfirm = () => {
-    // クーポン使用音を再生
+    // クリック内で初期化し、自動再生ブロックを回避
+    initializeAudio()
     playCouponSound()
     // 既存の処理を実行
     onConfirm()
