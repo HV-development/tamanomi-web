@@ -51,11 +51,11 @@ export async function getLatestOtp(request: APIRequestContext, email: string): P
                         try {
                             const decoded = Buffer.from(base64Text, 'base64').toString('utf-8');
                             body = decoded;
-                        } catch (e) {
+                        } catch {
                         }
                     }
                 }
-            } catch (e) {
+            } catch {
             }
             
             // デバッグ用: メール本文の一部をログに出力

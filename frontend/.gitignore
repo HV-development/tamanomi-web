@@ -110,3 +110,8 @@ Thumbs.db
 .npmrc
 .yarnrc
 .pnpmfile.cjs
+
+# Playwright
+.auth/
+test-results/
+playwright-report/

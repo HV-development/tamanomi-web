@@ -130,8 +130,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // /_next/image エンドポイントのURLパラメータを検証（ディレクトリトラバーサル対策）
+  // unoptimized: trueが設定されている場合、このエンドポイントは使用されないはずだが、
+  // 念のため検証を残す
   if (pathname === '/_next/image') {
     const imageUrl = request.nextUrl.searchParams.get('url');
+    if (!imageUrl) {
+      // URLパラメータがない場合は許可（Next.jsの内部処理）
+      return NextResponse.next();
+    }
     if (!validateImageUrl(imageUrl)) {
       console.warn('[middleware] Invalid image URL blocked', {
         url: imageUrl,
@@ -163,7 +169,7 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('accessToken')?.value || request.cookies.get('__Host-accessToken')?.value
     if (!token) {
       const url = request.nextUrl.clone()
-      url.pathname = '/'
+      url.pathname = '/login'
       url.searchParams.set('session', 'expired')
       const redirectResponse = NextResponse.redirect(url)
       // リダイレクトレスポンスにもキャッシュ無効化ヘッダーを設定
