@@ -230,6 +230,25 @@ export default function FAQPage() {
       {/* Main Content */}
       <main className="w-full py-12 md:py-16">
         <div className="max-w-4xl mx-auto px-4 md:px-[120px]">
+          {/* Back Button */}
+          <div className="mb-8">
+            <Link
+              href="/lp"
+              className="inline-flex items-center gap-2 hover:opacity-70 transition-opacity"
+              style={{
+                color: '#6FC8E5',
+                fontFamily: '"Zen Kaku Gothic New"',
+                fontWeight: '500',
+                fontSize: '16px'
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              トップへ戻る
+            </Link>
+          </div>
+
           {/* Page Title */}
           <div className="text-center mb-12 md:mb-16">
             <h1 
@@ -422,6 +441,25 @@ export default function FAQPage() {
                 height={329}
                 className="w-32 h-auto md:w-40 mx-auto"
               />
+            </div>
+
+            {/* Back to Top Link */}
+            <div className="mb-8">
+              <Link
+                href="/lp"
+                className="inline-flex items-center gap-2 hover:opacity-70 transition-opacity"
+                style={{
+                  color: '#6FC8E5',
+                  fontFamily: '"Zen Kaku Gothic New"',
+                  fontWeight: '500',
+                  fontSize: '16px'
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                トップへ戻る
+              </Link>
             </div>
 
             {/* Footer Links */}

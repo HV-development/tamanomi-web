@@ -145,19 +145,19 @@ export default function LPPage() {
                 />
               </div>
               <div style={{ flex: 1 }}></div>
-              <div className="flex items-center gap-4 md:gap-11">
-                <nav className="hidden md:flex items-center space-x-6 lg:space-x-10">
-                  <a href="#about" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">たまのみとは</a>
-                  <a href="#features" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">魅力</a>
-                  <a href="#howto" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使い方</a>
-                  <a href="#pricing" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">利用料金</a>
-                  <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">使えるお店</a>
-                  <Link href="/lp/contact" className="text-white hover:text-blue-200 transition-colors text-base lg:text-lg">お問い合わせ</Link>
+              <div className="flex items-center gap-4 lg:gap-8 xl:gap-11">
+                <nav className="hidden lg:flex items-center space-x-4 xl:space-x-8">
+                  <a href="#about" className="text-white hover:text-blue-200 transition-colors text-sm xl:text-base whitespace-nowrap">たまのみとは</a>
+                  <a href="#features" className="text-white hover:text-blue-200 transition-colors text-sm xl:text-base whitespace-nowrap">魅力</a>
+                  <a href="#howto" className="text-white hover:text-blue-200 transition-colors text-sm xl:text-base whitespace-nowrap">使い方</a>
+                  <a href="#pricing" className="text-white hover:text-blue-200 transition-colors text-sm xl:text-base whitespace-nowrap">利用料金</a>
+                  <a href="#stores" className="text-white hover:text-blue-200 transition-colors text-sm xl:text-base whitespace-nowrap">使えるお店</a>
+                  <Link href="/lp/contact" className="text-white hover:text-blue-200 transition-colors text-sm xl:text-base whitespace-nowrap">お問い合わせ</Link>
                 </nav>
                 
                 <Link 
                   href="/lp/merchant"
-                  className="text-white font-bold hover:opacity-90 transition-opacity text-xs md:text-sm lg:text-base px-4 py-2 md:px-6 md:py-4"
+                  className="text-white font-bold hover:opacity-90 transition-opacity text-xs lg:text-sm xl:text-base px-4 py-2 lg:px-5 lg:py-3 xl:px-6 xl:py-4 whitespace-nowrap"
                   style={{
                     display: 'flex',
                     justifyContent: 'center',
@@ -167,13 +167,13 @@ export default function LPPage() {
                     background: 'var(--main, #6FC8E5)'
                   }}
                 >
-                  <span className="hidden md:inline">お店の方はこちら</span>
-                  <span className="md:hidden">お店の方</span>
+                  <span className="hidden lg:inline">お店の方はこちら</span>
+                  <span className="lg:hidden">お店の方</span>
                 </Link>
 
-                {/* ハンバーガーメニューアイコン（モバイルのみ表示） */}
+                {/* ハンバーガーメニューアイコン（lg未満で表示） */}
                 <button
-                  className="md:hidden flex flex-col justify-center items-center cursor-pointer mr-4"
+                  className="lg:hidden flex flex-col justify-center items-center cursor-pointer mr-4"
                   style={{
                     gap: '6px'
                   }}
@@ -191,7 +191,7 @@ export default function LPPage() {
           {/* モバイルメニュー */}
           {isMobileMenuOpen && (
             <div 
-              className="md:hidden fixed inset-0 w-full h-full"
+              className="lg:hidden fixed inset-0 w-full h-full"
               style={{
                 background: '#FFF',
                 display: 'flex',
@@ -1402,20 +1402,18 @@ export default function LPPage() {
           <div className="flex justify-center mb-8 md:mb-12">
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <h2
-                className="md:text-5xl lg:text-6xl"
+                className="text-5xl md:text-6xl lg:text-[64px]"
                 style={{
                   color: '#FFF',
                   fontFamily: 'var(--font-plaster)',
-                  fontSize: '48px',
                   fontStyle: 'normal',
                   fontWeight: '400',
-                  lineHeight: '100%'
+                  lineHeight: '1em'
                 }}
               >
                 Pricing
               </h2>
               <p
-                className="md:text-lg lg:text-xl"
                 style={{
                   position: 'absolute',
                   top: '85%',
@@ -1426,7 +1424,7 @@ export default function LPPage() {
                   fontSize: '20px',
                   fontStyle: 'normal',
                   fontWeight: '700',
-                  lineHeight: '100%',
+                  lineHeight: '1em',
                   whiteSpace: 'nowrap'
                 }}
               >
@@ -1438,14 +1436,15 @@ export default function LPPage() {
           {/* Pricing Subtitle */}
           <div className="flex justify-center mb-8 md:mb-12">
             <p
-              className="text-base md:text-lg lg:text-xl"
+              className="md:text-lg lg:text-xl"
               style={{
                 color: '#FFF',
                 textAlign: 'center',
                 fontFamily: '"Zen Kaku Gothic New"',
                 fontStyle: 'normal',
                 fontWeight: '700',
-                lineHeight: '160%'
+                fontSize: '20px',
+                lineHeight: '1.6em'
               }}
             >
               1日あたり約30円でちょい飲み体験
@@ -1455,115 +1454,113 @@ export default function LPPage() {
           {/* Pricing Content */}
           <div className="flex justify-center mb-8">
             <div className="relative flex flex-col items-center w-full max-w-[580px]">
-              {/* Top Section - White Background */}
-              <div
-                className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg mx-[39px] md:mx-0"
-              >
-                <div className="flex items-baseline gap-2">
+              {/* Frame 79 - 白いボックスと画像の組み合わせ (SP用はgap: -100px相当) */}
+              <div className="flex flex-col items-center w-full md:contents">
+                {/* Top Section - White Background */}
+                <div
+                  className="flex flex-col justify-center items-center gap-6 w-full py-12 md:py-14 px-4 bg-white rounded-lg mx-[39px] md:mx-0"
+                >
+                <div className="flex items-baseline gap-2 md:gap-4">
                   <h3
-                    className="text-4xl md:text-5xl"
+                    className="text-[54px] md:text-[70px]"
                     style={{
                       color: '#000',
                       textAlign: 'center',
                       fontFamily: 'Rubik',
                       fontStyle: 'normal',
                       fontWeight: '600',
-                      lineHeight: '100%',
-                      letterSpacing: '1px',
-                      WebkitTextStroke: '3px #000'
+                      lineHeight: '1em',
+                      letterSpacing: '-0.07em'
                     }}
                   >
                     980
                   </h3>
                   <p
-                    className="text-lg md:text-xl"
+                    className="text-[16px] md:text-[22px]"
                     style={{
                       color: '#000',
                       textAlign: 'center',
                       fontFamily: '"Zen Kaku Gothic New"',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%'
+                      lineHeight: '1em'
                     }}
                   >
                     円/月額（税込）
                   </p>
                 </div>
                 <div
-                  className="flex flex-col justify-center items-center px-6 md:px-8 py-3 rounded-full"
+                  className="flex flex-col justify-center items-center px-8 py-2.5 md:py-3 rounded-full"
                   style={{
                     background: 'var(--accent-yellow, #FFD93B)'
                   }}
                 >
                   <span
-                    className="text-base md:text-lg lg:text-xl"
+                    className="text-[16px] md:text-[20px]"
                     style={{
                       color: '#000',
                       textAlign: 'center',
                       fontFamily: '"Zen Kaku Gothic New"',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '100%'
+                      lineHeight: '1em'
                     }}
                   >
-                    1日1軒1杯無料
+                    １日1軒1杯無料
                   </span>
                 </div>
               </div>
 
-              {/* Images Section - Absolute Positioning */}
-              <div
-                className="absolute bottom-32 md:bottom-40 left-1/2 transform -translate-x-1/2 flex justify-center items-end gap-8 md:gap-16 lg:gap-32"
-              >
-                {/* Left illustration - スマホ用 */}
+              {/* Images Section - スマホ用（白いボックスと-100pxオーバーラップ、黄色いボックスとピッタリ合わせる） */}
+              <div className="md:hidden flex justify-center items-end gap-4 -mt-[100px] relative z-20">
                 <Image
                   src="/lp/images/pricing-left.png"
                   alt="Left illustration"
                   width={597}
                   height={481}
-                  className="md:hidden"
                   style={{
                     width: '179px',
                     height: '144px',
-                    aspectRatio: '179/144',
                     objectFit: 'cover'
                   }}
                 />
-                {/* Left illustration - PC用 */}
+                <Image
+                  src="/lp/images/pricing-right.png"
+                  alt="Right illustration"
+                  width={614}
+                  height={476}
+                  style={{
+                    width: '184px',
+                    height: '142px',
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
+              </div>{/* End of Frame 79 wrapper */}
+
+              {/* Images Section - PC用（Absolute Positioning） */}
+              <div
+                className="hidden md:flex absolute bottom-40 left-1/2 transform -translate-x-1/2 justify-center items-end gap-[120px]"
+              >
                 <Image
                   src="/lp/images/pricing-left.png"
                   alt="Left illustration"
                   width={597}
                   height={481}
-                  className="hidden md:block w-32 h-auto md:w-48 lg:w-[298px]"
                   style={{
-                    aspectRatio: '298.50/240.50',
+                    width: '298.5px',
+                    height: '240.5px',
                     objectFit: 'cover'
                   }}
                 />
-                {/* Right illustration - スマホ用 */}
                 <Image
                   src="/lp/images/pricing-right.png"
                   alt="Right illustration"
                   width={614}
                   height={476}
-                  className="md:hidden"
                   style={{
-                    width: '184px',
-                    height: '142px',
-                    aspectRatio: '92/71',
-                    objectFit: 'cover'
-                  }}
-                />
-                {/* Right illustration - PC用 */}
-                <Image
-                  src="/lp/images/pricing-right.png"
-                  alt="Right illustration"
-                  width={614}
-                  height={476}
-                  className="hidden md:block w-32 h-auto md:w-48 lg:w-[307px]"
-                  style={{
-                    aspectRatio: '307/238',
+                    width: '307px',
+                    height: '238px',
                     objectFit: 'cover'
                   }}
                 />
@@ -1571,73 +1568,70 @@ export default function LPPage() {
 
               {/* Bottom Section - Yellow Background */}
               <div
-                className="flex items-start md:items-center gap-3 md:gap-4 w-full pt-6 pb-6 md:py-8 px-4 md:px-6 rounded-lg mt-8 md:mt-12 relative h-[317px] md:h-[160px] mx-[39px] md:mx-0"
+                className="flex flex-col md:flex-row items-center gap-6 md:gap-4 w-full pt-6 pb-[170px] md:py-0 px-6 md:pl-6 rounded-lg md:mt-12 relative md:h-[160px] mx-[39px] md:mx-0"
                 style={{
                   background: 'var(--accent-yellow, #FFD93B)'
                 }}
               >
-                <div className="flex flex-col gap-2 flex-1 md:ml-40">
+                <div className="flex flex-col gap-4 md:gap-2.5 flex-1 md:ml-40">
                   <p
-                    className="text-sm md:text-base lg:text-lg text-center"
+                    className="text-center text-[17px] md:text-[19px]"
                     style={{
                       color: '#000',
                       fontFamily: '"Zen Kaku Gothic New"',
                       fontStyle: 'normal',
                       fontWeight: '700',
-                      lineHeight: '160%'
+                      lineHeight: '1.6em'
                     }}
                   >
-                    さいたま市みんなのアプリ会員なら
+                    さいたま市みんなのアプリ<br className="md:hidden" />会員なら
                   </p>
-                  <div className="flex items-end gap-2 justify-center">
+                  <div className="flex items-center gap-1 md:gap-2 justify-center">
                     <div
-                      className="flex justify-center items-center w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full self-center"
+                      className="flex justify-center items-center w-10 h-10 md:w-[45px] md:h-[45px] rounded-full self-center"
                       style={{
                         background: '#000'
                       }}
                     >
                       <span
-                        className="text-xs md:text-sm"
+                        className="text-[14px] md:text-[16px]"
                         style={{
                           color: '#FFF',
                           textAlign: 'center',
                           fontFamily: '"Zen Kaku Gothic New"',
                           fontStyle: 'normal',
                           fontWeight: '700',
-                          lineHeight: '100%'
+                          lineHeight: '1em'
                         }}
                       >
                         月額
                       </span>
                     </div>
                     <h4
-                      className="text-7xl md:text-7xl lg:text-8xl"
+                      className="text-[84px] md:text-[108px]"
                       style={{
                         color: '#000',
                         textAlign: 'center',
                         fontFamily: 'Rubik',
                         fontStyle: 'normal',
-                        fontWeight: '600',
-                        lineHeight: '100%',
-                        letterSpacing: '5px',
-                        WebkitTextStroke: '3px #000'
+                        fontWeight: '700',
+                        lineHeight: '1em',
+                        letterSpacing: '-0.03em'
                       }}
                     >
                       480
                     </h4>
                     <p
-                      className="text-xs md:text-sm"
+                      className="text-[15px] md:text-[16px]"
                       style={{
                         color: '#000',
                         fontFamily: '"Zen Kaku Gothic New"',
                         fontStyle: 'normal',
                         fontWeight: '700',
-                        lineHeight: '120%'
+                        lineHeight: '1.2em'
                       }}
                     >
-                      円で
-                      <br />
-                      利用可能！
+                      円で<br />利用可能！
                     </p>
                   </div>
                   
@@ -1683,25 +1677,26 @@ export default function LPPage() {
           </div>
 
           {/* Disclaimers */}
-          <div className="text-center">
+          <div className="text-left px-[39px] md:px-0 md:text-center">
             <p 
-              className="mb-2 text-sm md:text-base"
+              className="mb-2"
               style={{
                 color: '#FFF',
                 fontFamily: '"Zen Kaku Gothic New"',
                 fontWeight: '400',
-                lineHeight: '160%'
+                fontSize: '16px',
+                lineHeight: '1.6em'
               }}
             >
               ※対象ドリンクは店舗により異なります。
             </p>
             <p 
-              className="text-sm md:text-base"
               style={{
                 color: '#FFF',
                 fontFamily: '"Zen Kaku Gothic New"',
                 fontWeight: '400',
-                lineHeight: '160%'
+                fontSize: '16px',
+                lineHeight: '1.6em'
               }}
             >
               ※同一店舗での無料適用は1日お一人さま1杯までです。
@@ -1998,64 +1993,86 @@ export default function LPPage() {
               />
             </div>
 
-            {/* Footer Links */}
-            <div className="flex flex-wrap justify-center gap-4 md:gap-6 lg:gap-8 mb-4 md:mb-8">
+            {/* Footer Links - SP: 縦並び(gap-6), PC: 横並び(gap-10) */}
+            <div className="flex flex-col md:flex-row md:flex-wrap justify-center items-center gap-6 md:gap-10 mb-4 md:mb-8">
               <Link 
                 href="/lp/faq"
-                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
+                className="hover:opacity-70 transition-opacity"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontWeight: '400'
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  lineHeight: '1em',
+                  color: '#000'
                 }}
               >
                 よくあるご質問
               </Link>
               <Link 
                 href="/lp/contact" 
-                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
+                className="hover:opacity-70 transition-opacity"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontWeight: '400'
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  lineHeight: '1em',
+                  color: '#000'
                 }}
               >
                 お問い合わせ
               </Link>
               <a 
-                href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
+                href="/プライバシーポリシー.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-70 transition-opacity"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontWeight: '400'
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  lineHeight: '1em',
+                  color: '#000'
                 }}
               >
                 プライバシーポリシー
               </a>
-              <a 
-                href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
+              <Link 
+                href="/lp/commercial-law"
+                className="hover:opacity-70 transition-opacity"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontWeight: '400'
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  lineHeight: '1em',
+                  color: '#000'
                 }}
               >
                 特定商取引法に基づく表記
-              </a>
+              </Link>
               <a 
-                href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
+                href="/たまのみサービス利用規約.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-70 transition-opacity"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontWeight: '400'
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  lineHeight: '1em',
+                  color: '#000'
                 }}
               >
                 ご利用規約
               </a>
               <a 
                 href="#" 
-                className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
+                className="hover:opacity-70 transition-opacity"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
-                  fontWeight: '400'
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  lineHeight: '1em',
+                  color: '#000'
                 }}
               >
                 運営会社
@@ -2065,14 +2082,14 @@ export default function LPPage() {
             {/* Copyright */}
             <div className="pb-6 md:pb-8">
               <p 
-                className="text-sm md:text-base"
                 style={{
                   color: '#000',
                   textAlign: 'center',
                   fontFamily: 'Rubik',
                   fontStyle: 'normal',
                   fontWeight: '400',
-                  lineHeight: '100%'
+                  fontSize: '16px',
+                  lineHeight: '1em'
                 }}
               >
                 ©2025 TAMANOMI

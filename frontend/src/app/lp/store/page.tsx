@@ -1,9 +1,8 @@
 'use client'
 
-import StorePage from '../../store/page'
+import LPPage from '../page'
 
-// /lp/store でも /store と同じLPを表示するための薄いラッパー
+// /lp/store でも /lp と同じLPを表示するための薄いラッパー
 export default function LPStorePage() {
-  return <StorePage />
+  return <LPPage />
 }
-

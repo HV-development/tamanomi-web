@@ -98,6 +98,7 @@ export default defineConfig({
       testMatch: [
         'auth.spec.ts',
         'registration.spec.ts',
+        'cross-app-auth.spec.ts',
       ],
       use: { ...devices['Desktop Chrome'] },
       fullyParallel: false,
@@ -114,6 +115,7 @@ export default defineConfig({
       testMatch: 'navigation.spec.ts',
       use: { ...devices['Desktop Chrome'] },
     },
+
   ],
 
   /* 開発サーバーの設定 */
