@@ -106,7 +106,7 @@ export default function RegisterPage() {
     setFormData(data)
 
     // デバッグ: 保存されたデータを確認
-    const savedData = useRegisterStore.getState().formData
+    const _savedData = useRegisterStore.getState().formData
 
     // 確認画面に遷移（クライアントサイドのみ）
     // 次のイベントループで遷移することで、Zustandストアへの保存が確実に完了する

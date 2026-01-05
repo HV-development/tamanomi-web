@@ -720,7 +720,7 @@ export const useAppHandlers = (
                 throw new Error(errorData.message || 'プラン変更に失敗しました')
             }
 
-            const responseData = await response.json();
+            const _responseData = await response.json();
 
             // プラン変更後、新しいユーザー情報を取得してauth状態を更新
             try {
