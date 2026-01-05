@@ -130,14 +130,13 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       return
     }
 
+    // 画像エリアのクリックの場合は何もしない（写真切り替えのみ）
+    if (target.closest('.image-area')) {
+      return
+    }
+
     // デフォルトで店舗詳細を表示
     onStoreClick(store)
-  }
-
-  const handleImageAreaClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    onCouponsClick(store.id)
   }
 
   return (
@@ -210,20 +209,19 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
       </div>
 
       {/* 店舗写真カルーセル / 画像なしプレースホルダ */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden image-area">
         {shouldShowPlaceholder ? (
-          <button
-            onClick={handleImageAreaClick}
-            className="w-full aspect-[4/3] md:aspect-[16/9] rounded-lg border border-gray-300 bg-gray-200 flex items-center justify-center cursor-pointer"
+          <div
+            className="w-full aspect-[4/3] md:aspect-[16/9] rounded-lg border border-gray-300 bg-gray-200 flex items-center justify-center"
             aria-label="画像なし"
           >
             <span className="text-black text-sm">no image</span>
-          </button>
+          </div>
         ) : (
           <>
             <div
               className="w-full aspect-[4/3] md:aspect-[16/9] cursor-pointer select-none relative rounded-lg overflow-hidden"
-              onClick={handleImageAreaClick}
+              onClick={handleImageClick}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
