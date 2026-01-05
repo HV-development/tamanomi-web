@@ -2,6 +2,8 @@
 "use client"
 
 import { X } from "lucide-react"
+import Image from "next/image"
+import { useState } from "react"
 import type { Store } from "@/types/store"
 
 interface StoreDetailPopupProps {
@@ -12,6 +14,32 @@ interface StoreDetailPopupProps {
   onCouponsClick: (storeId: string) => void
 }
 
+// ジャンルに応じた店内画像を取得
+const getStoreInteriorImage = (genre: string) => {
+  const interiorImages: Record<string, string> = {
+    izakaya: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    japanese: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    bar: "https://images.pexels.com/photos/274192/pexels-photo-274192.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    default: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"
+  }
+  return interiorImages[genre] || interiorImages.default
+}
+
+// ジャンルに応じた料理画像を取得
+const getStoreFoodImage = (genre: string) => {
+  const foodImages: Record<string, string> = {
+    izakaya: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    italian: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    yakiniku: "https://images.pexels.com/photos/1633525/pexels-photo-1633525.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    japanese: "https://images.pexels.com/photos/1283219/pexels-photo-1283219.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    bar: "https://images.pexels.com/photos/1407846/pexels-photo-1407846.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2",
+    default: "https://images.pexels.com/photos/5490778/pexels-photo-5490778.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=2"
+  }
+  return foodImages[genre] || foodImages.default
+}
+
 export function StoreDetailPopup({
   isOpen,
   store,
@@ -19,6 +47,28 @@ export function StoreDetailPopup({
   onCouponsClick
 }: StoreDetailPopupProps) {
   if (!isOpen || !store) return null
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [isImageError, setIsImageError] = useState(false)
+
+  // 画像配列を作成
+  const images = [
+    store.thumbnailUrl || "",
+    getStoreInteriorImage(store.genre),
+    getStoreFoodImage(store.genre)
+  ]
+
+  const hasThumbnail = Boolean(store.thumbnailUrl)
+  const shouldShowPlaceholder = !hasThumbnail || isImageError
+
+  // 写真クリックで次の写真に切り替え
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (images.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length)
+    }
+  }
 
   // 喫煙ポリシーのテキスト変換
   const getSmokingPolicyText = (policy: string) => {
@@ -84,6 +134,44 @@ export function StoreDetailPopup({
           {/* コンテンツ */}
           <div className="flex-1 overflow-y-auto p-4">
             <div className="space-y-4">
+              {/* 店舗写真 */}
+              <div className="relative overflow-hidden">
+                {shouldShowPlaceholder ? (
+                  <div className="w-full aspect-[4/3] rounded-lg border border-gray-300 bg-gray-200 flex items-center justify-center">
+                    <span className="text-black text-sm">no image</span>
+                  </div>
+                ) : (
+                  <>
+                    <div
+                      className="w-full aspect-[4/3] cursor-pointer select-none relative rounded-lg overflow-hidden"
+                      onClick={handleImageClick}
+                    >
+                      <Image
+                        src={images[currentImageIndex] || store.thumbnailUrl!}
+                        alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
+                        fill
+                        className="object-cover transition-opacity duration-300 pointer-events-none"
+                        onError={() => setIsImageError(true)}
+                      />
+                    </div>
+                    {/* インジケーター */}
+                    {images.length > 1 && (
+                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                        <div className="flex gap-1">
+                          {images.map((_, index) => (
+                            <div
+                              key={index}
+                              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentImageIndex ? "bg-white" : "bg-white/60"
+                                }`}
+                            ></div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
               {/* ホームページURL（一番上） */}
               {(store.homepageUrl || store.website) && (
                 <div className="space-y-2">
