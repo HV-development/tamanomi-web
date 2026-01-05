@@ -46,10 +46,10 @@ export function StoreDetailPopup({
   onClose,
   onCouponsClick
 }: StoreDetailPopupProps) {
-  if (!isOpen || !store) return null
-
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isImageError, setIsImageError] = useState(false)
+
+  if (!isOpen || !store) return null
 
   // 画像配列を作成
   const images = [
