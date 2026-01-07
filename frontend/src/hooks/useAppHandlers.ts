@@ -1196,15 +1196,11 @@ export const useAppHandlers = (
             }
 
             // 成功時
-            // まず成功状態を設定（モーダル表示用）
+            // 確認メール送信完了画面を表示（まだメールアドレス変更は完了していない）
             dispatch({ type: 'SET_NEW_EMAIL', payload: data.newEmail })
             dispatch({ type: 'SET_EMAIL_CHANGE_STEP', payload: "complete" })
-            dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: true })
-
-            // 少し待ってからログアウト処理を実行（モーダルが表示されるまで待つ）
-            setTimeout(() => {
-                auth.logout()
-            }, 100)
+            // 成功モーダルは表示しない（メール確認リンクをクリックした後に表示される）
+            // dispatch({ type: 'SET_EMAIL_CHANGE_SUCCESS_MODAL_OPEN', payload: true })
         } catch (error) {
             // エラーを表示するための状態管理が必要
             // TODO: エラー状態を管理する仕組みを追加
