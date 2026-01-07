@@ -64,21 +64,21 @@ export default function CouponConfirmationPage({
                 <div className="p-6">
                   {/* クーポン名 */}
                   <div className="text-center mb-4">
-                    <h4 className="font-bold text-2xl text-gray-900">
+                    <h4 className="font-bold text-2xl text-gray-900 break-all">
                       {coupon.name}
                     </h4>
                   </div>
 
                   {/* クーポン説明 */}
                   <div className="text-center mb-4">
-                    <p className="text-base text-gray-700 leading-relaxed">
+                    <p className="text-base text-gray-700 leading-relaxed break-all">
                       {coupon.description}
                     </p>
 
                     {/* 利用条件 */}
                     {coupon.conditions && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 break-all">
                           利用条件：{coupon.conditions}
                         </p>
                       </div>
