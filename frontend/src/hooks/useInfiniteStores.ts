@@ -124,7 +124,15 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     const address2 = shop.address2 as string | undefined
     const phone = shop.phone as string | undefined
     const description = shop.description as string | undefined
-    const images = shop.images as string[] | undefined
+    const rawImages = shop.images as unknown
+    const imageList = Array.isArray(rawImages)
+      ? (rawImages as unknown[]).map((img) => (typeof img === 'string' ? img.trim() : String(img ?? '').trim())).filter((img) => img.length > 0)
+      : rawImages
+        ? (() => {
+          const imgStr = String(rawImages).trim()
+          return imgStr ? [imgStr] : []
+        })()
+        : []
     const scenes = shop.scenes as (string | { name?: string })[] | undefined
     const sceneIds = shop.sceneIds as (string | { name?: string })[] | undefined
     const customSceneText = shop.customSceneText as string | undefined
@@ -147,7 +155,8 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       city: city || undefined,
       phone: phone || '',
       description: description || '',
-      thumbnailUrl: images?.[0] || '',
+      thumbnailUrl: imageList[0] || '',
+      images: imageList.length > 0 ? imageList : undefined,
       isFavorite,
       latitude: shop.latitude ? Number(shop.latitude) : undefined,
       longitude: shop.longitude ? Number(shop.longitude) : undefined,
