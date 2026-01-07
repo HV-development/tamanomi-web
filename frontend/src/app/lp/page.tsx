@@ -1766,8 +1766,11 @@ export default function LPPage() {
             
             {/* Store List Button */}
             <div className="flex justify-center">
-              <button
-                className="relative inline-flex py-4 md:py-6 px-8 md:px-12 lg:px-16 justify-center items-center gap-2 rounded-full border-none cursor-pointer"
+              <a
+                href="https://www.tamanomi.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative inline-flex py-4 md:py-6 px-8 md:px-12 lg:px-16 justify-center items-center gap-2 rounded-full border-none cursor-pointer hover:opacity-90 transition-opacity"
                 style={{
                   background: '#FF6B6B'
                 }}
@@ -1800,7 +1803,7 @@ export default function LPPage() {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </button>
+              </a>
             </div>
           </div>
         </div>
