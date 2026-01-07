@@ -26,27 +26,27 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
       id: "terms",
       label: "利用規約",
       onClick: () => {
-        // PDFファイルを新しいタブで開く
+        // PDFファイルを新しいタブで開く（元のページのURLは変更しない）
         window.open("/たまのみサービス利用規約.pdf", "_blank")
-        onMenuItemClick("terms")
+        // onMenuItemClickは呼ばない（URL変更を防ぐため）
       },
     },
     {
       id: "privacy",
       label: "プライバシーポリシー",
       onClick: () => {
-        // PDFファイルを新しいタブで開く
+        // PDFファイルを新しいタブで開く（元のページのURLは変更しない）
         window.open("/プライバシーポリシー.pdf", "_blank")
-        onMenuItemClick("privacy")
+        // onMenuItemClickは呼ばない（URL変更を防ぐため）
       },
     },
     {
       id: "commercial-law",
       label: "特定商取引法について",
       onClick: () => {
-        // PDFファイルを新しいタブで開く
+        // PDFファイルを新しいタブで開く（元のページのURLは変更しない）
         window.open("/特定商取引法.pdf", "_blank")
-        onMenuItemClick("commercial-law")
+        // onMenuItemClickは呼ばない（URL変更を防ぐため）
       },
     },
     {
