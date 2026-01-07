@@ -27,6 +27,7 @@ export interface Store {
   phone: string
   description: string
   thumbnailUrl?: string
+  images?: string[]
   isFavorite: boolean
   latitude?: number
   longitude?: number

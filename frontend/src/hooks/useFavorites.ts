@@ -132,6 +132,7 @@ export function useFavorites(isOpen: boolean, isAuthenticated: boolean, options?
           phone: shop.phone || existingStore?.phone || '',
           description: shop.description || existingStore?.description || '',
           thumbnailUrl, // 上で処理したthumbnailUrlを使用
+          images: images.length > 0 ? images : existingStore?.images || undefined,
           isFavorite: true,
           latitude: shop.latitude ? Number(shop.latitude) : (existingStore?.latitude || undefined),
           longitude: shop.longitude ? Number(shop.longitude) : (existingStore?.longitude || undefined),
