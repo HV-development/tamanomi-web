@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { PlanRegistrationContainer } from '@/components/organisms/PlanRegistrationContainer'
 import {
   PlanListResponse,
-  PlanListResponseSchema
+  PlanListResponseSchema,
+  PlanResponse
 } from '@hv-development/schemas'
 import { isFutureExecutedDate } from '@/utils/application-date'
 
@@ -205,22 +206,23 @@ export default function PlanRegistrationPage() {
         const selectedPlan = plans.find(p => p.id === planId)
         if (selectedPlan) {
           // デバッグ: plansステートから取得したデータをログ出力
+          const planWithDate = selectedPlan as PlanResponse & { first_executed_date?: string | null }
           console.log('[plan-registration] plansステートから取得したプラン:', {
             planId: selectedPlan.id,
             planName: selectedPlan.name,
-            first_executed_date: (selectedPlan as any).first_executed_date,
-            allKeys: Object.keys(selectedPlan),
+            first_executed_date: planWithDate.first_executed_date,
+            allKeys: Object.keys(selectedPlan) as string[],
           })
           
           const isLinked = saitamaAppLinked === true
           const discountPrice = selectedPlan.discount_price ?? null
-          const rawAmount = isLinked && discountPrice != null
+          const rawAmount: number = isLinked && discountPrice != null
             ? discountPrice
             : selectedPlan.price
           const paymentAmount = Number(rawAmount)
           
           // first_executed_dateが未来日かどうかを判定
-          const firstExecutedDate = (selectedPlan as any).first_executed_date
+          const firstExecutedDate = planWithDate.first_executed_date
           const isFutureDate = isFutureExecutedDate(firstExecutedDate)
           console.log('[plan-registration] first_executed_date判定:', {
             firstExecutedDate,
