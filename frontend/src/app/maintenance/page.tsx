@@ -29,24 +29,31 @@ export default function MaintenancePage() {
           />
         </div>
         
+        {/* サービス説明 */}
+        <div 
+          className="opacity-0 animate-fade-in mb-8"
+          style={{ animationDelay: '0.5s' }}
+        >
+          <p className="text-base md:text-lg text-[#007D4F]/80 leading-relaxed">
+            たまのみは さいたま市内の飲食店で<br />
+            毎日1軒1杯無料で ドリンクを飲める<br />
+            クーポンサービスです
+          </p>
+        </div>
+        
         {/* メッセージ */}
         <div 
           className="opacity-0 animate-fade-in"
-          style={{ animationDelay: '0.5s' }}
+          style={{ animationDelay: '0.8s' }}
         >
-          <h1 className="text-2xl md:text-3xl font-medium text-[#007D4F] mb-4 tracking-wide">
-            ただいまメンテナンス中です
+          <h1 className="text-base md:text-3xl font-medium text-[#007D4F] mb-4 tracking-wide">
+            公開までしばらくお待ちください
           </h1>
-          
-          <p className="text-base md:text-lg text-[#007D4F]/70 mt-6 leading-relaxed">
-            ご不便をおかけして申し訳ございません。<br />
-            しばらくお待ちください。
-          </p>
           
           {/* 装飾的なライン */}
           <div className="flex items-center justify-center gap-4 mt-8">
             <div className="h-[1px] w-16 bg-gradient-to-r from-transparent to-[#007D4F]/40" />
-            <div className="w-2 h-2 rounded-full bg-[#7FBE26]/50 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-[#7FBE26]/50 animate-pulse-slow" />
             <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-[#007D4F]/40" />
           </div>
         </div>
@@ -54,16 +61,16 @@ export default function MaintenancePage() {
         {/* サブテキスト */}
         <p 
           className="mt-8 text-sm text-[#007D4F]/60 opacity-0 animate-fade-in"
-          style={{ animationDelay: '0.8s' }}
+          style={{ animationDelay: '1.1s' }}
         >
-          Under Maintenance
+          Coming Soon
         </p>
       </div>
       
       {/* フッター */}
       <footer 
         className="absolute bottom-8 text-xs text-[#007D4F]/40 opacity-0 animate-fade-in"
-        style={{ animationDelay: '1s' }}
+        style={{ animationDelay: '1.3s' }}
       >
         © {new Date().getFullYear()} たまのみ
       </footer>
@@ -82,6 +89,17 @@ export default function MaintenancePage() {
         }
         .animate-fade-in {
           animation: fade-in 0.8s ease-out forwards;
+        }
+        @keyframes pulse-slow {
+          0%, 100% {
+            opacity: 0.5;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 2s ease-in-out infinite;
         }
       `}</style>
     </main>

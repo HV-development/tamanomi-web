@@ -9,8 +9,7 @@ import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-ca
 import { WithdrawalComplete } from "@/components/molecules/WithdrawalComplete"
 import type { User as UserType, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 import { appConfig } from '@/config/appConfig'
-import { useDataPreloader } from "@/hooks/useDataPreloader"
-import { SkeletonMyPage, SkeletonCard, SkeletonRankCard, SkeletonMenuButton } from "../skeletons/MypageSkeleton"
+import { SkeletonMyPage } from "../skeletons/MypageSkeleton"
 import { StaggeredContainer, FadeInComponent } from "../atoms/ProgressiveLoader"
 import {
   LazyUsageHistoryList,
@@ -427,9 +426,6 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   currentUserRank,
   isEmailChangeSuccessModalOpen = false,
 }: MyPageContainerProps) {
-  // データプリローダーを使用
-  const { isPreloading, preloadProgress } = useDataPreloader()
-
   // 背景色をメモ化
   const backgroundColorClass = useMemo(() =>
     "bg-gradient-to-br from-green-50 to-green-100", []
@@ -444,52 +440,6 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   // ただし、メールアドレス変更成功モーダルが表示されている場合は無視
   if (!user && !isEmailChangeSuccessModalOpen) {
     return <SkeletonMyPage />
-  }
-
-  // データがプリロード中の場合、段階的に表示
-  if (isPreloading && preloadProgress < 100) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-        {/* ヘッダー */}
-        <div className="bg-white border-b border-gray-200 px-4 py-4">
-          <div className="flex items-center justify-between">
-            <button onClick={onBack} className="text-green-600 hover:text-green-700 transition-colors">
-              ← 戻る
-            </button>
-            <Logo size="lg" onClick={onLogoClick} />
-            <div className="w-12"></div>
-          </div>
-        </div>
-
-        <div className="p-4 space-y-4 max-w-md mx-auto">
-          {/* プログレッシブ表示 */}
-          <StaggeredContainer staggerDelay={150}>
-            <SkeletonCard />
-            <SkeletonRankCard />
-            <SkeletonMenuButton />
-            <SkeletonMenuButton />
-            <SkeletonMenuButton />
-            <SkeletonMenuButton />
-            <SkeletonMenuButton />
-            <SkeletonMenuButton />
-            <SkeletonMenuButton />
-          </StaggeredContainer>
-
-          {/* プログレスバー */}
-          <div className="mt-8">
-            <div className="bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${preloadProgress}%` }}
-              ></div>
-            </div>
-            <p className="text-center text-sm text-gray-600 mt-2">
-              読み込み中... {preloadProgress}%
-            </p>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   // 早期リターンでレンダリングを最適化

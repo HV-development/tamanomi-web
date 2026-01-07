@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 
 /**
+ * サーバーエラー時の共通メッセージ
+ */
+export const SERVER_ERROR_MESSAGE = 'サーバーエラーが発生しました。しばらく経ってから再度お試しください。';
+
+/**
  * キャッシュ無効化ヘッダーを設定したNextResponseを作成
  * 
  * @param data - レスポンスデータ
