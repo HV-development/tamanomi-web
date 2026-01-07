@@ -642,7 +642,12 @@ const MyPageSubView = React.memo(({
             newEmail={newEmail}
             onSubmit={onEmailChangeSubmit}
             onCancel={() => onViewChange("main")}
-            onBackToMyPage={() => onViewChange("main")}
+            onBackToMyPage={() => {
+              // ログイン画面に遷移（確認メール送信完了後はログイン画面に戻る）
+              if (typeof window !== 'undefined') {
+                window.location.href = '/?view=login&skip-auth-check=true'
+              }
+            }}
             onResend={onEmailChangeResend}
             onLogoClick={onLogoClick}
             isLoading={false}
