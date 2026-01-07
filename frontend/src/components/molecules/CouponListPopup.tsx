@@ -141,17 +141,17 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
 
                       {/* クーポン情報 */}
                       <div className="p-4">
-                        <h4 className="font-bold text-lg text-gray-900 mb-2 text-center break-all">
+                        <h4 className="font-bold text-lg text-gray-900 mb-2 text-left break-all">
                           {coupon.name}
                         </h4>
-                        <p className="text-base text-gray-900 leading-relaxed mb-4 text-center font-medium break-all">
+                        <p className="text-base text-gray-900 leading-relaxed mb-4 text-left font-medium break-all">
                           {coupon.description}
                         </p>
 
                         {/* 利用条件 */}
                         {coupon.conditions && (
                           <div className="mb-4 pt-3 border-t border-gray-200">
-                            <p className="text-sm text-gray-900 text-center font-medium break-all">
+                            <p className="text-sm text-gray-900 text-left font-medium break-all">
                               利用条件：{coupon.conditions}
                             </p>
                           </div>

@@ -63,14 +63,14 @@ export default function CouponConfirmationPage({
                 {/* クーポン情報 */}
                 <div className="p-6">
                   {/* クーポン名 */}
-                  <div className="text-center mb-4">
+                  <div className="text-left mb-4">
                     <h4 className="font-bold text-2xl text-gray-900 break-all">
                       {coupon.name}
                     </h4>
                   </div>
 
                   {/* クーポン説明 */}
-                  <div className="text-center mb-4">
+                  <div className="text-left mb-4">
                     <p className="text-base text-gray-700 leading-relaxed break-all">
                       {coupon.description}
                     </p>
