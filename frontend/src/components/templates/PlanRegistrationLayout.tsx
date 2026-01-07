@@ -1,0 +1,49 @@
+"use client"
+
+import { PlanRegistrationContainer } from "../organisms/PlanRegistrationContainer"
+import { PlanListResponse } from '@hv-development/schemas'
+
+interface PlanRegistrationLayoutProps {
+  onPaymentMethodRegister: (planId: string) => void
+  onCancel: () => void
+  onLogoClick: () => void
+  isLoading?: boolean
+  plans: PlanListResponse['plans']
+  error?: string
+  saitamaAppLinked?: boolean
+  onSaitamaAppLinked?: () => void
+  hasPaymentMethod?: boolean
+  isPaymentMethodChangeOnly?: boolean
+}
+
+export function PlanRegistrationLayout({ 
+  onPaymentMethodRegister, 
+  onCancel, 
+  onLogoClick, 
+  isLoading, 
+  plans,
+  error,
+  saitamaAppLinked,
+  onSaitamaAppLinked,
+  hasPaymentMethod,
+  isPaymentMethodChangeOnly,
+}: PlanRegistrationLayoutProps) {
+  // ランクに基づく背景色を取得
+  const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
+
+  return (
+    <PlanRegistrationContainer
+      onPaymentMethodRegister={onPaymentMethodRegister}
+      onCancel={onCancel}
+      onLogoClick={onLogoClick}
+      isLoading={isLoading}
+      backgroundColorClass={backgroundColorClass}
+      plans={plans}
+      error={error}
+      saitamaAppLinked={saitamaAppLinked}
+      onSaitamaAppLinked={onSaitamaAppLinked}
+      hasPaymentMethod={hasPaymentMethod}
+      isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
+    />
+  )
+}

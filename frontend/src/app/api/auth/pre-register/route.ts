@@ -1,0 +1,132 @@
+import { NextRequest } from 'next/server';
+import { buildApiUrl } from '@/lib/api-config';
+import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { createNoCacheResponse } from '@/lib/response-utils'
+
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    // バリデーション
+    if (!body.email) {
+      return createNoCacheResponse(
+        { success: false, message: 'メールアドレスは必須です' },
+        { status: 400 }
+      );
+    }
+
+    // タイムアウト設定付きのfetch
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒でタイムアウト
+
+    const fullUrl = buildApiUrl('/pre-register');
+
+    try {
+      interface RequestBody {
+        email: string;
+        campaignCode?: string;
+        referrerUserId?: string;
+        shopId?: string;
+      }
+      const requestBody: RequestBody = {
+        email: body.email,
+        campaignCode: body.campaignCode,
+      };
+      
+      // 紹介者IDがある場合は追加
+      if (body.referrerUserId && typeof body.referrerUserId === 'string' && body.referrerUserId.trim() !== '') {
+        requestBody.referrerUserId = body.referrerUserId.trim();
+      }
+
+      // shopIdがある場合は追加
+      if (body.shopId && typeof body.shopId === 'string' && body.shopId.trim() !== '') {
+        requestBody.shopId = body.shopId.trim();
+      }
+
+      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+        method: 'POST',
+        headerOptions: {
+          requireAuth: false, // 事前登録は認証不要
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      // レスポンスのステータスをチェック
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+
+        // 409エラー（メールアドレス重複）の場合は特別な処理
+        if (response.status === 409) {
+          return createNoCacheResponse(
+            {
+              success: false,
+              message: 'このメールアドレスは既に登録されています。ログイン画面からログインしてください。',
+              errorCode: 'USER_ALREADY_EXISTS',
+              error: errorData,
+            },
+            { status: 409 }
+          );
+        }
+
+        return createNoCacheResponse(
+          {
+            success: false,
+            message: errorData.error?.message || errorData.message || `サーバーエラーが発生しました (${response.status})`,
+            error: errorData,
+          },
+          { status: response.status }
+        );
+      }
+
+      const data = await response.json();
+      return createNoCacheResponse(data, { status: response.status });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      throw fetchError;
+    }
+  } catch (error) {
+    console.error('Pre-registration error:', error);
+    console.error('Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+    });
+
+    // エラーの種類に応じて適切なメッセージを返す
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        return createNoCacheResponse(
+          {
+            success: false,
+            message: 'リクエストがタイムアウトしました。しばらくしてから再度お試しください。',
+          },
+          { status: 408 }
+        );
+      }
+
+      if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
+        return createNoCacheResponse(
+          {
+            success: false,
+            message: 'サーバーに接続できません。ネットワーク接続を確認してください。',
+          },
+          { status: 503 }
+        );
+      }
+    }
+
+    return createNoCacheResponse(
+      {
+        success: false,
+        message: 'リクエストの処理に失敗しました。しばらくしてから再度お試しください。',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}

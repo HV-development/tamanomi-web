@@ -1,0 +1,193 @@
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import { Input } from "@/components/atoms/Input"
+import { Button } from "@/components/atoms/Button"
+import { adminLoginSchema, type AdminLoginInput } from "@hv-development/schemas"
+
+interface LoginFormProps {
+  onLogin: (data: AdminLoginInput) => void
+  onSignup: () => void
+  onForgotPassword: () => void
+  isLoading?: boolean
+  error?: string
+}
+
+export function LoginForm({ onLogin, onSignup, onForgotPassword, isLoading = false, error: externalError }: LoginFormProps) {
+  const [formData, setFormData] = useState<AdminLoginInput>({
+    email: "",
+    password: ""
+  })
+  const [errors, setErrors] = useState<Partial<Record<keyof AdminLoginInput, string>>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const validateField = (fieldName: keyof AdminLoginInput, value: string) => {
+    try {
+      const fieldSchema = adminLoginSchema.shape[fieldName];
+      fieldSchema.parse(value);
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    } catch (error) {
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ message: string }> };
+        const errorMessage = zodError.errors[0]?.message || "入力エラーです"
+        setErrors(prev => ({ ...prev, [fieldName]: errorMessage }))
+      }
+    }
+  }
+
+  const validateForm = (): boolean => {
+    try {
+      adminLoginSchema.parse(formData)
+      setErrors({})
+      return true
+    } catch (error) {
+      // ZodErrorかどうかをより確実にチェック
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: Array<{ path?: (string | number)[]; message: string }> };
+        const newErrors: Partial<Record<keyof AdminLoginInput, string>> = {}
+        zodError.errors.forEach((err) => {
+          const fieldName = err.path?.[0] as keyof AdminLoginInput
+          if (fieldName === 'email' || fieldName === 'password') {
+            newErrors[fieldName] = err.message
+          }
+        })
+        setErrors(newErrors)
+      }
+      return false
+    }
+  }
+
+  const handleEmailChange = (value: string) => {
+    setFormData(prev => ({ ...prev, email: value }))
+    // 常にバリデーションを実行（空の文字列でもエラーを表示）
+    validateField('email', value)
+  }
+
+  const handlePasswordChange = (value: string) => {
+    setFormData(prev => ({ ...prev, password: value }))
+    // 常にバリデーションを実行（空の文字列でもエラーを表示）
+    validateField('password', value)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // 連続押下を防ぐ
+    if (isSubmitting || isLoading) {
+      return
+    }
+
+    // バリデーションを実行してエラーを表示
+    const isValid = validateForm()
+
+    if (isValid) {
+      setIsSubmitting(true)
+      // Fast Refresh対策: 直接APIを呼び出してページ遷移
+      try {
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // Cookieを送信
+          body: JSON.stringify(formData),
+        })
+        const loginData = await loginResponse.json()
+
+        if (!loginResponse.ok) {
+          throw new Error(loginData.error || 'ログインに失敗しました')
+        }
+
+        const otpResponse = await fetch('/api/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // Cookieを送信
+          body: JSON.stringify({ email: formData.email }),
+        })
+        const otpData = await otpResponse.json()
+
+        if (!otpResponse.ok) {
+          throw new Error('OTPの送信に失敗しました')
+        }
+
+        // セキュリティ改善：メールアドレスをURLパラメータで送信しない
+        // requestIdのみをURLパラメータで送信（メールアドレスはサーバーサイドセッションに保存済み）
+        // skip-auth-checkパラメータを追加して、OTP入力画面での認証チェックをスキップ
+        const targetUrl = `/login/verify-otp?requestId=${encodeURIComponent(otpData.requestId)}&skip-auth-check=true`
+        window.location.href = targetUrl
+      } catch {
+        // エラーは親コンポーネントに渡す
+        setIsSubmitting(false)
+        onLogin(formData)
+      }
+    } else {
+      // バリデーションエラーがある場合は、すべてのフィールドを再検証
+      validateField('email', formData.email)
+      validateField('password', formData.password)
+    }
+  }
+
+  const handleSignupClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    onSignup()
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {externalError && externalError.trim() !== "" && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+          <p className="text-sm text-red-800">{externalError}</p>
+        </div>
+      )}
+
+      <Input
+        type="email"
+        label="メールアドレス"
+        placeholder="example@email.com"
+        value={formData.email}
+        onChange={handleEmailChange}
+        error={errors.email}
+      />
+
+      <Input
+        type="password"
+        label="パスワード"
+        placeholder="パスワードを入力"
+        value={formData.password}
+        onChange={handlePasswordChange}
+        error={errors.password}
+      />
+
+      <div className="space-y-4">
+        <Button
+          type="submit"
+          disabled={isSubmitting || isLoading}
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base font-medium"
+        >
+          {isSubmitting || isLoading ? "ログイン中..." : "ログイン"}
+        </Button>
+
+        <Button type="button" onClick={handleSignupClick} variant="secondary" className="w-full py-3 text-base font-medium">
+          新規登録
+        </Button>
+      </div>
+
+      <div className="text-center">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            onForgotPassword()
+          }}
+          className="text-sm text-green-600 hover:text-green-700 underline"
+        >
+          パスワードを忘れた方
+        </button>
+      </div>
+    </form>
+  )
+}
