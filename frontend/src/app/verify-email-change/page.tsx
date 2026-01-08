@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, Suspense } from "react"
+import { useEffect, useState, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react"
 
@@ -9,18 +9,36 @@ function VerifyEmailChangeContent() {
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
+  
+  // 重複実行を防ぐためのフラグ
+  const hasExecutedRef = useRef(false)
+  const processedTokenRef = useRef<string | null>(null)
 
   useEffect(() => {
-    const verifyEmailChange = async () => {
-      const token = searchParams.get('token')
+    const token = searchParams.get('token')
 
-      if (!token) {
+    // トークンがない場合はエラー
+    if (!token) {
+      if (!hasExecutedRef.current) {
+        hasExecutedRef.current = true
         setStatus('error')
         setMessage('トークンが見つかりません')
-        return
       }
+      return
+    }
 
+    // 既に同じトークンで処理済みの場合は実行しない
+    if (hasExecutedRef.current && processedTokenRef.current === token) {
+      return
+    }
+
+    // 処理済みフラグを立てる
+    hasExecutedRef.current = true
+    processedTokenRef.current = token
+
+    const verifyEmailChange = async () => {
       try {
+        console.log('🔍 [verify-email-change] Starting verification for token:', token?.substring(0, 8) + '...')
         const response = await fetch(`/api/auth/email/change/confirm?token=${encodeURIComponent(token)}`)
         const data = await response.json()
 
@@ -29,24 +47,31 @@ function VerifyEmailChangeContent() {
           setMessage(data.data?.message || 'メールアドレスの変更が完了しました')
         } else {
           setStatus('error')
-          const errorMessage = data.error?.message || 'メールアドレス変更の確認に失敗しました'
+          // エラー構造を確認（data.error.error.code または data.error.code のどちらかに対応）
+          const errorCode = data.error?.error?.code || data.error?.code
+          const errorMessage = data.error?.error?.message || data.error?.message || 'メールアドレス変更の確認に失敗しました'
           
-          // エラーメッセージを日本語化
-          switch (errorMessage) {
-            case 'INVALID_TOKEN':
-              setMessage('無効なトークンです')
-              break
-            case 'TOKEN_ALREADY_USED':
-              setMessage('このトークンは既に使用されています')
-              break
-            case 'TOKEN_EXPIRED':
-              setMessage('トークンの有効期限が切れています')
-              break
-            case 'EMAIL_ALREADY_EXISTS':
-              setMessage('このメールアドレスは既に使用されています')
-              break
-            default:
-              setMessage(errorMessage)
+          // エラーコードに基づいてエラーメッセージを日本語化
+          if (errorCode) {
+            switch (errorCode) {
+              case 'INVALID_TOKEN':
+                setMessage('無効なトークンです')
+                break
+              case 'TOKEN_ALREADY_USED':
+                setMessage('このトークンは既に使用されています。メールアドレス変更は既に完了しています。')
+                break
+              case 'TOKEN_EXPIRED':
+                setMessage('トークンの有効期限が切れています')
+                break
+              case 'EMAIL_ALREADY_EXISTS':
+                setMessage('このメールアドレスは既に使用されています')
+                break
+              default:
+                setMessage(errorMessage)
+            }
+          } else {
+            // エラーコードがない場合は、メッセージをそのまま使用
+            setMessage(errorMessage)
           }
         }
       } catch {
@@ -58,8 +83,29 @@ function VerifyEmailChangeContent() {
     verifyEmailChange()
   }, [searchParams])
 
-  const handleLoginRedirect = () => {
-    router.push('/?view=login')
+  const handleLoginRedirect = async () => {
+    // ログイン画面に遷移する前に、認証状態をクリア
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+    } catch (error) {
+      console.error('ログアウトAPIエラー:', error)
+      // エラーが発生してもログイン画面に遷移する
+    }
+    
+    // マイページ（localhost:3000）のログイン画面に遷移
+    // window.location.originを使って現在のオリジンを取得し、ポート番号を3000に変更
+    if (typeof window !== 'undefined') {
+      const origin = window.location.origin
+      // ポート番号を3000に変更（localhost:3001 → localhost:3000）
+      const webUrl = origin.replace(/:\d+$/, ':3000')
+      window.location.href = `${webUrl}/?view=login&skip-auth-check=true`
+    } else {
+      // サーバーサイドの場合は相対パスで遷移
+      router.push('/?view=login&skip-auth-check=true')
+    }
   }
 
   return (

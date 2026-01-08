@@ -29,6 +29,13 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
 
     if (!response.ok) {
+      // エラーログを出力（デバッグ用）
+      console.error('❌ API Route: Email change confirm failed', {
+        status: response.status,
+        error: data.error || data,
+        fullData: data,
+      })
+      
       return createNoCacheResponse(
         { error: data.error || { message: 'メールアドレス変更の確認に失敗しました' } },
         { status: response.status }
