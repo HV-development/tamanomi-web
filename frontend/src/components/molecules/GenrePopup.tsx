@@ -30,7 +30,7 @@ const GENRES = [
   { value: "bar", label: "バー" },
   { value: "cafe", label: "カフェ" },
   { value: "shokudo", label: "食堂" },
-  { value: "event", label: "イベント出店" },
+  // { value: "event", label: "イベント出店" }, // 一時的に非表示
 ]
 
 export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onClear }: GenrePopupProps) {
