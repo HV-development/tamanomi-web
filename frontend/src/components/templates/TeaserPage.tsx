@@ -46,8 +46,11 @@ export function TeaserPage() {
           className="opacity-0 animate-fade-in"
           style={{ animationDelay: '0.8s' }}
         >
-          <h1 className="text-base md:text-3xl font-medium text-[#007D4F] mb-4 tracking-wide">
-            公開までしばらくお待ちください
+          <p className="text-sm md:text-base text-[#007D4F]/80 mb-2">
+            ユーザー新規登録・利用開始は
+          </p>
+          <h1 className="text-xl md:text-3xl font-bold text-[#007D4F] mb-4 tracking-wide">
+            令和7年1月20日（火）スタート！
           </h1>
           
           {/* 装飾的なライン */}
