@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Ticket, X } from "lucide-react"
 import type { Coupon } from "@/types/coupon"
 import { calculateAge } from "@/utils/age-calculator"
+import { getDefaultCouponImage } from "@/utils/coupon-image"
 
 interface CouponListPopupProps {
   isOpen: boolean
@@ -115,7 +116,9 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
                 {filteredCoupons.map((coupon) => {
                   const hasImage = Boolean(coupon.imageUrl)
                   const isImageError = imageErrors[coupon.id] || false
-                  const shouldShowPlaceholder = !hasImage || isImageError
+                  const defaultImage = getDefaultCouponImage(coupon.drinkType)
+                  const displayImage = hasImage && !isImageError ? coupon.imageUrl! : defaultImage
+                  const shouldShowPlaceholder = !displayImage
 
                   return (
                     <div
@@ -130,7 +133,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
                       ) : (
                         <div className="w-full h-48 overflow-hidden relative">
                           <Image
-                            src={coupon.imageUrl!}
+                            src={displayImage!}
                             alt={coupon.name}
                             fill
                             className="object-cover object-center"

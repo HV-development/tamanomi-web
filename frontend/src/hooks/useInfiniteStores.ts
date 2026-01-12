@@ -340,6 +340,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         }
 
         const items: Store[] = (data?.shops || []).map(mapShopToStore)
+
         const pagination = data?.pagination || {}
         const totalPages = typeof pagination.totalPages === 'number' ? pagination.totalPages : targetPage
 
@@ -363,7 +364,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
 
   const loadNext = useCallback(async () => {
     // 直近でエラーが発生している場合や、ロード中/末尾到達時は再取得しない
-    if (isLoading || isLoadingMore || !hasMore || error) return null
+    if (isLoading || isLoadingMore || !hasMore || error) {
+      return null
+    }
     setIsLoadingMore(true)
     setError(null)
     try {
@@ -413,6 +416,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         setItems(result.items)
         isFirstLoadRef.current = true
         initialLoadCompletedRef.current = true
+        setIsLoading(false) // 初回ロード完了時に必ずisLoadingをfalseに設定
       } catch (e) {
         if (initialLoadCompletedRef.current) return
         const message = e instanceof Error ? e.message : 'エラーが発生しました'

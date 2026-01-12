@@ -6,6 +6,7 @@ import { Clock } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import type { Coupon } from "@/types/coupon"
+import { getDefaultCouponImage } from "@/utils/coupon-image"
 
 interface CouponCardProps {
   coupon: Coupon
@@ -20,7 +21,9 @@ export function CouponCard({ coupon, onUse, className = "" }: CouponCardProps) {
   }
 
   const hasImage = Boolean(coupon.imageUrl)
-  const shouldShowPlaceholder = !hasImage || isImageError
+  const defaultImage = getDefaultCouponImage(coupon.drinkType)
+  const displayImage = hasImage && !isImageError ? coupon.imageUrl! : defaultImage
+  const shouldShowPlaceholder = !displayImage
 
   return (
     <div
@@ -34,7 +37,7 @@ export function CouponCard({ coupon, onUse, className = "" }: CouponCardProps) {
       ) : (
         <div className="relative h-48 overflow-hidden">
           <Image 
-            src={coupon.imageUrl!} 
+            src={displayImage!} 
             alt={coupon.name} 
             fill 
             className="object-cover object-center" 
