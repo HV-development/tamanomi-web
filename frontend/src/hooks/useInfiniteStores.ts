@@ -94,6 +94,33 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       return services
     }
 
+    const parseServices = (services: unknown): string[] => {
+      if (!services) return []
+
+      if (Array.isArray(services)) {
+        return services
+          .map((service) => (typeof service === 'string' ? service.trim() : String(service ?? '').trim()))
+          .filter((service) => service.length > 0)
+      }
+
+      if (typeof services === 'string') {
+        try {
+          const parsed = JSON.parse(services)
+          return parseServices(parsed)
+        } catch {
+          return services.split(',').map((service) => service.trim()).filter((service) => service.length > 0)
+        }
+      }
+
+      if (typeof services === 'object') {
+        return Object.entries(services as Record<string, unknown>)
+          .filter(([, value]) => Boolean(value))
+          .map(([key]) => key)
+      }
+
+      return []
+    }
+
     // paymentMethodsを構築
     const creditCards = parsePaymentCredit(shop.paymentCredit)
     const digitalPayments = parsePaymentCode(shop.paymentCode)
@@ -120,6 +147,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     const fulladdress = shop.fulladdress as string | undefined
     const prefecture = shop.prefecture as string | undefined
     const city = shop.city as string | undefined
+    const area = (shop as any).area as string | undefined
     const address1 = shop.address1 as string | undefined
     const address2 = shop.address2 as string | undefined
     const phone = shop.phone as string | undefined
@@ -142,6 +170,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     const accountEmail = shop.accountEmail as string | undefined
     const createdAt = shop.createdAt as string | undefined
     const updatedAt = shop.updatedAt as string | undefined
+    const services = parseServices((shop as { services?: unknown }).services)
 
     return {
       id: shop.id as string,
@@ -153,6 +182,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         [prefecture, city, address1, address2].filter(Boolean).join(' '),
       prefecture: prefecture || undefined,
       city: city || undefined,
+      area: area || undefined,
       phone: phone || '',
       description: description || '',
       thumbnailUrl: imageList[0] || '',
@@ -180,6 +210,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       customSceneText: customSceneText && typeof customSceneText === 'string' && customSceneText.trim()
         ? customSceneText.trim()
         : undefined,
+      services: services.length > 0 ? services : undefined,
       paymentMethods: hasPaymentMethods ? {
         saicoin: hasSaicoin,
         tamapon: hasTamapon,
@@ -340,6 +371,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         }
 
         const items: Store[] = (data?.shops || []).map(mapShopToStore)
+
         const pagination = data?.pagination || {}
         const totalPages = typeof pagination.totalPages === 'number' ? pagination.totalPages : targetPage
 
@@ -363,7 +395,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
 
   const loadNext = useCallback(async () => {
     // 直近でエラーが発生している場合や、ロード中/末尾到達時は再取得しない
-    if (isLoading || isLoadingMore || !hasMore || error) return null
+    if (isLoading || isLoadingMore || !hasMore || error) {
+      return null
+    }
     setIsLoadingMore(true)
     setError(null)
     try {
@@ -413,6 +447,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         setItems(result.items)
         isFirstLoadRef.current = true
         initialLoadCompletedRef.current = true
+        setIsLoading(false) // 初回ロード完了時に必ずisLoadingをfalseに設定
       } catch (e) {
         if (initialLoadCompletedRef.current) return
         const message = e instanceof Error ? e.message : 'エラーが発生しました'

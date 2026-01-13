@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useCouponAudio } from "@/hooks/use-audio"
 import type { Coupon } from "@/types/coupon"
+import { getDefaultCouponImage } from "@/utils/coupon-image"
 
 interface CouponConfirmationPopupProps {
   isOpen: boolean
@@ -59,7 +60,7 @@ export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }:
                 <div className="flex items-center gap-4">
                   <div className="flex-shrink-0 relative w-20 h-20">
                     <Image
-                      src={coupon.imageUrl || "/placeholder.svg"}
+                      src={coupon.imageUrl || getDefaultCouponImage(coupon.drinkType) || "/placeholder.svg"}
                       alt={coupon.name}
                       fill
                       className="rounded-xl object-cover border border-gray-300"

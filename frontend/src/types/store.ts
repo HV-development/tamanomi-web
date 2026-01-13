@@ -24,6 +24,7 @@ export interface Store {
   address: string
   prefecture?: string
   city?: string
+  area?: string
   phone: string
   description: string
   thumbnailUrl?: string
@@ -48,6 +49,7 @@ export interface Store {
   paymentMethods?: StorePaymentMethods
   usageScenes?: string[]
   customSceneText?: string
+  services?: string[]
 
   // メタ情報（任意）
   status?: string

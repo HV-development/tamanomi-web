@@ -3,6 +3,7 @@
 import Image from "next/image"
 import React, { useState } from 'react'
 import type { Coupon } from '@/types/coupon'
+import { getDefaultCouponImage } from "@/utils/coupon-image"
 
 interface CouponConfirmationPageProps {
   coupon: Coupon | null
@@ -53,7 +54,7 @@ export default function CouponConfirmationPage({
                 {/* クーポン画像 */}
                 <div className="w-full h-64 overflow-hidden relative">
                   <Image
-                    src={coupon.imageUrl || "/placeholder.svg"}
+                    src={coupon.imageUrl || getDefaultCouponImage(coupon.drinkType) || "/placeholder.svg"}
                     alt={coupon.name}
                     fill
                     className="object-cover object-center"

@@ -137,8 +137,13 @@ export function StoreDetailPopup({
               {/* 店舗写真 */}
               <div className="relative overflow-hidden">
                 {shouldShowPlaceholder ? (
-                  <div className="w-full aspect-[4/3] rounded-lg border border-gray-300 bg-gray-200 flex items-center justify-center">
-                    <span className="text-black text-sm">no image</span>
+                  <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-white flex items-center justify-center">
+                    <Image
+                      src="/store-default.svg"
+                      alt="店舗デフォルト画像"
+                      fill
+                      className="object-contain p-4"
+                    />
                   </div>
                 ) : (
                   <>
@@ -296,6 +301,16 @@ export function StoreDetailPopup({
                   </div>
                 )
               })()}
+
+              {/* サービス */}
+              {store.services && store.services.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">サービス</div>
+                  <div className="text-base text-gray-700">
+                    {store.services.join('　')}
+                  </div>
+                </div>
+              )}
 
               {/* 利用時間 */}
               {store.couponUsageStart && store.couponUsageEnd && (
