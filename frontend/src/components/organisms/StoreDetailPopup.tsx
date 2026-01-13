@@ -302,6 +302,16 @@ export function StoreDetailPopup({
                 )
               })()}
 
+              {/* サービス */}
+              {store.services && store.services.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-base font-bold text-gray-900">サービス</div>
+                  <div className="text-base text-gray-700">
+                    {store.services.join('　')}
+                  </div>
+                </div>
+              )}
+
               {/* 利用時間 */}
               {store.couponUsageStart && store.couponUsageEnd && (
                 <div className="space-y-2">

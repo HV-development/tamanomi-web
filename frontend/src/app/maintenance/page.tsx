@@ -50,7 +50,7 @@ export default function MaintenancePage() {
             ユーザー新規登録・利用開始は
           </p>
           <h1 className="text-xl md:text-3xl font-bold text-[#007D4F] mb-4 tracking-wide">
-            令和7年1月20日（火）スタート！
+            令和8年1月20日（火）スタート！
           </h1>
           
           {/* 装飾的なライン */}
