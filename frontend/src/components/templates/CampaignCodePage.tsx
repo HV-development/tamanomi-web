@@ -37,7 +37,7 @@ export function CampaignCodePage({ onBack }: CampaignCodePageProps) {
           <p className="text-center text-gray-700 text-base leading-relaxed">
             新規登録ページ内コード入力欄に
             <br />
-            上記4桁の数字を入力してください
+            下記4桁の数字を入力してください
           </p>
           <p className="text-center text-green-700 font-extrabold text-6xl tracking-[0.35em]">5959</p>
         </div>
