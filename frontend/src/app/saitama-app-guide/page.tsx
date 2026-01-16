@@ -179,7 +179,7 @@ export default function SaitamaAppGuidePage() {
               ) : (
                 <>
                   <span>🔗</span>
-                  アプリと連携して500円OFFで利用する
+                  連携して480円で申し込む
                 </>
               )}
             </button>
