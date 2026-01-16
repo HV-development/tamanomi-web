@@ -2068,7 +2068,9 @@ export default function LPPage() {
                 ご利用規約
               </a>
               <a 
-                href="#" 
+                href="https://www.home.saitama-tsunagu.com/company/" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:opacity-70 transition-opacity"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',

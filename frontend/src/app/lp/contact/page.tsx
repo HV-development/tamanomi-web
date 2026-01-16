@@ -650,7 +650,9 @@ function ContactFormContent() {
                 ご利用規約
               </a>
               <a
-                href="#"
+                href="https://www.home.saitama-tsunagu.com/company/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{ fontFamily: '"Zen Kaku Gothic New"' }}
               >
