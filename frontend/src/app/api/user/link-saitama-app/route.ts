@@ -40,7 +40,12 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       console.error('Backend API error:', data)
       return createNoCacheResponse(
-        { error: data.error?.message || 'さいたま市アプリ連携に失敗しました' },
+        { 
+          error: {
+            code: data.error?.code || 'LINK_FAILED',
+            message: data.error?.message || 'さいたま市アプリ連携に失敗しました'
+          }
+        },
         { status: response.status }
       )
     }
