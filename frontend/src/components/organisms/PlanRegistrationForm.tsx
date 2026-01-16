@@ -362,9 +362,9 @@ export function PlanRegistrationForm({
                 </>
               ) : (
                 <span className="text-center">
-                  アプリと連携して
+                  連携して
                   <br />
-                  500円OFFで利用する
+                  480円で申し込む
                 </span>
               )}
             </button>

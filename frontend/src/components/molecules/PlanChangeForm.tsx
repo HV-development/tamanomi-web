@@ -553,7 +553,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
               ) : (
                 <>
                   <LinkIcon className="w-4 h-4" />
-                  アプリと連携して500円OFFで利用する
+                  連携して480円で申し込む
                 </>
               )}
             </button>

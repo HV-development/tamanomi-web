@@ -25,6 +25,34 @@ interface UseInfiniteStoresResult {
   items: Store[]
 }
 
+const normalizeSmokingPolicy = (smokingType: unknown, smokingPolicy: unknown): Store['smokingPolicy'] => {
+  const raw = [smokingPolicy, smokingType].find(
+    (value) => typeof value === 'string' && value.trim().length > 0,
+  ) as string | undefined
+
+  if (!raw) return undefined
+
+  const value = raw.trim()
+  const lower = value.toLowerCase()
+
+  const mapping: Record<string, Store['smokingPolicy']> = {
+    non_smoking: 'NON_SMOKING',
+    'non-smoking': 'NON_SMOKING',
+    separated: 'SEPARATED',
+    smoking_allowed: 'SMOKING',
+    'smoking-allowed': 'SMOKING',
+    smoking: 'SMOKING',
+    electronic_only: 'HEATED_TOBACCO',
+    'electronic-only': 'HEATED_TOBACCO',
+    heated_tobacco: 'HEATED_TOBACCO',
+    'heated-tobacco': 'HEATED_TOBACCO',
+    unknown: 'UNKNOWN',
+    unspecified: 'UNSPECIFIED',
+  }
+
+  return mapping[lower] ?? value.toUpperCase()
+}
+
 export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseInfiniteStoresResult {
   const { limit = 5, selectedAreas = [], selectedGenres = [] } = options
 
@@ -198,7 +226,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       businessHours: shop.businessHours || undefined,
       closedDays: shop.holidays || shop.closedDays || undefined,
       holidays: shop.holidays || undefined,
-      smokingPolicy: shop.smokingType || shop.smokingPolicy || undefined,
+      smokingPolicy: normalizeSmokingPolicy(shop.smokingType, shop.smokingPolicy),
       usageScenes: (() => {
         // 利用シーンの配列を構築（「その他」は除外）
         const sceneArray: string[] = (scenes || sceneIds || [])
