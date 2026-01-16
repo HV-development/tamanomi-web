@@ -44,9 +44,8 @@ export function HamburgerMenu({ onMenuItemClick, isAuthenticated = false, classN
       id: "commercial-law",
       label: "特定商取引法について",
       onClick: () => {
-        // PDFファイルを新しいタブで開く（元のページのURLは変更しない）
-        window.open("/特定商取引法.pdf", "_blank")
-        // onMenuItemClickは呼ばない（URL変更を防ぐため）
+        window.location.href = "/lp/commercial-law"
+        onMenuItemClick("commercial-law")
       },
     },
     {

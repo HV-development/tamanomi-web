@@ -1492,8 +1492,8 @@ export default function MerchantLPPage() {
 
             {/* Footer Links */}
             <div className="flex flex-wrap justify-center gap-4 md:gap-6 lg:gap-8 mb-4 md:mb-8">
-              <a 
-                href="#" 
+              <Link 
+                href="/lp/faq" 
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -1501,7 +1501,7 @@ export default function MerchantLPPage() {
                 }}
               >
                 よくあるご質問
-              </a>
+              </Link>
               <Link 
                 href="/lp/contact?type=merchant" 
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
@@ -1513,7 +1513,9 @@ export default function MerchantLPPage() {
                 お問い合わせ
               </Link>
               <a 
-                href="#" 
+                href="/プライバシーポリシー.pdf" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -1522,8 +1524,8 @@ export default function MerchantLPPage() {
               >
                 プライバシーポリシー
               </a>
-              <a 
-                href="#" 
+              <Link 
+                href="/lp/commercial-law" 
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
@@ -1531,9 +1533,11 @@ export default function MerchantLPPage() {
                 }}
               >
                 特定商取引法に基づく表記
-              </a>
+              </Link>
               <a 
-                href="#" 
+                href="/たまのみサービス利用規約.pdf" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
                 style={{
                   fontFamily: '"Zen Kaku Gothic New"',
