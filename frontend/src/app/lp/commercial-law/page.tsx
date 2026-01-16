@@ -31,7 +31,7 @@ const commercialLawData: CommercialLawItem[] = [
   },
   {
     label: '販売価格',
-    value: '月額980円（一般価格）\n月額490円（会員価格）\n※価格は税込表示です'
+    value: '月額980円（一般価格）\n月額480円（さいたま市みんなのアプリ会員価格）\n※価格は税込表示です'
   },
   {
     label: '支払方法',
@@ -51,7 +51,7 @@ const commercialLawData: CommercialLawItem[] = [
   },
   {
     label: 'その他',
-    value: 'サービスに関するお問い合わせは、お問い合わせフォームまたはメールアドレスよりご連絡ください。'
+    value: 'サービスに関するお問い合わせは、お問い合わせフォームまたはメールよりご連絡ください。'
   }
 ]
 
@@ -153,7 +153,7 @@ export default function CommercialLawPage() {
               textAlign: 'center'
             }}
           >
-            <p>※本表記は2025年1月時点の情報です。内容は予告なく変更される場合があります。</p>
+            <p>※本表記は20266年1月時点の情報です。内容は予告なく変更される場合があります。</p>
             <p className="mt-2">最新の情報はお問い合わせフォームよりご確認ください。</p>
           </div>
         </div>
