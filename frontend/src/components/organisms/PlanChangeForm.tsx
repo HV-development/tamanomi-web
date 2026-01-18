@@ -246,7 +246,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
             <div className="text-center">
               <div className="text-sm text-gray-600 mb-1">現在のプラン</div>
               <div className="font-bold text-gray-900">{currentPlan.name}</div>
-              <div className="text-sm text-gray-700">¥{currentPlan.price.toLocaleString()}/月</div>
+              <div className="text-sm text-gray-700">¥{(currentPlan.discountPrice ?? currentPlan.price).toLocaleString()}/月</div>
             </div>
           </div>
 

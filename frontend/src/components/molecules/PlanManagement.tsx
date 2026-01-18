@@ -41,7 +41,7 @@ export function PlanManagement({ plan, onChangePlan, className = "" }: PlanManag
           <div className="bg-green-100 rounded-xl p-4">
             <div className="text-center mb-3">
               <h4 className="text-lg font-bold text-green-900">{plan.name}</h4>
-              <div className="text-2xl font-bold text-green-900">¥{plan.price.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-green-900">¥{(plan.discountPrice ?? plan.price).toLocaleString()}</div>
             </div>
             
             <div className="text-sm text-green-800 text-center mb-4">
