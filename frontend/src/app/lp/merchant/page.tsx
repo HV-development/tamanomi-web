@@ -1548,7 +1548,7 @@ export default function MerchantLPPage() {
                 特定商取引法に基づく表記
               </Link>
               <a 
-                href="/たまのみサービス利用規約.pdf" 
+                href="/「たまのみ」サービス広告掲載約款.pdf" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"
@@ -1557,7 +1557,7 @@ export default function MerchantLPPage() {
                   fontWeight: '400'
                 }}
               >
-                ご利用規約
+                「たまのみ」サービス広告掲載約款
               </a>
               <a 
                 href="https://www.home.saitama-tsunagu.com/company/" 
