@@ -50,20 +50,20 @@ const faqData: FAQSection[] = [
       {
         question: 'クーポンの使い方の流れは？',
         answer: (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-6">
             <Image
               src="/lp/images/利用の流れ①.png"
               alt="利用の流れ 1"
               width={1280}
               height={720}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
             <Image
               src="/lp/images/利用の流れ②.png"
               alt="利用の流れ 2"
               width={1280}
               height={720}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
           </div>
         )
@@ -104,20 +104,20 @@ const faqData: FAQSection[] = [
       {
         question: '店舗のオペレーションは？',
         answer: (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-6">
             <Image
               src="/lp/images/利用の流れ①.png"
               alt="利用の流れ 1"
               width={1280}
               height={720}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
             <Image
               src="/lp/images/利用の流れ②.png"
               alt="利用の流れ 2"
               width={1280}
               height={720}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
           </div>
         )
