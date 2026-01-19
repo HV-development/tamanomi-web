@@ -58,11 +58,6 @@ export const useAppHandlers = (
     }, [filters, dispatch])
 
     const handleTabChange = useCallback((tab: string) => {
-        if (tab === "home" && appConfig.restrictTopPageAccess && auth.isAuthenticated) {
-            alert("現在、トップ画面へのアクセスは制限されています。マイページをご利用ください。")
-            return
-        }
-
         if (tab === "mypage") {
             if (!auth.isAuthenticated) {
                 dispatch({ type: 'RESET_LOGIN_STATE' })
