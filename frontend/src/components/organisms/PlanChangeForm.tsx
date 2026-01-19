@@ -15,6 +15,7 @@ interface PlanOption {
   id: string
   name: string
   price: number
+  discountPrice?: number | null
   description: string
   features: string[]
   badge?: string
@@ -91,6 +92,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
         id: string; 
         name: string; 
         price: number; 
+        discount_price?: number | null;
         description?: string; 
         features?: string[]; 
         badge?: string; 
@@ -100,6 +102,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
         id: plan.id,
         name: plan.name,
         price: plan.price,
+        discountPrice: plan.discount_price,
         description: plan.description || '',
         features: plan.features || [],
         badge: plan.badge,
@@ -131,8 +134,17 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
   }, [saitamaAppLinked, fetchPlans])
 
   const selectedPlanData = availablePlans.find((plan) => plan.id === selectedPlan)
-  const isUpgrade = selectedPlanData && selectedPlanData.price > currentPlan.price
-  const isDowngrade = selectedPlanData && selectedPlanData.price < currentPlan.price
+  // 割引価格を考慮した実際の価格を計算
+  const selectedPlanDisplayPrice = selectedPlanData 
+    ? (selectedPlanData.discountPrice != null && selectedPlanData.discountPrice < selectedPlanData.price 
+        ? selectedPlanData.discountPrice 
+        : selectedPlanData.price)
+    : 0
+  const currentPlanDisplayPrice = currentPlan.discountPrice != null && currentPlan.discountPrice < currentPlan.price
+    ? currentPlan.discountPrice
+    : currentPlan.price
+  const isUpgrade = selectedPlanData && selectedPlanDisplayPrice > currentPlanDisplayPrice
+  const isDowngrade = selectedPlanData && selectedPlanDisplayPrice < currentPlanDisplayPrice
 
   // プランリストを現在のプランを基準に並び替え
   const getSortedPlans = () => {
@@ -282,7 +294,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
             <div className="text-center">
               <div className="text-sm text-green-700 mb-1">新しいプラン</div>
               <div className="font-bold text-green-900">{selectedPlanData.name}</div>
-              <div className="text-sm text-green-800">¥{selectedPlanData.price.toLocaleString()}/月</div>
+              <div className="text-sm text-green-800">¥{selectedPlanDisplayPrice.toLocaleString()}/月</div>
             </div>
           </div>
         </div>
@@ -313,7 +325,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
           <div className="text-sm text-blue-900 font-bold mb-3">請求情報</div>
           <ul className="text-sm text-blue-800 space-y-1">
             <li>• 次回請求日: {formatNextBillingDate()}</li>
-            <li>• 請求金額: ¥{selectedPlanData.price.toLocaleString()}</li>
+            <li>• 請求金額: ¥{selectedPlanDisplayPrice.toLocaleString()}</li>
             <li>• 決済方法: 登録済みのクレジットカード</li>
           </ul>
         </div>
