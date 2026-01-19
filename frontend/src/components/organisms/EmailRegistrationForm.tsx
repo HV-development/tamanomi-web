@@ -156,7 +156,7 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
             href="/campaign-code"
             className="text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
           >
-            キャンペーンコードはこちら
+            キャンペーンコードの詳細はこちら
           </Link>
         </div>
       </div>
