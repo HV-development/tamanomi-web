@@ -1,7 +1,6 @@
 "use client"
 
 import { StoreCard } from "./StoreCard"
-import { FadeInComponent } from "@/components/atoms/ProgressiveLoader"
 import type { Store } from "@/types/store"
 
 interface StoreListProps {
@@ -55,16 +54,15 @@ export function StoreList({
 
   return (
     <div className={`space-y-5 ${className}`}>
-      {stores.map((store, index) => (
-        <FadeInComponent key={store.id} delay={index * 100}>
-          <StoreCard
-            store={store}
-            onFavoriteToggle={onFavoriteToggle}
-            onCouponsClick={onCouponsClick}
-            onStoreClick={onStoreClick ?? (() => { })}
-            showDistance={showDistance}
-          />
-        </FadeInComponent>
+      {stores.map((store) => (
+        <StoreCard
+          key={store.id}
+          store={store}
+          onFavoriteToggle={onFavoriteToggle}
+          onCouponsClick={onCouponsClick}
+          onStoreClick={onStoreClick ?? (() => { })}
+          showDistance={showDistance}
+        />
       ))}
     </div>
   )
