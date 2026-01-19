@@ -342,7 +342,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
 
   // 無限スクロール: 初回ロードと追加ロード
   const { isLoading: isStoresLoading, isLoadingMore, error, sentinelRef, items } = useInfiniteStores({
-    limit: 5,
+    limit: 20,
     selectedAreas: selectedAreas ?? [],
     selectedGenres: selectedGenres ?? [],
   })
@@ -400,6 +400,37 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
 
   // 追加ロード時の stores 追記（セントリネル交差で loadNext 実行済み）
   // 追加ロードはフック内部の items 更新で反映されるため、ここでの明示的処理は不要
+
+  // 初回マウント時に位置情報を取得（近くのお店フィルターがデフォルトON）
+  const initialLocationFetchedRef = useRef(false)
+  useEffect(() => {
+    if (initialLocationFetchedRef.current) return
+    initialLocationFetchedRef.current = true
+    
+    // 初期表示時に位置情報を取得（handleCurrentLocationClickはトグルなので直接取得処理を実行）
+    const fetchInitialLocation = async () => {
+      dispatch({ type: 'SET_LOCATION_LOADING', payload: true })
+      dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
+      
+      try {
+        const { getCurrentPosition } = await import('@/utils/location')
+        const location = await getCurrentPosition()
+        dispatch({ type: 'SET_CURRENT_LOCATION', payload: location })
+        dispatch({ type: 'SET_LOCATION_ERROR', payload: null })
+        // isNearbyFilter は初期値が true なのでそのまま
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : '位置情報の取得に失敗しました'
+        dispatch({ type: 'SET_LOCATION_ERROR', payload: errorMessage })
+        dispatch({ type: 'SET_CURRENT_LOCATION', payload: null })
+        // 位置情報取得に失敗した場合はフィルターをOFFにしてカナ順表示
+        filters.setIsNearbyFilter(false)
+      } finally {
+        dispatch({ type: 'SET_LOCATION_LOADING', payload: false })
+      }
+    }
+    
+    fetchInitialLocation()
+  }, [dispatch, filters])
 
   // 先頭へ戻るフローティングボタンの制御
   const [showBackToTop, setShowBackToTop] = useState(false)

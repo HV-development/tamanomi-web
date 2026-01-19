@@ -24,7 +24,6 @@ export function UsageGuideModal({ isOpen, onClose }: UsageGuideModalProps) {
       title: "利用者ご自身で「利用する」ボタンをタップしてください",
       description: "クーポンを使用します。利用できるのは1店舗1回のみです。",
       details: [
-        "お客様ご自身では押さないでください",
         "店員にクーポン内容を確認してもらった後にタップしてください",
         "ボタンをタップするとクーポンが使用済みになります"
       ]
