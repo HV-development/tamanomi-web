@@ -2,7 +2,6 @@
 
 import type React from "react"
 
-import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/atoms/Button"
 import { Input } from "@/components/atoms/Input"
@@ -152,12 +151,14 @@ export function EmailRegistrationForm({ initialEmail = "", onSubmit, onBack, isL
 
         {/* キャンペーンコード案内リンク */}
         <div className="text-center mt-3">
-          <Link
-            href="/campaign-code"
+          <a
+            href="/campaigncode.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-700 text-sm font-medium underline transition-colors"
           >
             キャンペーンコードの詳細はこちら
-          </Link>
+          </a>
         </div>
       </div>
 
