@@ -1325,11 +1325,11 @@ export default function MerchantLPPage() {
             <p 
               className="text-xs md:text-sm w-full"
               style={{
-                color: '#666',
+                color: '#DC2626',
                 textAlign: 'left',
                 fontFamily: '"Zen Kaku Gothic New"',
                 fontStyle: 'normal',
-                fontWeight: '400',
+                fontWeight: '700',
                 lineHeight: '160%'
               }}
             >
@@ -1394,11 +1394,11 @@ export default function MerchantLPPage() {
             <p 
               className="text-xs md:text-sm w-full"
               style={{
-                color: '#666',
+                color: '#DC2626',
                 textAlign: 'left',
                 fontFamily: '"Zen Kaku Gothic New"',
                 fontStyle: 'normal',
-                fontWeight: '400',
+                fontWeight: '700',
                 lineHeight: '160%'
               }}
             >
