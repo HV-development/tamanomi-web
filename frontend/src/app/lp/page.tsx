@@ -496,7 +496,7 @@ export default function LPPage() {
                 className="flex absolute left-1/2"
                 style={{ 
                   gap: '16px',
-                  transform: `translateX(calc(-50% - ${currentSlide * (carouselImageWidth + 16)}px))`,
+                  transform: `translateX(calc(-${currentSlide * (carouselImageWidth + 16)}px - ${carouselImageWidth / 2}px))`,
                   transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
                 }}
               >
