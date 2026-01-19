@@ -30,6 +30,7 @@ export default function LPPage() {
   const [currentSlide, setCurrentSlide] = useState(bannerItems.length * 7) // 中央のセット（8番目）の先頭から開始
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
   // LPページ用：bodyの最大幅制限を解除
   useEffect(() => {
@@ -38,6 +39,34 @@ export default function LPPage() {
       document.body.style.maxWidth = ''
     }
   }, [])
+
+  // 自動スライド（4秒間隔）
+  useEffect(() => {
+    if (!isAutoPlaying || isTransitioning) return
+
+    const interval = setInterval(() => {
+      setIsTransitioning(true)
+      setCurrentSlide(prev => prev - 1) // 右方向にスクロール
+      
+      // トランジション完了後に境界チェックと瞬間移動
+      setTimeout(() => {
+        setIsTransitioning(false)
+        
+        // 境界を超えたら瞬間移動（トランジションなし）
+        setCurrentSlide((prev) => {
+          if (prev >= bannerItems.length * 11) {
+            return prev - bannerItems.length * 5
+          }
+          if (prev < bannerItems.length * 3) {
+            return prev + bannerItems.length * 5
+          }
+          return prev
+        })
+      }, 500)
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [isAutoPlaying, isTransitioning])
 
   // 無限ループ用：バナーを15回複製（PCで3枚同時表示するため十分な余裕を持たせる）
   const extendedBanners = [
@@ -66,6 +95,8 @@ export default function LPPage() {
   const handleScroll = (direction: 'left' | 'right') => {
     if (isTransitioning) return
     
+    // 手動操作時は自動再生を一時停止
+    setIsAutoPlaying(false)
     setIsTransitioning(true)
     
     // スライドを増減（無限に）
@@ -89,16 +120,24 @@ export default function LPPage() {
         return prev
       })
     }, 500)
+    
+    // 5秒後に自動再生を再開
+    setTimeout(() => setIsAutoPlaying(true), 5000)
   }
 
   const goToSlide = (index: number) => {
     if (isTransitioning) return
     
+    // 手動操作時は自動再生を一時停止
+    setIsAutoPlaying(false)
     setIsTransitioning(true)
     setCurrentSlide(bannerItems.length * 7 + index) // 中央のセット（8番目）の該当位置
     
     // トランジション完了後にフラグをリセット
     setTimeout(() => setIsTransitioning(false), 500)
+    
+    // 5秒後に自動再生を再開
+    setTimeout(() => setIsAutoPlaying(true), 5000)
   }
 
   // メディアクエリでカルーセル画像サイズを動的に変更
