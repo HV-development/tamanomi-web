@@ -25,14 +25,6 @@ const faqData: FAQSection[] = [
       {
         question: '料金は？',
         answer: '月額 一般価格：980円、「さいたま市みんなのアプリ」会員価格：480円。'
-      },
-      {
-        question: '目的は？',
-        answer: '背景として酒類出荷の長期減少傾向や若年層の飲酒頻度低下が指摘されています。飲食業界の活性化、若年層の"ちょい飲み"機会づくり、観光・来街促進などを目的としています。'
-      },
-      {
-        question: 'だれが運営？出資・連携は？',
-        answer: '株式会社つなぐが運営。さいたま市、J:COM、JTB、イオンフィナンシャルサービス、埼玉りそな銀行、武蔵野銀行、埼玉縣信用金庫、さいたま商工会議所等が出資・連携しております（商連は出資なし）。最新の構成はさいたま市みんなのアプリの公式サイト等をご確認ください。'
       }
     ]
   },
@@ -58,31 +50,27 @@ const faqData: FAQSection[] = [
       {
         question: 'クーポンの使い方の流れは？',
         answer: (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-6">
             <Image
               src="/lp/images/利用の流れ①.png"
               alt="利用の流れ 1"
               width={1280}
               height={720}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
             <Image
               src="/lp/images/利用の流れ②.png"
               alt="利用の流れ 2"
               width={1280}
               height={720}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
           </div>
         )
       },
       {
-        question: 'たまポンのポイント還元を受けられる？',
-        answer: '実施中のキャンペーンにより、条件満たされた方にポイント還元されます。付与タイミング・上限・対象は企画ごとに異なるため、専用サイト等で告知をご確認ください。ポイント還元を受けるためには、さいたま市みんなのアプリのIDをたまのみサイト上で登録する必要があります。'
-      },
-      {
         question: '支払い方法は？',
-        answer: 'たまのみサイト内の月額課金です。利用可能な決済手段（例：各種クレジットカード、コード決済等）を選択できます。詳細はサイト内でご確認ください。'
+        answer: 'たまのみサイト内の月額課金です。利用可能な決済手段を選択できます。詳細はサイト内でご確認ください。'
       },
       {
         question: '退会（解約）方法は？契約更新日は？',
@@ -106,26 +94,30 @@ const faqData: FAQSection[] = [
     title: '3) 掲載店向け',
     items: [
       {
+        question: '目的は？',
+        answer: '背景として酒類出荷の長期減少傾向や若年層の飲酒頻度低下が指摘されています。飲食業界の活性化、若年層の"ちょい飲み"機会づくり、観光・来街促進などを目的としています。'
+      },
+      {
         question: '掲載費は？',
         answer: '掲載費は無料です（別途、掲載店用の規約をご確認ください）。'
       },
       {
         question: '店舗のオペレーションは？',
         answer: (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-6">
             <Image
               src="/lp/images/利用の流れ①.png"
               alt="利用の流れ 1"
               width={1280}
               height={720}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
             <Image
               src="/lp/images/利用の流れ②.png"
               alt="利用の流れ 2"
               width={1280}
               height={720}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
           </div>
         )
@@ -140,11 +132,11 @@ const faqData: FAQSection[] = [
       },
       {
         question: '長期休業・クーポン利用一時停止の際の対応は？',
-        answer: '店舗都合でクーポン利用を一時停止する場合は、事前にたまのみ運営事務局へご連絡ください'
+        answer: '店舗都合でクーポン利用を一時停止する場合は、事前にたまのみ運営事務局へご連絡ください。'
       },
       {
-        question: '未成年・本人確認は？',
-        answer: 'ソフトドリンクの場合、特に必要はありませんが、アルコール類の提供で年齢確認が必要と判断した場合は、身分証確認をお願いします。'
+        question: '未成年と思われる方への年齢確認は？',
+        answer: 'ソフトドリンクの場合、特に必要はありません。アルコール類の提供で年齢確認が必要と判断した場合は、身分証等による確認をお願いします。'
       },
       {
         question: '運営事務局による掲載一時停止・退会について',
@@ -153,37 +145,16 @@ const faqData: FAQSection[] = [
     ]
   },
   {
-    title: '4) 行政・パートナー向け（概要）',
-    items: [
-      {
-        question: '社会的な狙いと評価指標は？',
-        answer: '来店回数・はしご率・平均滞在時間・客単価・曜日/時間帯分散・来街者の回遊性、地域ポイント循環など。観光・MICEとの連携や、市民満足度向上効果も今後検証できるようにしていきたいと考えています。'
-      },
-      {
-        question: 'エコシステム連携は？',
-        answer: '地域ポイント「たまポン」や商店会施策、観光キャンペーン等と組み合わせ、20万人規模のユーザー基盤活用による波及効果を想定しています（数値は目標の一例）。'
-      }
-    ]
-  },
-  {
-    title: '5) セキュリティ・プライバシー',
+    title: '4) セキュリティ・プライバシー',
     items: [
       {
         question: '個人情報の取り扱いは？',
         answer: '利用目的の範囲で最小限を取得し、適切に管理します。必要に応じて、アクセス制御・ログ監査を行います。詳細はプライバシーポリシーをご確認ください。'
-      },
-      {
-        question: '不正利用対策は？',
-        answer: '1日1杯ルールの検知、同一アカウントの不自然な利用、端末・位置情報の整合性チェック、スクリーンショット防止策（画面動的要素・カウントダウン等）を段階導入します。'
-      },
-      {
-        question: '位置情報は必須？',
-        answer: '近隣店舗表示や不正対策のために許諾をお願いする場合があります。'
       }
     ]
   },
   {
-    title: '6) トラブルシューティング',
+    title: '5) トラブルシューティング',
     items: [
       {
         question: '「このクーポンで乾杯！」がタップできない',
@@ -194,17 +165,13 @@ const faqData: FAQSection[] = [
         answer: 'マイページ内の「決済履歴」をご確認の上、「お問い合わせ」フォームにてご連絡ください。'
       },
       {
-        question: '店舗が混雑・売切れで提供不可だった',
-        answer: '当日の提供可否は店舗裁量です。代替メニューの有無や別日振替は店頭でご確認ください。'
-      },
-      {
         question: 'アカウントにログインできない',
-        answer: 'パスワード再設定、スマホのバージョンの更新をお試しください。端末制限に該当する可能性もあります。解決しない場合はサポートへご連絡ください。'
+        answer: 'パスワード再設定、スマホOSのバージョン更新をお試しください。解決しない場合は「お問い合わせ」フォームにてご連絡ください。'
       }
     ]
   },
   {
-    title: '7) ルール・マナー（重要）',
+    title: '6) ルール・マナー（重要）',
     items: [
       {
         question: '利用時の注意事項は？',
@@ -213,19 +180,11 @@ const faqData: FAQSection[] = [
     ]
   },
   {
-    title: '8) 連絡先',
+    title: '7) 連絡先',
     items: [
       {
         question: 'ユーザーサポートの連絡先は？',
         answer: 'サイト内「お問い合わせ」からご連絡ください。'
-      },
-      {
-        question: '掲載店サポートの連絡先は？',
-        answer: '運営窓口、営業担当へご連絡ください。'
-      },
-      {
-        question: '取材・協業の連絡先は？',
-        answer: '運営窓口までご連絡ください。'
       }
     ]
   }
