@@ -41,8 +41,8 @@ const rubik = Rubik({
 })
 
 export const metadata: Metadata = {
-  title: 'たまのみ - さいたま市のお得なサービス',
-  description: 'さいたま市のお店で使える便利でお得なサービス「たまのみ」。会員登録でポイントが貯まる、クーポンが使えるなど、お得な特典がいっぱい！',
+  title: 'たまのみ - 毎日1杯無料で乾杯',
+  description: 'さいたま市のお店で使える便利でお得なサービス「たまのみ」。対象の飲食店で毎日ドリンクが1杯無料になる"Welcomeドリンク"サービスです。',
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
