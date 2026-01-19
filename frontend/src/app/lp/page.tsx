@@ -8,17 +8,17 @@ import { useRouter } from 'next/navigation'
 // カルーセル用バナー画像とリンク先
 const bannerItems = [
   {
-    imageUrl: '/lp/images/monitor-recruitment-lp.jpg',
+    imageUrl: '/lp/images/monitor-recruitment-lp.webp',
     linkUrl: '/campaigncode.pdf',
     alt: 'モニター募集'
   },
   {
-    imageUrl: '/lp/images/merchant-recruitment-lp.jpg',
+    imageUrl: '/lp/images/merchant-recruitment-lp.webp',
     linkUrl: 'https://www.tamanomi.com/lp/merchant',
     alt: '掲載店募集'
   },
   {
-    imageUrl: '/lp/images/saitama-app-benefits-lp.jpg',
+    imageUrl: '/lp/images/saitama-app-benefits-lp.webp',
     linkUrl: 'https://www.home.saitama-tsunagu.com',
     alt: 'さいたま市みんなのアプリ'
   }
@@ -136,7 +136,7 @@ export default function LPPage() {
         {/* Background Image */}
         <div className="absolute inset-0 pointer-events-none">
           <Image
-            src="/lp/images/user-lp-fv.png"
+            src="/lp/images/user-lp-fv.webp"
             alt="ファーストビュー背景"
             fill
             className="object-cover"
@@ -151,7 +151,7 @@ export default function LPPage() {
             <div className="flex items-center w-full">
               <div className="flex items-center">
                 <Image
-                  src="/lp/images/horizon-color-white.png"
+                  src="/lp/images/horizon-color-white.webp"
                   alt="たまのみ"
                   width={1312}
                   height={320}
@@ -618,7 +618,7 @@ export default function LPPage() {
             {/* Logo - モバイル・タブレットのみ表示 */}
             <div className="mb-6 md:mb-8 lg:hidden">
               <Image
-                src="/lp/images/about-text-logo.png"
+                src="/lp/images/about-text-logo.webp"
                 alt="たまのみロゴ"
                 width={1305}
                 height={453}
@@ -649,7 +649,7 @@ export default function LPPage() {
                 {/* Phone Image */}
                 <div style={{ position: 'relative', zIndex: 15 }}>
                   <Image
-                    src="/lp/images/about-phone.png"
+                    src="/lp/images/about-phone.webp"
                     alt="スマホ画面"
                     width={860}
                     height={1740}
@@ -663,7 +663,7 @@ export default function LPPage() {
                 {/* Character - overlapping bottom of phone */}
                 <div className="-mt-6 md:-mt-8" style={{ zIndex: 21, position: 'relative' }}>
                   <Image
-                    src="/lp/images/about-character.png"
+                    src="/lp/images/about-character.webp"
                     alt="たまのみキャラクター"
                     width={1520}
                     height={602}
@@ -692,7 +692,7 @@ export default function LPPage() {
                 flexShrink: 0
               }}>
                 <Image
-                  src="/lp/images/about-text-logo.png"
+                  src="/lp/images/about-text-logo.webp"
                   alt="たまのみテキストロゴ"
                   width={1305}
                   height={453}
@@ -705,7 +705,7 @@ export default function LPPage() {
                 {/* Phone Image */}
                 <div style={{ position: 'relative', zIndex: 15 }}>
                   <Image
-                    src="/lp/images/about-phone.png"
+                    src="/lp/images/about-phone.webp"
                     alt="スマホ画面"
                     width={860}
                     height={1740}
@@ -719,7 +719,7 @@ export default function LPPage() {
               {/* Character - overlapping bottom of phone */}
               <div className="-mt-6 md:-mt-8 lg:-mt-10" style={{ zIndex: 21, position: 'relative' }}>
                 <Image
-                  src="/lp/images/about-character.png"
+                  src="/lp/images/about-character.webp"
                   alt="たまのみキャラクター"
                   width={1520}
                   height={602}
@@ -877,7 +877,7 @@ export default function LPPage() {
                   </h3>
                 </div>
                 <Image
-                  src="/lp/images/feature-01-beer-circle.png"
+                  src="/lp/images/feature-01-beer-circle.webp"
                   alt="1店舗につき1杯無料!"
                   width={379}
                   height={379}
@@ -951,7 +951,7 @@ export default function LPPage() {
                   </h3>
                 </div>
                 <Image
-                  src="/lp/images/feature-02-street-circle.png"
+                  src="/lp/images/feature-02-street-circle.webp"
                   alt="1日で複数店舗をはしごできる!"
                   width={379}
                   height={379}
@@ -1025,7 +1025,7 @@ export default function LPPage() {
                   </h3>
                 </div>
                 <Image
-                  src="/lp/images/feature-03-drink-circle.png"
+                  src="/lp/images/feature-03-drink-circle.webp"
                   alt="お酒が苦手でも楽しめる!"
                   width={379}
                   height={379}
@@ -1099,7 +1099,7 @@ export default function LPPage() {
                   </h3>
                 </div>
                 <Image
-                  src="/lp/images/feature-04-server-circle.png"
+                  src="/lp/images/feature-04-server-circle.webp"
                   alt="新しいお店との出会い!"
                   width={379}
                   height={379}
@@ -1242,7 +1242,7 @@ export default function LPPage() {
               </div>
               <div className="w-full">
                 <Image
-                  src="/lp/images/how-to-use-step-01.png"
+                  src="/lp/images/how-to-use-step-01.webp"
                   alt="Step 01"
                   width={320}
                   height={200}
@@ -1300,7 +1300,7 @@ export default function LPPage() {
               </div>
               <div className="w-full">
                 <Image
-                  src="/lp/images/how-to-use-step-02.png"
+                  src="/lp/images/how-to-use-step-02.webp"
                   alt="Step 02"
                   width={320}
                   height={200}
@@ -1358,7 +1358,7 @@ export default function LPPage() {
               </div>
               <div className="w-full">
                 <Image
-                  src="/lp/images/how-to-use-step-03.png"
+                  src="/lp/images/how-to-use-step-03.webp"
                   alt="Step 03"
                   width={320}
                   height={200}
@@ -1394,7 +1394,7 @@ export default function LPPage() {
             position: 'absolute',
             left: '-287px',
             top: '-93px',
-            backgroundImage: 'url(/lp/images/pricing-confetti.png)',
+            backgroundImage: 'url(/lp/images/pricing-confetti.webp)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
@@ -1404,7 +1404,7 @@ export default function LPPage() {
         <div 
           className="hidden md:block absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url(/lp/images/pricing-confetti.png)',
+            backgroundImage: 'url(/lp/images/pricing-confetti.webp)',
             backgroundColor: '#6FC8E5'
           }}
         />
@@ -1528,7 +1528,7 @@ export default function LPPage() {
               {/* Images Section - スマホ用（白いボックスと-100pxオーバーラップ、黄色いボックスとピッタリ合わせる） */}
               <div className="md:hidden flex justify-center items-end gap-4 -mt-[100px] relative z-20">
                 <Image
-                  src="/lp/images/pricing-left.png"
+                  src="/lp/images/pricing-left.webp"
                   alt="Left illustration"
                   width={597}
                   height={481}
@@ -1539,7 +1539,7 @@ export default function LPPage() {
                   }}
                 />
                 <Image
-                  src="/lp/images/pricing-right.png"
+                  src="/lp/images/pricing-right.webp"
                   alt="Right illustration"
                   width={614}
                   height={476}
@@ -1557,7 +1557,7 @@ export default function LPPage() {
                 className="hidden md:flex absolute bottom-40 left-1/2 transform -translate-x-1/2 justify-center items-end gap-[120px]"
               >
                 <Image
-                  src="/lp/images/pricing-left.png"
+                  src="/lp/images/pricing-left.webp"
                   alt="Left illustration"
                   width={597}
                   height={481}
@@ -1568,7 +1568,7 @@ export default function LPPage() {
                   }}
                 />
                 <Image
-                  src="/lp/images/pricing-right.png"
+                  src="/lp/images/pricing-right.webp"
                   alt="Right illustration"
                   width={614}
                   height={476}
@@ -1653,7 +1653,7 @@ export default function LPPage() {
                 
                 {/* Phone Image - PC用（absolute配置で左側） */}
                 <Image
-                  src="/lp/images/pricing-phone.png"
+                  src="/lp/images/pricing-phone.webp"
                   alt="Phone illustration"
                   width={152.5}
                   height={179.5}
@@ -1671,7 +1671,7 @@ export default function LPPage() {
                 
                 {/* Phone Image - スマホ用（absolute配置で中央） */}
                 <Image
-                  src="/lp/images/pricing-phone.png"
+                  src="/lp/images/pricing-phone.webp"
                   alt="Phone illustration"
                   width={145.279}
                   height={171}
@@ -1999,7 +1999,7 @@ export default function LPPage() {
             {/* Logo */}
             <div className="mb-4 md:mb-8">
               <Image
-                src="/lp/images/logo.png"
+                src="/lp/images/logo.webp"
                 alt="TAMANOMI"
                 width={328}
                 height={329}

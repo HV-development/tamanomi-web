@@ -277,7 +277,7 @@ export default function MerchantApplyPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link href="/lp/merchant" className="inline-flex items-center">
             <Image
-              src="/lp/images/logo.png"
+              src="/lp/images/logo.webp"
               alt="たまのみ"
               width={160}
               height={160}

@@ -16,7 +16,7 @@ export default function MerchantLPPage() {
         {/* 上半分: 背景画像とヘッダー */}
         <div className="relative w-full h-[50vh] flex-shrink-0">
           <Image
-            src="/lp/images/merchant-fv-sp.png"
+            src="/lp/images/merchant-fv-sp.webp"
             alt="飲食店向けファーストビュー"
             fill
             className="object-cover"
@@ -29,7 +29,7 @@ export default function MerchantLPPage() {
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center">
                   <Image
-                    src="/lp/images/horizon-color-white.png"
+                    src="/lp/images/horizon-color-white.webp"
                     alt="たまのみ"
                     width={1312}
                     height={320}
@@ -352,7 +352,7 @@ export default function MerchantLPPage() {
           <div className="relative w-full md:absolute md:inset-0">
             {/* PC用画像 */}
             <Image
-              src="/lp/images/merchant-fv.png"
+              src="/lp/images/merchant-fv.webp"
               alt="飲食店向けファーストビュー"
               fill
               className="object-cover"
@@ -367,7 +367,7 @@ export default function MerchantLPPage() {
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
                 <Image
-                  src="/lp/images/horizon-color-white.png"
+                  src="/lp/images/horizon-color-white.webp"
                   alt="たまのみ"
                   width={1312}
                   height={320}
@@ -776,7 +776,7 @@ export default function MerchantLPPage() {
             {/* Left Side - Image */}
             <div className="flex-shrink-0 w-full lg:w-auto">
               <Image
-                src="/lp/images/overview-diagram.png"
+                src="/lp/images/overview-diagram.webp"
                 alt="たまのみの仕組み"
                 width={540}
                 height={400}
@@ -861,7 +861,7 @@ export default function MerchantLPPage() {
               <div className="flex flex-row gap-4 items-center md:items-start md:gap-0 md:flex-shrink-0">
                 <div className="flex-shrink-0">
                   <Image
-                    src="/lp/images/benefit-free-cost.png"
+                    src="/lp/images/benefit-free-cost.webp"
                     alt="初期費用・掲載費無料"
                     width={120}
                     height={120}
@@ -918,7 +918,7 @@ export default function MerchantLPPage() {
               <div className="flex flex-row gap-4 items-center md:items-start md:gap-0 md:flex-shrink-0">
                 <div className="flex-shrink-0">
                   <Image
-                    src="/lp/images/benefit-drink.png"
+                    src="/lp/images/benefit-drink.webp"
                     alt="無料ドリンクで集客"
                     width={120}
                     height={120}
@@ -975,7 +975,7 @@ export default function MerchantLPPage() {
               <div className="flex flex-row gap-4 items-center md:items-start md:gap-0 md:flex-shrink-0">
                 <div className="flex-shrink-0">
                   <Image
-                    src="/lp/images/benefit-connection.png"
+                    src="/lp/images/benefit-connection.webp"
                     alt="新しいお客様との接点づくり"
                     width={120}
                     height={120}
@@ -1032,7 +1032,7 @@ export default function MerchantLPPage() {
               <div className="flex flex-row gap-4 items-center md:items-start md:gap-0 md:flex-shrink-0">
                 <div className="flex-shrink-0">
                   <Image
-                    src="/lp/images/benefit-support.png"
+                    src="/lp/images/benefit-support.webp"
                     alt="簡単導入＆安心サポート"
                     width={120}
                     height={120}
@@ -1124,7 +1124,7 @@ export default function MerchantLPPage() {
             {/* Left Phone */}
             <div className="flex-shrink-0">
               <Image
-                src="/lp/images/merchant-coupon-before.png"
+                src="/lp/images/merchant-coupon-before.webp"
                 alt="クーポン使用前"
                 width={280}
                 height={570}
@@ -1159,7 +1159,7 @@ export default function MerchantLPPage() {
             {/* Right Phone */}
             <div className="flex-shrink-0">
               <Image
-                src="/lp/images/merchant-coupon-after.png"
+                src="/lp/images/merchant-coupon-after.webp"
                 alt="クーポン使用後"
                 width={280}
                 height={570}
@@ -1245,7 +1245,7 @@ export default function MerchantLPPage() {
             </div>
             <div className="w-full">
               <Image
-                src="/lp/images/merchant-step-application.png"
+                src="/lp/images/merchant-step-application.webp"
                 alt="お申し込み"
                 width={280}
                 height={200}
@@ -1301,7 +1301,7 @@ export default function MerchantLPPage() {
             </div>
             <div className="w-full">
               <Image
-                src="/lp/images/merchant-step-confirmation.png"
+                src="/lp/images/merchant-step-confirmation.webp"
                 alt="掲載内容確認"
                 width={280}
                 height={200}
@@ -1371,7 +1371,7 @@ export default function MerchantLPPage() {
             </div>
             <div className="w-full">
               <Image
-                src="/lp/images/merchant-step-start.png"
+                src="/lp/images/merchant-step-start.webp"
                 alt="ご利用開始"
                 width={280}
                 height={200}
@@ -1492,7 +1492,7 @@ export default function MerchantLPPage() {
             {/* Logo */}
             <div className="mb-4 md:mb-8">
               <Image
-                src="/lp/images/logo.png"
+                src="/lp/images/logo.webp"
                 alt="TAMANOMI"
                 width={328}
                 height={329}

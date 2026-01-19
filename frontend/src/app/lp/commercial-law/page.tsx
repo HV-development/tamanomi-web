@@ -80,7 +80,7 @@ export default function CommercialLawPage() {
           <div className="flex items-center justify-between">
             <Link href="/lp">
               <Image
-                src="/lp/images/horizon-color-white.png"
+                src="/lp/images/horizon-color-white.webp"
                 alt="たまのみ"
                 width={1312}
                 height={320}

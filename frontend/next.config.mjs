@@ -20,6 +20,7 @@ const nextConfig = {
   trailingSlash: false,
   // Google Maps API用の外部ドメイン許可
   async headers() {
+    // セキュリティヘッダー（キャッシュ制御を除く）
     const securityHeaders = [
       {
         key: 'Content-Security-Policy',
@@ -45,6 +46,10 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=31536000; includeSubDomains; preload'
       },
+    ]
+
+    // HTML/APIページ用のキャッシュ無効化ヘッダー
+    const noCacheHeaders = [
       {
         key: 'Cache-Control',
         value: 'no-store, no-cache, must-revalidate, private',
@@ -52,6 +57,14 @@ const nextConfig = {
       {
         key: 'Pragma',
         value: 'no-cache',
+      },
+    ]
+
+    // 静的ファイル用の長期キャッシュヘッダー（1年間）
+    const staticCacheHeaders = [
+      {
+        key: 'Cache-Control',
+        value: 'public, max-age=31536000, immutable',
       },
     ]
 
@@ -63,15 +76,32 @@ const nextConfig = {
     }
 
     return [
+      // 静的ファイル（画像）に長期キャッシュを設定
       {
-        // 全てのルートに適用（静的ファイルを除く）
-        source: '/(.*)',
-        headers: securityHeaders,
+        source: '/lp/images/:path*',
+        headers: [...securityHeaders, ...staticCacheHeaders],
       },
       {
-        // APIルートにも明示的に適用
+        source: '/:path*.(png|jpg|jpeg|webp|gif|svg|ico)',
+        headers: [...securityHeaders, ...staticCacheHeaders],
+      },
+      {
+        source: '/:path*.(woff|woff2|ttf|eot)',
+        headers: [...securityHeaders, ...staticCacheHeaders],
+      },
+      {
+        source: '/:path*.(pdf)',
+        headers: [...securityHeaders, ...staticCacheHeaders],
+      },
+      // APIルートにはキャッシュ無効化
+      {
         source: '/api/:path*',
-        headers: securityHeaders,
+        headers: [...securityHeaders, ...noCacheHeaders],
+      },
+      // その他全てのルート（HTML等）にはキャッシュ無効化
+      {
+        source: '/(.*)',
+        headers: [...securityHeaders, ...noCacheHeaders],
       },
     ]
   },
