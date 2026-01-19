@@ -232,18 +232,18 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
             </div>
 
             {/* ボタン */}
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-3 pt-4">
               <button
                 type="button"
                 onClick={onBack}
-                className="flex-1 py-3 px-6 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-3 px-4 border border-gray-300 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 disabled={isLoading}
               >
-                マイページに戻る
+                戻る
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 px-6 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-3 px-4 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 disabled={isLoading}
               >
                 {isLoading ? (isEditMode ? '変更中...' : '登録中...') : (isEditMode ? '変更する' : '登録する')}
