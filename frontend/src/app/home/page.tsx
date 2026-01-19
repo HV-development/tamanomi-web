@@ -5,7 +5,7 @@
  * ログイン後にアクセスする画面
  */
 
-import { useEffect, useMemo, Suspense, useReducer, useRef, useState } from "react"
+import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useFilters } from "@/hooks/useFilters"
@@ -18,20 +18,7 @@ import { initialState, appReducer } from "@/hooks/useAppReducer"
 // 店舗データの読み込みは HomeLayout に移譲
 import { useComputedValues } from "@/hooks/useComputedValues"
 import { useAppHandlers } from "@/hooks/useAppHandlers"
-import dynamic from "next/dynamic"
-
-// HomeLayoutを動的インポート（遅延読み込み）
-const HomeLayout = dynamic(() => import("@/components/templates/HomeLayout").then(mod => ({ default: mod.HomeLayout })), {
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-        <p className="text-green-600 font-medium">読み込み中...</p>
-      </div>
-    </div>
-  ),
-  ssr: false,
-})
+import { HomeLayout } from "@/components/templates/HomeLayout"
 
 // メインコンポーネント
 export default function HomePage() {
@@ -150,16 +137,7 @@ export default function HomePage() {
   return (
     <AppContext.Provider value={contextValue}>
       <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
-        <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-              <p className="text-green-600 font-medium">読み込み中...</p>
-            </div>
-          </div>
-        }>
-          <HomeLayout onMount={() => setIsLoginRedirecting(false)} />
-        </Suspense>
+        <HomeLayout onMount={() => setIsLoginRedirecting(false)} />
       </div>
     </AppContext.Provider>
   )
