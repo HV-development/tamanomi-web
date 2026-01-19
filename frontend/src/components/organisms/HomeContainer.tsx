@@ -127,7 +127,8 @@ export function HomeContainer({
       }))
     }
 
-    return storesList
+    // 近くのお店フィルターがOFFの場合は、店舗名カナ順でソート
+    return [...storesList].sort((a, b) => a.name.localeCompare(b.name, 'ja'))
   }, [stores, selectedAreas, selectedEvents, isFavoritesFilter, isNearbyFilter, currentLocation])
 
   return (

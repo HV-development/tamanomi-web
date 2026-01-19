@@ -4,7 +4,7 @@ export function useFilters() {
     const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
     const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
     const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
-    const [isNearbyFilter, setIsNearbyFilter] = useState(false);
+    const [isNearbyFilter, setIsNearbyFilter] = useState(true);
     const [isFavoritesFilter, setIsFavoritesFilter] = useState(false);
 
     const toggleNearbyFilter = () => {
