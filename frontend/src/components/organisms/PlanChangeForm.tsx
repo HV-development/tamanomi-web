@@ -42,6 +42,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [modalMessage, setModalMessage] = useState<string>("")
   const [alsoChangePaymentMethod, setAlsoChangePaymentMethod] = useState<boolean>(false)
+  const [firstExecutedDate, setFirstExecutedDate] = useState<string | null>(null)
 
   const fetchUserInfo = useCallback(async () => {
     try {
@@ -107,6 +108,11 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       }))
       
       setAvailablePlans(formattedPlans)
+
+      // first_executed_dateを取得（アプリケーション共通）
+      if (data.plans.length > 0 && data.plans[0].first_executed_date) {
+        setFirstExecutedDate(data.plans[0].first_executed_date)
+      }
     } catch {
       setFetchError('プランの取得に失敗しました')
     }
@@ -225,6 +231,22 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
   }
 
   const formatNextBillingDate = () => {
+    // 1. 既存プランのnextBillingDateがあればそれを使用
+    if (currentPlan.nextBillingDate) {
+      const date = currentPlan.nextBillingDate instanceof Date 
+        ? currentPlan.nextBillingDate 
+        : new Date(currentPlan.nextBillingDate)
+      return format(date, "yyyy年M月d日", { locale: ja })
+    }
+    // 2. フォールバック: application.first_executed_date を使用
+    if (firstExecutedDate) {
+      // YYYYMMDD形式をパース
+      const year = parseInt(firstExecutedDate.substring(0, 4), 10)
+      const month = parseInt(firstExecutedDate.substring(4, 6), 10) - 1
+      const day = parseInt(firstExecutedDate.substring(6, 8), 10)
+      return format(new Date(year, month, day), "yyyy年M月d日", { locale: ja })
+    }
+    // 3. 最終フォールバック: 現在日から1ヶ月後
     const nextMonth = new Date()
     nextMonth.setMonth(nextMonth.getMonth() + 1)
     return format(nextMonth, "yyyy年M月d日", { locale: ja })
