@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Store } from 'lucide-react';
 import type { CreateStoreIntroductionRequest } from '@/types/store-introduction';
 
@@ -8,12 +8,16 @@ interface StoreIntroductionFormProps {
   onSubmit: (data: CreateStoreIntroductionRequest) => Promise<void>;
   onBack: () => void;
   isLoading?: boolean;
+  initialData?: CreateStoreIntroductionRequest | null;
+  isEditMode?: boolean;
 }
 
 export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
   onSubmit,
   onBack,
   isLoading = false,
+  initialData = null,
+  isEditMode = false,
 }) => {
   const [formData, setFormData] = useState<CreateStoreIntroductionRequest>({
     storeName1: '',
@@ -23,6 +27,13 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
     storeName3: '',
     recommendedMenu3: '',
   });
+
+  // 初期データがある場合はフォームにセット
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
 
   const [errors, setErrors] = useState<Partial<Record<keyof CreateStoreIntroductionRequest, string>>>({});
 
@@ -37,23 +48,28 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreateStoreIntroductionRequest, string>> = {};
 
+    // 1店舗目は必須
     if (!formData.storeName1.trim()) {
       newErrors.storeName1 = '店舗名を入力してください';
     }
     if (!formData.recommendedMenu1.trim()) {
       newErrors.recommendedMenu1 = 'おすすめメニューを入力してください';
     }
-    if (!formData.storeName2.trim()) {
-      newErrors.storeName2 = '店舗名を入力してください';
-    }
-    if (!formData.recommendedMenu2.trim()) {
+
+    // 2店舗目は任意（ただし店舗名を入力した場合はおすすめメニューも必要）
+    if (formData.storeName2.trim() && !formData.recommendedMenu2.trim()) {
       newErrors.recommendedMenu2 = 'おすすめメニューを入力してください';
     }
-    if (!formData.storeName3.trim()) {
-      newErrors.storeName3 = '店舗名を入力してください';
+    if (!formData.storeName2.trim() && formData.recommendedMenu2.trim()) {
+      newErrors.storeName2 = '店舗名を入力してください';
     }
-    if (!formData.recommendedMenu3.trim()) {
+
+    // 3店舗目は任意（ただし店舗名を入力した場合はおすすめメニューも必要）
+    if (formData.storeName3.trim() && !formData.recommendedMenu3.trim()) {
       newErrors.recommendedMenu3 = 'おすすめメニューを入力してください';
+    }
+    if (!formData.storeName3.trim() && formData.recommendedMenu3.trim()) {
+      newErrors.storeName3 = '店舗名を入力してください';
     }
 
     setErrors(newErrors);
@@ -76,11 +92,13 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
           <div className="flex items-center mb-6">
             <Store className="w-8 h-8 text-green-600 mr-3" />
-            <h1 className="text-2xl font-bold text-gray-800">店舗紹介</h1>
+            <h1 className="text-2xl font-bold text-gray-800">
+              {isEditMode ? '店舗紹介の変更' : '店舗紹介'}
+            </h1>
           </div>
           
           <p className="text-gray-600 mb-6">
-            お気に入りの店舗を3店舗ご紹介ください。店舗名とおすすめメニューを入力してください。
+            お気に入りの店舗をご紹介ください。1店舗目は必須、2店舗目・3店舗目は任意です。
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -127,13 +145,13 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
               </div>
             </div>
 
-            {/* 店舗2 */}
-            <div className="border-2 border-green-200 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">店舗 2</h3>
+            {/* 店舗2（任意） */}
+            <div className="border-2 border-gray-200 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">店舗 2 <span className="text-sm font-normal text-gray-500">（任意）</span></h3>
               
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  店舗名 <span className="text-red-500">*</span>
+                  店舗名
                 </label>
                 <input
                   type="text"
@@ -152,7 +170,7 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
 
               <div className="mb-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  おすすめメニュー <span className="text-red-500">*</span>
+                  おすすめメニュー
                 </label>
                 <input
                   type="text"
@@ -170,13 +188,13 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
               </div>
             </div>
 
-            {/* 店舗3 */}
-            <div className="border-2 border-green-200 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">店舗 3</h3>
+            {/* 店舗3（任意） */}
+            <div className="border-2 border-gray-200 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">店舗 3 <span className="text-sm font-normal text-gray-500">（任意）</span></h3>
               
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  店舗名 <span className="text-red-500">*</span>
+                  店舗名
                 </label>
                 <input
                   type="text"
@@ -195,7 +213,7 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
 
               <div className="mb-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  おすすめメニュー <span className="text-red-500">*</span>
+                  おすすめメニュー
                 </label>
                 <input
                   type="text"
@@ -228,7 +246,7 @@ export const StoreIntroductionForm: React.FC<StoreIntroductionFormProps> = ({
                 className="flex-1 py-3 px-6 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isLoading}
               >
-                {isLoading ? '登録中...' : '登録する'}
+                {isLoading ? (isEditMode ? '変更中...' : '登録中...') : (isEditMode ? '変更する' : '登録する')}
               </button>
             </div>
           </form>
