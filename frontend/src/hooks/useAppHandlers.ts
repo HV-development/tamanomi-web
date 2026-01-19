@@ -58,11 +58,6 @@ export const useAppHandlers = (
     }, [filters, dispatch])
 
     const handleTabChange = useCallback((tab: string) => {
-        if (tab === "home" && appConfig.restrictTopPageAccess && auth.isAuthenticated) {
-            alert("現在、トップ画面へのアクセスは制限されています。マイページをご利用ください。")
-            return
-        }
-
         if (tab === "mypage") {
             if (!auth.isAuthenticated) {
                 dispatch({ type: 'RESET_LOGIN_STATE' })
@@ -70,6 +65,16 @@ export const useAppHandlers = (
             } else {
                 navigation.navigateToView("mypage", tab)
                 navigation.navigateToMyPage("main")
+            }
+        } else if (tab === "home") {
+            // 未認証の場合はルート(/)に遷移
+            if (!auth.isAuthenticated) {
+                router.push('/')
+            } else {
+                navigation.setActiveTab(tab)
+                if (navigation.currentView !== "home") {
+                    navigation.navigateToView("home")
+                }
             }
         } else {
             navigation.setActiveTab(tab)
@@ -79,7 +84,7 @@ export const useAppHandlers = (
         }
         // dispatch is intentionally omitted as it's a stable function from useReducer
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [auth.isAuthenticated, navigation])
+    }, [auth.isAuthenticated, navigation, router])
 
     // ステップ1: パスワード認証 + OTP送信
     const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {

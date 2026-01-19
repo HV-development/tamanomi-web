@@ -288,7 +288,7 @@ export function PlanRegistrationForm({
             <div>
               <h4 className="font-bold text-gray-900 text-sm mb-1">さいたま市みんなのアプリ</h4>
               <p className="text-xs text-gray-700 leading-relaxed">
-                さいたま市が提供する公式アプリです。<br />
+                デジタル地域通貨機能や、様々な行政・民間サービスを統合したアプリです。<br />
                 アプリと連携することで、特別な割引価格でご利用いただけます。
               </p>
             </div>

@@ -362,10 +362,9 @@ const MenuButtons = React.memo(({
     <div className="space-y-3">
       {onStoreIntroduction && (
         <MenuButton 
-          onClick={hasStoreIntroduction ? undefined : onStoreIntroduction} 
+          onClick={onStoreIntroduction} 
           icon={Store} 
-          label={hasStoreIntroduction ? "店舗紹介（紹介済み）" : "店舗紹介"} 
-          disabled={hasStoreIntroduction}
+          label={hasStoreIntroduction ? "店舗紹介（変更）" : "店舗紹介"} 
         />
       )}
       {appConfig.myPageSettings.showProfile && (

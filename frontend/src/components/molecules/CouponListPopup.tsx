@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect, useState } from "react"
 import Image from "next/image"
-import { Ticket, X } from "lucide-react"
+import { Ticket, X, Clock } from "lucide-react"
 import type { Coupon } from "@/types/coupon"
 import { calculateAge } from "@/utils/age-calculator"
 import { getDefaultCouponImage } from "@/utils/coupon-image"
@@ -18,9 +18,12 @@ interface CouponListPopupProps {
   userBirthDate?: string | null
   isUsedToday?: boolean
   isCheckingUsage?: boolean
+  couponUsageStart?: string | null
+  couponUsageEnd?: string | null
+  couponUsageDays?: string | null
 }
 
-export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userBirthDate, isUsedToday, isCheckingUsage = false }: CouponListPopupProps) {
+export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoupon, onUsageGuideClick, userBirthDate, isUsedToday, isCheckingUsage = false, couponUsageStart, couponUsageEnd, couponUsageDays }: CouponListPopupProps) {
   // 各クーポンの画像エラー状態を管理
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
 
@@ -82,6 +85,17 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
               <h4 className="text-lg font-bold text-green-900">{storeName}</h4>
+              {/* 時間限定クーポン情報 */}
+              {couponUsageStart && couponUsageEnd && (
+                <div className="mt-2 flex items-center justify-center gap-2 text-green-700 text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span className="font-medium">時間限定クーポン</span>
+                  {couponUsageDays && couponUsageDays.length > 0 && (
+                    <span>{couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')}</span>
+                  )}
+                  <span>{couponUsageStart}〜{couponUsageEnd}</span>
+                </div>
+              )}
               {/* 使用済みメッセージ */}
               {isUsedToday && (
                 <p className="text-red-600 font-bold text-base mt-2">
