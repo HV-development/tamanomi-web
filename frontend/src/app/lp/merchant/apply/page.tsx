@@ -365,8 +365,8 @@ export default function MerchantApplyPage() {
             </div>
 
             {/* 代表者名（姓・名） */}
-            <div className="flex gap-4">
-              <div className="w-50">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 min-w-0">
                 <label htmlFor="representativeNameLast" className="block text-sm font-bold text-gray-700 mb-2">
                   代表者名（姓） <span className="text-red-600">*</span>
                 </label>
@@ -389,7 +389,7 @@ export default function MerchantApplyPage() {
                 </div>
               </div>
 
-              <div className="w-50">
+              <div className="flex-1 min-w-0">
                 <label htmlFor="representativeNameFirst" className="block text-sm font-bold text-gray-700 mb-2">
                   代表者名（名） <span className="text-red-600">*</span>
                 </label>
@@ -414,8 +414,8 @@ export default function MerchantApplyPage() {
             </div>
 
             {/* 代表者名（姓・名 / カナ） */}
-            <div className="flex gap-4">
-              <div className="w-50">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 min-w-0">
                 <label htmlFor="representativeNameLastKana" className="block text-sm font-bold text-gray-700 mb-2">
                   代表者名（姓 / カナ） <span className="text-red-600">*</span>
                 </label>
@@ -438,7 +438,7 @@ export default function MerchantApplyPage() {
                 </div>
               </div>
 
-              <div className="w-50">
+              <div className="flex-1 min-w-0">
                 <label htmlFor="representativeNameFirstKana" className="block text-sm font-bold text-gray-700 mb-2">
                   代表者名（名 / カナ） <span className="text-red-600">*</span>
                 </label>
@@ -463,7 +463,7 @@ export default function MerchantApplyPage() {
             </div>
 
             {/* 電話番号 */}
-            <div className="w-100">
+            <div className="w-full">
               <label htmlFor="representativePhone" className="block text-sm font-bold text-gray-700 mb-2">
                 代表者電話番号 <span className="text-red-600">*</span>
               </label>
@@ -473,7 +473,7 @@ export default function MerchantApplyPage() {
                 value={formData.representativePhone}
                 onChange={(e) => handleInputChange('representativePhone', e.target.value.replace(/\D/g, ''))}
                 onBlur={() => handleBlur('representativePhone')}
-                className={`w-100 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
                   errors.representativePhone ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="0312345678"
@@ -486,7 +486,7 @@ export default function MerchantApplyPage() {
             </div>
 
             {/* メールアドレス */}
-            <div className="w-full md:w-[640px]">
+            <div className="w-full max-w-xl">
               <label htmlFor="accountEmail" className="block text-sm font-bold text-gray-700 mb-2">
                 メールアドレス <span className="text-red-600">*</span>
               </label>
@@ -518,8 +518,8 @@ export default function MerchantApplyPage() {
               <label htmlFor="postalCode" className="block text-sm font-bold text-gray-700 mb-2">
                 郵便番号 <span className="text-red-600">*</span>
               </label>
-              <div className="flex gap-4">
-                <div className="w-40">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                <div className="flex-1 sm:flex-none sm:w-40">
                   <input
                     type="text"
                     id="postalCode"
@@ -538,12 +538,12 @@ export default function MerchantApplyPage() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-end">
+                <div className="flex items-start sm:items-end">
                   <button
                     type="button"
                     onClick={handleAddressSearch}
                     disabled={isSearchingAddress || formData.postalCode.length !== 7}
-                    className="w-32 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 disabled:bg-gray-200 disabled:cursor-not-allowed transition-colors"
+                    className="w-full sm:w-auto px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 disabled:bg-gray-200 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                   >
                     {isSearchingAddress ? '検索中...' : '住所検索'}
                   </button>
@@ -552,7 +552,7 @@ export default function MerchantApplyPage() {
             </div>
 
             {/* 都道府県 */}
-            <div className="w-60">
+            <div className="w-full sm:w-60">
               <label htmlFor="prefecture" className="block text-sm font-bold text-gray-700 mb-2">
                 都道府県 <span className="text-red-600">*</span>
               </label>

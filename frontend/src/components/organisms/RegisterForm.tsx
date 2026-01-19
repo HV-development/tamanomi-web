@@ -347,8 +347,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           郵便番号
         </label>
-        <div className="flex gap-3">
-          <div className="flex-1">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <div className="flex-1 min-w-0">
             <input
               id="postalCode"
               type="text"
@@ -364,7 +364,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             onClick={handleAddressSearch}
             disabled={isSearchingAddress}
             variant="secondary"
-            className="px-6 py-3 whitespace-nowrap"
+            className="w-full sm:w-auto px-6 py-3 whitespace-nowrap"
           >
             {isSearchingAddress ? "検索中..." : "住所検索"}
           </Button>
