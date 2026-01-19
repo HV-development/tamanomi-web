@@ -71,16 +71,6 @@ export const useAppHandlers = (
                 navigation.navigateToView("mypage", tab)
                 navigation.navigateToMyPage("main")
             }
-        } else if (tab === "home") {
-            // 未認証の場合はルート(/)に遷移
-            if (!auth.isAuthenticated) {
-                router.push('/')
-            } else {
-                navigation.setActiveTab(tab)
-                if (navigation.currentView !== "home") {
-                    navigation.navigateToView("home")
-                }
-            }
         } else {
             navigation.setActiveTab(tab)
             if (navigation.currentView !== "home") {
@@ -89,7 +79,7 @@ export const useAppHandlers = (
         }
         // dispatch is intentionally omitted as it's a stable function from useReducer
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [auth.isAuthenticated, navigation, router])
+    }, [auth.isAuthenticated, navigation])
 
     // ステップ1: パスワード認証 + OTP送信
     const handlePasswordLogin = useCallback(async (loginData: { email: string; password: string }) => {
