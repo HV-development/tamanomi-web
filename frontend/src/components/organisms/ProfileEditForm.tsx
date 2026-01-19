@@ -326,8 +326,8 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
         <label className="block text-sm font-medium text-gray-700 mb-2">
           郵便番号
         </label>
-        <div className="flex gap-3">
-          <div className="flex-1">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <div className="flex-1 min-w-0">
             <input
               type="text"
               placeholder="ハイフンなし7桁数字"
@@ -341,7 +341,7 @@ export function ProfileEditForm({ user, onSubmit, onCancel, isLoading = false }:
             type="button"
             onClick={handleAddressSearch}
             disabled={isSearchingAddress}
-            className="px-6 py-3 whitespace-nowrap bg-transparent hover:bg-green-50 text-green-600 rounded-lg border-2 border-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-6 py-3 whitespace-nowrap bg-transparent hover:bg-green-50 text-green-600 rounded-lg border-2 border-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSearchingAddress ? "検索中..." : "住所検索"}
           </button>
