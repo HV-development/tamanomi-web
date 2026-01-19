@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import './styles.css'
 
 export const metadata: Metadata = {
-  title: 'たまのみ - 毎日1杯、無料で乾杯',
-  description: '「たまのみ」は、毎日1軒につきドリンクが1杯無料になる新しい"Welcomeドリンク"サービスです。',
+  title: 'たまのみ - 毎日1杯無料で乾杯',
+  description: 'さいたま市のお店で使える便利でお得なサービス「たまのみ」。対象の飲食店で毎日ドリンクが1杯無料になる"Welcomeドリンク"サービスです。',
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
