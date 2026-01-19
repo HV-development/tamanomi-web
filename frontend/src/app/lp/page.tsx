@@ -5,17 +5,29 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-// カルーセル用のプレースホルダー（実際の画像がある場合は置き換えてください）
-const images = [
-  null, // プレースホルダー1
-  null, // プレースホルダー2
-  null, // プレースホルダー3
+// カルーセル用バナー画像とリンク先
+const bannerItems = [
+  {
+    imageUrl: '/lp/images/モニター募集（LP）.jpg',
+    linkUrl: '/campaigncode.pdf',
+    alt: 'モニター募集'
+  },
+  {
+    imageUrl: '/lp/images/掲載店募集（LP）.jpg',
+    linkUrl: 'https://www.tamanomi.com/lp/merchant',
+    alt: '掲載店募集'
+  },
+  {
+    imageUrl: '/lp/images/みんなのアプリ（LP）.jpg',
+    linkUrl: 'https://www.home.saitama-tsunagu.com',
+    alt: 'さいたま市みんなのアプリ'
+  }
 ];
 
 export default function LPPage() {
   const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [currentSlide, setCurrentSlide] = useState(images.length * 7) // 中央のセット（8番目）の先頭から開始
+  const [currentSlide, setCurrentSlide] = useState(bannerItems.length * 7) // 中央のセット（8番目）の先頭から開始
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
 
@@ -27,24 +39,29 @@ export default function LPPage() {
     }
   }, [])
 
-  // 無限ループ用：画像を15回複製（PCで3枚同時表示するため十分な余裕を持たせる）
-  const extendedImages = [
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images, // 中央のセット（表示用）
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
+  // 無限ループ用：バナーを15回複製（PCで3枚同時表示するため十分な余裕を持たせる）
+  const extendedBanners = [
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems, // 中央のセット（表示用）
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
+    ...bannerItems,
   ]
+
+  // バナークリックハンドラー
+  const handleBannerClick = (linkUrl: string) => {
+    window.open(linkUrl, '_blank', 'noopener,noreferrer')
+  }
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (isTransitioning) return
@@ -62,12 +79,12 @@ export default function LPPage() {
       // 境界を超えたら瞬間移動（トランジションなし）
       setCurrentSlide((prev) => {
         // 右端を超えた場合（12番目のセット以降に入った）
-        if (prev >= images.length * 11) {
-          return prev - images.length * 5
+        if (prev >= bannerItems.length * 11) {
+          return prev - bannerItems.length * 5
         }
         // 左端を超えた場合（4番目のセット以前に入った）
-        if (prev < images.length * 3) {
-          return prev + images.length * 5
+        if (prev < bannerItems.length * 3) {
+          return prev + bannerItems.length * 5
         }
         return prev
       })
@@ -78,7 +95,7 @@ export default function LPPage() {
     if (isTransitioning) return
     
     setIsTransitioning(true)
-    setCurrentSlide(images.length * 7 + index) // 中央のセット（8番目）の該当位置
+    setCurrentSlide(bannerItems.length * 7 + index) // 中央のセット（8番目）の該当位置
     
     // トランジション完了後にフラグをリセット
     setTimeout(() => setIsTransitioning(false), 500)
@@ -483,10 +500,10 @@ export default function LPPage() {
                   transition: isTransitioning ? 'transform 0.5s ease-in-out' : 'none'
                 }}
               >
-                {extendedImages.map((src, i) => (
+                {extendedBanners.map((banner, i) => (
                   <div
                     key={i}
-                    className="relative flex-shrink-0 overflow-hidden w-[303px] h-[170px] md:w-[375px] md:h-[210px]"
+                    className="relative flex-shrink-0 overflow-hidden w-[303px] h-[170px] md:w-[375px] md:h-[210px] cursor-pointer"
                     style={{
                       display: 'flex',
                       justifyContent: 'center',
@@ -495,18 +512,15 @@ export default function LPPage() {
                       borderRadius: '20px',
                       background: '#D9D9D9'
                     }}
+                    onClick={() => handleBannerClick(banner.linkUrl)}
                   >
-                    {src ? (
-                      <Image
-                        src={src}
-                        alt={`banner-${i}`}
-                        fill
-                        className="object-cover"
-                        priority={i < 2}
-                      />
-                    ) : (
-                      <p style={{ color: '#999', fontSize: '16px', fontWeight: 400 }}>準備中</p>
-                    )}
+                    <Image
+                      src={banner.imageUrl}
+                      alt={banner.alt}
+                      fill
+                      className="object-cover"
+                      priority={i < 2}
+                    />
                   </div>
                 ))}
               </div>
@@ -565,9 +579,9 @@ export default function LPPage() {
 
           {/* Pagination Dots */}
           <div className="flex justify-center space-x-2 md:space-x-3">
-            {images.map((_, index) => {
+            {bannerItems.map((_, index) => {
               // 現在のスライドがどの画像を表示しているかを計算
-              const actualIndex = ((currentSlide % images.length) + images.length) % images.length
+              const actualIndex = ((currentSlide % bannerItems.length) + bannerItems.length) % bannerItems.length
               return (
                 <button 
                   key={index} 
