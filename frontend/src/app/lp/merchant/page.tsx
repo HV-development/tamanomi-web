@@ -812,19 +812,6 @@ export default function MerchantLPPage() {
                   lineHeight: '160%'
                 }}
               >
-                地元行政や金融機関と連携し、安心・信頼ある仕組みで飲食店のにぎわいをつくっていきます。
-              </p>
-              <p 
-                className="text-base md:text-lg"
-                style={{
-                  color: 'var(--green1, #007D4F)',
-                  textAlign: 'justify',
-                  fontFamily: '"Zen Kaku Gothic New"',
-                  fontStyle: 'normal',
-                  fontWeight: '400',
-                  lineHeight: '160%'
-                }}
-              >
                 地元に根ざした運営だからこそ、お店の皆さまも安心して「たまのみ」にご参加いただけます。
               </p>
             </div>
@@ -1335,6 +1322,19 @@ export default function MerchantLPPage() {
             >
               申し込み内容をたまのみ事務局で確認し、販促物を店舗に向けて発送します。
             </p>
+            <p 
+              className="text-xs md:text-sm w-full"
+              style={{
+                color: '#666',
+                textAlign: 'left',
+                fontFamily: '"Zen Kaku Gothic New"',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                lineHeight: '160%'
+              }}
+            >
+              ※お申込～発送まで約2週間
+            </p>
           </div>
 
           {/* Step 3 Card */}
@@ -1390,6 +1390,19 @@ export default function MerchantLPPage() {
               }}
             >
               販促キットが到着したことを確認したのち、ご利用を開始していただけます。
+            </p>
+            <p 
+              className="text-xs md:text-sm w-full"
+              style={{
+                color: '#666',
+                textAlign: 'left',
+                fontFamily: '"Zen Kaku Gothic New"',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                lineHeight: '160%'
+              }}
+            >
+              ※「たまのみ」掲載店ステッカーを掲示
             </p>
           </div>
         </div>
