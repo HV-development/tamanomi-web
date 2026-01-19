@@ -54,7 +54,7 @@ const normalizeSmokingPolicy = (smokingType: unknown, smokingPolicy: unknown): S
 }
 
 export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseInfiniteStoresResult {
-  const { limit = 5, selectedAreas = [], selectedGenres = [] } = options
+  const { limit = 20, selectedAreas = [], selectedGenres = [] } = options
 
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)

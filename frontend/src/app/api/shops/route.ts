@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url)
     const searchParams = url.searchParams
     const page = searchParams.get('page') || '1'
-    const limit = searchParams.get('limit') || '5'
+    const limit = searchParams.get('limit') || '20'
     const city = searchParams.get('city')
     const genreId = searchParams.get('genreId')
 
