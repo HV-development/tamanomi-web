@@ -1548,7 +1548,7 @@ export default function MerchantLPPage() {
                 特定商取引法に基づく表記
               </Link>
               <a 
-                href="/「たまのみ」サービス広告掲載約款.pdf" 
+                href="/lp/images/advertising-terms.pdf" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-sm md:text-base"

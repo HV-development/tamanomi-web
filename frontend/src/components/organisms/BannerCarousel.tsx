@@ -18,19 +18,19 @@ interface BannerCarouselProps {
 const banners: BannerItem[] = [
   {
     id: "banner-1",
-    imageUrl: "/モニター募集（ユーザー）.jpg",
+    imageUrl: "/monitor-recruitment-user.jpg",
     linkUrl: "/campaigncode.pdf",
     alt: "モニター募集"
   },
   {
     id: "banner-2", 
-    imageUrl: "/掲載店募集（ユーザー）.jpg",
+    imageUrl: "/merchant-recruitment-user.jpg",
     linkUrl: "https://www.tamanomi.com/lp/merchant",
     alt: "掲載店募集"
   },
   {
     id: "banner-3",
-    imageUrl: "/みんなのアプリ（ユーザー）.jpg",
+    imageUrl: "/saitama-app-benefits-user.jpg",
     linkUrl: "https://www.home.saitama-tsunagu.com",
     alt: "さいたま市みんなのアプリ"
   }

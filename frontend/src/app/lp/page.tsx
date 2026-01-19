@@ -8,17 +8,17 @@ import { useRouter } from 'next/navigation'
 // カルーセル用バナー画像とリンク先
 const bannerItems = [
   {
-    imageUrl: '/lp/images/モニター募集（LP）.jpg',
+    imageUrl: '/lp/images/monitor-recruitment-lp.jpg',
     linkUrl: '/campaigncode.pdf',
     alt: 'モニター募集'
   },
   {
-    imageUrl: '/lp/images/掲載店募集（LP）.jpg',
+    imageUrl: '/lp/images/merchant-recruitment-lp.jpg',
     linkUrl: 'https://www.tamanomi.com/lp/merchant',
     alt: '掲載店募集'
   },
   {
-    imageUrl: '/lp/images/みんなのアプリ（LP）.jpg',
+    imageUrl: '/lp/images/saitama-app-benefits-lp.jpg',
     linkUrl: 'https://www.home.saitama-tsunagu.com',
     alt: 'さいたま市みんなのアプリ'
   }

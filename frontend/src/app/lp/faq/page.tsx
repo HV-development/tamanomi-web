@@ -52,14 +52,14 @@ const faqData: FAQSection[] = [
         answer: (
           <div className="flex flex-col items-center gap-6">
             <Image
-              src="/lp/images/利用の流れ①.png"
+              src="/lp/images/usage-flow-1.png"
               alt="利用の流れ 1"
               width={1280}
               height={720}
               className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
             <Image
-              src="/lp/images/利用の流れ②.png"
+              src="/lp/images/usage-flow-2.png"
               alt="利用の流れ 2"
               width={1280}
               height={720}
@@ -106,14 +106,14 @@ const faqData: FAQSection[] = [
         answer: (
           <div className="flex flex-col items-center gap-6">
             <Image
-              src="/lp/images/利用の流れ①.png"
+              src="/lp/images/usage-flow-1.png"
               alt="利用の流れ 1"
               width={1280}
               height={720}
               className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
             <Image
-              src="/lp/images/利用の流れ②.png"
+              src="/lp/images/usage-flow-2.png"
               alt="利用の流れ 2"
               width={1280}
               height={720}
