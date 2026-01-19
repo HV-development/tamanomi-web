@@ -933,6 +933,9 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         userBirthDate={user?.birthDate}
         isUsedToday={isCouponUsedToday}
         isCheckingUsage={isCheckingUsage || isLoadingCoupons}
+        couponUsageStart={selectedStore?.couponUsageStart}
+        couponUsageEnd={selectedStore?.couponUsageEnd}
+        couponUsageDays={selectedStore?.couponUsageDays}
       />
 
       {/* 使用方法ガイドモーダル */}
