@@ -232,9 +232,9 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
       // 入力フィールドをクリア
       setSaitamaAppId("")
       
-      // 連携成功後、プランを再取得
-      await fetchUserInfo()
-      await fetchPlans()
+      // 連携成功後、saitamaAppLinkedをtrueに設定
+      // useEffectがsaitamaAppLinkedの変更を検知して自動的にfetchPlansを呼び出す
+      setSaitamaAppLinked(true)
     } catch {
       setLinkError('さいたま市アプリ連携中にエラーが発生しました')
     } finally {
