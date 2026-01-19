@@ -52,14 +52,14 @@ const faqData: FAQSection[] = [
         answer: (
           <div className="flex flex-col items-center gap-6">
             <Image
-              src="/lp/images/usage-flow-1.png"
+              src="/lp/images/usage-flow-1.webp"
               alt="利用の流れ 1"
               width={1280}
               height={720}
               className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
             <Image
-              src="/lp/images/usage-flow-2.png"
+              src="/lp/images/usage-flow-2.webp"
               alt="利用の流れ 2"
               width={1280}
               height={720}
@@ -102,14 +102,14 @@ const faqData: FAQSection[] = [
         answer: (
           <div className="flex flex-col items-center gap-6">
             <Image
-              src="/lp/images/usage-flow-1.png"
+              src="/lp/images/usage-flow-1.webp"
               alt="利用の流れ 1"
               width={1280}
               height={720}
               className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
             />
             <Image
-              src="/lp/images/usage-flow-2.png"
+              src="/lp/images/usage-flow-2.webp"
               alt="利用の流れ 2"
               width={1280}
               height={720}
@@ -209,7 +209,7 @@ export default function FAQPage() {
           <div className="flex items-center justify-between">
             <Link href="/lp">
               <Image
-                src="/lp/images/horizon-color-white.png"
+                src="/lp/images/horizon-color-white.webp"
                 alt="たまのみ"
                 width={1312}
                 height={320}
@@ -432,7 +432,7 @@ export default function FAQPage() {
             {/* Logo */}
             <div className="mb-8">
               <Image
-                src="/lp/images/logo.png"
+                src="/lp/images/logo.webp"
                 alt="TAMANOMI"
                 width={328}
                 height={329}

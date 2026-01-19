@@ -135,7 +135,7 @@ function ContactFormContent() {
           <div className="flex items-center w-full max-w-6xl mx-auto">
             <Link href="/lp" className="flex items-center">
               <Image
-                src="/lp/images/logo.png"
+                src="/lp/images/logo.webp"
                 alt="たまのみ"
                 width={328}
                 height={329}
@@ -604,7 +604,7 @@ function ContactFormContent() {
             {/* Logo */}
             <div className="mb-4 md:mb-8">
               <Image
-                src="/lp/images/logo.png"
+                src="/lp/images/logo.webp"
                 alt="TAMANOMI"
                 width={328}
                 height={329}
