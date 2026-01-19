@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { preRegister } from '@/lib/api-client'
 import type { UserRegistrationRequest } from "@hv-development/schemas"
@@ -27,8 +27,33 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
   const [lastEmail, setLastEmail] = useState<string>('')
   const [lastCampaignCode, setLastCampaignCode] = useState<string>('')
   const [shopId, setShopId] = useState<string | undefined>(undefined)
+  const hasCleanedSession = useRef(false)
 
   const searchParams = useSearchParams()
+
+  // 新規登録フロー開始時に既存のセッション（Cookie）をクリア
+  // これにより、ログアウトせずに新規登録画面にアクセスした場合でも
+  // 古いアカウントの情報が表示されることを防ぐ
+  useEffect(() => {
+    const cleanupExistingSession = async () => {
+      // 既にクリーンアップ済みの場合はスキップ
+      if (hasCleanedSession.current) return
+      hasCleanedSession.current = true
+
+      try {
+        // ログアウトAPIを呼び出して既存のCookieをクリア
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        })
+      } catch {
+        // ログアウトに失敗してもエラーを表示しない（新規登録は続行可能）
+        console.warn('既存セッションのクリアに失敗しましたが、新規登録は続行可能です')
+      }
+    }
+
+    cleanupExistingSession()
+  }, [])
 
   // URLパラメータからエラーメッセージとshopIdを取得
   useEffect(() => {
