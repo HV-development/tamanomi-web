@@ -275,14 +275,12 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           limit: limit.toString(),
         })
 
-        // エリアフィルターを追加（複数エリアの場合はOR条件で処理）
+        // エリアフィルターを追加（複数エリアの場合はカンマ区切りでOR条件として処理）
         if (selectedAreas.length > 0) {
           const cities = mapAreasToCities(selectedAreas)
-          // 複数のエリアがある場合は、各エリアに対してクエリを実行する必要があるが、
-          // バックエンドAPIが複数のcityパラメータをサポートしているか確認が必要
-          // 暫定的には最初のエリアのみを使用
           if (cities.length > 0) {
-            queryParams.append('city', cities[0])
+            // 全てのエリアをカンマ区切りで送信
+            queryParams.append('city', cities.join(','))
           }
         }
 
