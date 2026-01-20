@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { StoreList } from "./StoreList"
 import { X } from "lucide-react"
 import type { Store } from "@/types/store"
@@ -13,6 +14,17 @@ interface HistoryPopupProps {
 }
 
 export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCouponsClick }: HistoryPopupProps) {
+  // モーダルが開いている間、背後のスクロールを無効にする
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   return (
@@ -45,7 +57,7 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
           </div>
 
           {/* コンテンツ */}
-          <div className="flex-1 overflow-y-auto p-6 bg-transparent">
+          <div className="flex-1 overflow-y-auto overscroll-y-contain p-6 bg-transparent">
             <StoreList
               stores={stores}
               onFavoriteToggle={onFavoriteToggle}
