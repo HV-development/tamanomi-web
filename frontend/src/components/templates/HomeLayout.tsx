@@ -775,7 +775,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const isInitialStoresLoading = isStoresLoading && items.length === 0
 
   return (
-    <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full`}>
+    <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full pb-20`}>
       {/* ヘッダー部分のみ */}
       <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
         <div className="flex items-center justify-between px-4 py-3">

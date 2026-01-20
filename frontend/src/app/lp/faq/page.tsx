@@ -56,14 +56,14 @@ const faqData: FAQSection[] = [
               alt="利用の流れ 1"
               width={1280}
               height={720}
-              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-[900px] h-auto rounded-lg border border-gray-200"
             />
             <Image
               src="/lp/images/usage-flow-2.webp"
               alt="利用の流れ 2"
               width={1280}
               height={720}
-              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-[900px] h-auto rounded-lg border border-gray-200"
             />
           </div>
         )
@@ -106,14 +106,14 @@ const faqData: FAQSection[] = [
               alt="利用の流れ 1"
               width={1280}
               height={720}
-              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-[900px] h-auto rounded-lg border border-gray-200"
             />
             <Image
               src="/lp/images/usage-flow-2.webp"
               alt="利用の流れ 2"
               width={1280}
               height={720}
-              className="w-full max-w-2xl h-auto rounded-lg border border-gray-200"
+              className="w-full max-w-[900px] h-auto rounded-lg border border-gray-200"
             />
           </div>
         )
