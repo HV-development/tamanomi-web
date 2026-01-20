@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { AreaButton } from "@/components/atoms/AreaButton"
 import { Button } from "@/components/atoms/Button"
 
@@ -25,6 +26,17 @@ const SAITAMA_AREAS = [
 ]
 
 export function AreaPopup({ isOpen, selectedAreas, onAreaToggle, onClose, onClear }: AreaPopupProps) {
+  // モーダルが開いている間、背後のスクロールを無効にする
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   return (

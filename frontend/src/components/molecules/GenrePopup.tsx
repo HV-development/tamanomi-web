@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import { Button } from "@/components/atoms/Button"
 import { getGenreColor } from "@/utils/genre-colors"
 import { cn } from "@/lib/utils"
@@ -40,6 +40,17 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
     }
   }, [onClose])
 
+  // モーダルが開いている間、背後のスクロールを無効にする
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   return (
@@ -66,7 +77,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
 
           <div className="text-sm text-gray-600 mb-4">複数選択可能です</div>
 
-          <div className="max-h-96 overflow-y-auto mb-6">
+          <div className="max-h-96 overflow-y-auto overscroll-y-contain mb-6">
             {/* イベントヘッダー */}
             <div className="mb-4">
               <h4 className="text-md font-bold text-gray-800 mb-3">ジャンル</h4>
