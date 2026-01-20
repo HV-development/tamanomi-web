@@ -85,15 +85,19 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
           <div className="px-6 py-4 bg-green-50 border-b border-green-100 flex-shrink-0">
             <div className="text-center">
               <h4 className="text-lg font-bold text-green-900">{storeName}</h4>
-              {/* 時間限定クーポン情報 */}
-              {couponUsageStart && couponUsageEnd && (
+              {/* 時間・曜日限定クーポン情報 */}
+              {((couponUsageStart && couponUsageEnd) || (couponUsageDays && couponUsageDays.length > 0)) && (
                 <div className="mt-2 flex items-center justify-center gap-2 text-green-700 text-sm">
                   <Clock className="w-4 h-4" />
-                  <span className="font-medium">時間限定クーポン</span>
+                  <span className="font-medium">
+                    {couponUsageStart && couponUsageEnd ? '時間限定クーポン' : '曜日限定クーポン'}
+                  </span>
                   {couponUsageDays && couponUsageDays.length > 0 && (
                     <span>{couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')}</span>
                   )}
-                  <span>{couponUsageStart}〜{couponUsageEnd}</span>
+                  {couponUsageStart && couponUsageEnd && (
+                    <span>{couponUsageStart}〜{couponUsageEnd}</span>
+                  )}
                 </div>
               )}
               {/* 使用済みメッセージ */}

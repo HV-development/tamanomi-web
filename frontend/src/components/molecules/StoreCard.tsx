@@ -178,16 +178,20 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
           </div>
         )}
 
-        {/* 時間限定クーポン情報 */}
-        {store.couponUsageStart && store.couponUsageEnd && (
+        {/* 時間・曜日限定クーポン情報 */}
+        {((store.couponUsageStart && store.couponUsageEnd) || (store.couponUsageDays && store.couponUsageDays.length > 0)) && (
           <div className="mt-1 flex items-center gap-2 text-green-600 text-sm">
             <Clock className="w-5 h-5" />
-            <span className="font-medium">時間限定クーポン</span>
+            <span className="font-medium">
+              {store.couponUsageStart && store.couponUsageEnd ? '時間限定クーポン' : '曜日限定クーポン'}
+            </span>
             {/* クーポン利用可能曜日 */}
             {store.couponUsageDays && store.couponUsageDays.length > 0 && (
               <span>{store.couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')}</span>
             )}
-            <span>{store.couponUsageStart}〜{store.couponUsageEnd}</span>
+            {store.couponUsageStart && store.couponUsageEnd && (
+              <span>{store.couponUsageStart}〜{store.couponUsageEnd}</span>
+            )}
           </div>
         )}
       </div>
