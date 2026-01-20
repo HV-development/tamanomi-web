@@ -312,16 +312,20 @@ export function StoreDetailPopup({
                 </div>
               )}
 
-              {/* 利用時間 */}
-              {store.couponUsageStart && store.couponUsageEnd && (
+              {/* 利用時間・曜日 */}
+              {((store.couponUsageStart && store.couponUsageEnd) || (store.couponUsageDays && store.couponUsageDays.length > 0)) && (
                 <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">利用時間</div>
+                  <div className="text-base font-bold text-gray-900">
+                    {store.couponUsageStart && store.couponUsageEnd ? '利用時間' : '利用可能曜日'}
+                  </div>
                   <div className="text-base text-gray-700">
                     {/* クーポン利用可能曜日 */}
                     {store.couponUsageDays && store.couponUsageDays.length > 0 && (
-                      <span>{store.couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')} </span>
+                      <span>{store.couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')}{store.couponUsageStart && store.couponUsageEnd ? ' ' : ''}</span>
                     )}
-                    {`${store.couponUsageStart}〜${store.couponUsageEnd}`}
+                    {store.couponUsageStart && store.couponUsageEnd && (
+                      <span>{store.couponUsageStart}〜{store.couponUsageEnd}</span>
+                    )}
                   </div>
                 </div>
               )}
