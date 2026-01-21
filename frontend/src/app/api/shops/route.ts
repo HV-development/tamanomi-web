@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
     const page = searchParams.get('page') || '1'
     const limit = searchParams.get('limit') || '20'
     const city = searchParams.get('city')
+    const area = searchParams.get('area')
     const genreId = searchParams.get('genreId')
 
     // クエリパラメータを構築
@@ -35,6 +36,9 @@ export async function GET(request: NextRequest) {
     // フィルターパラメータを追加
     if (city) {
       backendParams.append('city', city)
+    }
+    if (area) {
+      backendParams.append('area', area)
     }
     if (genreId) {
       backendParams.append('genreId', genreId)
