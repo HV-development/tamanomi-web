@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Store } from '@/types/store'
 import type { ShopData } from '@hv-development/schemas'
 import { isFavoriteInStorage } from '@/lib/favorites-storage'
-import { mapAreasToCities } from '@/utils/area-mapping'
 import { mapGenresToIds } from '@/utils/genre-mapping'
 
 interface UseInfiniteStoresOptions {
@@ -275,13 +274,10 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           limit: limit.toString(),
         })
 
-        // エリアフィルターを追加（複数エリアの場合はカンマ区切りでOR条件として処理）
+        // エリアフィルターを追加（複数エリアの場合はカンマ区切りでareaパラメータに設定）
         if (selectedAreas.length > 0) {
-          const cities = mapAreasToCities(selectedAreas)
-          if (cities.length > 0) {
-            // 全てのエリアをカンマ区切りで送信
-            queryParams.append('city', cities.join(','))
-          }
+          // エリア値をそのままareaパラメータとして送信（例: "nishi,kita"）
+          queryParams.append('area', selectedAreas.join(','))
         }
 
         // ジャンルフィルターを追加
