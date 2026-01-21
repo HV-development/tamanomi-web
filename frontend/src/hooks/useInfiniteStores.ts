@@ -517,11 +517,15 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       isFirstLoadRef.current = true
 
       // 再取得を実行
+      // 注意: fetchPageRef.currentではなく、直接fetchPageを使用する
+      // fetchPageはselectedAreasとselectedGenresを依存関係として持っているため、
+      // フィルター変更時には最新の値を参照している
+      // fetchPageRef.currentは別のuseEffectで更新されるため、
+      // 同じレンダリングサイクル内では古い値を参照している可能性がある
       let aborted = false
         ; (async () => {
           try {
-            const currentFetchPage = fetchPageRef.current || fetchPage
-            const result = await currentFetchPage(1)
+            const result = await fetchPage(1)
             if (aborted) {
               return
             }
