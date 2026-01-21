@@ -34,6 +34,7 @@ export function OtpInputForm({
     }
   }, [externalError])
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+  const isComposingRef = useRef(false) // IME入力中かどうかを追跡
 
   // 入力フィールドの参照を初期化
   useEffect(() => {
@@ -188,8 +189,22 @@ export function OtpInputForm({
                 inputRefs.current[index] = el
               }}
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={digit}
-              onChange={(e) => handleInputChange(index, e.target.value)}
+              onChange={(e) => {
+                // IME入力中は処理をスキップ
+                if (!isComposingRef.current) {
+                  handleInputChange(index, e.target.value)
+                }
+              }}
+              onCompositionStart={() => {
+                isComposingRef.current = true
+              }}
+              onCompositionEnd={(e) => {
+                isComposingRef.current = false
+                handleInputChange(index, e.currentTarget.value)
+              }}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={index === 0 ? handlePaste : undefined}
               disabled={isLoading}
