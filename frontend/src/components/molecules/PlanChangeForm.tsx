@@ -542,7 +542,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
                   href="/saitama-app-guide"
                   className="text-xs text-blue-600 hover:text-blue-800 underline"
                 >
-                  ユーザーID取得手順はこちら
+                  確認方法はこちら
                 </a>
               </div>
             </div>
