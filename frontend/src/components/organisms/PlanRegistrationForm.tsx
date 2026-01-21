@@ -318,7 +318,7 @@ export function PlanRegistrationForm({
                   href="/saitama-app-guide"
                   className="text-xs text-blue-600 hover:text-blue-800 underline"
                 >
-                  ユーザーID取得手順はこちら
+                  ユーザーID取得手順はこち
                 </a>
               </div>
             </div>
