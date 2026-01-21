@@ -205,12 +205,41 @@ export function StoreDetailPopup({
               )}
 
               {/* 定休日 */}
-              {(store.closedDays || store.holidays) && (
-                <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">定休日</div>
-                  <div className="text-base text-gray-700">{store.closedDays || store.holidays}</div>
-                </div>
-              )}
+              {(store.closedDays || store.holidays) && (() => {
+                const holidaysValue = store.closedDays || store.holidays || ''
+                // 定休日の表示をフォーマット
+                // 「その他」のみの場合は「その他:」を表示しない
+                // 曜日 + その他の場合は「その他:」を表示する
+                const formatHolidays = (value: string): string => {
+                  const otherPrefix = 'その他:'
+                  const otherIdx = value.indexOf(otherPrefix)
+                  
+                  if (otherIdx === -1) {
+                    // 「その他」がない場合はそのまま表示
+                    return value
+                  }
+                  
+                  const beforeOther = value.substring(0, otherIdx).trim()
+                  const customText = value.substring(otherIdx + otherPrefix.length).trim()
+                  
+                  if (!beforeOther || beforeOther === ',') {
+                    // 「その他」のみの場合はカスタムテキストのみ表示
+                    return customText
+                  }
+                  
+                  // 曜日 + その他の場合は「その他:」を含めて表示
+                  // 先頭のカンマを除去
+                  const cleanedBefore = beforeOther.replace(/,\s*$/, '')
+                  return `${cleanedBefore}、その他:${customText}`
+                }
+                
+                return (
+                  <div className="space-y-2">
+                    <div className="text-base font-bold text-gray-900">定休日</div>
+                    <div className="text-base text-gray-700">{formatHolidays(holidaysValue)}</div>
+                  </div>
+                )
+              })()}
 
               {/* 支払い方法 */}
               {store.paymentMethods && (() => {
