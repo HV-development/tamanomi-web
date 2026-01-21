@@ -479,23 +479,17 @@ export function PlanRegistrationForm({
 
       {/* カードブランドロゴ */}
       <div className="flex flex-col items-center gap-3 py-4 border-t border-gray-200">
-        <div className="flex items-center justify-center gap-4">
-          <Image 
-            src="/visa.png" 
-            alt="VISA" 
-            width={60} 
-            height={40}
-            className="object-contain"
-          />
-          <Image 
-            src="/master.png" 
-            alt="Mastercard" 
-            width={60} 
-            height={40}
-            className="object-contain"
-          />
+        <div className="flex flex-nowrap items-center justify-center gap-x-3 px-2">
+          <Image src="/visa.png" alt="VISA" width={80} height={40} className="h-6 w-auto max-w-[56px] object-contain" />
+          <Image src="/master.png" alt="Mastercard" width={80} height={40} className="h-6 w-auto max-w-[56px] object-contain" />
+          <Image src="/amex-logomark.webp" alt="American Express" width={80} height={40} className="h-6 w-auto max-w-[56px] object-contain" />
+          <Image src="/diners-logomark.webp" alt="Diners Club" width={80} height={40} className="h-6 w-auto max-w-[56px] object-contain" />
+          <Image src="/aeonpay_1.png" alt="AEON Pay" width={96} height={40} className="h-6 w-auto max-w-[56px] object-contain" />
+          <Image src="/AEONFinancial.png" alt="AEON Financial" width={96} height={40} className="h-6 w-auto max-w-[72px] object-contain" />
         </div>
-        <p className="text-sm text-gray-600">現在はVISA、MASTERのみ利用できます</p>
+        <p className="text-sm text-gray-600 text-center leading-relaxed">
+          ご利用可能な決済ブランド：VISA / Mastercard / American Express / Diners Club / AEON Pay / AEON Financial
+        </p>
       </div>
 
       {/* 注意事項 */}

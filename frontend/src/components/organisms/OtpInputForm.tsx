@@ -34,6 +34,7 @@ export function OtpInputForm({
     }
   }, [externalError])
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+  const isComposingRef = useRef(false) // IME入力中かどうかを追跡
 
   // 入力フィールドの参照を初期化
   useEffect(() => {
@@ -67,6 +68,26 @@ export function OtpInputForm({
   const handleInputChange = (index: number, value: string) => {
     // 数字のみ許可
     const numericValue = value.replace(/\D/g, "")
+
+    // 自動入力などで複数桁が入力された場合（6桁の場合）
+    if (numericValue.length >= 6) {
+      const newOtp = numericValue.slice(0, 6).split("")
+      setOtp(newOtp)
+
+      // エラーをクリア
+      if (error) {
+        setError("")
+      }
+
+      // 最後のフィールドにフォーカス
+      inputRefs.current[5]?.focus()
+
+      // 6桁入力されたら自動送信
+      setTimeout(() => {
+        handleSubmit(newOtp)
+      }, 100)
+      return
+    }
 
     if (numericValue.length <= 1) {
       const newOtp = [...otp]
@@ -188,8 +209,22 @@ export function OtpInputForm({
                 inputRefs.current[index] = el
               }}
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={digit}
-              onChange={(e) => handleInputChange(index, e.target.value)}
+              onChange={(e) => {
+                // IME入力中は処理をスキップ
+                if (!isComposingRef.current) {
+                  handleInputChange(index, e.target.value)
+                }
+              }}
+              onCompositionStart={() => {
+                isComposingRef.current = true
+              }}
+              onCompositionEnd={(e) => {
+                isComposingRef.current = false
+                handleInputChange(index, e.currentTarget.value)
+              }}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={index === 0 ? handlePaste : undefined}
               disabled={isLoading}
@@ -197,8 +232,8 @@ export function OtpInputForm({
                 ? "border-green-500 bg-green-50 text-green-900"
                 : "border-gray-300 bg-white text-gray-900"
                 } focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
-              maxLength={1}
-              autoComplete="off"
+              maxLength={6}
+              autoComplete={index === 0 ? "one-time-code" : "off"}
             />
           ))}
         </div>
