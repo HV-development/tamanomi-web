@@ -32,11 +32,13 @@ import { HamburgerMenu } from "../molecules/HamburgerMenu"
 import { UsageGuideModal } from "@/components/organisms/UsageGuideModal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
+import type { Coupon as UiCoupon } from "@/types/coupon"
 import type { MyPageViewType } from "@/types/navigation"
-import type { AppAction } from '@hv-development/schemas'
+import type { AppAction, Coupon as SchemaCoupon } from '@hv-development/schemas'
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"
 import { useFavorites } from "@/hooks/useFavorites"
 import { checkTodayUsage } from "@/utils/coupon-usage-check"
+import type { CreateStoreIntroductionRequest } from "@/types/store-introduction"
 
 interface HomeLayoutProps {
   onMount?: () => void
@@ -69,7 +71,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const selectedAreas = filters.selectedAreas
   const isNearbyFilter = filters.isNearbyFilter
   const isFavoritesFilter = filters.isFavoritesFilter
-  const stores = state.stores
+  // AppContext の AppState は schemas 側の型に固定されているため、UI 側の Store 型として扱う
+  const stores = state.stores as unknown as Store[]
   const currentView = navigation.currentView
   const myPageView = navigation.myPageView
   const isAuthenticated = auth.isAuthenticated
@@ -218,13 +221,48 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const usageHistory = auth.usageHistory || []
   const paymentHistory = auth.paymentHistory || []
   const isCouponListOpen = state.isCouponListOpen
-  const selectedStore = state.selectedStore
-  const selectedCoupon = state.selectedCoupon
-  const storeCoupons = state.storeCoupons
+  const selectedStore = state.selectedStore as unknown as Store | null
+  const selectedSchemaCoupon = state.selectedCoupon
+  const storeSchemaCoupons = state.storeCoupons
   const passwordResetStep = state.passwordResetStep
   const passwordResetEmail = state.passwordResetEmail
   const emailRegistrationStep = state.emailRegistrationStep
   const emailRegistrationEmail = state.emailRegistrationEmail
+
+  const getStoreNameById = useCallback((storeId: string) => {
+    if (selectedStore?.id === storeId) return selectedStore.name
+    return stores.find((s) => s.id === storeId)?.name
+  }, [selectedStore, stores])
+
+  const toUiCoupon = useCallback((coupon: SchemaCoupon): UiCoupon => {
+    const storeName = getStoreNameById(coupon.shopId)
+    if (!storeName) {
+      console.error('❌ [HomeLayout] storeName not found for coupon.shopId:', coupon.shopId)
+    }
+    return {
+      id: coupon.id,
+      uuid: coupon.id,
+      name: coupon.title,
+      description: coupon.description,
+      conditions: coupon.conditions,
+      imageUrl: coupon.imageUrl,
+      drinkType: coupon.drinkType ?? null,
+      status: coupon.status,
+      storeId: coupon.shopId,
+      storeName: storeName ?? "",
+      createdAt: coupon.createdAt,
+      updatedAt: coupon.updatedAt,
+    }
+  }, [getStoreNameById])
+
+  const selectedCoupon = useMemo(() => {
+    if (!selectedSchemaCoupon) return null
+    return toUiCoupon(selectedSchemaCoupon)
+  }, [selectedSchemaCoupon, toUiCoupon])
+
+  const storeCoupons = useMemo(() => {
+    return storeSchemaCoupons.map(toUiCoupon)
+  }, [storeSchemaCoupons, toUiCoupon])
 
   // クーポン使用履歴のチェック
   useEffect(() => {
@@ -288,10 +326,12 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onWithdrawComplete = handlers.handleWithdrawComplete
   interface ExtendedHandlers {
     handleStoreIntroduction: () => void;
-    handleStoreIntroductionSubmit: (data: { referrerUserId?: string; shopId?: string }) => Promise<void>;
+    handleStoreIntroductionSubmit: (data: CreateStoreIntroductionRequest) => Promise<void>;
   }
-  const onStoreIntroduction = (handlers as ExtendedHandlers).handleStoreIntroduction
-  const onStoreIntroductionSubmit = (handlers as ExtendedHandlers).handleStoreIntroductionSubmit
+  // AppContext上のhandlers型がAppHandlersに固定されているため、実体に合わせてunknown経由で拡張分を取り出す
+  const extendedHandlers = handlers as unknown as ExtendedHandlers
+  const onStoreIntroduction = extendedHandlers.handleStoreIntroduction
+  const onStoreIntroductionSubmit = extendedHandlers.handleStoreIntroductionSubmit
   const onLogout = handlers.handleLogout
   const onLogin = handlers.handleLogin
   const onSignup = handlers.handleSignup
@@ -312,7 +352,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onMenuItemClick = handlers.handleMenuItemClick
   const onPlanChangeBack = handlers.handlePlanChangeBack
   const onLogoClick = handlers.handleLogoClick
-  const onStoreClick = handlers.handleStoreClick
+  // handlers 側の型は schemas の Store だが、UI コンポーネント側は "@/types/store" を期待するため、ここで型を合わせる
+  const onStoreClick = handlers.handleStoreClick as unknown as (store: Store) => void
   const onCouponListClose = handlers.handleCouponListClose
   const onCouponListBack = handlers.handleCouponListBack
   const onUseCoupon = handlers.handleUseCoupon
@@ -929,6 +970,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         onClose={onFavoritesClose}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
+        onStoreClick={onStoreClick}
       />
 
       {/* 閲覧履歴ポップアップ */}
@@ -938,6 +980,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         onClose={onHistoryClose ?? (() => { })}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
+        onStoreClick={onStoreClick}
       />
 
       <StoreDetailPopup

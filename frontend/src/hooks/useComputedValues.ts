@@ -2,9 +2,10 @@
 
 import { useMemo } from "react"
 import { calculateUserRank } from "@/utils/rank-calculator"
+import type { Store } from "@/types/store"
 
 interface UseComputedValuesParams {
-    stores: { isFavorite: boolean }[] | undefined
+    stores: Store[] | undefined
     notifications: { isRead: boolean }[] | undefined
     auth: { isAuthenticated: boolean; user?: { contractStartDate?: Date; createdAt: Date } } | undefined
     filters: { isFavoritesFilter: boolean } | undefined
