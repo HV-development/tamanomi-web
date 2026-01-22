@@ -11,9 +11,10 @@ interface HistoryPopupProps {
   onClose: () => void
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
+  onStoreClick: (store: Store) => void
 }
 
-export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCouponsClick }: HistoryPopupProps) {
+export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCouponsClick, onStoreClick }: HistoryPopupProps) {
   // モーダルが開いている間、背後のスクロールを無効にする
   useEffect(() => {
     if (isOpen) {
@@ -62,6 +63,7 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
               stores={stores}
               onFavoriteToggle={onFavoriteToggle}
               onCouponsClick={onCouponsClick}
+              onStoreClick={onStoreClick}
               emptyMessage="まだ閲覧履歴がありません"
               emptyEmoji="📋"
             />

@@ -2,13 +2,13 @@
 
 import React, { useCallback, useState, useRef, useEffect } from "react"
 import type { AppAction, AppState, AppHandlers, Store } from '@hv-development/schemas'
-import { appConfig } from '@/config/appConfig'
 import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
 import type { useFilters } from './useFilters'
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { getCurrentPosition } from '@/utils/location'
 import { toast } from 'sonner'
+import type { CreateStoreIntroductionRequest } from '@/types/store-introduction'
 
 // ハンドラー作成フック
 export const useAppHandlers = (
@@ -1287,14 +1287,7 @@ export const useAppHandlers = (
     }, [navigation])
 
     // 店舗紹介登録
-    const handleStoreIntroductionSubmit = useCallback(async (data: {
-        storeName1: string
-        recommendedMenu1: string
-        storeName2: string
-        recommendedMenu2: string
-        storeName3: string
-        recommendedMenu3: string
-    }) => {
+    const handleStoreIntroductionSubmit = useCallback(async (data: CreateStoreIntroductionRequest) => {
         try {
             const response = await fetch('/api/store-introductions', {
                 method: 'POST',
@@ -1408,5 +1401,5 @@ export const useAppHandlers = (
         handlePasswordChangeComplete,
         handleStoreIntroduction,
         handleStoreIntroductionSubmit,
-    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: { referrerUserId?: string; shopId?: string }) => Promise<void> }
+    } as AppHandlers & { handleEmailChangeSuccessModalClose: () => void; handleStoreIntroduction: () => void; handleStoreIntroductionSubmit: (data: CreateStoreIntroductionRequest) => Promise<void> }
 }
