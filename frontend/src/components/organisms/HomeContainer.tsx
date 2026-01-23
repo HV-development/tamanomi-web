@@ -100,31 +100,18 @@ export function HomeContainer({
     return true
     })
 
-    // 距離計算とソート処理（近くのお店フィルターがONで位置情報がある場合）
+    // 近くのお店: 並び順はサーバーの距離順ソートを信頼し、クライアントは距離表示のみ付与する
     if (isNearbyFilter && currentLocation) {
-      const storesWithDistance = storesList.map(store => {
-        // 店舗の座標がある場合のみ距離を計算
-        if (store.latitude !== undefined && store.longitude !== undefined) {
-          const distance = calculateDistance(
-            currentLocation.latitude,
-            currentLocation.longitude,
-            store.latitude,
-            store.longitude
-          )
-          return { store, distance }
-        }
-        // 座標がない場合は距離を無限大として扱う（末尾に配置）
-        return { store, distance: Infinity }
+      return storesList.map((store) => {
+        if (store.latitude === undefined || store.longitude === undefined) return store
+        const distance = calculateDistance(
+          currentLocation.latitude,
+          currentLocation.longitude,
+          store.latitude,
+          store.longitude
+        )
+        return { ...store, distance }
       })
-
-      // 距離の近い順にソート（座標がない店舗は末尾に配置）
-      storesWithDistance.sort((a, b) => a.distance - b.distance)
-
-      // 距離情報を店舗オブジェクトに追加
-      return storesWithDistance.map(({ store, distance }) => ({
-        ...store,
-        distance: distance !== Infinity ? distance : undefined
-      }))
     }
 
     // 近くのお店フィルターがOFFの場合は、店舗名カナ順でソート
