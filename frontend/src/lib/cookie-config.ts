@@ -23,11 +23,11 @@ export const COOKIE_NAMES = {
 
 // Cookie有効期限の設定
 export const COOKIE_MAX_AGE = {
-  // アクセストークン: 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
-  ACCESS_TOKEN: 60 * 60 * 2,
+  // アクセストークン: 1時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
+  ACCESS_TOKEN: 60 * 60,
   // リフレッシュトークン: 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
   REFRESH_TOKEN: 60 * 60 * 24 * 7,
-  // セッション: 30分
-  SESSION: 30 * 60,
+  // セッション: 1時間
+  SESSION: 60 * 60,
 } as const
 

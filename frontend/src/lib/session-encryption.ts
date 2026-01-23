@@ -4,13 +4,14 @@
  */
 
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto'
+import { COOKIE_MAX_AGE, COOKIE_NAMES } from '@/lib/cookie-config'
 
-export const COOKIE_NAME = 'register_session'
+export const COOKIE_NAME = COOKIE_NAMES.REGISTER_SESSION
 const ALGORITHM = 'aes-256-gcm'
 const IV_LENGTH = 16
 const AUTH_TAG_LENGTH = 16
 const SALT_LENGTH = 16
-export const SESSION_MAX_AGE = 30 * 60 // 30分
+export const SESSION_MAX_AGE = COOKIE_MAX_AGE.SESSION
 
 /**
  * 暗号化キーを生成
