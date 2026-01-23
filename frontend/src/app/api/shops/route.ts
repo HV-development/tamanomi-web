@@ -26,6 +26,10 @@ export async function GET(request: NextRequest) {
     const city = searchParams.get('city')
     const area = searchParams.get('area')
     const genreId = searchParams.get('genreId')
+    const sortBy = searchParams.get('sortBy')
+    const sortOrder = searchParams.get('sortOrder')
+    const latitude = searchParams.get('latitude')
+    const longitude = searchParams.get('longitude')
 
     // クエリパラメータを構築
     const backendParams = new URLSearchParams({
@@ -42,6 +46,18 @@ export async function GET(request: NextRequest) {
     }
     if (genreId) {
       backendParams.append('genreId', genreId)
+    }
+    if (sortBy) {
+      backendParams.append('sortBy', sortBy)
+    }
+    if (sortOrder) {
+      backendParams.append('sortOrder', sortOrder)
+    }
+    if (latitude) {
+      backendParams.append('latitude', latitude)
+    }
+    if (longitude) {
+      backendParams.append('longitude', longitude)
     }
 
     // 公開エンドポイントに切替（未ログインでも取得可能）

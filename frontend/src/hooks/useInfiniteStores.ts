@@ -12,6 +12,8 @@ interface UseInfiniteStoresOptions {
   limit?: number
   selectedAreas?: string[]
   selectedGenres?: string[]
+  isNearbyFilter?: boolean
+  currentLocation?: { latitude: number; longitude: number } | null
 }
 
 interface UseInfiniteStoresResult {
@@ -54,7 +56,13 @@ const normalizeSmokingPolicy = (smokingType: unknown, smokingPolicy: unknown): S
 }
 
 export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseInfiniteStoresResult {
-  const { limit = 20, selectedAreas = [], selectedGenres = [] } = options
+  const {
+    limit = 20,
+    selectedAreas = [],
+    selectedGenres = [],
+    isNearbyFilter = false,
+    currentLocation = null,
+  } = options
 
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -295,6 +303,14 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           }
         }
 
+        // 近くのお店: サーバーサイドで距離順ソート（全件ソート→ページング）
+        if (isNearbyFilter && currentLocation) {
+          queryParams.append('sortBy', 'distance')
+          queryParams.append('sortOrder', 'asc')
+          queryParams.append('latitude', String(currentLocation.latitude))
+          queryParams.append('longitude', String(currentLocation.longitude))
+        }
+
         const url = `/api/shops?${queryParams.toString()}`
 
         let res: Response
@@ -411,7 +427,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
         throw new Error(message)
       }
     },
-    [limit, mapShopToStore, selectedAreas, selectedGenres]
+    [limit, mapShopToStore, selectedAreas, selectedGenres, isNearbyFilter, currentLocation]
   )
 
   // fetchPageが変更されたらrefを更新
@@ -455,7 +471,10 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       return
     }
 
-    const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}`
+    const nearbyKey = isNearbyFilter && currentLocation
+      ? `${currentLocation.latitude.toFixed(6)},${currentLocation.longitude.toFixed(6)}`
+      : 'off'
+    const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}:${nearbyKey}`
     filterKeyRef.current = currentFilterKey
     initialLoadInProgressRef.current = true
 
@@ -506,7 +525,10 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       return
     }
 
-    const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}`
+    const nearbyKey = isNearbyFilter && currentLocation
+      ? `${currentLocation.latitude.toFixed(6)},${currentLocation.longitude.toFixed(6)}`
+      : 'off'
+    const currentFilterKey = `${selectedAreas.join(',')}:${selectedGenres.join(',')}:${nearbyKey}`
 
     // フィルターが変更された場合のみ再取得
     if (filterKeyRef.current !== currentFilterKey) {
@@ -552,7 +574,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     } else {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAreas, selectedGenres])
+  }, [selectedAreas, selectedGenres, isNearbyFilter, currentLocation])
 
   // IntersectionObserver 設定
   const sentinelRef = useCallback(
