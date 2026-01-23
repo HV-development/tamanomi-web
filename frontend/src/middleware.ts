@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { COOKIE_NAMES } from '@/lib/cookie-config'
 
 /**
  * IPv4-mapped IPv6アドレスからIPv4部分を抽出
@@ -166,7 +167,9 @@ export async function middleware(request: NextRequest) {
   ]
 
   if (protectedPaths.some(p => pathname === p || pathname.startsWith(`${p}/`))) {
-    const token = request.cookies.get('accessToken')?.value || request.cookies.get('__Host-accessToken')?.value
+    const token =
+      request.cookies.get(COOKIE_NAMES.ACCESS_TOKEN)?.value ||
+      request.cookies.get(COOKIE_NAMES.HOST_ACCESS_TOKEN)?.value
     if (!token) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'

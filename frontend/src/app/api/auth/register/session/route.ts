@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto'
 import { SERVER_ERROR_MESSAGE } from '@/lib/response-utils'
+import { COOKIE_MAX_AGE, COOKIE_NAMES } from '@/lib/cookie-config'
 
 /**
  * 登録セッションデータをサーバーサイドで管理するAPI
  * sessionStorageの代わりにhttpOnly Cookieを使用してセキュリティを向上
  */
 
-const COOKIE_NAME = 'register_session'
+const COOKIE_NAME = COOKIE_NAMES.REGISTER_SESSION
 const ALGORITHM = 'aes-256-gcm'
 const IV_LENGTH = 16
 const AUTH_TAG_LENGTH = 16
 const SALT_LENGTH = 16
-
-// セッション有効期限（30分）
-const SESSION_MAX_AGE = 30 * 60
 
 /**
  * 暗号化キーを生成
@@ -133,7 +131,38 @@ export async function POST(request: NextRequest) {
     if (value === null || value === undefined) {
       delete existingData[key]
     } else {
-      existingData[key] = value as RegisterSessionData[typeof key]
+      // keyごとに型を検証してから保存（セッションデータの破損を防ぐ）
+      switch (key) {
+        case 'registerEmail':
+        case 'referrerUserId':
+        case 'userEmail': {
+          if (typeof value !== 'string') {
+            return NextResponse.json(
+              { error: { code: 'INVALID_VALUE_TYPE', message: '値の形式が不正です' } },
+              { status: 400 }
+            )
+          }
+          existingData[key] = value
+          break
+        }
+        case 'registerFormData':
+        case 'editFormData': {
+          if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+            return NextResponse.json(
+              { error: { code: 'INVALID_VALUE_TYPE', message: '値の形式が不正です' } },
+              { status: 400 }
+            )
+          }
+          existingData[key] = value as Record<string, unknown>
+          break
+        }
+        default: {
+          return NextResponse.json(
+            { error: { code: 'INVALID_KEY', message: 'キーが不正です' } },
+            { status: 400 }
+          )
+        }
+      }
     }
     
     // 暗号化してCookieに保存
@@ -149,7 +178,7 @@ export async function POST(request: NextRequest) {
       secure: isSecure,
       sameSite: 'strict',
       path: '/',
-      maxAge: SESSION_MAX_AGE,
+      maxAge: COOKIE_MAX_AGE.SESSION,
     })
     
     return response
@@ -198,7 +227,7 @@ export async function DELETE(request: NextRequest) {
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: SESSION_MAX_AGE,
+          maxAge: COOKIE_MAX_AGE.SESSION,
         })
       } else {
         // データが空になった場合はCookieを削除

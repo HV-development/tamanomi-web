@@ -15,9 +15,19 @@ interface StoreCardProps {
   onStoreClick: (store: Store) => void
   showDistance?: boolean
   className?: string
+  /** クーポン/店舗チェックボタンの並び方（お気に入りは縦、それ以外は既存の横並び） */
+  actionsLayout?: "horizontal" | "vertical"
 }
 
-export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClick, showDistance = false, className = "" }: StoreCardProps) {
+export function StoreCard({
+  store,
+  onFavoriteToggle,
+  onCouponsClick,
+  onStoreClick,
+  showDistance = false,
+  className = "",
+  actionsLayout = "horizontal",
+}: StoreCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isImageError, setIsImageError] = useState(false)
   const touchStartX = useRef<number | null>(null)
@@ -248,17 +258,31 @@ export function StoreCard({ store, onFavoriteToggle, onCouponsClick, onStoreClic
 
       {/* クーポンボタン */}
       <div className="pt-2">
-        <div className="flex gap-3 max-[400px]:flex-col max-[400px]:gap-2">
+        <div
+          className={
+            actionsLayout === "vertical"
+              ? "flex flex-col gap-2"
+              : "flex gap-3 max-[400px]:flex-col max-[400px]:gap-2"
+          }
+        >
           <button
             onClick={() => onCouponsClick(store.id)}
-            className="flex-1 max-[400px]:w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg font-medium"
+            className={
+              actionsLayout === "vertical"
+                ? "w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg font-medium"
+                : "flex-1 max-[400px]:w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg font-medium"
+            }
           >
             <span>今すぐクーポンGET</span>
           </button>
 
           <button
             onClick={() => onStoreClick(store)}
-            className="flex items-center justify-center gap-1 max-[400px]:w-full bg-white hover:bg-gray-50 text-gray-700 py-3 px-3 rounded-2xl transition-all duration-300 border border-gray-300 hover:border-gray-400 font-medium whitespace-nowrap"
+            className={
+              actionsLayout === "vertical"
+                ? "w-full flex items-center justify-center gap-1 bg-white hover:bg-gray-50 text-gray-700 py-3 px-3 rounded-2xl transition-all duration-300 border border-gray-300 hover:border-gray-400 font-medium whitespace-nowrap"
+                : "flex items-center justify-center gap-1 max-[400px]:w-full bg-white hover:bg-gray-50 text-gray-700 py-3 px-3 rounded-2xl transition-all duration-300 border border-gray-300 hover:border-gray-400 font-medium whitespace-nowrap"
+            }
           >
             <span className="text-sm">お店をチェック</span>
           </button>
