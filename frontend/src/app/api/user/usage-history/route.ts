@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { getRefreshToken } from '@/lib/auth-header'
+import { COOKIE_MAX_AGE, COOKIE_NAMES } from '@/lib/cookie-config'
 import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
@@ -70,35 +71,43 @@ export async function GET(request: NextRequest) {
               
               // 新しいトークンをCookieに設定
               if (refreshData.accessToken) {
-                res.cookies.set('accessToken', refreshData.accessToken, {
+                // 旧Cookie（プレフィックス無し）を削除して衝突を解消
+                res.cookies.set('accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+                res.cookies.set('__Host-accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+
+                res.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, refreshData.accessToken, {
                   httpOnly: true,
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
+                  maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる
                 })
-                res.cookies.set('__Host-accessToken', refreshData.accessToken, {
+                res.cookies.set(COOKIE_NAMES.HOST_ACCESS_TOKEN, refreshData.accessToken, {
                   httpOnly: true,
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
+                  maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる
                 })
               }
               if (refreshData.refreshToken) {
-                res.cookies.set('refreshToken', refreshData.refreshToken, {
+                // 旧Cookie（プレフィックス無し）を削除して衝突を解消
+                res.cookies.set('refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+                res.cookies.set('__Host-refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+
+                res.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, refreshData.refreshToken, {
                   httpOnly: true,
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
+                  maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる
                 })
-                res.cookies.set('__Host-refreshToken', refreshData.refreshToken, {
+                res.cookies.set(COOKIE_NAMES.HOST_REFRESH_TOKEN, refreshData.refreshToken, {
                   httpOnly: true,
                   secure: isSecure,
                   sameSite: 'strict',
                   path: '/',
-                  maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
+                  maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる
                 })
               }
               

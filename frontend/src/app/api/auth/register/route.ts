@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
+import { COOKIE_MAX_AGE, COOKIE_NAMES } from '@/lib/cookie-config'
 import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
@@ -264,35 +265,43 @@ export async function POST(request: NextRequest) {
       })()
 
       if (data.accessToken) {
-        nextResponse.cookies.set('accessToken', data.accessToken, {
+        // 旧Cookie（プレフィックス無し）を削除して衝突を解消
+        nextResponse.cookies.set('accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+        nextResponse.cookies.set('__Host-accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+
+        nextResponse.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, data.accessToken, {
           httpOnly: true,
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
+          maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる
         })
-        nextResponse.cookies.set('__Host-accessToken', data.accessToken, {
+        nextResponse.cookies.set(COOKIE_NAMES.HOST_ACCESS_TOKEN, data.accessToken, {
           httpOnly: true,
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: 60 * 60 * 2, // 2時間（バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる）
+          maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる
         })
       }
       if (data.refreshToken) {
-        nextResponse.cookies.set('refreshToken', data.refreshToken, {
+        // 旧Cookie（プレフィックス無し）を削除して衝突を解消
+        nextResponse.cookies.set('refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+        nextResponse.cookies.set('__Host-refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+
+        nextResponse.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, data.refreshToken, {
           httpOnly: true,
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
+          maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる
         })
-        nextResponse.cookies.set('__Host-refreshToken', data.refreshToken, {
+        nextResponse.cookies.set(COOKIE_NAMES.HOST_REFRESH_TOKEN, data.refreshToken, {
           httpOnly: true,
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: 60 * 60 * 24 * 7, // 7日（バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる）
+          maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる
         })
       }
 

@@ -3,6 +3,8 @@
  * Authorization ヘッダーまたはCookieからアクセストークンを取得
  */
 
+import { COOKIE_NAMES } from '@/lib/cookie-config'
+
 /**
  * Requestからアクセストークンを取得してAuthorizationヘッダーを返す
  * 1. Authorization ヘッダーがあればそれを使用
@@ -19,12 +21,12 @@ export function getAuthHeader(request: Request | { cookies?: { get: (name: strin
   // NextRequestのcookies APIから取得を試みる
   if ('cookies' in request && request.cookies) {
     // __Host-プレフィックス付きのCookieを優先的にチェック
-    const hostAccessTokenCookie = request.cookies.get('__Host-accessToken');
+    const hostAccessTokenCookie = request.cookies.get(COOKIE_NAMES.HOST_ACCESS_TOKEN);
     if (hostAccessTokenCookie?.value) {
       return `Bearer ${hostAccessTokenCookie.value}`;
     }
     
-    const accessTokenCookie = request.cookies.get('accessToken');
+    const accessTokenCookie = request.cookies.get(COOKIE_NAMES.ACCESS_TOKEN);
     if (accessTokenCookie?.value) {
       return `Bearer ${accessTokenCookie.value}`;
     }
@@ -34,7 +36,7 @@ export function getAuthHeader(request: Request | { cookies?: { get: (name: strin
   const cookieHeader = request.headers.get('cookie') || '';
   const pairs = cookieHeader.split(';').map(v => v.trim());
   // __Host-プレフィックス付きのCookieを優先的にチェック
-  const hostAccessPair = pairs.find(v => v.startsWith('__Host-accessToken='));
+  const hostAccessPair = pairs.find(v => v.startsWith(`${COOKIE_NAMES.HOST_ACCESS_TOKEN}=`));
   if (hostAccessPair) {
     const accessToken = decodeURIComponent(hostAccessPair.split('=')[1] || '');
     if (accessToken) {
@@ -42,7 +44,7 @@ export function getAuthHeader(request: Request | { cookies?: { get: (name: strin
     }
   }
   
-  const accessPair = pairs.find(v => v.startsWith('accessToken='));
+  const accessPair = pairs.find(v => v.startsWith(`${COOKIE_NAMES.ACCESS_TOKEN}=`));
   const accessToken = accessPair ? decodeURIComponent(accessPair.split('=')[1] || '') : '';
   
   return accessToken ? `Bearer ${accessToken}` : null;
@@ -55,7 +57,9 @@ export function getAuthHeader(request: Request | { cookies?: { get: (name: strin
 export function getRefreshToken(request: Request | { cookies?: { get: (name: string) => { value: string } | undefined }; headers: Headers }): string | null {
   // NextRequestのcookies APIから取得を試みる
   if ('cookies' in request && request.cookies) {
-    const refreshTokenCookie = request.cookies.get('refreshToken') || request.cookies.get('__Host-refreshToken');
+    const refreshTokenCookie =
+      request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN) ||
+      request.cookies.get(COOKIE_NAMES.HOST_REFRESH_TOKEN);
     if (refreshTokenCookie?.value) {
       return refreshTokenCookie.value;
     }
@@ -64,7 +68,9 @@ export function getRefreshToken(request: Request | { cookies?: { get: (name: str
   // Cookieヘッダーから取得（フォールバック）
   const cookieHeader = request.headers.get('cookie') || '';
   const pairs = cookieHeader.split(';').map(v => v.trim());
-  const refreshPair = pairs.find(v => v.startsWith('refreshToken=')) || pairs.find(v => v.startsWith('__Host-refreshToken='));
+  const refreshPair =
+    pairs.find(v => v.startsWith(`${COOKIE_NAMES.REFRESH_TOKEN}=`)) ||
+    pairs.find(v => v.startsWith(`${COOKIE_NAMES.HOST_REFRESH_TOKEN}=`));
   const refreshToken = refreshPair ? decodeURIComponent(refreshPair.split('=')[1] || '') : '';
   
   return refreshToken || null;

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
 import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { COOKIE_NAMES } from '@/lib/cookie-config'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -24,15 +25,15 @@ export async function POST(request: NextRequest) {
       try { return new URL(request.url).protocol === 'https:' } catch { return process.env.NODE_ENV === 'production' }
     })()
     
-    // accessToken クッキーを削除
-    nextResponse.cookies.set('accessToken', '', {
+    // accessToken クッキーを削除（プレフィックス付き）
+    nextResponse.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, '', {
       httpOnly: true,
       secure: isSecure,
       sameSite: 'strict',
       maxAge: 0,
       path: '/',
     })
-    nextResponse.cookies.set('__Host-accessToken', '', {
+    nextResponse.cookies.set(COOKIE_NAMES.HOST_ACCESS_TOKEN, '', {
       httpOnly: true,
       secure: isSecure,
       sameSite: 'strict',
@@ -40,21 +41,27 @@ export async function POST(request: NextRequest) {
       path: '/',
     })
     
-    // refreshToken クッキーを削除
-    nextResponse.cookies.set('refreshToken', '', {
+    // refreshToken クッキーを削除（プレフィックス付き）
+    nextResponse.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, '', {
       httpOnly: true,
       secure: isSecure,
       sameSite: 'strict',
       maxAge: 0,
       path: '/',
     })
-    nextResponse.cookies.set('__Host-refreshToken', '', {
+    nextResponse.cookies.set(COOKIE_NAMES.HOST_REFRESH_TOKEN, '', {
       httpOnly: true,
       secure: isSecure,
       sameSite: 'strict',
       maxAge: 0,
       path: '/',
     })
+
+    // 旧Cookie（プレフィックス無し）も削除して衝突を解消
+    nextResponse.cookies.set('accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', maxAge: 0, path: '/' })
+    nextResponse.cookies.set('__Host-accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', maxAge: 0, path: '/' })
+    nextResponse.cookies.set('refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', maxAge: 0, path: '/' })
+    nextResponse.cookies.set('__Host-refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', maxAge: 0, path: '/' })
     
     return nextResponse
   } catch (error: unknown) {
@@ -64,34 +71,39 @@ export async function POST(request: NextRequest) {
       try { return new URL(request.url).protocol === 'https:' } catch { return process.env.NODE_ENV === 'production' }
     })()
     
-    res.cookies.set('accessToken', '', {
+    res.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, '', {
       httpOnly: true,
       secure: isSecure,
       sameSite: 'strict',
       maxAge: 0,
       path: '/',
     })
-    res.cookies.set('__Host-accessToken', '', {
+    res.cookies.set(COOKIE_NAMES.HOST_ACCESS_TOKEN, '', {
       httpOnly: true,
       secure: isSecure,
       sameSite: 'strict',
       maxAge: 0,
       path: '/',
     })
-    res.cookies.set('refreshToken', '', {
+    res.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, '', {
       httpOnly: true,
       secure: isSecure,
       sameSite: 'strict',
       maxAge: 0,
       path: '/',
     })
-    res.cookies.set('__Host-refreshToken', '', {
+    res.cookies.set(COOKIE_NAMES.HOST_REFRESH_TOKEN, '', {
       httpOnly: true,
       secure: isSecure,
       sameSite: 'strict',
       maxAge: 0,
       path: '/',
     })
+    // 旧Cookie（プレフィックス無し）も削除して衝突を解消
+    res.cookies.set('accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', maxAge: 0, path: '/' })
+    res.cookies.set('__Host-accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', maxAge: 0, path: '/' })
+    res.cookies.set('refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', maxAge: 0, path: '/' })
+    res.cookies.set('__Host-refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', maxAge: 0, path: '/' })
     return res
   }
 }
