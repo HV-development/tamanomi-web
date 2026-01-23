@@ -9,6 +9,8 @@ interface StoreListProps {
   onCouponsClick: (storeId: string) => void
   onStoreClick?: (store: Store) => void
   showDistance?: boolean
+  /** 店舗カード下部のアクションボタンの並び方 */
+  actionsLayout?: "horizontal" | "vertical"
   emptyMessage?: string
   emptyEmoji?: string
   className?: string
@@ -22,6 +24,7 @@ export function StoreList({
   onCouponsClick,
   onStoreClick,
   showDistance = false,
+  actionsLayout = "horizontal",
   emptyMessage = "店舗が見つかりませんでした",
   emptyEmoji = "🔍",
   className = "",
@@ -62,6 +65,7 @@ export function StoreList({
           onCouponsClick={onCouponsClick}
           onStoreClick={onStoreClick ?? (() => { })}
           showDistance={showDistance}
+          actionsLayout={actionsLayout}
         />
       ))}
     </div>

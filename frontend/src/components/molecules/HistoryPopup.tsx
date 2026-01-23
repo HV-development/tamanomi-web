@@ -64,6 +64,7 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
               onFavoriteToggle={onFavoriteToggle}
               onCouponsClick={onCouponsClick}
               onStoreClick={onStoreClick}
+              actionsLayout="vertical"
               emptyMessage="まだ閲覧履歴がありません"
               emptyEmoji="📋"
             />
