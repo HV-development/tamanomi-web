@@ -134,14 +134,16 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
   }, [saitamaAppLinked, fetchPlans])
 
   const selectedPlanData = availablePlans.find((plan) => plan.id === selectedPlan)
-  // 割引価格を考慮した実際の価格を計算
-  const selectedPlanDisplayPrice = selectedPlanData 
-    ? (selectedPlanData.discountPrice != null && selectedPlanData.discountPrice < selectedPlanData.price 
-        ? selectedPlanData.discountPrice 
-        : selectedPlanData.price)
+  // さいたま市アプリ連携済みか（ID入力直後も考慮）
+  const isSaitamaLinked = Boolean(saitamaAppLinked || linkedSaitamaAppId)
+  const currentPlanOption = availablePlans.find((plan) => plan.id === currentPlan.id)
+
+  // 表示/判定で使う金額（連携済みなら discount_price を優先）
+  const selectedPlanDisplayPrice = selectedPlanData
+    ? (isSaitamaLinked ? (selectedPlanData.discountPrice ?? selectedPlanData.price) : selectedPlanData.price)
     : 0
-  const currentPlanDisplayPrice = currentPlan.discountPrice != null && currentPlan.discountPrice < currentPlan.price
-    ? currentPlan.discountPrice
+  const currentPlanDisplayPrice = isSaitamaLinked
+    ? (currentPlanOption?.discountPrice ?? currentPlan.discountPrice ?? currentPlan.price)
     : currentPlan.price
   const isUpgrade = selectedPlanData && selectedPlanDisplayPrice > currentPlanDisplayPrice
   const isDowngrade = selectedPlanData && selectedPlanDisplayPrice < currentPlanDisplayPrice
@@ -280,7 +282,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
             <div className="text-center">
               <div className="text-sm text-gray-600 mb-1">現在のプラン</div>
               <div className="font-bold text-gray-900">{currentPlan.name}</div>
-              <div className="text-sm text-gray-700">¥{(currentPlan.discountPrice ?? currentPlan.price).toLocaleString()}/月</div>
+              <div className="text-sm text-gray-700">¥{currentPlanDisplayPrice.toLocaleString()}/月</div>
             </div>
           </div>
 
