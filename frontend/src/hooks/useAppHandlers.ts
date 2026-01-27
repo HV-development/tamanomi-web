@@ -644,7 +644,7 @@ export const useAppHandlers = (
                         updatedAt?: string;
                     }) => ({
                         id: coupon.id,
-                        name: coupon.title,
+                        title: coupon.title,
                         description: coupon.description || '',
                         conditions: coupon.conditions || null,
                         imageUrl: coupon.imageUrl || '',

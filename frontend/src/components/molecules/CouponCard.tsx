@@ -38,7 +38,7 @@ export function CouponCard({ coupon, onUse, className = "" }: CouponCardProps) {
         <div className="relative h-48 overflow-hidden">
           <Image 
             src={displayImage!} 
-            alt={coupon.name} 
+            alt={coupon.title} 
             fill 
             className="object-cover object-center" 
             onError={() => setIsImageError(true)}
@@ -49,7 +49,7 @@ export function CouponCard({ coupon, onUse, className = "" }: CouponCardProps) {
       {/* クーポン情報 */}
       <div className="p-5 space-y-4">
         <div>
-          <h3 className="font-bold text-xl text-gray-900 mb-2">{coupon.name}</h3>
+          <h3 className="font-bold text-xl text-gray-900 mb-2">{coupon.title}</h3>
           <p className="text-sm text-gray-600 leading-relaxed">{coupon.description}</p>
         </div>
 
