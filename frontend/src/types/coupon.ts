@@ -1,6 +1,6 @@
 export interface Coupon {
   id: string
-  name: string // titleから変換
+  title: string // backendのtitleをそのまま使用
   description: string | null
   conditions: string | null
   imageUrl: string | null

@@ -152,7 +152,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
                         <div className="w-full h-48 overflow-hidden relative">
                           <Image
                             src={displayImage!}
-                            alt={coupon.name}
+                            alt={coupon.title}
                             fill
                             className="object-cover object-center"
                             onError={() => handleImageError(coupon.id)}
@@ -163,7 +163,7 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
                       {/* クーポン情報 */}
                       <div className="p-4">
                         <h4 className="font-bold text-lg text-gray-900 mb-2 text-left break-all">
-                          {coupon.name}
+                          {coupon.title}
                         </h4>
                         <p className="text-base text-gray-900 leading-relaxed mb-4 text-left font-medium break-all">
                           {coupon.description}
