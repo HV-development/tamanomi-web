@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.10.0
     version: 3.10.0(react-hook-form@7.68.0)
   '@hv-development/schemas':
-    specifier: 1.107.0
-    version: 1.107.0
+    specifier: 1.108.0
+    version: 1.108.0
   '@radix-ui/react-accordion':
     specifier: 1.2.2
     version: 1.2.2(@types/react-dom@18.3.7)(@types/react@18.3.27)(react-dom@18.3.1)(react@18.3.1)
@@ -575,8 +575,8 @@ packages:
     deprecated: Use @eslint/object-schema instead
     dev: true
 
-  /@hv-development/schemas@1.107.0:
-    resolution: {integrity: sha512-3Ry5a9SnwZsJUA8qmLmq+XPBDzIl9KtVrBZfLZz6cB6SA4oek/01Zq9dhQpMB/RaoDv+xwoB5nFaahhE7Q/8Yg==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.107.0/5d58039ec663f58fecc000176b0d385ed840ac05}
+  /@hv-development/schemas@1.108.0:
+    resolution: {integrity: sha512-9V2syzYF8s1nT2lZNU/6qXjFLfrHAJPTtvv2SI2U1LrXoECmmgPZ8d/n0IXiDExh1+vxMZS1gLJc2iW0cRBuWA==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.108.0/e1d638b7f29defe1a12f2c3a0471750bbad503a1}
     engines: {node: 22.x}
     dependencies:
       zod: 3.25.76
