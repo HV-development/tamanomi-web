@@ -89,6 +89,13 @@ export function PlanRegistrationForm({
     setAllPlansDisplayed(false)
   }, [plans.length])
 
+  // プランが取得されたら、最初のプランをデフォルトで選択
+  useEffect(() => {
+    if (plans.length > 0 && (!selectedPlan || !plans.find(p => p.id === selectedPlan))) {
+      setSelectedPlan(plans[0].id)
+    }
+  }, [plans, selectedPlan])
+
   // プランが表示完了したことを記録
   const handlePlanDisplayed = () => {
     displayedPlansCount.current += 1
