@@ -220,6 +220,18 @@ export default function PlanRegistrationPage() {
             ? discountPrice
             : selectedPlan.price
           const paymentAmount = Number(rawAmount)
+
+          // nomoka向け: 決済金額の算出根拠が追えるようにログ出力
+          console.log('[plan-registration] paymentAmount算出:', {
+            planId: selectedPlan.id,
+            planName: selectedPlan.name,
+            saitamaAppLinked,
+            isLinked,
+            discountPrice,
+            price: selectedPlan.price,
+            rawAmount,
+            paymentAmount,
+          })
           
           // first_executed_dateが未来日かどうかを判定
           const firstExecutedDate = planWithDate.first_executed_date
@@ -227,6 +239,7 @@ export default function PlanRegistrationPage() {
           console.log('[plan-registration] first_executed_date判定:', {
             firstExecutedDate,
             isFutureDate,
+            paymentAmount,
             planId: selectedPlan.id,
             planName: selectedPlan.name,
           })
