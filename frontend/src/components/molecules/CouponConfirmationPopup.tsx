@@ -61,13 +61,13 @@ export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }:
                   <div className="flex-shrink-0 relative w-20 h-20">
                     <Image
                       src={coupon.imageUrl || getDefaultCouponImage(coupon.drinkType) || "/placeholder.svg"}
-                      alt={coupon.name}
+                      alt={coupon.title}
                       fill
                       className="rounded-xl object-cover border border-gray-300"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-lg text-gray-900 mb-1">{coupon.name}</h4>
+                    <h4 className="font-bold text-lg text-gray-900 mb-1">{coupon.title}</h4>
                     <p className="text-sm text-gray-600">{coupon.storeName}</p>
                   </div>
                 </div>

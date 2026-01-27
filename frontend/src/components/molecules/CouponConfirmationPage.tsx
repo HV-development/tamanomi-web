@@ -55,7 +55,7 @@ export default function CouponConfirmationPage({
                 <div className="w-full h-64 overflow-hidden relative">
                   <Image
                     src={coupon.imageUrl || getDefaultCouponImage(coupon.drinkType) || "/placeholder.svg"}
-                    alt={coupon.name}
+                    alt={coupon.title}
                     fill
                     className="object-cover object-center"
                   />
@@ -66,7 +66,7 @@ export default function CouponConfirmationPage({
                   {/* クーポン名 */}
                   <div className="text-left mb-4">
                     <h4 className="font-bold text-2xl text-gray-900 break-all">
-                      {coupon.name}
+                      {coupon.title}
                     </h4>
                   </div>
 

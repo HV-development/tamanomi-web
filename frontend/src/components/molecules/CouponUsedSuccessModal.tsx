@@ -73,7 +73,7 @@ export function CouponUsedSuccessModal({ isOpen, coupon, onClose }: CouponUsedSu
               </h4>
 
               <div className="space-y-2">
-                <p className="text-green-700 font-medium">{coupon.name}</p>
+                <p className="text-green-700 font-medium">{coupon.title}</p>
                 <p className="text-sm text-gray-600">{coupon.storeName}</p>
               </div>
 
