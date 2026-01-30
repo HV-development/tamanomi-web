@@ -53,6 +53,11 @@ export function buildCommonHeaders(
     const authHeader = getAuthHeader(request)
     if (authHeader) {
       headers['Authorization'] = authHeader
+    } else {
+      // 認証が必要なのにトークンが取得できない場合はエラーをスロー
+      const error = new Error('Authentication required but no token found')
+      ;(error as any).code = 'AUTH_TOKEN_NOT_FOUND'
+      throw error
     }
   }
 

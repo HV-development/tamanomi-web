@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       // 認証エラーの場合は401を返す
       if (response.status === 401) {
         return createNoCacheResponse(
-          { error: { message: '認証トークンが必要です' } },
+          { error: { message: '認証トークンが必要です。再度ログインしてください。' } },
           { status: 401 }
         )
       }
@@ -75,6 +75,14 @@ export async function POST(request: NextRequest) {
         return createNoCacheResponse(
           { error: { message: 'リクエストがタイムアウトしました' } },
           { status: 408 }
+        )
+      }
+
+      // 認証トークンが取得できない場合のエラーハンドリング
+      if (fetchError instanceof Error && (fetchError as any).code === 'AUTH_TOKEN_NOT_FOUND') {
+        return createNoCacheResponse(
+          { error: { message: '認証トークンが必要です。再度ログインしてください。' } },
+          { status: 401 }
         )
       }
 

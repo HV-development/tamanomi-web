@@ -50,6 +50,13 @@ export async function POST(request: NextRequest) {
     return createNoCacheResponse(data)
 
   } catch (error) {
+    // 認証トークンが取得できない場合のエラーハンドリング
+    if (error instanceof Error && (error as any).code === 'AUTH_TOKEN_NOT_FOUND') {
+      return createNoCacheResponse(
+        { error: { message: '認証トークンが必要です。再度ログインしてください。' } },
+        { status: 401 }
+      )
+    }
     console.error('❌ [password/change] Route error:', error)
     return createNoCacheResponse(
       { error: { message: 'パスワード変更中にエラーが発生しました' } },
