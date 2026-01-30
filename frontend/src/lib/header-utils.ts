@@ -53,12 +53,8 @@ export function buildCommonHeaders(
     const authHeader = getAuthHeader(request)
     if (authHeader) {
       headers['Authorization'] = authHeader
-    } else {
-      // 認証が必要なのにトークンが取得できない場合はエラーをスロー
-      const error = new Error('Authentication required but no token found')
-      ;(error as any).code = 'AUTH_TOKEN_NOT_FOUND'
-      throw error
     }
+    // トークンが取得できない場合でも続行（バックエンドで401が返される）
   }
 
   // リクエストIDを生成（トレーシング用）
