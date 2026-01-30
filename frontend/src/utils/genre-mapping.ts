@@ -50,7 +50,7 @@ async function buildGenreMapping(): Promise<Map<string, string>> {
     // クライアントサイドではNext.jsのAPIルート経由で取得
     const apiUrl = typeof window !== 'undefined'
       ? '/api/genres'
-      : `${process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || 'http://localhost:3002'}/api/v1/public/genres`
+      : `${process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || 'http://localhost:3002'}/api/v1/genres`
 
     const response = await fetch(apiUrl, {
       method: 'GET',
