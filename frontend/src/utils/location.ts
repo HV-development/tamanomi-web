@@ -35,7 +35,7 @@ export function getCurrentPosition(): Promise<Coordinates> {
         
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message = "位置情報の使用が許可されていません。ブラウザの設定で位置情報を許可してください。"
+            message = "端末とアプリ両方の位置情報をONにしてください"
             break
           case error.POSITION_UNAVAILABLE:
             message = "位置情報が利用できません"
