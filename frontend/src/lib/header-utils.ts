@@ -54,6 +54,7 @@ export function buildCommonHeaders(
     if (authHeader) {
       headers['Authorization'] = authHeader
     }
+    // トークンが取得できない場合でも続行（バックエンドで401が返される）
   }
 
   // リクエストIDを生成（トレーシング用）

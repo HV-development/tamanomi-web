@@ -145,25 +145,29 @@ export function PlanRegistrationForm({
 
       const data = result.data as { pointsGranted?: number }
       
-      // 連携したIDを保存
-      setLinkedSaitamaAppId(saitamaAppId)
-      
       // モーダル用のメッセージを作成
       const pointsMessage = typeof data.pointsGranted === 'number' && data.pointsGranted > 0
         ? `${data.pointsGranted}ポイントを付与しました！` 
         : 'ポイントが付与されました！'
       setModalMessage(`さいたま市みんなのアプリとの連携が完了しました。\n\n${pointsMessage}\n\nお得なプランが表示されます。`)
       
-      // モーダルを表示
-      setShowSuccessModal(true)
+      // 入力したIDを一時保存（連携完了後に設定するため）
+      const linkedId = saitamaAppId
       
       // 入力フィールドをクリア
       setSaitamaAppId("")
       
       // 連携成功後、プランを再取得するために親コンポーネントに通知
+      // この処理が成功した後に連携IDを設定する
       if (onSaitamaAppLinked) {
         await onSaitamaAppLinked()
       }
+
+      // プラン再取得が成功した後に連携したIDを保存
+      setLinkedSaitamaAppId(linkedId)
+      
+      // モーダルを表示
+      setShowSuccessModal(true)
     } catch {
       setLinkError('さいたま市アプリ連携中にエラーが発生しました')
     } finally {
