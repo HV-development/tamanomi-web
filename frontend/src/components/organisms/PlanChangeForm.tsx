@@ -582,10 +582,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white p-3 text-sm font-bold flex items-center justify-center gap-2 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               {isLinking ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  連携中...
-                </>
+                '連携中...'
               ) : (
                 <>
                   <LinkIcon className="w-4 h-4" />
