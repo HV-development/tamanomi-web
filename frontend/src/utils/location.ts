@@ -16,10 +16,7 @@ export interface LocationError {
 export function getCurrentPosition(): Promise<Coordinates> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject({
-        code: 0,
-        message: "このブラウザでは位置情報がサポートされていません"
-      })
+      reject(new Error("このブラウザでは位置情報がサポートされていません"))
       return
     }
 
@@ -31,24 +28,21 @@ export function getCurrentPosition(): Promise<Coordinates> {
         })
       },
       (error) => {
-        let message = "位置情報の取得に失敗しました"
+        let message = "端末とアプリ両方の位置情報をONにしてください"
         
         switch (error.code) {
           case error.PERMISSION_DENIED:
             message = "端末とアプリ両方の位置情報をONにしてください"
             break
           case error.POSITION_UNAVAILABLE:
-            message = "位置情報が利用できません"
+            message = "端末とアプリ両方の位置情報をONにしてください"
             break
           case error.TIMEOUT:
             message = "位置情報の取得がタイムアウトしました"
             break
         }
         
-        reject({
-          code: error.code,
-          message
-        })
+        reject(new Error(message))
       },
       {
         enableHighAccuracy: true,
