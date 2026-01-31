@@ -86,20 +86,34 @@ export function CouponListPopup({ isOpen, storeName, coupons, onClose, onUseCoup
             <div className="text-center">
               <h4 className="text-lg font-bold text-green-900">{storeName}</h4>
               {/* 時間・曜日限定クーポン情報 */}
-              {((couponUsageStart && couponUsageEnd) || (couponUsageDays && couponUsageDays.length > 0)) && (
-                <div className="mt-2 flex items-center justify-center gap-2 text-green-700 text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span className="font-medium">
-                    {couponUsageStart && couponUsageEnd ? '時間限定クーポン' : '曜日限定クーポン'}
-                  </span>
-                  {couponUsageDays && couponUsageDays.length > 0 && (
-                    <span>{couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')}</span>
-                  )}
-                  {couponUsageStart && couponUsageEnd && (
-                    <span>{couponUsageStart}〜{couponUsageEnd}</span>
-                  )}
-                </div>
-              )}
+              {((couponUsageStart && couponUsageEnd) || (couponUsageDays && couponUsageDays.length > 0)) && (() => {
+                // 曜日を月〜日の順にソートする
+                const dayOrder = ['月', '火', '水', '木', '金', '土', '日']
+                const sortDays = (days: string[]): string[] => {
+                  return days.sort((a, b) => {
+                    const indexA = dayOrder.indexOf(a)
+                    const indexB = dayOrder.indexOf(b)
+                    if (indexA === -1) return 1
+                    if (indexB === -1) return -1
+                    return indexA - indexB
+                  })
+                }
+                
+                return (
+                  <div className="mt-2 flex items-center justify-center gap-2 text-green-700 text-sm">
+                    <Clock className="w-4 h-4" />
+                    <span className="font-medium">
+                      {couponUsageStart && couponUsageEnd ? '時間限定クーポン' : '曜日限定クーポン'}
+                    </span>
+                    {couponUsageDays && couponUsageDays.length > 0 && (
+                      <span>{sortDays(couponUsageDays.split(',').filter(Boolean).map(d => d.trim())).join(' ')}</span>
+                    )}
+                    {couponUsageStart && couponUsageEnd && (
+                      <span>{couponUsageStart}〜{couponUsageEnd}</span>
+                    )}
+                  </div>
+                )
+              })()}
               {/* 使用済みメッセージ */}
               {isUsedToday && (
                 <p className="text-red-600 font-bold text-base mt-2">

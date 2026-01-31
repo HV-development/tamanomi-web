@@ -320,22 +320,37 @@ export function StoreDetailPopup({
               )}
 
               {/* 利用時間・曜日 */}
-              {((store.couponUsageStart && store.couponUsageEnd) || (store.couponUsageDays && store.couponUsageDays.length > 0)) && (
-                <div className="space-y-2">
-                  <div className="text-base font-bold text-gray-900">
-                    {store.couponUsageStart && store.couponUsageEnd ? '利用時間' : '利用可能曜日'}
+              {((store.couponUsageStart && store.couponUsageEnd) || (store.couponUsageDays && store.couponUsageDays.length > 0)) && (() => {
+                // 曜日を月〜日の順にソートする
+                const dayOrder = ['月', '火', '水', '木', '金', '土', '日']
+                const sortDays = (days: string[]): string[] => {
+                  return days.sort((a, b) => {
+                    const indexA = dayOrder.indexOf(a)
+                    const indexB = dayOrder.indexOf(b)
+                    // 定義されていない曜日は末尾に
+                    if (indexA === -1) return 1
+                    if (indexB === -1) return -1
+                    return indexA - indexB
+                  })
+                }
+                
+                return (
+                  <div className="space-y-2">
+                    <div className="text-base font-bold text-gray-900">
+                      {store.couponUsageStart && store.couponUsageEnd ? '利用時間' : '利用可能曜日'}
+                    </div>
+                    <div className="text-base text-gray-700">
+                      {/* クーポン利用可能曜日 */}
+                      {store.couponUsageDays && store.couponUsageDays.length > 0 && (
+                        <span>{sortDays(store.couponUsageDays.split(',').filter(Boolean).map(d => d.trim())).join(' ')}{store.couponUsageStart && store.couponUsageEnd ? ' ' : ''}</span>
+                      )}
+                      {store.couponUsageStart && store.couponUsageEnd && (
+                        <span>{store.couponUsageStart}〜{store.couponUsageEnd}</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-base text-gray-700">
-                    {/* クーポン利用可能曜日 */}
-                    {store.couponUsageDays && store.couponUsageDays.length > 0 && (
-                      <span>{store.couponUsageDays.split(',').filter(Boolean).map(d => d.trim()).join(' ')}{store.couponUsageStart && store.couponUsageEnd ? ' ' : ''}</span>
-                    )}
-                    {store.couponUsageStart && store.couponUsageEnd && (
-                      <span>{store.couponUsageStart}〜{store.couponUsageEnd}</span>
-                    )}
-                  </div>
-                </div>
-              )}
+                )
+              })()}
 
               {/* 利用シーン */}
               {store.usageScenes && store.usageScenes.length > 0 && (
