@@ -875,7 +875,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
             onClick={() => setIsAreaPopupOpen(true)}
             className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${(selectedAreas?.length ?? 0) > 0
               ? "border-green-500 bg-green-50 text-green-700"
-              : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+              : "border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50"
               }`}
           >
             <span>エリア</span>
@@ -889,7 +889,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
             onClick={() => setIsGenrePopupOpen(true)}
             className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${(selectedGenres?.length ?? 0) > 0
               ? "border-green-500 bg-green-50 text-green-700"
-              : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
+              : "border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50"
               }`}
           >
             <span>ジャンル</span>
