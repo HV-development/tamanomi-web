@@ -523,8 +523,8 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
 
   // フィルター変更時のデータ取得
   useEffect(() => {
-    // 初回マウント時はスキップ（上記のuseEffectで処理）
-    if (filterKeyRef.current === '') {
+    // 初回ロードが完了するまでスキップ
+    if (!initialLoadCompletedRef.current) {
       return
     }
 
