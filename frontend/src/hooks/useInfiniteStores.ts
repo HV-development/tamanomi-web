@@ -292,14 +292,11 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           }
         }
 
-        // ジャンルフィルターを追加
+        // ジャンルフィルターを追加（複数ジャンルをカンマ区切りで送信）
         if (selectedGenres.length > 0) {
           const genreIds = await mapGenresToIds(selectedGenres)
-          // 複数のジャンルがある場合は、各ジャンルに対してクエリを実行する必要があるが、
-          // バックエンドAPIが複数のgenreIdパラメータをサポートしているか確認が必要
-          // 暫定的には最初のジャンルのみを使用
           if (genreIds.length > 0) {
-            queryParams.append('genreId', genreIds[0])
+            queryParams.append('genreId', genreIds.join(','))
           }
         }
 
