@@ -166,7 +166,10 @@ export function FilterControls({
           近くのお店
         </button>
         <button
-          onClick={handleAreaPopupOpen}
+          onClick={(e) => {
+            (e.currentTarget as HTMLButtonElement).blur()
+            handleAreaPopupOpen()
+          }}
           className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap active:bg-gray-100 ${selectedArea
             ? "border-green-500 bg-green-50 text-green-700"
             : "border-gray-300 bg-white text-gray-700"
@@ -180,7 +183,10 @@ export function FilterControls({
           )}
         </button>
         <button
-          onClick={handleGenrePopupOpen}
+          onClick={(e) => {
+            (e.currentTarget as HTMLButtonElement).blur()
+            handleGenrePopupOpen()
+          }}
           className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap active:bg-gray-100 ${selectedGenres.length > 0
             ? "border-green-500 bg-green-50 text-green-700"
             : "border-gray-300 bg-white text-gray-700"
