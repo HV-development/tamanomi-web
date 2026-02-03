@@ -14,6 +14,7 @@ interface UseInfiniteStoresOptions {
   selectedGenres?: string[]
   isNearbyFilter?: boolean
   currentLocation?: { latitude: number; longitude: number } | null
+  isLocationLoading?: boolean
 }
 
 interface UseInfiniteStoresResult {
@@ -62,6 +63,7 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     selectedGenres = [],
     isNearbyFilter = false,
     currentLocation = null,
+    isLocationLoading = false,
   } = options
 
   const [page, setPage] = useState(1)
@@ -469,7 +471,8 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     }
 
     // 近くのお店フィルタが有効な場合、位置情報が取得されるまで待機
-    if (isNearbyFilter && !currentLocation) {
+    // isLocationLoadingがtrueの場合、またはcurrentLocationがnullの場合は待機
+    if (isNearbyFilter && (isLocationLoading || !currentLocation)) {
       return
     }
 
@@ -517,9 +520,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     fetchInitialData()
 
     // クリーンアップ関数は不要（refで管理しているため）
-    // 依存配列にisNearbyFilterとcurrentLocationを追加し、位置情報取得後に初回ロードを実行
+    // 依存配列にisNearbyFilter, currentLocation, isLocationLoadingを追加し、位置情報取得後に初回ロードを実行
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isNearbyFilter, currentLocation])
+  }, [isNearbyFilter, currentLocation, isLocationLoading])
 
   // フィルター変更時のデータ取得
   useEffect(() => {

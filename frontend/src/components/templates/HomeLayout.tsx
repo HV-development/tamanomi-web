@@ -388,6 +388,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     selectedGenres: selectedGenres ?? [],
     isNearbyFilter,
     currentLocation: state.currentLocation,
+    isLocationLoading: state.isLocationLoading,
   })
 
   // itemsとstate.storesをマージして、isFavorite状態を同期
