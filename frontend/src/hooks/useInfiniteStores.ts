@@ -468,6 +468,11 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       return
     }
 
+    // 近くのお店フィルタが有効な場合、位置情報が取得されるまで待機
+    if (isNearbyFilter && !currentLocation) {
+      return
+    }
+
     const nearbyKey = isNearbyFilter && currentLocation
       ? `${currentLocation.latitude.toFixed(6)},${currentLocation.longitude.toFixed(6)}`
       : 'off'
@@ -512,8 +517,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     fetchInitialData()
 
     // クリーンアップ関数は不要（refで管理しているため）
+    // 依存配列にisNearbyFilterとcurrentLocationを追加し、位置情報取得後に初回ロードを実行
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isNearbyFilter, currentLocation])
 
   // フィルター変更時のデータ取得
   useEffect(() => {
