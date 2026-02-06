@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       
       if (refreshToken) {
         // リフレッシュトークンでトークン更新（直接backend APIを呼び出す）
-        const refreshUrl = buildApiUrl('/auth/refresh')
+        const refreshUrl = buildApiUrl('/refresh')
         const refreshResponse = await secureFetchWithCommonHeaders(request, refreshUrl, {
           method: 'POST',
           headerOptions: {

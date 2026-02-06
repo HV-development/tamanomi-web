@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         
         if (refreshToken) {
           // リフレッシュトークンでトークン更新
-          const refreshUrl = buildApiUrl('/auth/refresh')
+          const refreshUrl = buildApiUrl('/refresh')
           const refreshResponse = await secureFetchWithCommonHeaders(request, refreshUrl, {
             method: 'POST',
             headerOptions: {
