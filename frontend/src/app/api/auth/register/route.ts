@@ -274,14 +274,14 @@ export async function POST(request: NextRequest) {
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる
+          maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // 環境変数JWT_ACCESS_TOKEN_EXPIRES_INから取得（cookie-config.tsで一元管理）
         })
         nextResponse.cookies.set(COOKIE_NAMES.HOST_ACCESS_TOKEN, data.accessToken, {
           httpOnly: true,
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる
+          maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // 環境変数JWT_ACCESS_TOKEN_EXPIRES_INから取得（cookie-config.tsで一元管理）
         })
       }
       if (data.refreshToken) {
@@ -294,14 +294,14 @@ export async function POST(request: NextRequest) {
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる
+          maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // 環境変数JWT_REFRESH_TOKEN_EXPIRES_INから取得（cookie-config.tsで一元管理）
         })
         nextResponse.cookies.set(COOKIE_NAMES.HOST_REFRESH_TOKEN, data.refreshToken, {
           httpOnly: true,
           secure: isSecure,
           sameSite: 'strict',
           path: '/',
-          maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる
+          maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // 環境変数JWT_REFRESH_TOKEN_EXPIRES_INから取得（cookie-config.tsで一元管理）
         })
       }
 
