@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const fullUrl = buildApiUrl('/auth/refresh')
+    const fullUrl = buildApiUrl('/refresh')
 
     const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
