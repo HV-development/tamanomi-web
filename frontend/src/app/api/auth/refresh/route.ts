@@ -49,6 +49,15 @@ export async function POST(request: NextRequest) {
     res.headers.set('Pragma', 'no-cache')
 
     if (data.accessToken) {
+      const accessTokenMaxAge = COOKIE_MAX_AGE.ACCESS_TOKEN;
+      const accessTokenDays = accessTokenMaxAge / (60 * 60 * 24);
+      console.log('🍪 [auth/refresh] アクセストークンCookie設定:', {
+        maxAge: accessTokenMaxAge,
+        days: accessTokenDays,
+        hours: accessTokenMaxAge / (60 * 60),
+        configValue: COOKIE_MAX_AGE.ACCESS_TOKEN,
+      });
+      
       // 旧Cookie（プレフィックス無し）を削除して衝突を解消
       res.cookies.set('accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
       res.cookies.set('__Host-accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
@@ -59,7 +68,7 @@ export async function POST(request: NextRequest) {
         secure: isSecure,
         sameSite: 'strict',
         path: '/',
-        maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる
+        maxAge: accessTokenMaxAge,
       })
       // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
       if (isSecure) {
@@ -68,11 +77,20 @@ export async function POST(request: NextRequest) {
           secure: true, // __Host-プレフィックスにはsecure: trueが必須
           sameSite: 'strict',
           path: '/',
-          maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN, // バックエンドのJWT_ACCESS_TOKEN_EXPIRES_INに合わせる
+          maxAge: accessTokenMaxAge,
         })
       }
     }
     if (data.refreshToken) {
+      const refreshTokenMaxAge = COOKIE_MAX_AGE.REFRESH_TOKEN;
+      const refreshTokenDays = refreshTokenMaxAge / (60 * 60 * 24);
+      console.log('🍪 [auth/refresh] リフレッシュトークンCookie設定:', {
+        maxAge: refreshTokenMaxAge,
+        days: refreshTokenDays,
+        hours: refreshTokenMaxAge / (60 * 60),
+        configValue: COOKIE_MAX_AGE.REFRESH_TOKEN,
+      });
+      
       // 旧Cookie（プレフィックス無し）を削除して衝突を解消
       res.cookies.set('refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
       res.cookies.set('__Host-refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
@@ -83,7 +101,7 @@ export async function POST(request: NextRequest) {
         secure: isSecure,
         sameSite: 'strict',
         path: '/',
-        maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる
+        maxAge: refreshTokenMaxAge,
       })
       // __Host-プレフィックス付きCookie（HTTPS環境でのみ有効）
       if (isSecure) {
@@ -92,7 +110,7 @@ export async function POST(request: NextRequest) {
           secure: true, // __Host-プレフィックスにはsecure: trueが必須
           sameSite: 'strict',
           path: '/',
-          maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN, // バックエンドのJWT_REFRESH_TOKEN_EXPIRES_INに合わせる
+          maxAge: refreshTokenMaxAge,
         })
       }
     }
