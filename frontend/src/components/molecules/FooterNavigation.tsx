@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Heart, User, LogIn } from "lucide-react"
+import { Search, Heart, User, LogIn } from "lucide-react"
 import { useAppContext } from "@/contexts/AppContext"
 
 interface FooterNavigationProps {
@@ -11,7 +11,7 @@ export function FooterNavigation({
   className = "",
 }: FooterNavigationProps) {
   // Context から必要な値を取得
-  const { navigation, auth, handlers } = useAppContext()
+  const { navigation, auth, handlers, state } = useAppContext()
 
   const activeTab = navigation.activeTab
   const isAuthenticated = auth.isAuthenticated
@@ -20,6 +20,9 @@ export function FooterNavigation({
   const handleTabClick = (tab: string) => {
     if (tab === "favorites") {
       onFavoritesClick()
+    } else if (tab === "home") {
+      // @ts-ignore - handleSearchClickはスキーマに追加済み
+      handlers.handleSearchClick()
     } else {
       onTabChange(tab)
     }
@@ -28,8 +31,8 @@ export function FooterNavigation({
   const tabs = [
     {
       id: "home",
-      label: "ホーム",
-      icon: Home,
+      label: "検索",
+      icon: Search,
     },
     {
       id: "favorites",

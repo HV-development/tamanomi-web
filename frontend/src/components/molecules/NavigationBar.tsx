@@ -6,7 +6,7 @@
 import { Map, Heart, MoreHorizontal, User } from "lucide-react"
 
 interface NavigationBarProps {
-  activeTab: string
+  activeTab: string | null
   onTabChange: (tab: string) => void
   isAuthenticated: boolean
   onFavoritesClick: () => void

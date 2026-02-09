@@ -10,6 +10,7 @@ import { SubscriptionContainer } from "../organisms/SubscriptionContainer"
 import { PasswordResetContainer } from "../organisms/PasswordResetContainer"
 
 import { HistoryPopup } from "../molecules/HistoryPopup"
+import { SearchBar } from "../molecules/SearchBar"
 import { MyPageLayout } from "./MypageLayout"
 import { PlanManagementContainer } from "../organisms/PlanManagementContainer"
 import { PlanChangeContainer } from "../organisms/PlanChangeContainer"
@@ -52,6 +53,20 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const [isAreaPopupOpen, setIsAreaPopupOpen] = useState(false)
   const [isGenrePopupOpen, setIsGenrePopupOpen] = useState(false)
   const [isUsageGuideModalOpen, setIsUsageGuideModalOpen] = useState(false)
+  // 検索モードの状態管理
+  const [isSearchMode, setIsSearchMode] = useState(false)
+  const [searchResults, setSearchResults] = useState<Store[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchKeyword, setSearchKeyword] = useState<string>('')
+
+  // 検索ボタンが押されたときに検索モードをトグル
+  useEffect(() => {
+    setIsSearchMode(state.isSearchPopupOpen)
+    // 検索モードが閉じられたら検索結果もクリア
+    if (!state.isSearchPopupOpen) {
+      setSearchResults([])
+    }
+  }, [state.isSearchPopupOpen])
   const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
   const [isCheckingUsage, setIsCheckingUsage] = useState(false)
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false)
@@ -409,6 +424,33 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       isFavorite: favoriteMap.get(item.id) ?? item.isFavorite
     }))
   }, [items, stores])
+
+  // 検索処理を関数として抽出
+  // エリアとジャンルで絞った条件（mergedStores）から店名をAND検索で絞る
+  const performSearch = useCallback((keyword: string) => {
+    if (!keyword.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    // mergedStoresは既にエリア・ジャンルでフィルタリング済み
+    // その結果から店名でAND検索で絞る
+    const keywordLower = keyword.toLowerCase().trim()
+    const results = mergedStores.filter(store => {
+      return store.name.toLowerCase().includes(keywordLower)
+    })
+
+    setSearchResults(results)
+    setIsSearching(false)
+  }, [mergedStores])
+
+  // エリアやジャンルが変更された時に、検索モード中で検索キーワードがある場合は再検索
+  useEffect(() => {
+    if (isSearchMode && searchKeyword.trim()) {
+      performSearch(searchKeyword)
+    }
+  }, [isSearchMode, searchKeyword, performSearch])
 
   // 初回ページの要素を Context の stores に反映するため、監視と反映
   const initialAppliedRef = useRef(false)
@@ -918,6 +960,21 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         </div>
       </div>
 
+      {/* 検索バー */}
+      {isSearchMode && (
+        <SearchBar
+          onClose={() => {
+            handlers.handleSearchClose()
+            setSearchResults([])
+          }}
+          onSearch={(keyword) => {
+            setSearchKeyword(keyword)
+            performSearch(keyword)
+          }}
+          isLoading={isSearching}
+        />
+      )}
+
       {/* エリア選択ポップアップ */}
       <AreaPopup
         isOpen={isAreaPopupOpen}
@@ -958,17 +1015,17 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
           selectedAreas={selectedAreas}
           isNearbyFilter={isNearbyFilter}
           isFavoritesFilter={isFavoritesFilter}
-          stores={mergedStores}
+          stores={isSearchMode && searchKeyword.trim() ? searchResults : mergedStores}
           onStoreClick={onStoreClick}
           onFavoriteToggle={onFavoriteToggle}
           onCouponsClick={onCouponsClick}
           isModalOpen={isCouponListOpen || isSuccessModalOpen || isHistoryOpen || isStoreDetailPopupOpen}
-          loadMoreRef={sentinelRef}
-          isLoadingMore={isLoadingMore}
-          bottomError={error}
+          loadMoreRef={isSearchMode ? undefined : sentinelRef}
+          isLoadingMore={isSearchMode ? false : isLoadingMore}
+          bottomError={isSearchMode ? null : error}
           backgroundColorClass={backgroundColorClass}
           currentLocation={state.currentLocation}
-          isInitialLoading={isInitialStoresLoading}
+          isInitialLoading={isSearchMode ? isSearching : isInitialStoresLoading}
         />
       </div>
 
