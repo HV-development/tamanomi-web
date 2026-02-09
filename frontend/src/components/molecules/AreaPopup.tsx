@@ -12,17 +12,18 @@ interface AreaPopupProps {
   onClear: () => void
 }
 
+// エリア名を直接使用（DBに保存される値）
 const SAITAMA_AREAS = [
-  { value: "nishi", label: "西区" },
-  { value: "kita", label: "北区" },
-  { value: "omiya", label: "大宮区" },
-  { value: "minuma", label: "見沼区" },
-  { value: "chuo", label: "中央区" },
-  { value: "sakura", label: "桜区" },
-  { value: "urawa", label: "浦和区" },
-  { value: "minami", label: "南区" },
-  { value: "midori", label: "緑区" },
-  { value: "iwatsuki", label: "岩槻区" },
+  "西区",
+  "北区",
+  "大宮区",
+  "見沼区",
+  "中央区",
+  "桜区",
+  "浦和区",
+  "南区",
+  "緑区",
+  "岩槻区",
 ]
 
 export function AreaPopup({ isOpen, selectedAreas, onAreaToggle, onClose, onClear }: AreaPopupProps) {
@@ -67,10 +68,10 @@ export function AreaPopup({ isOpen, selectedAreas, onAreaToggle, onClose, onClea
           <div className="grid grid-cols-2 gap-3 mb-6">
             {SAITAMA_AREAS.map((area) => (
               <AreaButton
-                key={area.value}
-                label={area.label}
-                isSelected={selectedAreas.includes(area.value)}
-                onClick={() => onAreaToggle(area.value)}
+                key={area}
+                label={area}
+                isSelected={selectedAreas.includes(area)}
+                onClick={() => onAreaToggle(area)}
                 className="text-sm py-3 px-2 min-h-[44px] flex items-center justify-center w-full font-medium"
               />
             ))}
