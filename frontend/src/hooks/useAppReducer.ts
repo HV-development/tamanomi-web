@@ -33,6 +33,7 @@ export const initialState: AppState = {
     currentLocation: null,
     isLocationLoading: false,
     locationError: null,
+    isSearchPopupOpen: false,
 }
 
 // リデューサー（簡略化）
@@ -147,6 +148,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, isLocationLoading: action.payload }
         case 'SET_LOCATION_ERROR':
             return { ...state, locationError: action.payload }
+        case 'SET_SEARCH_POPUP_OPEN':
+            return { ...state, isSearchPopupOpen: action.payload }
         default:
             return state
     }

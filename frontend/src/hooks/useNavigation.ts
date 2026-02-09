@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { ViewType, MyPageViewType } from '@/types/navigation';
 
 export function useNavigation() {
-    const [activeTab, setActiveTab] = useState("home");
+    const [activeTab, setActiveTab] = useState<string | null>(null);
     const [currentView, setCurrentView] = useState<ViewType>("home");
     const [myPageView, setMyPageView] = useState<MyPageViewType>("main");
 

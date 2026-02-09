@@ -409,6 +409,15 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_FAVORITES_OPEN', payload: true })
     }, [dispatch])
 
+    const handleSearchClick = useCallback(() => {
+        // トグル機能：既に開いている場合は閉じる
+        dispatch({ type: 'SET_SEARCH_POPUP_OPEN', payload: !state.isSearchPopupOpen })
+    }, [dispatch, state.isSearchPopupOpen])
+
+    const handleSearchClose = useCallback(() => {
+        dispatch({ type: 'SET_SEARCH_POPUP_OPEN', payload: false })
+    }, [dispatch])
+
     const handleHistoryClick = useCallback(() => {
         // 履歴クリック処理
     }, [])
@@ -1353,6 +1362,8 @@ export const useAppHandlers = (
         handlePasswordResetResend,
         handleMenuItemClick,
         handleFavoritesClick,
+        handleSearchClick,
+        handleSearchClose,
         handleHistoryClick,
         handleFavoritesClose,
         handleHistoryClose,
