@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Store } from '@/types/store'
 import type { ShopData } from '@hv-development/schemas'
 import { isFavoriteInStorage } from '@/lib/favorites-storage'
-import { mapAreasToCities } from '@/utils/area-mapping'
 
 interface UseInfiniteStoresOptions {
   limit?: number
@@ -286,11 +285,8 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
 
         // エリアフィルターを追加（複数エリアの場合はカンマ区切りでareaパラメータに設定）
         if (selectedAreas.length > 0) {
-          // エリア値を日本語のエリア名に変換してから送信（例: "urawa" → "浦和区"）
-          const areaNames = mapAreasToCities(selectedAreas)
-          if (areaNames.length > 0) {
-            queryParams.append('area', areaNames.join(','))
-          }
+          // エリア名をそのまま送信（DBのareaカラムと直接比較するため）
+          queryParams.append('area', selectedAreas.join(','))
         }
 
         // ジャンルフィルターを追加（複数ジャンルをカンマ区切りで送信）
