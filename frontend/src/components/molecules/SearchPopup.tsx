@@ -74,8 +74,41 @@ export function SearchPopup({
 
       const data = await response.json()
       
+      // APIレスポンスのshop型定義
+      interface ApiShop {
+        id: string
+        name: string
+        genre?: { id: string; name: string }
+        fulladdress?: string
+        address?: string
+        prefecture?: string
+        city?: string
+        area?: string
+        phone?: string
+        description?: string
+        thumbnailUrl?: string
+        images?: string[]
+        isFavorite?: boolean
+        latitude?: number | string
+        longitude?: number | string
+        distance?: number
+        couponUsageStart?: string
+        couponUsageEnd?: string
+        couponUsageDays?: string
+        website?: string
+        homepageUrl?: string
+        details?: string
+        businessHours?: string
+        closedDays?: string
+        holidays?: string
+        budget?: Store['budget']
+        smokingPolicy?: string
+        paymentMethods?: Store['paymentMethods']
+        usageScenes?: string[]
+      }
+      
       // APIレスポンスから店舗データをマッピング
-      const stores: Store[] = (data.shops || []).map((shop: any) => ({
+      const stores: Store[] = ((data.shops as ApiShop[]) || []).map((shop) => ({
         id: shop.id,
         name: shop.name,
         genre: shop.genre?.id || '',
@@ -89,8 +122,8 @@ export function SearchPopup({
         thumbnailUrl: shop.thumbnailUrl,
         images: shop.images || [],
         isFavorite: shop.isFavorite || false,
-        latitude: shop.latitude,
-        longitude: shop.longitude,
+        latitude: typeof shop.latitude === 'string' ? parseFloat(shop.latitude) : shop.latitude,
+        longitude: typeof shop.longitude === 'string' ? parseFloat(shop.longitude) : shop.longitude,
         distance: shop.distance,
         couponUsageStart: shop.couponUsageStart,
         couponUsageEnd: shop.couponUsageEnd,

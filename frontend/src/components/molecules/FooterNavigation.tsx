@@ -11,7 +11,7 @@ export function FooterNavigation({
   className = "",
 }: FooterNavigationProps) {
   // Context から必要な値を取得
-  const { navigation, auth, handlers, state } = useAppContext()
+  const { navigation, auth, handlers } = useAppContext()
 
   const activeTab = navigation.activeTab
   const isAuthenticated = auth.isAuthenticated
@@ -21,7 +21,6 @@ export function FooterNavigation({
     if (tab === "favorites") {
       onFavoritesClick()
     } else if (tab === "home") {
-      // @ts-ignore - handleSearchClickはスキーマに追加済み
       handlers.handleSearchClick()
     } else {
       onTabChange(tab)
