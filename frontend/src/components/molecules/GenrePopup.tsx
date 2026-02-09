@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/atoms/Button"
 import { getGenreColor } from "@/utils/genre-colors"
 import { cn } from "@/lib/utils"
@@ -13,27 +13,56 @@ interface GenrePopupProps {
   onClear: () => void
 }
 
-const GENRES = [
-  { value: "japanese", label: "和食" },
-  { value: "western", label: "洋食" },
-  { value: "chinese", label: "中華" },
-  { value: "italian", label: "イタリアン" },
-  { value: "korean", label: "韓国料理" },
-  { value: "french", label: "フレンチ" },
-  { value: "ethnic", label: "エスニック" },
-  { value: "sushi", label: "寿司" },
-  { value: "curry", label: "カレー" },
-  { value: "yakiniku", label: "焼肉" },
-  { value: "nabe", label: "鍋" },
-  { value: "izakaya", label: "居酒屋" },
-  { value: "ramen", label: "ラーメン" },
-  { value: "bar", label: "バー" },
-  { value: "cafe", label: "カフェ" },
-  { value: "shokudo", label: "食堂" },
-  // { value: "event", label: "イベント出店" }, // 一時的に非表示
-]
+interface Genre {
+  id: string
+  name: string
+  sortOrder: number
+}
 
 export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onClear }: GenrePopupProps) {
+  const [genres, setGenres] = useState<Genre[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // ジャンル一覧をAPIから取得
+  useEffect(() => {
+    if (!isOpen) return
+
+    const fetchGenres = async () => {
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const response = await fetch('/api/genres', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('ジャンル一覧の取得に失敗しました')
+        }
+
+        const data = await response.json()
+        const genresArray = Array.isArray(data) ? data : (data.genres || [])
+        
+        // sortOrderでソート（管理画面に合わせる）
+        const sortedGenres = genresArray
+          .filter((g: Genre) => g && g.id && g.name)
+          .sort((a: Genre, b: Genre) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        
+        setGenres(sortedGenres)
+      } catch (err) {
+        console.error('ジャンル一覧の取得エラー:', err)
+        setError('ジャンル一覧の取得に失敗しました')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchGenres()
+  }, [isOpen])
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose()
@@ -78,69 +107,69 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
           <div className="text-sm text-gray-600 mb-4">複数選択可能です</div>
 
           <div className="max-h-96 overflow-y-auto overscroll-y-contain mb-6">
-            {/* イベントヘッダー */}
-            <div className="mb-4">
-              <h4 className="text-md font-bold text-gray-800 mb-3">ジャンル</h4>
-            </div>
-
-            {/* ジャンル選択 */}
-            <div className="space-y-3">
-              {/* イベントボタン（2カラム分） */}
-              {GENRES.filter(genre => genre.value === "event").map((genre) => {
-                const isSelected = selectedGenres.includes(genre.value)
-
-                return (
-                  <button
-                    key={genre.value}
-                    onClick={() => onGenreToggle(genre.value)}
-                    className={`relative rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${isSelected
-                        ? `border-orange-500 bg-orange-100 text-orange-800 shadow-md`
-                        : `border-orange-300 bg-orange-50 text-orange-700 hover:border-orange-400 hover:bg-orange-100 hover:shadow-sm`
-                      }`}
-                  >
-                    {isSelected && (
-                      <div className="absolute -top-1 -right-1">
-                        <div className="w-4 h-4 rounded-full flex items-center justify-center bg-orange-600">
-                          <span className="text-white text-xs">✓</span>
-                        </div>
-                      </div>
-                    )}
-                    <span className="block">{genre.label}</span>
-                  </button>
-                )
-              })}
-
-              {/* その他のジャンルは2カラムグリッド */}
-              <div className="grid grid-cols-2 gap-3">
-                {GENRES.filter(genre => genre.value !== "event").map((genre) => {
-                  const genreColors = getGenreColor(genre.value)
-                  const isSelected = selectedGenres.includes(genre.value)
-
-                  return (
-                    <button
-                      key={genre.value}
-                      onClick={(e) => {
-                        (e.currentTarget as HTMLButtonElement).blur()
-                        onGenreToggle(genre.value)
-                      }}
-                      className={`relative rounded-lg border-2 transition-all duration-200 active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${isSelected
-                          ? "border-green-700 bg-green-100 text-green-800 shadow-md"
-                          : "border-gray-300 bg-white text-gray-700"
-                        }`}
-                    >
-                      {isSelected && (
-                        <div className="absolute -top-1 -right-1">
-                          <div className={cn("w-4 h-4 rounded-full flex items-center justify-center", genreColors.text.replace('text-', 'bg-'))}>
-                            <span className="text-white text-xs">✓</span>
-                          </div>
-                        </div>
-                      )}
-                      <span className="block">{genre.label}</span>
-                    </button>
-                  )
-                })}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+                <div className="text-gray-600 text-lg font-medium">読み込み中...</div>
               </div>
-            </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <div className="text-red-600 text-sm mb-2">{error}</div>
+                <Button onClick={() => window.location.reload()} variant="secondary" className="mt-4">
+                  再読み込み
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* ジャンルヘッダー */}
+                <div className="mb-4">
+                  <h4 className="text-md font-bold text-gray-800 mb-3">ジャンル</h4>
+                </div>
+
+                {/* ジャンル選択（管理画面に合わせて2カラムグリッド） */}
+                <div className="grid grid-cols-2 gap-3">
+                  {genres.map((genre) => {
+                    // ジャンル名からジャンル値（value）を推測（既存のgetGenreColorとの互換性のため）
+                    // ジャンルIDを直接使用するように変更
+                    const genreId = genre.id
+                    const genreName = genre.name
+                    const isSelected = selectedGenres.includes(genreId)
+                    
+                    // ジャンル名から既存のカラー設定を取得（フォールバック用）
+                    const genreValue = genreName.toLowerCase().replace(/\s+/g, '-')
+                    const genreColors = getGenreColor(genreValue) || {
+                      bg: "bg-gray-200",
+                      text: "text-gray-800",
+                      border: "border-gray-300",
+                      hover: "hover:bg-gray-300"
+                    }
+
+                    return (
+                      <button
+                        key={genreId}
+                        onClick={(e) => {
+                          (e.currentTarget as HTMLButtonElement).blur()
+                          onGenreToggle(genreId)
+                        }}
+                        className={`relative rounded-lg border-2 transition-all duration-200 active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${isSelected
+                            ? "border-green-700 bg-green-100 text-green-800 shadow-md"
+                            : "border-gray-300 bg-white text-gray-700"
+                          }`}
+                      >
+                        {isSelected && (
+                          <div className="absolute -top-1 -right-1">
+                            <div className={cn("w-4 h-4 rounded-full flex items-center justify-center", genreColors.text.replace('text-', 'bg-'))}>
+                              <span className="text-white text-xs">✓</span>
+                            </div>
+                          </div>
+                        )}
+                        <span className="block">{genreName}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex gap-3">
