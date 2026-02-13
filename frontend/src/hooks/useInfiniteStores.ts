@@ -301,6 +301,10 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
           queryParams.append('sortOrder', 'asc')
           queryParams.append('latitude', String(currentLocation.latitude))
           queryParams.append('longitude', String(currentLocation.longitude))
+        } else {
+          // 近くのお店以外: カナ順ソート（クライアントサイドの表示順と一致させる）
+          queryParams.append('sortBy', 'nameKana')
+          queryParams.append('sortOrder', 'asc')
         }
 
         const url = `/api/shops?${queryParams.toString()}`
@@ -517,6 +521,11 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNearbyFilter, currentLocation, isLocationLoading])
 
+  // 近くのお店フィルタが無効な場合は currentLocation の変更を無視するための安定した依存値
+  // これにより、isNearbyFilter=false の状態でエリア検索中に位置情報取得が完了しても
+  // フィルター変更エフェクトが再実行されず、進行中のフェッチが中断されることを防ぐ
+  const relevantLocation = isNearbyFilter ? currentLocation : null
+
   // フィルター変更時のデータ取得
   useEffect(() => {
     // 初回ロードが完了するまでスキップ
@@ -570,10 +579,9 @@ export function useInfiniteStores(options: UseInfiniteStoresOptions = {}): UseIn
       return () => {
         aborted = true
       }
-    } else {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAreas, selectedGenres, isNearbyFilter, currentLocation])
+  }, [selectedAreas, selectedGenres, isNearbyFilter, relevantLocation])
 
   // IntersectionObserver 設定
   const sentinelRef = useCallback(
