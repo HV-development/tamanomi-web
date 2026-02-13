@@ -18,6 +18,10 @@ const commercialLawData: CommercialLawItem[] = [
     value: '株式会社つなぐ'
   },
   {
+    label: '運営委託先',
+    value: '会社名: サイテックアイ株式会社\n代表者: 大澤 佳加\nURL: https:\n住所: 〒761-8064 高松市上之町2丁目8番27'
+  },
+  {
     label: '代表者名',
     value: '代表取締役　佐々木　彰'
   },
