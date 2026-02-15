@@ -39,6 +39,7 @@ import type { AppAction, Coupon as SchemaCoupon } from '@hv-development/schemas'
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"
 import { useFavorites } from "@/hooks/useFavorites"
 import { checkTodayUsage } from "@/utils/coupon-usage-check"
+import { mapGenresToIds } from "@/utils/genre-mapping"
 import type { CreateStoreIntroductionRequest } from "@/types/store-introduction"
 
 interface HomeLayoutProps {
@@ -425,25 +426,122 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     }))
   }, [items, stores])
 
-  // 検索処理を関数として抽出
-  // エリアとジャンルで絞った条件（mergedStores）から店名をAND検索で絞る
-  const performSearch = useCallback((keyword: string) => {
+  // 検索処理: サーバーAPIでキーワード・エリア・ジャンルを指定して取得
+  const performSearch = useCallback(async (keyword: string) => {
     if (!keyword.trim()) {
       setSearchResults([])
       return
     }
 
     setIsSearching(true)
-    // mergedStoresは既にエリア・ジャンルでフィルタリング済み
-    // その結果から店名でAND検索で絞る
-    const keywordLower = keyword.toLowerCase().trim()
-    const results = mergedStores.filter(store => {
-      return store.name.toLowerCase().includes(keywordLower)
-    })
+    try {
+      const queryParams = new URLSearchParams({
+        keyword: keyword.trim(),
+        page: '1',
+        limit: '50',
+      })
+      const areas = selectedAreas ?? []
+      const genres = selectedGenres ?? []
+      if (areas.length > 0) {
+        queryParams.append('area', areas.join(','))
+      }
+      if (genres.length > 0) {
+        const genreIds = await mapGenresToIds(genres)
+        if (genreIds.length > 0) {
+          queryParams.append('genreId', genreIds.join(','))
+        }
+      }
+      if (isNearbyFilter && state.currentLocation) {
+        queryParams.append('sortBy', 'distance')
+        queryParams.append('sortOrder', 'asc')
+        queryParams.append('latitude', String(state.currentLocation.latitude))
+        queryParams.append('longitude', String(state.currentLocation.longitude))
+      }
 
-    setSearchResults(results)
-    setIsSearching(false)
-  }, [mergedStores])
+      const response = await fetch(`/api/shops?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      })
+      if (!response.ok) throw new Error('検索に失敗しました')
+      const data = await response.json()
+
+      interface ApiShop {
+        id: string
+        name: string
+        genre?: { id: string; name: string }
+        fulladdress?: string
+        address?: string
+        prefecture?: string
+        city?: string
+        area?: string
+        phone?: string
+        description?: string
+        thumbnailUrl?: string
+        images?: string[]
+        isFavorite?: boolean
+        latitude?: number | string
+        longitude?: number | string
+        distance?: number
+        couponUsageStart?: string
+        couponUsageEnd?: string
+        couponUsageDays?: string
+        website?: string
+        homepageUrl?: string
+        details?: string
+        businessHours?: string
+        closedDays?: string
+        holidays?: string
+        budget?: Store['budget']
+        smokingPolicy?: string
+        paymentMethods?: Store['paymentMethods']
+        usageScenes?: string[]
+      }
+      const fetchedStores: Store[] = ((data.shops as ApiShop[]) || []).map((shop) => ({
+        id: shop.id,
+        name: shop.name,
+        genre: shop.genre?.id || '',
+        genreLabel: shop.genre?.name || '',
+        address: shop.fulladdress || shop.address || '',
+        prefecture: shop.prefecture,
+        city: shop.city,
+        area: shop.area,
+        phone: shop.phone || '',
+        description: shop.description || '',
+        thumbnailUrl: shop.thumbnailUrl,
+        images: shop.images || [],
+        isFavorite: shop.isFavorite || false,
+        latitude: typeof shop.latitude === 'string' ? parseFloat(shop.latitude) : shop.latitude,
+        longitude: typeof shop.longitude === 'string' ? parseFloat(shop.longitude) : shop.longitude,
+        distance: shop.distance,
+        couponUsageStart: shop.couponUsageStart,
+        couponUsageEnd: shop.couponUsageEnd,
+        couponUsageDays: shop.couponUsageDays,
+        website: shop.website,
+        homepageUrl: shop.homepageUrl,
+        details: shop.details,
+        businessHours: shop.businessHours,
+        closedDays: shop.closedDays,
+        holidays: shop.holidays,
+        budget: shop.budget,
+        smokingPolicy: shop.smokingPolicy,
+        paymentMethods: shop.paymentMethods,
+        usageScenes: shop.usageScenes,
+      }))
+      const favoriteMap = new Map<string, boolean>()
+      stores.forEach((s) => favoriteMap.set(s.id, s.isFavorite))
+      const results = fetchedStores.map((s) => ({
+        ...s,
+        isFavorite: favoriteMap.get(s.id) ?? s.isFavorite,
+      }))
+      setSearchResults(results)
+    } catch (error) {
+      console.error('[HomeLayout] 店名検索エラー:', error)
+      setSearchResults([])
+    } finally {
+      setIsSearching(false)
+    }
+  }, [selectedAreas, selectedGenres, isNearbyFilter, state.currentLocation, stores])
 
   // エリアやジャンルが変更された時に、検索モード中で検索キーワードがある場合は再検索
   useEffect(() => {

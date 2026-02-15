@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
     const searchParams = url.searchParams
     const page = searchParams.get('page') || '1'
     const limit = searchParams.get('limit') || '20'
+    const keyword = searchParams.get('keyword')
     const name = searchParams.get('name')
     const city = searchParams.get('city')
     const area = searchParams.get('area')
@@ -39,6 +40,9 @@ export async function GET(request: NextRequest) {
     })
     
     // フィルターパラメータを追加
+    if (keyword) {
+      backendParams.append('keyword', keyword)
+    }
     if (name) {
       backendParams.append('name', name)
     }
