@@ -269,10 +269,13 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   }, [selectedStore, stores])
 
   const toUiCoupon = useCallback((coupon: SchemaCoupon): UiCoupon => {
-    const storeName = getStoreNameById(coupon.shopId)
-    if (!storeName) {
-      console.error('❌ [HomeLayout] storeName not found for coupon.shopId:', coupon.shopId)
-    }
+    const couponWithShop = coupon as SchemaCoupon & { storeName?: string; shop?: { name?: string } }
+    const storeName =
+      (selectedStore?.id === coupon.shopId ? selectedStore.name : null) ??
+      getStoreNameById(coupon.shopId) ??
+      couponWithShop.storeName ??
+      couponWithShop.shop?.name ??
+      ""
     return {
       id: coupon.id,
       uuid: coupon.id,
@@ -283,11 +286,11 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       drinkType: coupon.drinkType ?? null,
       status: coupon.status,
       storeId: coupon.shopId,
-      storeName: storeName ?? "",
+      storeName,
       createdAt: coupon.createdAt,
       updatedAt: coupon.updatedAt,
     }
-  }, [getStoreNameById])
+  }, [getStoreNameById, selectedStore?.id, selectedStore?.name])
 
   const selectedCoupon = useMemo(() => {
     if (!selectedSchemaCoupon) return null
