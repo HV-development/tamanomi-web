@@ -4,13 +4,17 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  lodash: 4.17.23
+  qs: 6.14.2
+
 dependencies:
   '@hookform/resolvers':
     specifier: ^3.10.0
     version: 3.10.0(react-hook-form@7.68.0)
   '@hv-development/schemas':
-    specifier: 1.114.0
-    version: 1.114.0
+    specifier: 1.115.0
+    version: 1.115.0
   '@radix-ui/react-accordion':
     specifier: 1.2.2
     version: 1.2.2(@types/react-dom@18.3.7)(@types/react@18.3.27)(react-dom@18.3.1)(react@18.3.1)
@@ -123,8 +127,8 @@ dependencies:
     specifier: ^0.454.0
     version: 0.454.0(react@18.3.1)
   next:
-    specifier: 15.5.9
-    version: 15.5.9(@playwright/test@1.57.0)(react-dom@18.3.1)(react@18.3.1)
+    specifier: 15.5.10
+    version: 15.5.10(@playwright/test@1.57.0)(react-dom@18.3.1)(react@18.3.1)
   next-themes:
     specifier: ^0.4.6
     version: 0.4.6(react-dom@18.3.1)(react@18.3.1)
@@ -200,8 +204,8 @@ devDependencies:
     specifier: ^8.57.1
     version: 8.57.1
   eslint-config-next:
-    specifier: 15.5.9
-    version: 15.5.9(eslint@8.57.1)(typescript@5.9.3)
+    specifier: 15.5.10
+    version: 15.5.10(eslint@8.57.1)(typescript@5.9.3)
   googleapis:
     specifier: ^168.0.0
     version: 168.0.0
@@ -575,8 +579,8 @@ packages:
     deprecated: Use @eslint/object-schema instead
     dev: true
 
-  /@hv-development/schemas@1.114.0:
-    resolution: {integrity: sha512-6vr0TRtxBp1FoQfpDgeZ6KMfY39czyEP8uvUbU2UI4ca0Am5wGFDjARdyjLF9WG1l7kv9Mp+jyij1YHFkRrDOQ==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.114.0/663b814552670696221d27f8a5cb4a52f2170a25}
+  /@hv-development/schemas@1.115.0:
+    resolution: {integrity: sha512-x0qurHNwP7pQhlQkQvV/50R17L6lWc5sZ49lcubx0JhlB+I0CgImsbBUXEiHrfxld+DYcNg9MovyQEO/8jZLLQ==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.115.0/3908d267347b88f86f747e9064591ba6d11bb060}
     engines: {node: 22.x}
     dependencies:
       zod: 3.25.76
@@ -831,12 +835,12 @@ packages:
     dev: true
     optional: true
 
-  /@next/env@15.5.9:
-    resolution: {integrity: sha512-4GlTZ+EJM7WaW2HEZcyU317tIQDjkQIyENDLxYJfSWlfqguN+dHkZgyQTV/7ykvobU7yEH5gKvreNrH4B6QgIg==}
+  /@next/env@15.5.10:
+    resolution: {integrity: sha512-plg+9A/KoZcTS26fe15LHg+QxReTazrIOoKKUC3Uz4leGGeNPgLHdevVraAAOX0snnUs3WkRx3eUQpj9mreG6A==}
     dev: false
 
-  /@next/eslint-plugin-next@15.5.9:
-    resolution: {integrity: sha512-kUzXx0iFiXw27cQAViE1yKWnz/nF8JzRmwgMRTMh8qMY90crNsdXJRh2e+R0vBpFR3kk1yvAR7wev7+fCCb79Q==}
+  /@next/eslint-plugin-next@15.5.10:
+    resolution: {integrity: sha512-fDpxcy6G7Il4lQVVsaJD0fdC2/+SmuBGTF+edRLlsR4ZFOE3W2VyzrrGYdg/pHW8TydeAdSVM+mIzITGtZ3yWA==}
     dependencies:
       fast-glob: 3.3.1
     dev: true
@@ -2971,7 +2975,7 @@ packages:
     dependencies:
       chalk: 4.1.2
       date-fns: 2.30.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       rxjs: 7.8.2
       shell-quote: 1.8.3
       spawn-command: 0.0.2
@@ -3425,8 +3429,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-config-next@15.5.9(eslint@8.57.1)(typescript@5.9.3):
-    resolution: {integrity: sha512-852JYI3NkFNzW8CqsMhI0K2CDRxTObdZ2jQJj5CtpEaOkYHn13107tHpNuD/h0WRpU4FAbCdUaxQsrfBtNK9Kw==}
+  /eslint-config-next@15.5.10(eslint@8.57.1)(typescript@5.9.3):
+    resolution: {integrity: sha512-AeYOVGiSbIfH4KXFT3d0fIDm7yTslR/AWGoHLdsXQ99MH0zFWmkRIin1H7I9SFlkKgf4PKm9ncsyWHq1aAfHBA==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0 || ^9.0.0
       typescript: '>=3.3.1'
@@ -3434,7 +3438,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@next/eslint-plugin-next': 15.5.9
+      '@next/eslint-plugin-next': 15.5.10
       '@rushstack/eslint-patch': 1.15.0
       '@typescript-eslint/eslint-plugin': 8.50.0(@typescript-eslint/parser@8.50.0)(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser': 8.50.0(eslint@8.57.1)(typescript@5.9.3)
@@ -4049,7 +4053,7 @@ packages:
       extend: 3.0.2
       gaxios: 7.1.3
       google-auth-library: 10.5.0
-      qs: 6.14.0
+      qs: 6.14.2
       url-template: 2.0.8
     transitivePeerDependencies:
       - supports-color
@@ -4534,8 +4538,8 @@ packages:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
 
-  /lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  /lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
@@ -4629,8 +4633,8 @@ packages:
       react-dom: 18.3.1(react@18.3.1)
     dev: false
 
-  /next@15.5.9(@playwright/test@1.57.0)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-agNLK89seZEtC5zUHwtut0+tNrc0Xw4FT/Dg+B/VLEo9pAcS9rtTKpek3V6kVcVwsB2YlqMaHdfZL4eLEVYuCg==}
+  /next@15.5.10(@playwright/test@1.57.0)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-r0X65PNwyDDyOrWNKpQoZvOatw7BcsTPRKdwEqtc9cj3wv7mbBIk9tKed4klRaFXJdX0rugpuMTHslDrAU1bBg==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -4650,7 +4654,7 @@ packages:
       sass:
         optional: true
     dependencies:
-      '@next/env': 15.5.9
+      '@next/env': 15.5.10
       '@playwright/test': 1.57.0
       '@swc/helpers': 0.5.15
       caniuse-lite: 1.0.30001760
@@ -4981,8 +4985,8 @@ packages:
     resolution: {integrity: sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ==}
     dev: false
 
-  /qs@6.14.0:
-    resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
+  /qs@6.14.2:
+    resolution: {integrity: sha512-V/yCWTTF7VJ9hIh18Ugr2zhJMP01MY7c5kh4J870L7imm6/DIzBsNLTXzMwUA3yZ5b/KBqLx8Kp3uRvd7xSe3Q==}
     engines: {node: '>=0.6'}
     dependencies:
       side-channel: 1.1.0
@@ -5158,7 +5162,7 @@ packages:
     dependencies:
       clsx: 2.1.1
       eventemitter3: 4.0.7
-      lodash: 4.17.21
+      lodash: 4.17.23
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-is: 18.3.1
