@@ -12,7 +12,9 @@ import { PasswordResetContainer } from "../organisms/PasswordResetContainer"
 import { HistoryPopup } from "../molecules/HistoryPopup"
 import { SearchBar } from "../molecules/SearchBar"
 import { MyPageLayout } from "./MypageLayout"
-import { PlanManagementContainer } from "../organisms/PlanManagementContainer"
+import { PlanManagementContainer
+  
+ } from "../organisms/PlanManagementContainer"
 import { PlanChangeContainer } from "../organisms/PlanChangeContainer"
 import { StoreIntroductionForm } from "../organisms/StoreIntroductionForm"
 import { CouponListPopup } from "../molecules/CouponListPopup"
@@ -88,6 +90,11 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const isFavoritesFilter = filters.isFavoritesFilter
   // AppContext の AppState は schemas 側の型に固定されているため、UI 側の Store 型として扱う
   const stores = state.stores as unknown as Store[]
+  // performSearch の依存から stores を外し、クーポンGET押下時の SET_STORES で再検索が走らないように ref で参照する
+  const storesRef = useRef<Store[]>(stores)
+  useEffect(() => {
+    storesRef.current = stores
+  }, [stores])
   const currentView = navigation.currentView
   const myPageView = navigation.myPageView
   const isAuthenticated = auth.isAuthenticated
@@ -534,7 +541,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         usageScenes: shop.usageScenes,
       }))
       const favoriteMap = new Map<string, boolean>()
-      stores.forEach((s) => favoriteMap.set(s.id, s.isFavorite))
+      const currentStores = storesRef.current ?? []
+      currentStores.forEach((s) => favoriteMap.set(s.id, s.isFavorite))
       const results = fetchedStores.map((s) => ({
         ...s,
         isFavorite: favoriteMap.get(s.id) ?? s.isFavorite,
@@ -546,7 +554,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     } finally {
       setIsSearching(false)
     }
-  }, [selectedAreas, selectedGenres, isNearbyFilter, state.currentLocation, stores])
+  }, [selectedAreas, selectedGenres, isNearbyFilter, state.currentLocation])
 
   // エリアやジャンルが変更された時に、検索モード中で検索キーワードがある場合は再検索
   useEffect(() => {
