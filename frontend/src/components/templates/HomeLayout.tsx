@@ -316,9 +316,11 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         return
       }
 
+      console.log('[CouponFetch] HomeLayout useEffect: calling checkTodayUsage (GET /api/coupons/usage-history/today)', { shopId: selectedStore.id })
       setIsCheckingUsage(true)
       try {
         const hasUsedToday = await checkTodayUsage(selectedStore.id)
+        console.log('[CouponFetch] checkTodayUsage done', { hasUsedToday })
         setIsCouponUsedToday(hasUsedToday)
       } catch (error) {
         console.error('使用履歴チェックエラー:', error)
@@ -341,6 +343,11 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onFavoriteToggle = handlers.handleFavoriteToggle
   // クーポン取得中のローディング状態を管理するラッパー
   const onCouponsClick = useCallback(async (storeId: string) => {
+    console.log('[CouponFetch] HomeLayout onCouponsClick called', {
+      storeId,
+      isSearchMode,
+      stack: new Error().stack?.split('\n').slice(1, 4).join(' <- '),
+    })
     setIsLoadingCoupons(true)
     try {
       let storeOverride: Store | undefined

@@ -610,14 +610,24 @@ export const useAppHandlers = (
     }, [auth, dispatch, state.stores])
 
     const handleCouponsClick = useCallback(async (storeId: string, storeOverride?: Store) => {
+        const logPrefix = '[CouponFetch]'
+        console.log(`${logPrefix} handleCouponsClick called`, {
+            storeId,
+            hasStoreOverride: Boolean(storeOverride),
+            currentGuard: couponFetchingStoreId,
+            stack: new Error().stack?.split('\n').slice(1, 5).join(' <- '),
+        })
+
         const store = storeOverride ?? state.stores.find((s: { id: string }) => s.id === storeId)
 
         if (store) {
             // 同一店舗への二重リクエスト防止（モジュール変数で全インスタンス共有）
             if (couponFetchingStoreId === storeId) {
+                console.log(`${logPrefix} SKIP (guard): already fetching for storeId=${storeId}`)
                 return
             }
             couponFetchingStoreId = storeId
+            console.log(`${logPrefix} START fetch for storeId=${storeId}, storeName=${store.name}`)
 
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
             dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
@@ -627,6 +637,7 @@ export const useAppHandlers = (
             // クーポンを取得
             try {
                 const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
+                console.log(`${logPrefix} GET ${url}`)
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -645,6 +656,7 @@ export const useAppHandlers = (
                 }
 
                 const data = await response.json()
+                console.log(`${logPrefix} response ok, coupons count=${data.coupons?.length ?? 0}`)
 
                 if (data.coupons && data.coupons.length > 0) {
                     // APIからのクーポンをfrontend用の形式に変換
@@ -682,8 +694,11 @@ export const useAppHandlers = (
                 console.error('❌ Error fetching coupons:', error)
                 dispatch({ type: 'SET_STORE_COUPONS', payload: [] })
             } finally {
+                console.log(`${logPrefix} finally: clear guard (was=${couponFetchingStoreId})`)
                 couponFetchingStoreId = null
             }
+        } else {
+            console.log(`${logPrefix} SKIP: store not found for storeId=${storeId}`)
         }
     }, [state.stores, dispatch])
 
@@ -973,12 +988,14 @@ export const useAppHandlers = (
     }, [navigation])
 
     const handleCouponListClose = useCallback(() => {
+        console.log('[CouponFetch] handleCouponListClose: clear guard')
         couponFetchingStoreId = null
         dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
         dispatch({ type: 'SET_SELECTED_STORE', payload: null })
     }, [dispatch])
 
     const handleCouponListBack = useCallback(() => {
+        console.log('[CouponFetch] handleCouponListBack: clear guard')
         couponFetchingStoreId = null
         dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
         dispatch({ type: 'SET_SELECTED_STORE', payload: null })
