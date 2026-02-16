@@ -39,7 +39,6 @@ import type { AppAction, Coupon as SchemaCoupon } from '@hv-development/schemas'
 import { useInfiniteStores } from "@/hooks/useInfiniteStores"
 import { useFavorites } from "@/hooks/useFavorites"
 import { checkTodayUsage } from "@/utils/coupon-usage-check"
-import { mapGenresToIds } from "@/utils/genre-mapping"
 import type { CreateStoreIntroductionRequest } from "@/types/store-introduction"
 
 interface HomeLayoutProps {
@@ -445,11 +444,9 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       if (areas.length > 0) {
         queryParams.append('area', areas.join(','))
       }
+      // ジャンル検索: selectedGenresは既にジャンルIDの配列なので、そのまま送信
       if (genres.length > 0) {
-        const genreIds = await mapGenresToIds(genres)
-        if (genreIds.length > 0) {
-          queryParams.append('genreId', genreIds.join(','))
-        }
+        queryParams.append('genreId', genres.join(','))
       }
       if (isNearbyFilter && state.currentLocation) {
         queryParams.append('sortBy', 'distance')
