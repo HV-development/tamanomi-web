@@ -606,8 +606,8 @@ export const useAppHandlers = (
         }
     }, [auth, dispatch, state.stores])
 
-    const handleCouponsClick = useCallback(async (storeId: string) => {
-        const store = state.stores.find((s: { id: string }) => s.id === storeId)
+    const handleCouponsClick = useCallback(async (storeId: string, storeOverride?: Store) => {
+        const store = storeOverride ?? state.stores.find((s: { id: string }) => s.id === storeId)
 
         if (store) {
             dispatch({ type: 'SET_SELECTED_STORE', payload: store })
