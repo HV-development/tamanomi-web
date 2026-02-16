@@ -72,6 +72,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
   const [isCheckingUsage, setIsCheckingUsage] = useState(false)
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false)
+  // checkTodayUsage の同一店舗での二重呼び出し防止
+  const lastCheckedUsageShopIdRef = useRef<string | null>(null)
   const [hasStoreIntroduction, setHasStoreIntroduction] = useState(false)
   const [storeIntroductionData, setStoreIntroductionData] = useState<{
     storeName1: string;
@@ -301,26 +303,32 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     return storeSchemaCoupons.map(toUiCoupon)
   }, [storeSchemaCoupons, toUiCoupon])
 
-  // クーポン使用履歴のチェック
+  // クーポン使用履歴のチェック（useEffect の複数回実行で API が重複呼び出しされないよう同一店舗は1回だけ）
   useEffect(() => {
+    if (!isCouponListOpen || !selectedStore) {
+      if (!isCouponListOpen) {
+        lastCheckedUsageShopIdRef.current = null
+      }
+      setIsCouponUsedToday(false)
+      setIsCheckingUsage(false)
+      return
+    }
+
+    if (!isAuthenticated) {
+      setIsCouponUsedToday(false)
+      setIsCheckingUsage(false)
+      return
+    }
+
+    if (lastCheckedUsageShopIdRef.current === selectedStore.id) {
+      return
+    }
+    lastCheckedUsageShopIdRef.current = selectedStore.id
+
     const checkUsage = async () => {
-      if (!isCouponListOpen || !selectedStore) {
-        setIsCouponUsedToday(false)
-        setIsCheckingUsage(false)
-        return
-      }
-
-      if (!isAuthenticated) {
-        setIsCouponUsedToday(false)
-        setIsCheckingUsage(false)
-        return
-      }
-
-      console.log('[CouponFetch] HomeLayout useEffect: calling checkTodayUsage (GET /api/coupons/usage-history/today)', { shopId: selectedStore.id })
       setIsCheckingUsage(true)
       try {
         const hasUsedToday = await checkTodayUsage(selectedStore.id)
-        console.log('[CouponFetch] checkTodayUsage done', { hasUsedToday })
         setIsCouponUsedToday(hasUsedToday)
       } catch (error) {
         console.error('使用履歴チェックエラー:', error)
