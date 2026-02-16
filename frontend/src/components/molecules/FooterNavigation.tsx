@@ -22,6 +22,8 @@ export function FooterNavigation({
       onFavoritesClick()
     } else if (tab === "home") {
       handlers.handleSearchClick()
+      // ページトップにスクロール
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
       onTabChange(tab)
     }
