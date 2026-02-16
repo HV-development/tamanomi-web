@@ -351,11 +351,6 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onFavoriteToggle = handlers.handleFavoriteToggle
   // クーポン取得中のローディング状態を管理するラッパー
   const onCouponsClick = useCallback(async (storeId: string) => {
-    console.log('[CouponFetch] HomeLayout onCouponsClick called', {
-      storeId,
-      isSearchMode,
-      stack: new Error().stack?.split('\n').slice(1, 4).join(' <- '),
-    })
     setIsLoadingCoupons(true)
     try {
       let storeOverride: Store | undefined
