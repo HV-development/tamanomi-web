@@ -321,11 +321,19 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onCouponsClick = useCallback(async (storeId: string) => {
     setIsLoadingCoupons(true)
     try {
+      // 検索結果から店舗を探す（検索モードの場合）
+      if (isSearchMode && searchKeyword.trim()) {
+        const searchStore = searchResults.find((s) => s.id === storeId)
+        if (searchStore && !state.stores.find((s) => s.id === storeId)) {
+          // 検索結果の店舗がstate.storesに存在しない場合は追加
+          dispatch({ type: 'SET_STORES', payload: [...state.stores, searchStore] } as AppAction)
+        }
+      }
       await handlers.handleCouponsClick(storeId)
     } finally {
       setIsLoadingCoupons(false)
     }
-  }, [handlers])
+  }, [handlers, isSearchMode, searchKeyword, searchResults, state.stores, dispatch])
   const onMyPageViewChange = navigation.navigateToMyPage
   const onEditProfile = handlers.handleEditProfile
   const onChangeEmail = handlers.handleChangeEmail
