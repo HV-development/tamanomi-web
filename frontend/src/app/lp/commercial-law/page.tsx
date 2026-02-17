@@ -144,7 +144,7 @@ export default function CommercialLawPage() {
                 lineHeight: '160%'
               }}
             >
-              さいたま"welcome ドリンク"サイト「たまのみ」に関する特定商取引法に基づく表記です。
+              さいたま&quot;welcome ドリンク&quot;サイト「たまのみ」に関する特定商取引法に基づく表記です。
             </p>
           </div>
 
