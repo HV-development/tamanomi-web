@@ -18,12 +18,12 @@ const commercialLawData: CommercialLawItem[] = [
     value: '株式会社つなぐ'
   },
   {
-    label: '運営委託先',
-    value: '会社名: サイテックアイ株式会社\n代表者: 大澤 佳加\nURL: https://www.psytec-ai.com/\n住所: 〒761-8064 高松市上之町2丁目8番27'
-  },
-  {
     label: '代表者名',
     value: '代表取締役　佐々木　彰'
+  },
+  {
+    label: '運営委託先',
+    value: '会社名: サイテックアイ株式会社\n代表者: 大澤 佳加\nURL: https://www.psytec-ai.com/\n住所: 〒761-8064 高松市上之町2丁目8番27'
   },
   {
     label: '所在地',
@@ -75,6 +75,30 @@ const commercialLawData: CommercialLawItem[] = [
   }
 ]
 
+// URLをリンクに変換する関数
+function renderValueWithLinks(value: string) {
+  // URLパターンを検出（http:// または https:// で始まるURL）
+  const urlPattern = /(https?:\/\/[^\s]+)/g
+  const parts = value.split(urlPattern)
+  
+  return parts.map((part, index) => {
+    if (urlPattern.test(part)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          {part}
+        </a>
+      )
+    }
+    return <span key={index}>{part}</span>
+  })
+}
+
 export default function CommercialLawPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -120,7 +144,7 @@ export default function CommercialLawPage() {
                 lineHeight: '160%'
               }}
             >
-              さいたま“welcome ドリンク”サイト「たまのみ」に関する特定商取引法に基づく表記です。
+              さいたま"welcome ドリンク"サイト「たまのみ」に関する特定商取引法に基づく表記です。
             </p>
           </div>
 
@@ -154,7 +178,7 @@ export default function CommercialLawPage() {
                       color: '#333'
                     }}
                   >
-                    {item.value}
+                    {renderValueWithLinks(item.value)}
                   </div>
                 </div>
               </div>
