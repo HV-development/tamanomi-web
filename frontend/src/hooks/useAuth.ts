@@ -35,6 +35,31 @@ export function useAuth() {
         }
     }, []);
 
+    // 決済履歴を取得する関数
+    const fetchPaymentHistory = useCallback(async () => {
+        try {
+            const response = await fetch('/api/user/payment-history', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                cache: 'no-store',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setPaymentHistory(data.history || []);
+            } else {
+                console.error('決済履歴の取得に失敗しました:', response.status);
+                setPaymentHistory([]);
+            }
+        } catch (error) {
+            console.error('決済履歴の取得中にエラーが発生しました:', error);
+            setPaymentHistory([]);
+        }
+    }, []);
+
     // リフレッシュトークンでアクセストークンを更新する
     const tryRefresh = useCallback(async (): Promise<boolean> => {
         try {
@@ -163,5 +188,7 @@ export function useAuth() {
         setIsLoading,
         login,
         logout,
+        fetchUsageHistory,
+        fetchPaymentHistory,
     };
 }
