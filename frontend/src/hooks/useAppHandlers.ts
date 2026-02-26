@@ -792,13 +792,17 @@ export const useAppHandlers = (
         navigation.navigateToMyPage("main")
     }, [navigation])
 
-    const handleViewUsageHistory = useCallback(() => {
+    const handleViewUsageHistory = useCallback(async () => {
+        // 利用履歴画面を開くたびに最新を取得する
+        await auth.fetchUsageHistory()
         navigation.navigateToMyPage("usage-history")
-    }, [navigation])
+    }, [auth, navigation])
 
-    const handleViewPaymentHistory = useCallback(() => {
+    const handleViewPaymentHistory = useCallback(async () => {
+        // 決済履歴画面を開くたびに最新を取得する
+        await auth.fetchPaymentHistory()
         navigation.navigateToMyPage("payment-history")
-    }, [navigation])
+    }, [auth, navigation])
 
     const handleCancelSubscription = useCallback(() => {
         // サブスクリプションキャンセル処理
