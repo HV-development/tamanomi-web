@@ -31,7 +31,7 @@ const banners: BannerItem[] = [
   {
     id: "banner-3",
     imageUrl: "/saitama-app-benefits-user.png",
-    linkUrl: "https://www.home.saitama-tsunagu.com",
+    linkUrl: "/campaigncode.pdf",
     alt: "さいたま市みんなのアプリ"
   },
   {
