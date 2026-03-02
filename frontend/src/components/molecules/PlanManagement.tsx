@@ -9,10 +9,12 @@ interface PlanManagementProps {
   plan: Plan
   onChangePlan: () => void
   onCancelSubscription: () => void
+  onChangePaymentMethod?: () => void
+  hasPaymentMethod?: boolean
   className?: string
 }
 
-export function PlanManagement({ plan, onChangePlan, className = "" }: PlanManagementProps) {
+export function PlanManagement({ plan, onChangePlan, onChangePaymentMethod, hasPaymentMethod: _hasPaymentMethod, className = "" }: PlanManagementProps) {
   const formatDate = (date: Date) => {
     return format(date, "yyyy年M月d日", { locale: ja })
   }
@@ -76,6 +78,14 @@ export function PlanManagement({ plan, onChangePlan, className = "" }: PlanManag
           >
             変更する
           </button>
+          {onChangePaymentMethod && (
+            <button
+              onClick={onChangePaymentMethod}
+              className="w-full mt-3 bg-white border-2 border-green-300 hover:bg-green-50 text-green-700 py-3 px-4 rounded-xl font-medium transition-colors"
+            >
+              支払方法の変更
+            </button>
+          )}
         </div>
       </div>
     </div>

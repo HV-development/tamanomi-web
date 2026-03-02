@@ -376,6 +376,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onPlanChangeSubmit = handlers.handlePlanChangeSubmit
   const onViewUsageHistory = handlers.handleViewUsageHistory
   const onViewPaymentHistory = handlers.handleViewPaymentHistory
+  const onChangePaymentMethod = (handlers as typeof handlers & { handleChangePaymentMethod: () => void }).handleChangePaymentMethod
   const onCancelSubscription = handlers.handleCancelSubscription
   const onWithdraw = handlers.handleWithdraw
   const onWithdrawConfirm = handlers.handleWithdrawConfirm
@@ -819,10 +820,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
           plan={plan}
           onChangePlan={() => onMyPageViewChange("plan-change")}
           onCancelSubscription={onCancelSubscription}
-          onChangePaymentMethod={() => {
-            // 支払い方法変更の専用画面に遷移
-            window.location.href = '/payment-method-change'
-          }}
+          onChangePaymentMethod={onChangePaymentMethod}
           hasPaymentMethod={hasPaymentMethod}
           onBack={() => onMyPageViewChange("main")}
           onLogoClick={onLogoClick}
@@ -858,6 +856,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         onViewPlan={onViewPlan}
         onViewUsageHistory={onViewUsageHistory}
         onViewPaymentHistory={onViewPaymentHistory}
+        onChangePaymentMethod={onChangePaymentMethod}
         onStoreIntroduction={onStoreIntroduction}
         hasStoreIntroduction={hasStoreIntroduction}
         onCancelSubscription={onCancelSubscription}
