@@ -18,7 +18,7 @@ interface BannerCarouselProps {
 const banners: BannerItem[] = [
   {
     id: "banner-1",
-    imageUrl: "/monitor-recruitment-user.jpg",
+    imageUrl: "/monitor-recruitment-user.png",
     linkUrl: "/campaigncode.pdf",
     alt: "モニター募集"
   },
@@ -30,9 +30,15 @@ const banners: BannerItem[] = [
   },
   {
     id: "banner-3",
-    imageUrl: "/saitama-app-benefits-user.jpg",
-    linkUrl: "https://www.home.saitama-tsunagu.com",
+    imageUrl: "/saitama-app-benefits-user.png",
+    linkUrl: "/campaigncode.pdf",
     alt: "さいたま市みんなのアプリ"
+  },
+  {
+    id: "banner-4",
+    imageUrl: "/instagram-official-user.png",
+    linkUrl: "https://www.instagram.com/tamanomi.saitama?igsh=dTdnb2gxNGFnOWs=",
+    alt: "公式 Instagram たまのみ部がゆく"
   }
 ]
 

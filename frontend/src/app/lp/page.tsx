@@ -19,8 +19,13 @@ const bannerItems = [
   },
   {
     imageUrl: '/lp/images/saitama-app-benefits-lp.webp',
-    linkUrl: 'https://www.home.saitama-tsunagu.com',
+    linkUrl: '/campaigncode.pdf',
     alt: 'さいたま市みんなのアプリ'
+  },
+  {
+    imageUrl: '/lp/images/instagram-official-lp.png',
+    linkUrl: 'https://www.instagram.com/tamanomi.saitama?igsh=dTdnb2gxNGFnOWs=',
+    alt: '公式 Instagram たまのみ部がゆく'
   }
 ];
 
@@ -31,6 +36,7 @@ export default function LPPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [carouselImageWidth, setCarouselImageWidth] = useState(303)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [showFloatCta, setShowFloatCta] = useState(false)
 
   // LPページ用：bodyの最大幅制限を解除
   useEffect(() => {
@@ -38,6 +44,16 @@ export default function LPPage() {
     return () => {
       document.body.style.maxWidth = ''
     }
+  }, [])
+
+  // スクロールでフロート新規登録ボタンを表示
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowFloatCta(window.scrollY > 400)
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   // 自動スライド（4秒間隔）
@@ -557,6 +573,7 @@ export default function LPPage() {
                       src={banner.imageUrl}
                       alt={banner.alt}
                       fill
+                      sizes="(max-width: 768px) 303px, 375px"
                       className="object-cover"
                       priority={i < 2}
                     />
@@ -2156,6 +2173,42 @@ export default function LPPage() {
           </div>
         </div>
       </div>
+
+      {/* フロート新規登録ボタン（スクロール後に下から表示） */}
+      {showFloatCta && (
+        <button
+          type="button"
+          onClick={() => router.push('/email-registration')}
+          aria-label="新規登録"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '16px',
+            zIndex: 50,
+            padding: '14px 20px',
+            borderRadius: '9999px',
+            border: 'none',
+            background: '#FF6F61',
+            color: '#FFF',
+            fontFamily: '"Zen Kaku Gothic New", sans-serif',
+            fontSize: '16px',
+            fontWeight: 700,
+            boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
+            cursor: 'pointer',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.02)'
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = ''
+            e.currentTarget.style.boxShadow = '0 4px 14px rgba(0,0,0,0.2)'
+          }}
+        >
+          新規登録
+        </button>
+      )}
     </div>
   )
 }
