@@ -31,7 +31,7 @@ const commercialLawData: CommercialLawItem[] = [
   },
   {
     label: 'お問い合わせ',
-    value: '以下のお問い合わせフォームよりご連絡ください。\n\n※お問い合わせいただいた内容には、遅滞なく電子メールにてご返信いたします。\n\nhttps://www.tamanomi.com/lp/contact\n\n電話番号: 087-899-6513'
+    value: '以下のお問い合わせフォームよりご連絡ください。\n\n※お問い合わせいただいた内容には、遅滞なく電子メールにてご返信いたします。\nhttps://www.tamanomi.com/lp/contact\n電話番号: 087-899-6513'
   },
   {
     label: '販売価格',
