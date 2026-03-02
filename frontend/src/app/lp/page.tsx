@@ -19,8 +19,13 @@ const bannerItems = [
   },
   {
     imageUrl: '/lp/images/saitama-app-benefits-lp.webp',
-    linkUrl: 'https://www.home.saitama-tsunagu.com',
+    linkUrl: '/campaigncode.pdf',
     alt: 'さいたま市みんなのアプリ'
+  },
+  {
+    imageUrl: '/lp/images/instagram-official-lp.png',
+    linkUrl: 'https://www.instagram.com/tamanomi.saitama?igsh=dTdnb2gxNGFnOWs=',
+    alt: '公式 Instagram たまのみ部がゆく'
   }
 ];
 
@@ -557,6 +562,7 @@ export default function LPPage() {
                       src={banner.imageUrl}
                       alt={banner.alt}
                       fill
+                      sizes="(max-width: 768px) 303px, 375px"
                       className="object-cover"
                       priority={i < 2}
                     />
