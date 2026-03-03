@@ -9,6 +9,7 @@ export const usePaymentMethodChange = () => {
   const [paymentCard, setPaymentCard] = useState<{
     paygentCustomerId: string
     paygentCustomerCardId: string
+    cardLastFour?: string | null
   } | null>(null)
   const [useMockPayment, setUseMockPayment] = useState(false)
   const router = useRouter()
@@ -60,36 +61,89 @@ export const usePaymentMethodChange = () => {
       setIsLoading(true)
       setError('')
 
-      // モックモードの判定
-      const isMockMode = useMockPayment || !paymentCard
+      // モックモードの判定（API の設定のみ。API が false のときはカードがなくても実 Paygent 扱い）
+      const isMockMode = useMockPayment
 
       // モックモードの場合
       if (isMockMode) {
         const mockCustomerId = paymentCard?.paygentCustomerId || `cust_${Date.now()}`
         const mockCustomerCardId = paymentCard?.paygentCustomerCardId || 'mock_initial'
 
-        const response = await fetch('/api/payment/update', {
+        // ユーザー情報取得（プラン金額・runningId の有無で分岐するため）
+        const meResponse = await fetch('/api/user/me', {
+          cache: 'no-store',
+          credentials: 'include',
+        })
+        if (!meResponse.ok) {
+          throw new Error('ユーザー情報の取得に失敗しました')
+        }
+        const userData = await meResponse.json()
+        const plan = userData.plan
+        const userPlan = userData.userPlan
+        const currentAmount = plan != null
+          ? (plan.discountPrice != null && plan.discountPrice < plan.price ? plan.discountPrice : plan.price)
+          : undefined
+        const runningId = userPlan?.paygentRunningId || plan?.paygentRunningId || undefined
+
+        // 継続課金あり（runningId あり）→ 電文281でカード変更
+        if (runningId != null && runningId !== '') {
+          if (currentAmount == null || currentAmount === undefined) {
+            throw new Error('現在のプラン情報を取得できません。プランに加入後に支払方法の変更を行ってください。')
+          }
+          const response = await fetch('/api/payment/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              customerId: mockCustomerId,
+              customerCardId: mockCustomerCardId,
+              runningId,
+              amount: Number(currentAmount),
+              description: '支払方法変更（モック）',
+            })
+          })
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(errorData.error || 'PaymentSession作成に失敗しました')
+          }
+          await response.json()
+          const mockUrl = `/payment-mock?customer_id=${mockCustomerId}&operation_type=02`
+          window.location.href = mockUrl
+          return
+        }
+
+        // 無料期間・カード登録のみ（runningId なし）→ register でセッション作成しリダイレクト
+        const registerResponse = await fetch('/api/payment/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             customerId: mockCustomerId,
-            customerCardId: mockCustomerCardId,
-            // userEmailはバックエンドで認証トークンから取得するため、送信しない
           })
         })
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.error || 'PaymentSession作成に失敗しました')
+        if (!registerResponse.ok) {
+          const errorData = await registerResponse.json().catch(() => ({}))
+          throw new Error(errorData.error || errorData.message || 'カード変更の準備に失敗しました')
         }
-
-        await response.json()
-
-        // モック画面にリダイレクト
-        const mockUrl = `/payment-mock?customer_id=${mockCustomerId}&operation_type=02`
-        window.location.href = mockUrl
+        const data = await registerResponse.json()
+        if (data.redirectUrl && data.params) {
+          const form = document.createElement('form')
+          form.method = 'POST'
+          form.action = data.redirectUrl
+          Object.keys(data.params).forEach((key: string) => {
+            const input = document.createElement('input')
+            input.type = 'hidden'
+            input.name = key
+            input.value = data.params[key]
+            form.appendChild(input)
+          })
+          document.body.appendChild(form)
+          form.submit()
+        } else {
+          window.location.href = `/payment-mock?customer_id=${mockCustomerId}&operation_type=02`
+        }
         return
       }
 

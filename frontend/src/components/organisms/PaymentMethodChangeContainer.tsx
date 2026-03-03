@@ -9,6 +9,7 @@ interface PaymentMethodChangeContainerProps {
   paymentCard: {
     paygentCustomerId: string
     paygentCustomerCardId: string
+    cardLastFour?: string | null
   } | null
   fromPlanChange: boolean
   onChangePaymentMethod: () => void
@@ -54,6 +55,15 @@ export function PaymentMethodChangeContainer({
 
         {/* 情報表示 */}
         <div className="space-y-4 mb-6">
+          {paymentCard && (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <h3 className="text-sm font-bold text-gray-900 mb-2">現在の支払い方法</h3>
+              <p className="text-sm text-gray-700">
+                クレジットカード ************{paymentCard.cardLastFour ?? '----'}
+              </p>
+            </div>
+          )}
+
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 className="text-sm font-bold text-blue-900 mb-2">変更について</h3>
             <ul className="text-sm text-blue-800 space-y-1">
@@ -63,14 +73,6 @@ export function PaymentMethodChangeContainer({
               <li>• 変更後、次回から新しいカードで決済されます</li>
             </ul>
           </div>
-
-          {paymentCard && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-700">
-                <span className="font-medium">現在の登録状態:</span> カード登録済み
-              </p>
-            </div>
-          )}
         </div>
 
         {/* ボタン */}
