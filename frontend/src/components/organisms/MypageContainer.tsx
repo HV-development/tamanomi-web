@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react"
 import Image from "next/image"
-import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard, Share2, Copy, Check, Store } from "lucide-react"
+import { SquarePen, Crown, RefreshCw, Mail, Lock, LogOut, History, CreditCard, Share2, Copy, Check, Store, Wallet } from "lucide-react"
 import { User } from "lucide-react"
 import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
@@ -44,6 +44,7 @@ interface MyPageContainerProps {
   onViewPlan: () => void
   onViewUsageHistory: () => void
   onViewPaymentHistory: () => void
+  onChangePaymentMethod?: () => void
   onStoreIntroduction?: () => void
   hasStoreIntroduction?: boolean
   onCancelSubscription: () => void
@@ -339,6 +340,7 @@ const MenuButtons = React.memo(({
   onChangePassword,
   onViewUsageHistory,
   onViewPaymentHistory,
+  onChangePaymentMethod,
   onStoreIntroduction,
   onLogout,
   plan,
@@ -350,6 +352,7 @@ const MenuButtons = React.memo(({
   onChangePassword: () => void
   onViewUsageHistory: () => void
   onViewPaymentHistory: () => void
+  onChangePaymentMethod?: () => void
   onStoreIntroduction?: () => void
   onLogout: () => void
   plan?: Plan
@@ -372,6 +375,9 @@ const MenuButtons = React.memo(({
       )}
       {appConfig.myPageSettings.showPlanManagement && (
         <MenuButton onClick={onViewPlan} icon={RefreshCw} label={planMenuLabel} />
+      )}
+      {appConfig.myPageSettings.showPlanManagement && plan && onChangePaymentMethod && (
+        <MenuButton onClick={onChangePaymentMethod} icon={Wallet} label="支払方法の変更" />
       )}
       {appConfig.myPageSettings.showEmailChange && (
         <MenuButton onClick={onChangeEmail} icon={Mail} label="メールアドレスの変更" />
@@ -404,6 +410,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   onViewPlan,
   onViewUsageHistory,
   onViewPaymentHistory,
+  onChangePaymentMethod,
   onStoreIntroduction,
   hasStoreIntroduction,
   onWithdraw,
@@ -510,6 +517,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
               onChangePassword={onChangePassword}
               onViewUsageHistory={onViewUsageHistory}
               onViewPaymentHistory={onViewPaymentHistory}
+              onChangePaymentMethod={onChangePaymentMethod}
               onStoreIntroduction={onStoreIntroduction}
               onLogout={onLogout}
               plan={_plan}

@@ -804,6 +804,10 @@ export const useAppHandlers = (
         navigation.navigateToMyPage("payment-history")
     }, [auth, navigation])
 
+    const handleChangePaymentMethod = useCallback(() => {
+        window.location.href = '/payment-method-change'
+    }, [])
+
     const handleCancelSubscription = useCallback(() => {
         // サブスクリプションキャンセル処理
     }, [])
@@ -1398,6 +1402,7 @@ export const useAppHandlers = (
         handlePlanChangeBack,
         handleViewUsageHistory,
         handleViewPaymentHistory,
+        handleChangePaymentMethod,
         handleCancelSubscription,
         handleWithdraw,
         handleWithdrawConfirm,

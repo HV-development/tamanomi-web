@@ -24,6 +24,7 @@ interface MyPageLayoutProps {
   onViewPlan: () => void
   onViewUsageHistory: () => void
   onViewPaymentHistory: () => void
+  onChangePaymentMethod?: () => void
   onStoreIntroduction?: () => void
   hasStoreIntroduction?: boolean
   onCancelSubscription: () => void
@@ -62,6 +63,7 @@ export function MyPageLayout({
   onViewPlan,
   onViewUsageHistory,
   onViewPaymentHistory,
+  onChangePaymentMethod,
   onStoreIntroduction,
   onCancelSubscription,
   onLogout,
@@ -100,6 +102,7 @@ export function MyPageLayout({
       onViewPlan={onViewPlan}
       onViewUsageHistory={onViewUsageHistory}
       onViewPaymentHistory={onViewPaymentHistory}
+      onChangePaymentMethod={onChangePaymentMethod}
       onStoreIntroduction={onStoreIntroduction}
       hasStoreIntroduction={hasStoreIntroduction}
       onCancelSubscription={onCancelSubscription}
