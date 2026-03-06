@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import './styles.css'
+import { LpFlowButton } from '@/components/atoms/LpFlowButton'
 
 export const metadata: Metadata = {
   title: 'たまのみ - 毎日1杯無料で乾杯',
@@ -22,6 +23,7 @@ export default function LPLayout({
 }) {
   return (
     <div className="lp-layout">
+      <LpFlowButton />
       {children}
     </div>
   )
