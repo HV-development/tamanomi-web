@@ -1,15 +1,10 @@
 import type {
   PayPayPaymentResponse,
   PayPayGetTransactionResponse,
+  PaymentMethodType,
 } from '@hv-development/schemas'
 
-/**
- * 支払い方法種別
- * - CreditCard: クレジットカード決済
- * - AeonPay: イオンペイ（QRコード決済）
- * - PayPay: PayPay（QRコード決済）
- */
-export type PaymentMethodType = 'CreditCard' | 'AeonPay' | 'PayPay'
+export type { PaymentMethodType }
 
 /**
  * 単発プラン決済開始リクエスト（フロントエンド → 自社API）
