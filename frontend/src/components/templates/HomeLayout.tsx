@@ -24,6 +24,9 @@ import { PlanRequiredModal } from "../molecules/PlanRequiredModal"
 import { EmailChangeSuccessModal } from "../organisms/EmailChangeSuccessModal"
 import { StoreDetailPopup } from "@/components/organisms/StoreDetailPopup"
 import { Logo } from "../atoms/Logo"
+import { HomeHeader } from "../organisms/HomeHeader"
+import { HomeFilterBar } from "../molecules/HomeFilterBar"
+import { BackToTopButton } from "../molecules/BackToTopButton"
 import { EmailConfirmationComplete } from "../molecules/EmailConfirmationComplete"
 import CouponConfirmationPage from "../molecules/CouponConfirmationPage"
 import { UsageGuidePage } from "../molecules/UsageGuidePage"
@@ -31,7 +34,6 @@ import { FooterNavigation } from "../molecules/FooterNavigation"
 import { BannerCarousel } from "@/components/organisms/BannerCarousel"
 import { AreaPopup } from "../molecules/AreaPopup"
 import { GenrePopup } from "../molecules/GenrePopup"
-import { HamburgerMenu } from "../molecules/HamburgerMenu"
 import { UsageGuideModal } from "@/components/organisms/UsageGuideModal"
 import { useAppContext } from "@/contexts/AppContext"
 import type { Store } from "@/types/store"
@@ -64,9 +66,10 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   // 検索ボタンが押されたときに検索モードをトグル
   useEffect(() => {
     setIsSearchMode(state.isSearchPopupOpen)
-    // 検索モードが閉じられたら検索結果もクリア
+    // 検索モードが閉じられたら検索結果・キーワードもクリア
     if (!state.isSearchPopupOpen) {
       setSearchResults([])
+      setSearchKeyword('')
     }
   }, [state.isSearchPopupOpen])
   const [isCouponUsedToday, setIsCouponUsedToday] = useState(false)
@@ -281,7 +284,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     return {
       id: coupon.id,
       uuid: coupon.id,
-      title: coupon.title,
+      name: coupon.title,
       description: coupon.description,
       conditions: coupon.conditions,
       imageUrl: coupon.imageUrl,
@@ -999,117 +1002,40 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
 
   return (
     <div className={`min-h-screen flex flex-col ${backgroundColorClass} w-full pb-20`}>
-      {/* ヘッダー部分のみ */}
-      <div className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
-        <div className="flex items-center justify-between px-4 py-3">
-          {/* 左側: ハンバーガーメニューとランク */}
-          <div className="flex items-center gap-3 w-20">
-            <HamburgerMenu onMenuItemClick={onMenuItemClick} isAuthenticated={isAuthenticated} />
-          </div>
-
-          {/* 中央: ロゴ */}
-          <div className="flex-1 flex justify-center">
-            <Logo size="lg" onClick={onLogoClick} />
-          </div>
-
-          {/* 右側: ユーザーメニュー（ログイン時のみ） */}
-          <div className="flex items-center justify-end w-20">
-            {/* TODO: 将来的に解放予定 - ランク表示 */}
-            {/* {isAuthenticated ? (
-              user && currentUserRank && (
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border-2 border-green-600">
-                  <div className="relative w-5 h-5">
-                    <Image
-                      src={`/${currentUserRank}.svg`}
-                      alt={`${currentUserRank}ランク`}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-              )
-            ) : null} */}
-          </div>
-        </div>
-      </div>
+      <HomeHeader
+        onMenuItemClick={onMenuItemClick}
+        isAuthenticated={isAuthenticated}
+        onLogoClick={onLogoClick}
+      />
 
       {/* バナーカルーセル */}
       <BannerCarousel />
 
-      {/* フィルターボタン */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="grid grid-cols-3 gap-1 px-2 py-4">
-          <button
-            onClick={onCurrentLocationClick}
-            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap ${isNearbyFilter
-              ? "border-green-500 bg-green-50 text-green-700"
-              : "border-gray-300 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50"
-              }`}
-          >
-            {isNearbyFilter && (
-              <span className="text-green-600 text-xs">✓</span>
-            )}
-            近くのお店
-          </button>
-          <button
-            onClick={(e) => {
-              (e.currentTarget as HTMLButtonElement).blur()
-              setIsAreaPopupOpen(true)
-            }}
-            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap active:bg-gray-100 ${(selectedAreas?.length ?? 0) > 0
-              ? "border-green-500 bg-green-50 text-green-700"
-              : "border-gray-300 bg-white text-gray-700"
-              }`}
-          >
-            <span>エリア</span>
-            {(selectedAreas?.length ?? 0) > 0 && (
-              <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
-                {selectedAreas?.length ?? 0}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={(e) => {
-              (e.currentTarget as HTMLButtonElement).blur()
-              setIsGenrePopupOpen(true)
-            }}
-            className={`w-full flex items-center justify-center gap-1 px-2 py-2 border rounded-full text-xs font-medium transition-colors whitespace-nowrap active:bg-gray-100 ${(selectedGenres?.length ?? 0) > 0
-              ? "border-green-500 bg-green-50 text-green-700"
-              : "border-gray-300 bg-white text-gray-700"
-              }`}
-          >
-            <span>ジャンル</span>
-            {(selectedGenres?.length ?? 0) > 0 && (
-              <span className="bg-green-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
-                {selectedGenres?.length ?? 0}
-              </span>
-            )}
-          </button>
-        </div>
-        {/* 特定商取引法についてのリンク */}
-        <div className="px-2 pb-2 text-center">
-          <a
-            href="/lp/commercial-law"
-            className="text-xs text-gray-600 hover:text-gray-800 underline"
-          >
-            特定商取引法について
-          </a>
-        </div>
-      </div>
+      <HomeFilterBar
+        isNearbyFilter={isNearbyFilter}
+        selectedAreasCount={selectedAreas?.length ?? 0}
+        selectedGenresCount={selectedGenres?.length ?? 0}
+        onCurrentLocationClick={onCurrentLocationClick}
+        onAreaClick={() => setIsAreaPopupOpen(true)}
+        onGenreClick={() => setIsGenrePopupOpen(true)}
+      />
 
-      {/* 検索バー */}
+      {/* 検索バー: 現状の場所で固定し、スクロールしても表示。ヘッダーより下で張り付き3点リーダー・ロゴ・店名検索が全部見切れないように */}
       {isSearchMode && (
-        <SearchBar
-          onClose={() => {
-            handlers.handleSearchClose()
-            setSearchResults([])
-          }}
-          onSearch={(keyword) => {
-            setSearchKeyword(keyword)
-            performSearch(keyword)
-          }}
-          isLoading={isSearching}
-        />
+        <div className="sticky top-24 z-20 bg-white border-b border-gray-100">
+          <SearchBar
+            onClose={() => {
+              handlers.handleSearchClose()
+              setSearchResults([])
+              setSearchKeyword('')
+            }}
+            onSearch={(keyword) => {
+              setSearchKeyword(keyword)
+              performSearch(keyword)
+            }}
+            isLoading={isSearching}
+          />
+        </div>
       )}
 
       {/* エリア選択ポップアップ */}
@@ -1252,16 +1178,10 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       {/* フッターナビゲーション */}
       <FooterNavigation />
 
-      {/* 先頭へ戻るフローティングボタン */}
-      {showBackToTop && (
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-20 right-4 z-40 px-4 py-3 rounded-full shadow-lg bg-green-600 text-white text-sm hover:bg-green-700 transition-colors"
-          aria-label="先頭へ戻る"
-        >
-          先頭へ戻る
-        </button>
-      )}
+      <BackToTopButton
+        visible={showBackToTop}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      />
 
     </div>
   )
