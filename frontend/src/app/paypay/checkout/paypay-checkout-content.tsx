@@ -14,12 +14,14 @@ interface PayPayFormData {
  * PayPay決済専用画面（Suspense内で動作する実体コンポーネント）
  *
  * DOMParser で redirectHtml を解析し、ネイティブ <form> + type="submit" ボタンとして
- * レンダリングすることで iOS Safari でも確実にフォーム送信できるようにしている。
+ * レンダリングする。フォームデータが揃い次第 requestSubmit() で自動送信し、
+ * iOS Safari など自動送信がブロックされる環境ではボタンをフォールバックとして使用する。
  */
 export function PayPayCheckoutContent() {
   const searchParams = useSearchParams()
   const [redirectHtml, setRedirectHtml] = useState<string | null>(null)
   const initializedRef = useRef(false)
+  const formRef = useRef<HTMLFormElement | null>(null)
 
   const payPayFormData = useMemo<PayPayFormData | null>(() => {
     if (!redirectHtml) return null
@@ -64,6 +66,21 @@ export function PayPayCheckoutContent() {
     }
   }, [searchParams])
 
+  // フォームデータが確定したら自動送信（iOS Safari がブロックした場合はボタンで対応）
+  useEffect(() => {
+    if (!payPayFormData) return
+    const timer = setTimeout(() => {
+      if (!formRef.current) return
+      // requestSubmit() は submit イベントを発火させるため onSubmit の Cookie 削除も実行される
+      if (typeof formRef.current.requestSubmit === 'function') {
+        formRef.current.requestSubmit()
+      } else {
+        formRef.current.submit()
+      }
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [payPayFormData])
+
   if (!redirectHtml || !payPayFormData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
@@ -84,7 +101,7 @@ export function PayPayCheckoutContent() {
         <div className="border-b border-gray-100 px-6 py-4">
           <h1 className="text-lg font-bold text-gray-900">PayPayでお支払い</h1>
           <p className="text-xs text-gray-600 mt-1">
-            下の「PayPayへ進む」ボタンをタップして決済画面へ進んでください。
+            PayPayの決済画面に自動的にリダイレクトします...
           </p>
         </div>
 
@@ -93,8 +110,9 @@ export function PayPayCheckoutContent() {
         </div>
 
         <div className="p-6 text-center">
-          {/* ネイティブ <form> + type="submit" ボタンで送信。iOS Safari でも確実に動作する */}
+          {/* ネイティブ <form> + type="submit" ボタン。自動送信 or ボタンタップで遷移 */}
           <form
+            ref={formRef}
             method={payPayFormData.method}
             action={payPayFormData.action}
             onSubmit={() => {
@@ -111,6 +129,8 @@ export function PayPayCheckoutContent() {
                   value={input.value}
                 />
               ))}
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
+            <p className="mt-4 text-sm text-gray-600">PayPayの決済画面に移動しています...</p>
             <button
               type="submit"
               className="mt-4 inline-flex items-center justify-center px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-base font-medium"
@@ -118,9 +138,6 @@ export function PayPayCheckoutContent() {
               PayPayへ進む
             </button>
           </form>
-          <p className="mt-3 text-[11px] text-gray-400 break-all">
-            送信先: {payPayFormData.action}
-          </p>
         </div>
       </div>
     </div>
