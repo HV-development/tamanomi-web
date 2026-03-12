@@ -9,14 +9,44 @@ import { getCookie, deleteCookie } from '@/lib/cookie'
  */
 export function PayPayCheckoutContent() {
   const searchParams = useSearchParams()
+  const PAYPAY_FORM_ID = 'paypay-redirect-form'
   const [redirectHtml, setRedirectHtml] = useState<string | null>(null)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [formAction, setFormAction] = useState<string | null>(null)
+  const [formId, setFormId] = useState<string | null>(null)
   const submitContainerRef = useRef<HTMLDivElement | null>(null)
   const initializedRef = useRef(false)
   const cookieDeletedRef = useRef(false)
 
   const canShowManualSubmit = useMemo(() => !!redirectHtml && !isSubmitted, [redirectHtml, isSubmitted])
+
+  // 埋め込みHTML描画後にフォームを取得し、id を付与（ネイティブ submit 用）
+  const formCleanupRef = useRef<(() => void) | null>(null)
+  useEffect(() => {
+    if (!redirectHtml || !submitContainerRef.current) return
+    const timer = setTimeout(() => {
+      const root = submitContainerRef.current
+      if (!root) return
+      const form = root.querySelector('form') as HTMLFormElement | null
+      if (!form) return
+      form.id = PAYPAY_FORM_ID
+      setFormAction(form.action || null)
+      setFormId(PAYPAY_FORM_ID)
+      const onSubmit = () => {
+        if (!cookieDeletedRef.current) {
+          cookieDeletedRef.current = true
+          deleteCookie('tamanomi_payment_paypayHtml')
+        }
+      }
+      form.addEventListener('submit', onSubmit, { once: true })
+      formCleanupRef.current = () => form.removeEventListener('submit', onSubmit)
+    }, 50)
+    return () => {
+      clearTimeout(timer)
+      formCleanupRef.current?.()
+      formCleanupRef.current = null
+    }
+  }, [redirectHtml])
 
   const submitPayPayForm = () => {
     const root = submitContainerRef.current ?? document
@@ -103,23 +133,32 @@ export function PayPayCheckoutContent() {
               送信先: {formAction}
             </p>
           )}
-          {canShowManualSubmit && (
-            <button
-              type="button"
-              onClick={() => {
-                if (submitPayPayForm()) {
-                  setIsSubmitted(true)
-                  if (!cookieDeletedRef.current) {
-                    cookieDeletedRef.current = true
-                    deleteCookie('tamanomi_payment_paypayHtml')
+          {canShowManualSubmit &&
+            (formId ? (
+              <button
+                type="submit"
+                form={formId}
+                className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium"
+              >
+                PayPayへ進む
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (submitPayPayForm()) {
+                    setIsSubmitted(true)
+                    if (!cookieDeletedRef.current) {
+                      cookieDeletedRef.current = true
+                      deleteCookie('tamanomi_payment_paypayHtml')
+                    }
                   }
-                }
-              }}
-              className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium"
-            >
-              PayPayへ進む
-            </button>
-          )}
+                }}
+                className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium"
+              >
+                PayPayへ進む
+              </button>
+            ))}
         </div>
       </div>
     </div>
