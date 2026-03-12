@@ -17,10 +17,16 @@ export function PayPayCheckoutContent() {
       const decoded = decodeURIComponent(htmlFromParam)
       setRedirectHtml(decoded)
     } else {
-      // Cookieから取得
+      // Cookieから取得（保存時に encodeURIComponent しているためデコードする）
       const stored = getCookie('tamanomi_payment_paypayHtml')
       if (stored) {
-        setRedirectHtml(decodeURIComponent(stored))
+        try {
+          setRedirectHtml(decodeURIComponent(stored))
+        } catch {
+          // 既にデコード済みや不正な値の場合はそのまま使用
+          setRedirectHtml(stored)
+        }
+        // 使用後は削除
         deleteCookie('tamanomi_payment_paypayHtml')
       }
     }
