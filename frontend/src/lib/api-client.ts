@@ -1,8 +1,11 @@
 import type {
   PayPayPaymentStartResponse,
   PayPayTransactionStatusResponse,
-} from '@/types/payment'
-import type { PayPayPaymentRequest, QrPaymentRequest, QrPaymentResponse, QrGetTransactionResponse } from '@hv-development/schemas'
+  PayPayPaymentRequest,
+  QrPaymentRequest,
+  QrPaymentResponse,
+  QrGetTransactionResponse,
+} from '@hv-development/schemas'
 import { buildClientHeaders } from './client-header-utils'
 
 /**

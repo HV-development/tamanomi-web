@@ -6098,3 +6098,11 @@ packages:
       '@types/react': 18.3.27
       react: 18.3.1
     dev: false
+
+  file:../../tamanomi-schemas:
+    resolution: {directory: ../../tamanomi-schemas, type: directory}
+    name: '@hv-development/schemas'
+    engines: {node: 22.x}
+    dependencies:
+      zod: 3.25.76
+    dev: false

@@ -9,7 +9,7 @@ import { Input } from "@/components/atoms/Input"
 import { Modal } from "@/components/atoms/Modal"
 import { FadeInComponent } from "@/components/atoms/ProgressiveLoader"
 import { PlanListResponse } from '@hv-development/schemas'
-import type { PaymentMethodType } from '@/types/payment'
+import type { PaymentMethodType } from '@hv-development/schemas'
 import { ApiClient } from '@/lib/api-client';
 
 interface PlanRegistrationFormProps {

@@ -20,8 +20,7 @@ export function PayPayCheckoutContent() {
       // Cookieから取得
       const stored = getCookie('tamanomi_payment_paypayHtml')
       if (stored) {
-        setRedirectHtml(stored)
-        // 使用後は削除
+        setRedirectHtml(decodeURIComponent(stored))
         deleteCookie('tamanomi_payment_paypayHtml')
       }
     }

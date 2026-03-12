@@ -2,7 +2,7 @@
 
 import { HeaderLogo } from "../atoms/HeaderLogo"
 import { PlanRegistrationForm } from "./PlanRegistrationForm"
-import type { PaymentMethodType } from '@/types/payment'
+import type { PaymentMethodType } from '@hv-development/schemas'
 import { PlanListResponse } from '@hv-development/schemas'
 
 interface PlanRegistrationContainerProps {
