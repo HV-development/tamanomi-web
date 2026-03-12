@@ -4,58 +4,45 @@ import { useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getCookie, deleteCookie } from '@/lib/cookie'
 
+interface PayPayFormData {
+  action: string
+  method: string
+  inputs: Array<{ name: string; value: string; type: string }>
+}
+
 /**
  * PayPay決済専用画面（Suspense内で動作する実体コンポーネント）
+ *
+ * DOMParser で redirectHtml を解析し、ネイティブ <form> + type="submit" ボタンとして
+ * レンダリングすることで iOS Safari でも確実にフォーム送信できるようにしている。
  */
 export function PayPayCheckoutContent() {
   const searchParams = useSearchParams()
-  const PAYPAY_FORM_ID = 'paypay-redirect-form'
   const [redirectHtml, setRedirectHtml] = useState<string | null>(null)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [formAction, setFormAction] = useState<string | null>(null)
-  const [formId, setFormId] = useState<string | null>(null)
-  const submitContainerRef = useRef<HTMLDivElement | null>(null)
   const initializedRef = useRef(false)
-  const cookieDeletedRef = useRef(false)
 
-  const canShowManualSubmit = useMemo(() => !!redirectHtml && !isSubmitted, [redirectHtml, isSubmitted])
+  const payPayFormData = useMemo<PayPayFormData | null>(() => {
+    if (!redirectHtml) return null
+    try {
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(redirectHtml, 'text/html')
+      const form = doc.querySelector('form')
+      if (!form) return null
 
-  // 埋め込みHTML描画後にフォームを取得し、id を付与（ネイティブ submit 用）
-  const formCleanupRef = useRef<(() => void) | null>(null)
-  useEffect(() => {
-    if (!redirectHtml || !submitContainerRef.current) return
-    const timer = setTimeout(() => {
-      const root = submitContainerRef.current
-      if (!root) return
-      const form = root.querySelector('form') as HTMLFormElement | null
-      if (!form) return
-      form.id = PAYPAY_FORM_ID
-      setFormAction(form.action || null)
-      setFormId(PAYPAY_FORM_ID)
-      const onSubmit = () => {
-        if (!cookieDeletedRef.current) {
-          cookieDeletedRef.current = true
-          deleteCookie('tamanomi_payment_paypayHtml')
-        }
-      }
-      form.addEventListener('submit', onSubmit, { once: true })
-      formCleanupRef.current = () => form.removeEventListener('submit', onSubmit)
-    }, 50)
-    return () => {
-      clearTimeout(timer)
-      formCleanupRef.current?.()
-      formCleanupRef.current = null
+      // form.action はパース元ページのベースURLで解決されるため getAttribute で生の値を取得
+      const action = form.getAttribute('action') || ''
+      const method = form.getAttribute('method') || 'post'
+      const inputs = Array.from(form.querySelectorAll('input')).map(input => ({
+        name: input.name,
+        value: input.value,
+        type: input.type,
+      }))
+
+      return { action, method, inputs }
+    } catch {
+      return null
     }
   }, [redirectHtml])
-
-  const submitPayPayForm = () => {
-    const root = submitContainerRef.current ?? document
-    const form = root.querySelector('form') as HTMLFormElement | null
-    if (!form) return false
-    setFormAction(form.action || null)
-    form.submit()
-    return true
-  }
 
   useEffect(() => {
     if (initializedRef.current) return
@@ -63,8 +50,7 @@ export function PayPayCheckoutContent() {
 
     const htmlFromParam = searchParams.get('redirectHtml')
     if (htmlFromParam) {
-      const decoded = decodeURIComponent(htmlFromParam)
-      setRedirectHtml(decoded)
+      setRedirectHtml(decodeURIComponent(htmlFromParam))
     } else {
       // Cookieから取得（保存時に encodeURIComponent しているためデコードする）
       const stored = getCookie('tamanomi_payment_paypayHtml')
@@ -72,17 +58,13 @@ export function PayPayCheckoutContent() {
         try {
           setRedirectHtml(decodeURIComponent(stored))
         } catch {
-          // 既にデコード済みや不正な値の場合はそのまま使用
           setRedirectHtml(stored)
         }
       }
     }
   }, [searchParams])
 
-  // iOS/Safari はユーザー操作以外の form.submit() をブロックするため、自動送信は行わず
-  // 「PayPayへ進む」ボタンのタップ時のみ送信する
-
-  if (!redirectHtml) {
+  if (!redirectHtml || !payPayFormData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
         <div className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full text-center space-y-4">
@@ -110,58 +92,37 @@ export function PayPayCheckoutContent() {
           決済が完了すると、自動的にPayPayの画面から戻ります。ブラウザを閉じたり、このタブを更新しないでください。
         </div>
 
-        <div
-          ref={submitContainerRef}
-          className="p-4"
-          style={{
-            position: 'absolute',
-            left: -99999,
-            top: 0,
-            width: 1,
-            height: 1,
-            overflow: 'hidden',
-          }}
-        >
-          <div dangerouslySetInnerHTML={{ __html: redirectHtml }} />
-        </div>
-
         <div className="p-6 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
-          <p className="mt-4 text-sm text-gray-600">PayPayへ進むボタンをタップしてください。</p>
-          {formAction && (
-            <p className="mt-2 text-[11px] text-gray-500 break-all">
-              送信先: {formAction}
-            </p>
-          )}
-          {canShowManualSubmit &&
-            (formId ? (
-              <button
-                type="submit"
-                form={formId}
-                className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium"
-              >
-                PayPayへ進む
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  if (submitPayPayForm()) {
-                    setIsSubmitted(true)
-                    if (!cookieDeletedRef.current) {
-                      cookieDeletedRef.current = true
-                      deleteCookie('tamanomi_payment_paypayHtml')
-                    }
-                  }
-                }}
-                className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium"
-              >
-                PayPayへ進む
-              </button>
-            ))}
+          {/* ネイティブ <form> + type="submit" ボタンで送信。iOS Safari でも確実に動作する */}
+          <form
+            method={payPayFormData.method}
+            action={payPayFormData.action}
+            onSubmit={() => {
+              deleteCookie('tamanomi_payment_paypayHtml')
+            }}
+          >
+            {payPayFormData.inputs
+              .filter(input => input.type !== 'submit')
+              .map((input, index) => (
+                <input
+                  key={`${input.name}-${index}`}
+                  type="hidden"
+                  name={input.name}
+                  value={input.value}
+                />
+              ))}
+            <button
+              type="submit"
+              className="mt-4 inline-flex items-center justify-center px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-base font-medium"
+            >
+              PayPayへ進む
+            </button>
+          </form>
+          <p className="mt-3 text-[11px] text-gray-400 break-all">
+            送信先: {payPayFormData.action}
+          </p>
         </div>
       </div>
     </div>
   )
 }
-
