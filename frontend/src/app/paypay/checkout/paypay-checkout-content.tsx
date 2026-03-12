@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { getCookie, deleteCookie } from '@/lib/cookie'
 
 /**
@@ -10,6 +10,18 @@ import { getCookie, deleteCookie } from '@/lib/cookie'
 export function PayPayCheckoutContent() {
   const searchParams = useSearchParams()
   const [redirectHtml, setRedirectHtml] = useState<string | null>(null)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const submitContainerRef = useRef<HTMLDivElement | null>(null)
+
+  const canShowManualSubmit = useMemo(() => !!redirectHtml && !isSubmitted, [redirectHtml, isSubmitted])
+
+  const submitPayPayForm = () => {
+    const root = submitContainerRef.current ?? document
+    const form = root.querySelector('form') as HTMLFormElement | null
+    if (!form) return false
+    form.submit()
+    return true
+  }
 
   useEffect(() => {
     const htmlFromParam = searchParams.get('redirectHtml')
@@ -37,9 +49,9 @@ export function PayPayCheckoutContent() {
     if (redirectHtml) {
       // DOMが更新された後にフォームを探してサブミット
       const timer = setTimeout(() => {
-        const form = document.querySelector('form[name="form"]') as HTMLFormElement
-        if (form) {
-          form.submit()
+        // iOS/Safari での制限やフォーム構造差分に備え、埋め込んだ領域内の最初の form を送信する
+        if (submitPayPayForm()) {
+          setIsSubmitted(true)
         }
       }, 100)
 
@@ -75,15 +87,35 @@ export function PayPayCheckoutContent() {
           決済が完了すると、自動的にPayPayの画面から戻ります。ブラウザを閉じたり、このタブを更新しないでください。
         </div>
 
-        <div className="p-4" style={{ display: 'none' }}>
-          <div
-            dangerouslySetInnerHTML={{ __html: redirectHtml }}
-          />
+        <div
+          ref={submitContainerRef}
+          className="p-4"
+          style={{
+            position: 'absolute',
+            left: -99999,
+            top: 0,
+            width: 1,
+            height: 1,
+            overflow: 'hidden',
+          }}
+        >
+          <div dangerouslySetInnerHTML={{ __html: redirectHtml }} />
         </div>
 
         <div className="p-6 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
           <p className="mt-4 text-sm text-gray-600">PayPayの決済画面に移動しています...</p>
+          {canShowManualSubmit && (
+            <button
+              type="button"
+              onClick={() => {
+                if (submitPayPayForm()) setIsSubmitted(true)
+              }}
+              className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium"
+            >
+              PayPayへ進む
+            </button>
+          )}
         </div>
       </div>
     </div>
