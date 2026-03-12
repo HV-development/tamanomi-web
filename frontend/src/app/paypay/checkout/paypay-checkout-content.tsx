@@ -11,7 +11,10 @@ export function PayPayCheckoutContent() {
   const searchParams = useSearchParams()
   const [redirectHtml, setRedirectHtml] = useState<string | null>(null)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [formAction, setFormAction] = useState<string | null>(null)
   const submitContainerRef = useRef<HTMLDivElement | null>(null)
+  const initializedRef = useRef(false)
+  const cookieDeletedRef = useRef(false)
 
   const canShowManualSubmit = useMemo(() => !!redirectHtml && !isSubmitted, [redirectHtml, isSubmitted])
 
@@ -19,11 +22,15 @@ export function PayPayCheckoutContent() {
     const root = submitContainerRef.current ?? document
     const form = root.querySelector('form') as HTMLFormElement | null
     if (!form) return false
+    setFormAction(form.action || null)
     form.submit()
     return true
   }
 
   useEffect(() => {
+    if (initializedRef.current) return
+    initializedRef.current = true
+
     const htmlFromParam = searchParams.get('redirectHtml')
     if (htmlFromParam) {
       const decoded = decodeURIComponent(htmlFromParam)
@@ -38,8 +45,6 @@ export function PayPayCheckoutContent() {
           // 既にデコード済みや不正な値の場合はそのまま使用
           setRedirectHtml(stored)
         }
-        // 使用後は削除
-        deleteCookie('tamanomi_payment_paypayHtml')
       }
     }
   }, [searchParams])
@@ -52,6 +57,11 @@ export function PayPayCheckoutContent() {
         // iOS/Safari での制限やフォーム構造差分に備え、埋め込んだ領域内の最初の form を送信する
         if (submitPayPayForm()) {
           setIsSubmitted(true)
+          if (!cookieDeletedRef.current) {
+            cookieDeletedRef.current = true
+            // 使用後は削除（送信できた場合のみ）
+            deleteCookie('tamanomi_payment_paypayHtml')
+          }
         }
       }, 100)
 
@@ -105,11 +115,22 @@ export function PayPayCheckoutContent() {
         <div className="p-6 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
           <p className="mt-4 text-sm text-gray-600">PayPayの決済画面に移動しています...</p>
+          {formAction && (
+            <p className="mt-2 text-[11px] text-gray-500 break-all">
+              送信先: {formAction}
+            </p>
+          )}
           {canShowManualSubmit && (
             <button
               type="button"
               onClick={() => {
-                if (submitPayPayForm()) setIsSubmitted(true)
+                if (submitPayPayForm()) {
+                  setIsSubmitted(true)
+                  if (!cookieDeletedRef.current) {
+                    cookieDeletedRef.current = true
+                    deleteCookie('tamanomi_payment_paypayHtml')
+                  }
+                }
               }}
               className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium"
             >
