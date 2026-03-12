@@ -49,25 +49,8 @@ export function PayPayCheckoutContent() {
     }
   }, [searchParams])
 
-  // フォームを自動的にサブミット（すべてのフックは条件分岐の前に呼び出す必要がある）
-  useEffect(() => {
-    if (redirectHtml) {
-      // DOMが更新された後にフォームを探してサブミット
-      const timer = setTimeout(() => {
-        // iOS/Safari での制限やフォーム構造差分に備え、埋め込んだ領域内の最初の form を送信する
-        if (submitPayPayForm()) {
-          setIsSubmitted(true)
-          if (!cookieDeletedRef.current) {
-            cookieDeletedRef.current = true
-            // 使用後は削除（送信できた場合のみ）
-            deleteCookie('tamanomi_payment_paypayHtml')
-          }
-        }
-      }, 100)
-
-      return () => clearTimeout(timer)
-    }
-  }, [redirectHtml])
+  // iOS/Safari はユーザー操作以外の form.submit() をブロックするため、自動送信は行わず
+  // 「PayPayへ進む」ボタンのタップ時のみ送信する
 
   if (!redirectHtml) {
     return (
@@ -89,7 +72,7 @@ export function PayPayCheckoutContent() {
         <div className="border-b border-gray-100 px-6 py-4">
           <h1 className="text-lg font-bold text-gray-900">PayPayでお支払い</h1>
           <p className="text-xs text-gray-600 mt-1">
-            PayPayの決済画面に自動的にリダイレクトします...
+            下の「PayPayへ進む」ボタンをタップして決済画面へ進んでください。
           </p>
         </div>
 
@@ -114,7 +97,7 @@ export function PayPayCheckoutContent() {
 
         <div className="p-6 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
-          <p className="mt-4 text-sm text-gray-600">PayPayの決済画面に移動しています...</p>
+          <p className="mt-4 text-sm text-gray-600">PayPayへ進むボタンをタップしてください。</p>
           {formAction && (
             <p className="mt-2 text-[11px] text-gray-500 break-all">
               送信先: {formAction}
