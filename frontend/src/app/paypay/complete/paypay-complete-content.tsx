@@ -3,7 +3,6 @@
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { getPayPayTransactionStatus } from '@/lib/api-client'
 
 export function PayPayCompleteContent() {
   const searchParams = useSearchParams()
@@ -11,45 +10,32 @@ export function PayPayCompleteContent() {
   const [isError, setIsError] = useState(false)
 
   useEffect(() => {
-    const transactionId =
+    // Paygent はリダイレクト時に result パラメータを付与する（0=成功）
+    const result = searchParams.get('result')
+    const paymentId =
       searchParams.get('paypay_payment_id') ||
       searchParams.get('payment_id') ||
       searchParams.get('trading_id')
 
-    if (!transactionId) {
+    if (!paymentId) {
       setIsError(true)
       setStatusMessage('決済IDが取得できませんでした。決済を最初からやり直してください。')
       return
     }
 
-    ;(async () => {
-      const result = await getPayPayTransactionStatus(transactionId)
-
-      if (result.error) {
-        setIsError(true)
-        setStatusMessage(result.error.message || '決済状態の取得に失敗しました。時間をおいて再度お試しください。')
-        return
-      }
-
-      const payload = result.data
-      if (!payload) {
-        setIsError(true)
-        setStatusMessage('決済状態の取得に失敗しました。')
-        return
-      }
-
-      const status = payload.result.status
-      if (status === 'SUCCESS') {
-        setIsError(false)
-        setStatusMessage('決済が正常に完了しました。プランが有効になりました。')
-      } else if (status === 'PROCESSING' || status === 'REQUIRES_ACTION') {
-        setIsError(false)
-        setStatusMessage('決済処理中です。しばらく経ってからマイページのプラン情報をご確認ください。')
-      } else {
-        setIsError(true)
-        setStatusMessage('決済に失敗しました。再度お試しいただくか、別の支払い方法をご利用ください。')
-      }
-    })()
+    if (result === '0') {
+      // result=0 は Paygent が決済受付成功を示す
+      setIsError(false)
+      setStatusMessage('PayPay決済が完了しました。\nプランの有効化には少々お時間がかかる場合があります。\nしばらく経ってからマイページのプラン情報をご確認ください。')
+    } else if (result !== null) {
+      // result が存在するが 0 以外 → 決済失敗
+      setIsError(true)
+      setStatusMessage('決済に失敗しました。再度お試しいただくか、別の支払い方法をご利用ください。')
+    } else {
+      // result パラメータがない場合（キャンセル等）→ 処理中として扱う
+      setIsError(false)
+      setStatusMessage('決済処理中です。\nしばらく経ってからマイページのプラン情報をご確認ください。')
+    }
   }, [searchParams])
 
   return (
