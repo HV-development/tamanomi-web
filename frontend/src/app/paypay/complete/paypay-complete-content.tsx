@@ -12,7 +12,9 @@ export function PayPayCompleteContent() {
 
   useEffect(() => {
     const requestId = searchParams.get('requestId')
-    const paymentId = searchParams.get('paymentId')
+    // Paygentがリダイレクト時に付与するpayment_id（Paygent割り当てID）を優先使用
+    // フォールバックとして自社生成のpaymentIdも参照
+    const paymentId = searchParams.get('payment_id') || searchParams.get('paymentId')
 
     if (!requestId || !paymentId) {
       setIsLoading(false)
