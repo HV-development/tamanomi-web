@@ -15,6 +15,7 @@ export function PayPayCompleteContent() {
     // Paygentがリダイレクト時に付与するpayment_id（Paygent割り当てID）を優先使用
     // フォールバックとして自社生成のpaymentIdも参照
     const paymentId = searchParams.get('payment_id') || searchParams.get('paymentId')
+    const paypayPaymentId = searchParams.get('paypay_payment_id') ?? undefined
 
     if (!requestId || !paymentId) {
       setIsLoading(false)
@@ -26,7 +27,11 @@ export function PayPayCompleteContent() {
     fetch('/api/payment/paypay/complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ requestId, paymentId }),
+      body: JSON.stringify({
+        requestId,
+        paymentId,
+        ...(paypayPaymentId ? { paypayPaymentId } : {}),
+      }),
     })
       .then(async (res) => {
         const data = await res.json().catch(() => ({}))
