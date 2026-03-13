@@ -299,14 +299,24 @@ export function usePlanRegistration() {
 
       if (!isChangeOnly) {
         const selectedPlan = plans.find(p => p.id === planId)
-        if (selectedPlan) {
-          const planWithDate = selectedPlan as PlanResponse & { first_executed_date?: string | null }
-          paymentAmount = calcPaymentAmount(selectedPlan)
+        if (!selectedPlan) {
+          setError('選択したプランが見つかりません。ページを再読み込みしてください。')
+          setIsLoading(false)
+          return
+        }
 
-          if (!confirmPayment(planWithDate, paymentAmount, paymentMethod)) {
-            setIsLoading(false)
-            return
-          }
+        const planWithDate = selectedPlan as PlanResponse & { first_executed_date?: string | null }
+        paymentAmount = calcPaymentAmount(selectedPlan)
+
+        if (paymentAmount <= 0) {
+          setError('決済金額が正しくありません。プランをご確認ください。')
+          setIsLoading(false)
+          return
+        }
+
+        if (!confirmPayment(planWithDate, paymentAmount, paymentMethod)) {
+          setIsLoading(false)
+          return
         }
       }
 
