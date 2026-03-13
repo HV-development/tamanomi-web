@@ -24,20 +24,25 @@ export async function GET(request: NextRequest, { params }: Params) {
       },
     })
 
+    const responseData = await response.json().catch(() => ({}))
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+      console.error('PayPay transaction status API error response:', {
+        status: response.status,
+        transactionId,
+        errorData: responseData,
+      })
       return createNoCacheResponse(
-        { error: errorData.message || 'PayPay取引情報の取得に失敗しました' },
+        { error: { code: responseData.code || 'API_ERROR', message: responseData.message || 'PayPay取引情報の取得に失敗しました' } },
         { status: response.status },
       )
     }
 
-    const data = await response.json()
-    return createNoCacheResponse(data)
+    return createNoCacheResponse(responseData)
   } catch (error) {
     console.error('PayPay transaction status API error:', error)
     return createNoCacheResponse(
-      { error: 'PayPay取引情報の取得中にエラーが発生しました' },
+      { error: { code: 'NETWORK_ERROR', message: 'PayPay取引情報の取得中にエラーが発生しました' } },
       { status: 500 },
     )
   }
