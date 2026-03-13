@@ -13,8 +13,8 @@ dependencies:
     specifier: ^3.10.0
     version: 3.10.0(react-hook-form@7.68.0)
   '@hv-development/schemas':
-    specifier: 1.117.0
-    version: 1.117.0
+    specifier: 1.118.0
+    version: 1.118.0
   '@radix-ui/react-accordion':
     specifier: 1.2.2
     version: 1.2.2(@types/react-dom@18.3.7)(@types/react@18.3.27)(react-dom@18.3.1)(react@18.3.1)
@@ -235,24 +235,24 @@ packages:
     resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
     engines: {node: '>=6.9.0'}
 
-  /@emnapi/core@1.8.1:
-    resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
+  /@emnapi/core@1.9.0:
+    resolution: {integrity: sha512-0DQ98G9ZQZOxfUcQn1waV2yS8aWdZ6kJMbYCJB3oUBecjWYO1fqJ+a1DRfPF3O5JEkwqwP1A9QEN/9mYm2Yd0w==}
     requiresBuild: true
     dependencies:
-      '@emnapi/wasi-threads': 1.1.0
+      '@emnapi/wasi-threads': 1.2.0
       tslib: 2.8.1
     dev: true
     optional: true
 
-  /@emnapi/runtime@1.8.1:
-    resolution: {integrity: sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg==}
+  /@emnapi/runtime@1.9.0:
+    resolution: {integrity: sha512-QN75eB0IH2ywSpRpNddCRfQIhmJYBCJ1x5Lb3IscKAL8bMnVAKnRg8dCoXbHzVLLH7P38N2Z3mtulB7W0J0FKw==}
     requiresBuild: true
     dependencies:
       tslib: 2.8.1
     optional: true
 
-  /@emnapi/wasi-threads@1.1.0:
-    resolution: {integrity: sha512-WI0DdZ8xFSbgMjR1sFsKABJ/C5OnRrjT06JXbZKexJGrDuPTzZdDYfFlsgcCXCyf+suG5QU2e/y1Wo2V/OapLQ==}
+  /@emnapi/wasi-threads@1.2.0:
+    resolution: {integrity: sha512-N10dEJNSsUx41Z6pZsXU8FjPjpBEplgH24sfkmITrBED1/U2Esum9F3lfLrMjKHHjmi557zQn7kR9R+XWXu5Rg==}
     requiresBuild: true
     dependencies:
       tslib: 2.8.1
@@ -579,8 +579,8 @@ packages:
     deprecated: Use @eslint/object-schema instead
     dev: true
 
-  /@hv-development/schemas@1.117.0:
-    resolution: {integrity: sha512-FrUDjaA6JAg0ycgsVbyAIqvrWnHORapj/QpUJcVHysz5m0SspA7pS/dFBNjp1oYoRM5vtZMgQ5UCfVpk85LvQg==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.117.0/f8aeba78440ac1afa5e1bbc1b7609c4b1f7d4b26}
+  /@hv-development/schemas@1.118.0:
+    resolution: {integrity: sha512-rAsLDxrSXcUybAypF1YZlvYlnRByMlRPIBd9Ei20/WwvJG6DyfF7trL8gu3QFZv6a2VccXqhfZhLhu//1JkgtQ==, tarball: https://npm.pkg.github.com/download/@hv-development/schemas/1.118.0/812f887ab0f442f5a562b8e283f1f6c14159a8bf}
     engines: {node: 22.x}
     dependencies:
       zod: 3.25.76
@@ -767,7 +767,7 @@ packages:
     cpu: [wasm32]
     requiresBuild: true
     dependencies:
-      '@emnapi/runtime': 1.8.1
+      '@emnapi/runtime': 1.9.0
     optional: true
 
   /@img/sharp-win32-arm64@0.34.5:
@@ -829,8 +829,8 @@ packages:
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
     requiresBuild: true
     dependencies:
-      '@emnapi/core': 1.8.1
-      '@emnapi/runtime': 1.8.1
+      '@emnapi/core': 1.9.0
+      '@emnapi/runtime': 1.9.0
       '@tybys/wasm-util': 0.10.1
     dev: true
     optional: true
@@ -6097,12 +6097,4 @@ packages:
     dependencies:
       '@types/react': 18.3.27
       react: 18.3.1
-    dev: false
-
-  file:../../tamanomi-schemas:
-    resolution: {directory: ../../tamanomi-schemas, type: directory}
-    name: '@hv-development/schemas'
-    engines: {node: 22.x}
-    dependencies:
-      zod: 3.25.76
     dev: false
