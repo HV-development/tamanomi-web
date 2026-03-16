@@ -9,12 +9,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const fullUrl = buildApiUrl('/payment/paypay/pay')
+    const fullUrl = buildApiUrl('/payment/paypay/complete')
 
     const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
       headerOptions: {
-        requireAuth: true, // 決済は認証が必要
+        requireAuth: true,
       },
       body: JSON.stringify(body),
     })
@@ -22,21 +22,21 @@ export async function POST(request: NextRequest) {
     const responseData = await response.json().catch(() => ({}))
 
     if (!response.ok) {
-      console.error('PayPay payment API error response:', {
+      console.error('[PayPayComplete] API error response:', {
         status: response.status,
         errorData: responseData,
       })
       return createNoCacheResponse(
-        { error: { code: responseData.code || 'API_ERROR', message: responseData.message || 'PayPay決済の申込に失敗しました' } },
+        { error: { code: responseData.code || 'API_ERROR', message: responseData.message || 'PayPay購入完了処理に失敗しました' } },
         { status: response.status },
       )
     }
 
     return createNoCacheResponse(responseData)
   } catch (error) {
-    console.error('PayPay payment API error:', error)
+    console.error('[PayPayComplete] API error:', error)
     return createNoCacheResponse(
-      { error: { code: 'NETWORK_ERROR', message: 'PayPay決済の申込中にエラーが発生しました' } },
+      { error: { code: 'NETWORK_ERROR', message: 'PayPay購入完了処理中にエラーが発生しました' } },
       { status: 500 },
     )
   }
