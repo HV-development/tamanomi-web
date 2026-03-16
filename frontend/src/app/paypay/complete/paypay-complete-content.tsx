@@ -15,12 +15,21 @@ export function PayPayCompleteContent() {
     // Paygentがリダイレクト時に付与するpayment_id（Paygent割り当てID）を優先使用
     // フォールバックとして自社生成のpaymentIdも参照
     const paymentId = searchParams.get('payment_id') || searchParams.get('paymentId')
-    const paypayPaymentId = searchParams.get('paypay_payment_id') ?? undefined
+    const paypayPaymentId = searchParams.get('paypay_payment_id')?.trim()
 
     if (!requestId || !paymentId) {
       setIsLoading(false)
       setIsError(true)
       setStatusMessage('決済情報が取得できませんでした。決済を最初からやり直してください。')
+      return
+    }
+
+    if (!paypayPaymentId) {
+      setIsLoading(false)
+      setIsError(true)
+      setStatusMessage(
+        'リダイレクトに PayPay 決済番号がありません。決済が成功している場合は数分後にマイページを確認するか、しばらくしてから再度お試しください（Webhook で反映される場合があります）。',
+      )
       return
     }
 
@@ -30,7 +39,7 @@ export function PayPayCompleteContent() {
       body: JSON.stringify({
         requestId,
         paymentId,
-        ...(paypayPaymentId ? { paypayPaymentId } : {}),
+        paypayPaymentId,
       }),
     })
       .then(async (res) => {
