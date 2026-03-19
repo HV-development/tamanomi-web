@@ -721,7 +721,7 @@ export const useAppHandlers = (
 
     const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
         try {
-
+            const previousPlan = auth.plan
             auth.setIsLoading(true)
 
             const requestBody = {
@@ -764,9 +764,16 @@ export const useAppHandlers = (
                 // プラン変更は成功しているので、エラーでも続行
             }
 
-            // 支払い方法も変更する場合は、支払い方法変更確認画面へ遷移
+            // 支払い方法も変更する場合、またはプラン変更により is_subscription が false -> true になった場合は、
+            // 支払い方法変更確認画面へ遷移する
+            const updatedPlan = auth.plan
+            const hasSubscriptionChangedFromFalseToTrue =
+                previousPlan != null &&
+                updatedPlan != null &&
+                previousPlan.is_subscription === false &&
+                updatedPlan.is_subscription === true
 
-            if (alsoChangePaymentMethod) {
+            if (alsoChangePaymentMethod || hasSubscriptionChangedFromFalseToTrue) {
                 if (typeof window !== 'undefined') {
                     // 支払い方法変更確認画面へ遷移（カード登録APIは、確認画面で「カード情報を変更する」ボタンをクリックしたときに呼び出される）
                     // プラン変更時の新しいplanIdをURLパラメータとして渡す

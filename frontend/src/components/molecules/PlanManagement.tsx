@@ -78,7 +78,7 @@ export function PlanManagement({ plan, onChangePlan, onChangePaymentMethod, hasP
           >
             変更する
           </button>
-          {onChangePaymentMethod && (
+          {onChangePaymentMethod && plan.is_subscription && (
             <button
               onClick={onChangePaymentMethod}
               className="w-full mt-3 bg-white border-2 border-green-300 hover:bg-green-50 text-green-700 py-3 px-4 rounded-xl font-medium transition-colors"

@@ -376,7 +376,7 @@ const MenuButtons = React.memo(({
       {appConfig.myPageSettings.showPlanManagement && (
         <MenuButton onClick={onViewPlan} icon={RefreshCw} label={planMenuLabel} />
       )}
-      {appConfig.myPageSettings.showPlanManagement && plan && onChangePaymentMethod && (
+      {appConfig.myPageSettings.showPlanManagement && plan && plan.is_subscription && onChangePaymentMethod && (
         <MenuButton onClick={onChangePaymentMethod} icon={Wallet} label="支払方法の変更" />
       )}
       {appConfig.myPageSettings.showEmailChange && (
