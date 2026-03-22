@@ -612,7 +612,7 @@ export function PlanChangeForm({ currentPlan, onPlanChange, onCancel, isLoading 
                 支払い方法も変更する
               </div>
               <p className="text-xs text-purple-700">
-                プラン変更後、自動的にカード情報の変更画面に移動します
+                プラン変更完了後、続けてカード情報の変更画面に移動します
               </p>
             </div>
           </label>
