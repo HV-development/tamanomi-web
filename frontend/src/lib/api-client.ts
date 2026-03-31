@@ -206,9 +206,11 @@ export async function preRegister(
   shopId?: string
 ): Promise<PreRegisterResponse> {
   try {
-    const requestBody = {
+    const requestBody: Record<string, string> = {
       email,
-      campaignCode,
+      ...(campaignCode !== undefined && campaignCode.trim() !== ''
+        ? { campaignCode: campaignCode.trim() }
+        : {}),
       ...(referrerUserId && referrerUserId.trim() !== '' ? { referrerUserId: referrerUserId.trim() } : {}),
       ...(shopId && shopId.trim() !== '' ? { shopId: shopId.trim() } : {}),
     };

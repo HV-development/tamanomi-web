@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { preRegister } from '@/lib/api-client'
-import type { UserRegistrationRequest } from "@hv-development/schemas"
+import type { TamanomiUserRegistrationRequest } from "@hv-development/schemas"
 
 type Step = 'form' | 'complete'
 
@@ -11,7 +11,7 @@ export interface UseEmailRegistrationReturn {
   errorMessage: string
   successMessage: string
   email: string
-  handleEmailSubmit: (data: UserRegistrationRequest) => Promise<void>
+  handleEmailSubmit: (data: TamanomiUserRegistrationRequest) => Promise<void>
   handleResend: () => Promise<void>
   clearError: () => void
 }
@@ -25,7 +25,6 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [successMessage, setSuccessMessage] = useState<string>('')
   const [lastEmail, setLastEmail] = useState<string>('')
-  const [lastCampaignCode, setLastCampaignCode] = useState<string>('')
   const [shopId, setShopId] = useState<string | undefined>(undefined)
   const hasCleanedSession = useRef(false)
 
@@ -81,7 +80,7 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
   /**
    * メールアドレス送信処理
    */
-  const handleEmailSubmit = async (data: UserRegistrationRequest) => {
+  const handleEmailSubmit = async (data: TamanomiUserRegistrationRequest) => {
     // 連続押下を防ぐ
     if (isLoading) {
       return
@@ -96,16 +95,10 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       const referrerUserId = null; // 必要に応じてCookieから取得する実装を追加
 
       // 紹介者IDを含めてpreRegisterを呼び出し
-      const registrationData: UserRegistrationRequest = {
-        email: data.email,
-        campaignCode: data.campaignCode,
-        ...(referrerUserId && referrerUserId.trim() !== '' ? { referrerUserId: referrerUserId.trim() } : {}),
-      };
+      const code = data.campaignCode?.trim() ? data.campaignCode.trim() : undefined
 
-      await preRegister(registrationData.email, registrationData.campaignCode, referrerUserId || undefined, shopId)
-      // メールアドレスとキャンペーンコードを保存
-      setLastEmail(data.email)
-      setLastCampaignCode(data.campaignCode)
+      await preRegister(data.email.trim(), code, referrerUserId || undefined, shopId)
+      setLastEmail(data.email.trim())
       // 送信完了画面に遷移
       setCurrentStep('complete')
     } catch (error) {
@@ -134,11 +127,6 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       return
     }
 
-    if (!lastCampaignCode) {
-      setErrorMessage('キャンペーンコードが見つかりません')
-      return
-    }
-
     setIsLoading(true)
     setErrorMessage('')
     setSuccessMessage('')
@@ -148,7 +136,7 @@ export function useEmailRegistration(): UseEmailRegistrationReturn {
       // referrerUserIdはURLパラメータから取得するか、Cookieから取得する
       const referrerUserId = null; // 必要に応じてCookieから取得する実装を追加
 
-      await preRegister(lastEmail, lastCampaignCode, referrerUserId || undefined, shopId)
+      await preRegister(lastEmail, undefined, referrerUserId || undefined, shopId)
       // 成功メッセージを表示（画面は complete のまま）
       setSuccessMessage('認証メールを再送信しました')
 
