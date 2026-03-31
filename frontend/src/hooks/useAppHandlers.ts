@@ -8,6 +8,7 @@ import type { useFilters } from './useFilters'
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { getCurrentPosition } from '@/utils/location'
 import { toast } from 'sonner'
+import { preRegister } from '@/lib/api-client'
 import type { CreateStoreIntroductionRequest } from '@/types/store-introduction'
 
 // クーポン一覧取得の二重リクエスト防止（モジュールスコープで全インスタンス共有）
@@ -32,6 +33,7 @@ export const useAppHandlers = (
 
     // OTP requestIdを管理するローカルstate
     const [otpRequestId, setOtpRequestId] = useState<string>("")
+    const emailPreRegisterInFlightRef = useRef(false)
 
     const handleCurrentLocationClick = useCallback(async () => {
         if (filters.isNearbyFilter) {
@@ -265,17 +267,31 @@ export const useAppHandlers = (
         }
     }, [auth, state.loginEmail])
 
-    const handleEmailSubmit = useCallback((email: string, campaignCode?: string) => {
-        auth.setIsLoading(true)
-        setTimeout(() => {
-            dispatch({ type: 'SET_EMAIL_REGISTRATION_EMAIL', payload: email })
-            if (campaignCode) {
-                // キャンペーンコード処理
+    const handleEmailSubmit = useCallback(
+        async (email: string, campaignCode?: string) => {
+            const trimmed = email.trim()
+            if (!trimmed) {
+                toast.error('メールアドレスを入力してください')
+                return
             }
-            dispatch({ type: 'SET_EMAIL_REGISTRATION_STEP', payload: "complete" })
-            auth.setIsLoading(false)
-        }, 1500)
-    }, [auth, dispatch])
+            if (emailPreRegisterInFlightRef.current) return
+            emailPreRegisterInFlightRef.current = true
+            auth.setIsLoading(true)
+            try {
+                const code = campaignCode?.trim() ? campaignCode.trim() : undefined
+                await preRegister(trimmed, code, undefined, undefined)
+                dispatch({ type: 'SET_EMAIL_REGISTRATION_EMAIL', payload: trimmed })
+                dispatch({ type: 'SET_EMAIL_REGISTRATION_STEP', payload: 'complete' })
+                toast.success('認証メールを送信しました')
+            } catch (e) {
+                toast.error(e instanceof Error ? e.message : '認証メールの送信に失敗しました')
+            } finally {
+                emailPreRegisterInFlightRef.current = false
+                auth.setIsLoading(false)
+            }
+        },
+        [auth, dispatch]
+    )
 
     const handleEmailRegistrationBackToLogin = useCallback(() => {
         dispatch({ type: 'RESET_LOGIN_STATE' })
@@ -284,9 +300,26 @@ export const useAppHandlers = (
         dispatch({ type: 'SET_EMAIL_REGISTRATION_EMAIL', payload: "" })
     }, [navigation, dispatch])
 
-    const handleEmailRegistrationResend = useCallback(() => {
-        dispatch({ type: 'SET_EMAIL_REGISTRATION_STEP', payload: "form" })
-    }, [dispatch])
+    const handleEmailRegistrationResend = useCallback(async () => {
+        const regEmail = latestState.current.emailRegistrationEmail?.trim()
+        if (!regEmail) {
+            toast.error('メールアドレスが見つかりません')
+            dispatch({ type: 'SET_EMAIL_REGISTRATION_STEP', payload: 'form' })
+            return
+        }
+        if (emailPreRegisterInFlightRef.current) return
+        emailPreRegisterInFlightRef.current = true
+        auth.setIsLoading(true)
+        try {
+            await preRegister(regEmail, undefined, undefined, undefined)
+            toast.success('認証メールを再送信しました')
+        } catch (e) {
+            toast.error(e instanceof Error ? e.message : '認証メールの再送信に失敗しました')
+        } finally {
+            emailPreRegisterInFlightRef.current = false
+            auth.setIsLoading(false)
+        }
+    }, [auth, dispatch])
 
     const handleSignupSubmit = useCallback((data: Record<string, string>) => {
         // RegisterFormのデータ構造に合わせて変換

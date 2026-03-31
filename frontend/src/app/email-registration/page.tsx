@@ -21,7 +21,7 @@ function EmailRegistrationContent() {
   const handleLogoClick = () => router.push('/')
 
   // EmailRegistrationLayoutの型に合わせるためのラッパー関数
-  const handleSubmit = (data: { email: string; campaignCode: string; }) => {
+  const handleSubmit = (data: { email: string; campaignCode?: string; referrerUserId?: string }) => {
     handleEmailSubmit(data)
   }
 
