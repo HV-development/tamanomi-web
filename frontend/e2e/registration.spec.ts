@@ -9,9 +9,6 @@ test.describe('ユーザー登録フロー', () => {
   // OTP検証の競合を避けるため、このテストスイートは順次実行
   test.describe.configure({ mode: 'serial' });
 
-  // テスト用キャンペーンコード
-  const CAMPAIGN_CODE = '5959';
-
   // ================================================================
   // メールアドレス登録画面テスト
   // ================================================================
@@ -62,15 +59,6 @@ test.describe('ユーザー登録フロー', () => {
 
       // 入力されたことを確認
       await expect(emailInput).toHaveValue(testEmail);
-
-      // キャンペーンコード入力 - 2番目のinput[type="text"]を使用
-      const campaignCodeInput = page.locator('input[type="text"]').first();
-      await expect(campaignCodeInput).toBeVisible({ timeout: 5000 });
-      await campaignCodeInput.click();
-      await campaignCodeInput.fill(CAMPAIGN_CODE);
-
-      // 入力されたことを確認
-      await expect(campaignCodeInput).toHaveValue(CAMPAIGN_CODE);
 
       // 入力後待機（動画で確認できるように）
       await page.waitForTimeout(2000);
