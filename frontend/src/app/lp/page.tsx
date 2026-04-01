@@ -5,13 +5,8 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-// カルーセル用バナー画像とリンク先
+// カルーセル用バナー画像とリンク先（ユーザー画面 BannerCarousel とリンク先を揃える）
 const bannerItems = [
-  {
-    imageUrl: '/lp/images/monitor-recruitment-lp.webp',
-    linkUrl: '/campaigncode.pdf',
-    alt: 'モニター募集'
-  },
   {
     imageUrl: '/lp/images/merchant-recruitment-lp.webp',
     linkUrl: 'https://www.tamanomi.com/lp/merchant',
@@ -19,8 +14,8 @@ const bannerItems = [
   },
   {
     imageUrl: '/lp/images/saitama-app-benefits-lp.webp',
-    linkUrl: '/campaigncode.pdf',
-    alt: 'さいたま市みんなのアプリ'
+    linkUrl: 'https://www.home.saitama-tsunagu.com/',
+    alt: 'さいたま市みんなのアプリ（ユーザー特典）'
   },
   {
     imageUrl: '/lp/images/instagram-official-lp.png',
