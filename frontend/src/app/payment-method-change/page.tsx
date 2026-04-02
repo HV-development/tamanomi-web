@@ -8,7 +8,6 @@ function PaymentMethodChangeContent() {
   const {
     isLoading,
     error,
-    paymentCard,
     fromPlanChange,
     handleChangePaymentMethod,
     handleBack,
@@ -18,7 +17,6 @@ function PaymentMethodChangeContent() {
     <PaymentMethodChangeContainer
       isLoading={isLoading}
       error={error}
-      paymentCard={paymentCard}
       fromPlanChange={fromPlanChange}
       onChangePaymentMethod={handleChangePaymentMethod}
       onBack={handleBack}
