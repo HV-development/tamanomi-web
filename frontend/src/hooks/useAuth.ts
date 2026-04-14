@@ -60,21 +60,8 @@ export function useAuth() {
         }
     }, []);
 
-    // リフレッシュトークンでアクセストークンを更新する
-    const tryRefresh = useCallback(async (): Promise<boolean> => {
-        try {
-            const res = await fetch('/api/auth/refresh', {
-                method: 'POST',
-                credentials: 'include',
-            });
-            return res.ok;
-        } catch (error) {
-            console.error('トークンリフレッシュに失敗しました:', error);
-            return false;
-        }
-    }, []);
-
     // ユーザー情報を取得する
+    // サーバーサイドで自動リフレッシュが行われるため、クライアント側でのリフレッシュは不要
     const fetchUserMe = useCallback(async (): Promise<{ status: number; data: User | null }> => {
         try {
             const response = await fetch('/api/user/me', {
@@ -91,7 +78,7 @@ export function useAuth() {
         }
     }, []);
 
-    // 自動ログイン処理とトークンチェック
+    // 認証初期化
     useEffect(() => {
         if (typeof window !== 'undefined' && !hasInitialized.current) {
             hasInitialized.current = true;
@@ -100,40 +87,22 @@ export function useAuth() {
             const loginEmail = urlParams.get('email');
 
             if (autoLogin === 'true' && loginEmail) {
-                // 自動ログイン処理
                 setIsAuthenticated(true);
-                // URLパラメータをクリア
                 window.history.replaceState({}, '', '/');
             } else {
-                // Cookieにアクセストークンがある場合は認証済みとする
-                // Cookieは自動的に送信されるため、Authorizationヘッダーは不要
                 setIsLoading(true);
                 
                 const initAuth = async () => {
                     try {
-                        let result = await fetchUserMe();
-                        
-                        // 401/403エラーの場合はリフレッシュを試みる
-                        if (result.status === 401 || result.status === 403) {
-                            console.log('🔄 アクセストークン期限切れ、リフレッシュを試行中...');
-                            const refreshed = await tryRefresh();
-                            if (refreshed) {
-                                console.log('✅ トークンリフレッシュ成功、ユーザー情報を再取得中...');
-                                result = await fetchUserMe();
-                            } else {
-                                console.log('❌ トークンリフレッシュ失敗');
-                            }
-                        }
+                        const result = await fetchUserMe();
                         
                         if (result.data) {
                             setIsAuthenticated(true);
                             setUser(result.data);
                             setPlan(result.data.plan);
-                            // 利用履歴は別途APIから取得
                             fetchUsageHistory();
                             setPaymentHistory(result.data.paymentHistory || []);
                         } else {
-                            // トークンが無効な場合は未認証とする
                             setIsAuthenticated(false);
                         }
                     } catch (error) {
@@ -147,7 +116,7 @@ export function useAuth() {
                 initAuth();
             }
         }
-    }, [fetchUsageHistory, fetchUserMe, tryRefresh]);
+    }, [fetchUsageHistory, fetchUserMe]);
 
     const login = (userData: User, planData: Plan | undefined, usage: UsageHistory[], payment: PaymentHistory[]) => {
         setIsAuthenticated(true);

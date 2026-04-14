@@ -167,21 +167,25 @@ export async function middleware(request: NextRequest) {
   ]
 
   if (protectedPaths.some(p => pathname === p || pathname.startsWith(`${p}/`))) {
-    const token =
+    const hasAccessToken =
       request.cookies.get(COOKIE_NAMES.ACCESS_TOKEN)?.value ||
       request.cookies.get(COOKIE_NAMES.HOST_ACCESS_TOKEN)?.value
-    if (!token) {
+    const hasRefreshToken =
+      request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value ||
+      request.cookies.get(COOKIE_NAMES.HOST_REFRESH_TOKEN)?.value
+
+    if (!hasAccessToken && !hasRefreshToken) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
       url.searchParams.set('session', 'expired')
       const redirectResponse = NextResponse.redirect(url)
-      // リダイレクトレスポンスにもキャッシュ無効化ヘッダーを設定
       redirectResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
       redirectResponse.headers.set('Pragma', 'no-cache')
       redirectResponse.headers.set('Expires', '0')
       return redirectResponse
     }
-    // 署名検証はAPI層で実施。ここではCookieの存在のみでガード。
+    // 署名検証・リフレッシュはAPI層（authenticatedFetch）で実施。
+    // ここではいずれかのトークンCookieが存在すれば通過させる。
   }
 
   const response = NextResponse.next()
