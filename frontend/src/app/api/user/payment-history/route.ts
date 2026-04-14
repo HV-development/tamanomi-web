@@ -1,8 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { getRefreshToken } from '@/lib/auth-header'
-import { COOKIE_MAX_AGE, COOKIE_NAMES } from '@/lib/cookie-config'
-import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { authenticatedFetch } from '@/lib/auth-fetch'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -11,149 +9,11 @@ export async function GET(request: NextRequest) {
   try {
     const fullUrl = buildApiUrl('/users/me/payment-history')
 
-    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+    const { response } = await authenticatedFetch(request, fullUrl, {
       method: 'GET',
-      headerOptions: {
-        requireAuth: true, // 認証が必要
-      },
     })
 
-    // 認証エラーの場合は401を返す
-    if (response.status === 401) {
-      return createNoCacheResponse(
-        { error: '認証が必要です' },
-        { status: 401 }
-      )
-    }
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ [payment-history] Backend API error:', data)
-
-      // 401または403エラーの場合、リフレッシュトークンで再試行
-      if (response.status === 401 || response.status === 403) {
-        const refreshToken = getRefreshToken(request)
-
-        if (refreshToken) {
-          // リフレッシュトークンでトークン更新
-          const refreshUrl = buildApiUrl('/refresh')
-          const refreshResponse = await secureFetchWithCommonHeaders(request, refreshUrl, {
-            method: 'POST',
-            headerOptions: {
-              requireAuth: false, // リフレッシュトークンは認証不要
-            },
-            body: JSON.stringify({ refreshToken }),
-          })
-
-          if (refreshResponse.ok) {
-            const refreshData = await refreshResponse.json()
-
-            // リフレッシュ成功、新しいトークンで元のリクエストを再試行
-            const newAuthHeader = `Bearer ${refreshData.accessToken}`
-            const retryResponse = await secureFetchWithCommonHeaders(request, fullUrl, {
-              method: 'GET',
-              headerOptions: {
-                requireAuth: true,
-                customHeaders: {
-                  Authorization: newAuthHeader,
-                },
-              },
-            })
-
-            if (retryResponse.ok) {
-              const retryData = await retryResponse.json()
-              // リフレッシュされたトークンをCookieに反映
-              const res = createNoCacheResponse(retryData, { status: 200 })
-              const isSecure = (() => {
-                try {
-                  return new URL(request.url).protocol === 'https:'
-                } catch {
-                  return process.env.NODE_ENV === 'production'
-                }
-              })()
-
-              // 新しいトークンをCookieに設定
-              if (refreshData.accessToken) {
-                // 旧Cookie（プレフィックス無し）を削除して衝突を解消
-                res.cookies.set('accessToken', '', {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: 0,
-                })
-                res.cookies.set('__Host-accessToken', '', {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: 0,
-                })
-
-                res.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, refreshData.accessToken, {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN,
-                })
-                res.cookies.set(COOKIE_NAMES.HOST_ACCESS_TOKEN, refreshData.accessToken, {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN,
-                })
-              }
-              if (refreshData.refreshToken) {
-                // 旧Cookie（プレフィックス無し）を削除して衝突を解消
-                res.cookies.set('refreshToken', '', {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: 0,
-                })
-                res.cookies.set('__Host-refreshToken', '', {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: 0,
-                })
-
-                res.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, refreshData.refreshToken, {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN,
-                })
-                res.cookies.set(COOKIE_NAMES.HOST_REFRESH_TOKEN, refreshData.refreshToken, {
-                  httpOnly: true,
-                  secure: isSecure,
-                  sameSite: 'strict',
-                  path: '/',
-                  maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN,
-                })
-              }
-
-              return res
-            }
-          }
-        }
-      }
-
-      return createNoCacheResponse(
-        {
-          error: data.message || data.error?.message || '決済履歴の取得に失敗しました',
-        },
-        { status: response.status }
-      )
-    }
-
-    return createNoCacheResponse(data)
+    return response
   } catch (error) {
     console.error('❌ [payment-history] Route error:', error)
     return createNoCacheResponse(
