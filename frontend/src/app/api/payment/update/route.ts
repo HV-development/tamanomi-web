@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
+      userPlanId,
       customerId,
       customerCardId,
       planId,
@@ -20,6 +21,17 @@ export async function POST(request: NextRequest) {
     } = body
 
     const fullUrl = buildApiUrl('/payment/update')
+
+    if (
+      typeof userPlanId !== 'string' ||
+      userPlanId.length === 0 ||
+      userPlanId.length > 64
+    ) {
+      return createNoCacheResponse(
+        { error: 'userPlanId（ユーザープランID）を指定してください。' },
+        { status: 400 }
+      )
+    }
 
     // amountもendScheduledも指定されていない場合はエラー
     if (amount === undefined && endScheduled === undefined) {
@@ -39,7 +51,9 @@ export async function POST(request: NextRequest) {
 
     // undefinedのフィールドを除外してバックエンドに送信
     // セキュリティ改善：userEmailはバックエンドで認証トークンから取得するため、フロントエンドから送信しない
-    const backendRequestBody: Record<string, unknown> = {}
+    const backendRequestBody: Record<string, unknown> = {
+      userPlanId,
+    }
 
     if (customerId) {
       backendRequestBody.customerId = customerId
