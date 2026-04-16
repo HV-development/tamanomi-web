@@ -778,37 +778,49 @@ export const useAppHandlers = (
                 throw new Error(errorData.message || 'プラン変更に失敗しました')
             }
 
-            const _responseData = await response.json();
+            const responseData = await response.json();
+
+            // 単発プランへの切替の場合（旧継続課金はバックエンド側で解約済み）
+            if (responseData.change_kind === 'single_plan_qr') {
+                try {
+                    const userResponse = await fetch('/api/user/me', {
+                        credentials: 'include',
+                        cache: 'no-store',
+                    })
+                    if (userResponse.ok) {
+                        const updatedUserData = await userResponse.json()
+                        auth.login(updatedUserData, updatedUserData.plan, updatedUserData.usageHistory || [], updatedUserData.paymentHistory || [])
+                    }
+                } catch (userError) {
+                    console.error('❌ [handlePlanChangeSubmit] ユーザー情報取得エラー:', userError);
+                }
+                navigation.navigateToMyPage("main")
+                return
+            }
 
             // プラン変更後、新しいユーザー情報を取得してauth状態を更新
             try {
                 const userResponse = await fetch('/api/user/me', {
-                    credentials: 'include', // Cookieを送信
+                    credentials: 'include',
+                    cache: 'no-store',
                 })
 
                 if (userResponse.ok) {
                     const updatedUserData = await userResponse.json()
 
-                    // auth状態を更新
                     auth.login(updatedUserData, updatedUserData.plan, updatedUserData.usageHistory || [], updatedUserData.paymentHistory || [])
                 }
             } catch (userError) {
                 console.error('❌ [handlePlanChangeSubmit] ユーザー情報取得エラー:', userError);
-                // プラン変更は成功しているので、エラーでも続行
             }
-
-            // 支払い方法も変更する場合は、支払い方法変更確認画面へ遷移
 
             if (alsoChangePaymentMethod) {
                 if (typeof window !== 'undefined') {
-                    // 支払い方法変更確認画面へ遷移（カード登録APIは、確認画面で「カード情報を変更する」ボタンをクリックしたときに呼び出される）
-                    // プラン変更時の新しいplanIdをURLパラメータとして渡す
                     window.location.href = `/payment-method-change?from=plan-change&planId=${encodeURIComponent(planId)}`;
                 } else {
                     console.warn('⚠️ [handlePlanChangeSubmit] windowが定義されていません');
                 }
             } else {
-                // 成功時はマイページに戻る
                 navigation.navigateToMyPage("main")
             }
 
@@ -937,6 +949,12 @@ export const useAppHandlers = (
 
             const endScheduled = formatDate(nextBillingDate)
 
+            if (!userPlanId) {
+                throw new Error(
+                    'ユーザープラン情報を取得できませんでした。マイページを再読み込みしてから再度お試しください。'
+                )
+            }
+
             // 退会処理APIを呼び出し（Paygent継続課金ありの場合）
             // userEmailはバックエンドで認証トークンから取得するため、送信しない
             const response = await fetch('/api/payment/update', {
@@ -945,6 +963,7 @@ export const useAppHandlers = (
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    userPlanId,
                     customerId: user.paymentCard?.paygentCustomerId,
                     customerCardId: user.paymentCard?.paygentCustomerCardId,
                     runningId: runningId,

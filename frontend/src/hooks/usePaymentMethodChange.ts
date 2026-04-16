@@ -90,12 +90,19 @@ export const usePaymentMethodChange = () => {
           if (currentAmount == null || currentAmount === undefined) {
             throw new Error('現在のプラン情報を取得できません。プランに加入後に支払方法の変更を行ってください。')
           }
+          const userPlanId = userPlan?.id
+          if (!userPlanId) {
+            throw new Error(
+              'ユーザープラン情報を取得できませんでした。マイページを再読み込みしてから再度お試しください。'
+            )
+          }
           const response = await fetch('/api/payment/update', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+              userPlanId,
               customerId: mockCustomerId,
               customerCardId: mockCustomerCardId,
               runningId,
