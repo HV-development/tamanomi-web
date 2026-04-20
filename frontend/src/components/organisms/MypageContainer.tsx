@@ -131,6 +131,17 @@ const ProfileCard = React.memo(({ user, onEditProfile }: { user?: UserType, onEd
         </button>
       </div>
 
+      {user.accountStatus === 'withdrawing' && (
+        <div className="mb-4 py-2 px-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800 font-medium">
+            退会予定
+            {user.withdrawalScheduledDate
+              ? `（${new Date(user.withdrawalScheduledDate).getFullYear()}年${new Date(user.withdrawalScheduledDate).getMonth() + 1}月${new Date(user.withdrawalScheduledDate).getDate()}日 まで利用可）`
+              : '（契約期間終了後にアカウントが無効になります）'}
+          </p>
+        </div>
+      )}
+
       <div className="space-y-3">
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">ニックネーム</span>
@@ -306,7 +317,7 @@ const MenuButton = React.memo(({
 }: {
   onClick?: () => void,
   icon: React.ComponentType<{ className?: string }>,
-  label: string,
+  label: React.ReactNode,
   isRed?: boolean,
   disabled?: boolean
 }) => (
@@ -325,7 +336,7 @@ const MenuButton = React.memo(({
       <div className={`w-8 h-8 ${disabled ? 'bg-gray-100' : isRed ? 'bg-red-100' : 'bg-green-100'} rounded-lg flex items-center justify-center`}>
         <Icon className={`w-5 h-5 ${disabled ? 'text-gray-400' : isRed ? 'text-red-600' : 'text-green-600'}`} />
       </div>
-      <span className={`text-lg font-medium ${disabled ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
+      <span className={`text-lg font-medium text-left ${disabled ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
     </div>
     <div className={disabled ? 'text-gray-300' : 'text-gray-400'}>›</div>
   </button>
@@ -344,7 +355,8 @@ const MenuButtons = React.memo(({
   onStoreIntroduction,
   onLogout,
   plan,
-  hasStoreIntroduction
+  hasStoreIntroduction,
+  accountStatus,
 }: {
   onEditProfile: () => void
   onViewPlan: () => void
@@ -357,8 +369,9 @@ const MenuButtons = React.memo(({
   onLogout: () => void
   plan?: Plan
   hasStoreIntroduction?: boolean
+  accountStatus?: string
 }) => {
-  // プラン有無に応じてラベルを決定
+  const isWithdrawing = accountStatus === 'withdrawing'
   const planMenuLabel = plan ? "プランの変更" : "プラン登録"
   
   return (
@@ -374,10 +387,10 @@ const MenuButtons = React.memo(({
         <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
       )}
       {appConfig.myPageSettings.showPlanManagement && (
-        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={planMenuLabel} />
+        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={isWithdrawing ? <span>プランの変更<br /><span className="text-xs">（退会処理済みのため利用不可）</span></span> : planMenuLabel} disabled={isWithdrawing} />
       )}
       {appConfig.myPageSettings.showPlanManagement && plan && onChangePaymentMethod && (
-        <MenuButton onClick={onChangePaymentMethod} icon={Wallet} label="支払方法の変更" />
+        <MenuButton onClick={onChangePaymentMethod} icon={Wallet} label={isWithdrawing ? <span>支払方法の変更<br /><span className="text-xs">（退会処理済みのため利用不可）</span></span> : "支払方法の変更"} disabled={isWithdrawing} />
       )}
       {appConfig.myPageSettings.showEmailChange && (
         <MenuButton onClick={onChangeEmail} icon={Mail} label="メールアドレスの変更" />
@@ -450,6 +463,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
 
   // 早期リターンでレンダリングを最適化
   if (currentView !== "main") {
+    if (!user) return <SkeletonMyPage />
     return <MyPageSubView
       currentView={currentView}
       user={user}
@@ -522,6 +536,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
               onLogout={onLogout}
               plan={_plan}
               hasStoreIntroduction={hasStoreIntroduction}
+              accountStatus={user?.accountStatus}
             />
           </FadeInComponent>
         </StaggeredContainer>
@@ -671,7 +686,7 @@ const MyPageSubView = React.memo(({
           </div>
           <div className="flex-1 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-              <WithdrawalComplete onBackToTop={onWithdrawComplete} />
+              <WithdrawalComplete onBackToTop={onWithdrawComplete} withdrawalScheduledDate={user?.withdrawalScheduledDate} />
             </div>
           </div>
         </div>

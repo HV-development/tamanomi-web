@@ -38,7 +38,8 @@ export function WithdrawalConfirmation({ onConfirm, onCancel, isLoading = false 
             <div className="font-bold text-red-900 mb-2">重要なご注意事項</div>
             <ul className="space-y-2">
               <li>1. 退会後にデータを復旧することはできません。再度ご利用いただく場合は、新規登録が必要となります。</li>
-              <li>2. 退会完了後は、契約期間が残っていてもサービスをご利用いただけなくなります。</li>
+              <li>2. 退会手続き後も、ご契約期間の終了日まではサービスをご利用いただけます。</li>
+              <li>3. 契約期間終了後は自動的にアカウントが無効になります。</li>
             </ul>
           </div>
         </div>
