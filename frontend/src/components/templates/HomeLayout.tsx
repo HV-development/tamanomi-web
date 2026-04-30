@@ -242,7 +242,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
     return {
       id: coupon.id,
       uuid: coupon.id,
-      title: coupon.title,
+      name: coupon.title,
       description: coupon.description,
       conditions: coupon.conditions,
       imageUrl: coupon.imageUrl,
