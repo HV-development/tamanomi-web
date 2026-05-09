@@ -1,5 +1,6 @@
 import { MyPageContainer } from "../organisms/MypageContainer"
 import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
+import type { ProfileEditFormData } from "@/types/forms"
 
 interface MyPageLayoutProps {
   user?: User
@@ -16,6 +17,7 @@ interface MyPageLayoutProps {
   | "plan-management"
   | "withdrawal"
   | "withdrawal-complete"
+  | "withdrawal-failed"
   | "store-introduction"
   onViewChange: (view: string) => void
   onEditProfile: () => void
@@ -37,7 +39,7 @@ interface MyPageLayoutProps {
   onShowStoreOnHome: (storeId: string) => void
   onUseSameCoupon: (couponId: string) => void
   onLogoClick: () => void
-  onProfileEditSubmit: (data: Record<string, string>, updatedFields: string[]) => void
+  onProfileEditSubmit: (data: ProfileEditFormData) => void
   onEmailChangeSubmit?: (data: { currentPassword: string; newEmail: string; confirmEmail: string }) => void
   onPasswordChangeSubmit?: (currentPassword: string, newPassword: string) => void
   onPasswordChangeBackToLogin?: () => void
