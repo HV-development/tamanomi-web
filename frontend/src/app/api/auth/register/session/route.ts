@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set(COOKIE_NAME, encrypted, {
       httpOnly: true,
       secure: isSecure,
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: COOKIE_MAX_AGE.SESSION,
     })
@@ -225,7 +225,7 @@ export async function DELETE(request: NextRequest) {
         response.cookies.set(COOKIE_NAME, encrypted, {
           httpOnly: true,
           secure: isSecure,
-          sameSite: 'strict',
+          sameSite: 'lax',
           path: '/',
           maxAge: COOKIE_MAX_AGE.SESSION,
         })
@@ -234,7 +234,7 @@ export async function DELETE(request: NextRequest) {
         response.cookies.set(COOKIE_NAME, '', {
           httpOnly: true,
           secure: isSecure,
-          sameSite: 'strict',
+          sameSite: 'lax',
           path: '/',
           maxAge: 0,
         })
@@ -247,7 +247,7 @@ export async function DELETE(request: NextRequest) {
       response.cookies.set(COOKIE_NAME, '', {
         httpOnly: true,
         secure: isSecure,
-        sameSite: 'strict',
+        sameSite: 'lax',
         path: '/',
         maxAge: 0,
       })

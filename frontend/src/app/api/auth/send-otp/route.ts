@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       res.cookies.set(COOKIE_NAME, encrypted, {
         httpOnly: true,
         secure: isSecure,
-        sameSite: 'strict',
+        sameSite: 'lax',
         path: '/',
         maxAge: SESSION_MAX_AGE,
       })

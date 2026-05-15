@@ -94,7 +94,7 @@ export function setCookieLegacy(name: string, value: string, days: number = 1): 
   setCookie(name, value, {
     maxAge: days * 24 * 60 * 60,
     secure: isSecureEnvironment(),
-    sameSite: 'strict',
+    sameSite: 'lax',
     path: '/',
   });
 }

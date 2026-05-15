@@ -29,13 +29,13 @@ export function setTokenCookies(
   isSecure: boolean
 ): void {
   if (tokens.accessToken) {
-    response.cookies.set('accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
-    response.cookies.set('__Host-accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+    response.cookies.set('accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'lax', path: '/', maxAge: 0 })
+    response.cookies.set('__Host-accessToken', '', { httpOnly: true, secure: isSecure, sameSite: 'lax', path: '/', maxAge: 0 })
 
     response.cookies.set(COOKIE_NAMES.ACCESS_TOKEN, tokens.accessToken, {
       httpOnly: true,
       secure: isSecure,
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN,
     })
@@ -43,7 +43,7 @@ export function setTokenCookies(
       response.cookies.set(COOKIE_NAMES.HOST_ACCESS_TOKEN, tokens.accessToken, {
         httpOnly: true,
         secure: true,
-        sameSite: 'strict',
+        sameSite: 'lax',
         path: '/',
         maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN,
       })
@@ -51,13 +51,13 @@ export function setTokenCookies(
   }
 
   if (tokens.refreshToken) {
-    response.cookies.set('refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
-    response.cookies.set('__Host-refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'strict', path: '/', maxAge: 0 })
+    response.cookies.set('refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'lax', path: '/', maxAge: 0 })
+    response.cookies.set('__Host-refreshToken', '', { httpOnly: true, secure: isSecure, sameSite: 'lax', path: '/', maxAge: 0 })
 
     response.cookies.set(COOKIE_NAMES.REFRESH_TOKEN, tokens.refreshToken, {
       httpOnly: true,
       secure: isSecure,
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN,
     })
@@ -65,7 +65,7 @@ export function setTokenCookies(
       response.cookies.set(COOKIE_NAMES.HOST_REFRESH_TOKEN, tokens.refreshToken, {
         httpOnly: true,
         secure: true,
-        sameSite: 'strict',
+        sameSite: 'lax',
         path: '/',
         maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN,
       })
@@ -83,7 +83,7 @@ export function clearTokenCookies(
   const cookieOptions = {
     httpOnly: true,
     secure: isSecure,
-    sameSite: 'strict' as const,
+    sameSite: 'lax' as const,
     path: '/',
     maxAge: 0,
   }
