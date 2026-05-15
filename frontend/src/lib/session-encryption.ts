@@ -58,3 +58,26 @@ export function decrypt(encryptedData: string): string {
   return decrypted
 }
 
+/**
+ * 既存のセッションデータに新しいキーをマージして暗号化した値を返す
+ * @param existingCookieValue - 既存のCookie値（未設定の場合はundefined）
+ * @param updates - マージするキーと値のペア
+ * @returns 暗号化済みのCookie値
+ */
+export function mergeSessionData(
+  existingCookieValue: string | undefined,
+  updates: Record<string, unknown>
+): string {
+  let existingData: Record<string, unknown> = {}
+
+  if (existingCookieValue) {
+    try {
+      existingData = JSON.parse(decrypt(existingCookieValue))
+    } catch {
+      existingData = {}
+    }
+  }
+
+  return encrypt(JSON.stringify({ ...existingData, ...updates }))
+}
+

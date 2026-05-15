@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { encrypt, decrypt, COOKIE_NAME, SESSION_MAX_AGE } from '@/lib/session-encryption'
+import { mergeSessionData, COOKIE_NAME, SESSION_MAX_AGE } from '@/lib/session-encryption'
 import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
+import { isSecureRequest } from '@/lib/token-cookie'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,14 +12,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email } = body
 
-    // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
     const fullUrl = buildApiUrl('/otp/send')
 
     const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
-      headerOptions: {
-        requireAuth: false, // OTP送信は認証不要
-      },
+      headerOptions: { requireAuth: false },
       body: JSON.stringify({ email }),
     })
 
@@ -32,47 +30,21 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json()
-
-    // セキュリティ改善：メールアドレスをURLパラメータで送信しないため、サーバーサイドセッションに保存
-    // OTP検証時にrequestIdからメールアドレスを取得できるようにする
     const res = createNoCacheResponse(data)
 
-    // セッションにメールアドレスとrequestIdを保存（OTP検証用）
-    // 共通のセッション暗号化ユーティリティを使用
+    // セッションにOTP用データを保存（メールアドレスをURLパラメータに含めないためのセキュリティ対策）
     try {
-      // 既存のセッションデータを取得
-      let existingData: Record<string, unknown> = {}
-      const sessionCookie = request.cookies.get(COOKIE_NAME)
-      
-      if (sessionCookie?.value) {
-        try {
-          const decrypted = decrypt(sessionCookie.value)
-          existingData = JSON.parse(decrypted)
-        } catch {
-          // 復号化に失敗した場合は新しいセッションを開始
-          existingData = {}
-        }
-      }
-
-      // メールアドレスとrequestIdを保存
-      existingData['otpEmail'] = email
-      existingData['otpRequestId'] = data.requestId
-
-      // 暗号化してCookieに保存
-      const encrypted = encrypt(JSON.stringify(existingData))
-      
-      const isSecure = (() => {
-        try { return new URL(request.url).protocol === 'https:' } catch { return process.env.NODE_ENV === 'production' }
-      })()
-
+      const encrypted = mergeSessionData(
+        request.cookies.get(COOKIE_NAME)?.value,
+        { otpEmail: email, otpRequestId: data.requestId }
+      )
       res.cookies.set(COOKIE_NAME, encrypted, {
         httpOnly: true,
-        secure: isSecure,
+        secure: isSecureRequest(request),
         sameSite: 'lax',
         path: '/',
         maxAge: SESSION_MAX_AGE,
       })
-
     } catch (error) {
       console.error('❌ [send-otp] Error saving session:', error)
       // セッション保存に失敗してもOTP送信は成功しているので、エラーを返さない
