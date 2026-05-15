@@ -55,7 +55,7 @@ async function loadGenres(): Promise<Genre[]> {
 
 export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onClear }: GenrePopupProps) {
   const [genres, setGenres] = useState<Genre[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(() => genreCache === null)
   const [error, setError] = useState<string | null>(null)
 
   // ジャンル一覧をAPIから取得
