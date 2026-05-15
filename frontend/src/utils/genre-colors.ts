@@ -73,7 +73,7 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     checkBg: "#CB30E0"
   },
   ethnic: {
-    bg: "#C08E0F1A  ",
+    bg: "#C08E0F1A",
     text: "#C08E0F",
     border: "#C08E0F",
     hover: "#C08E0F33",
