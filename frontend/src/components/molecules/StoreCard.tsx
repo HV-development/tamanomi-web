@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Phone, Clock, MapPin } from "lucide-react"
 import { FavoriteButton } from "@/components/atoms/FavoriteButton"
 import type { Store } from "@/types/store"
-import { getGenreColor } from "@/utils/genre-colors"
+import { getGenreBackgroundClass, getGenreBackgroundStyle, getGenreBorderClass, getGenreBorderStyle, getGenreColor, getGenreTextClass, getGenreTextStyle } from "@/utils/genre-colors"
 import { formatDistance } from "@/utils/location"
 import { useState, useRef, useEffect } from "react"
 
@@ -155,7 +155,14 @@ export function StoreCard({
         {/* ジャンルバッジと連絡先アイコン */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreColor(store.genre).bg} ${getGenreColor(store.genre).text} ${getGenreColor(store.genre).border}`}>
+            <span
+              style={{
+                ...getGenreBackgroundStyle(getGenreColor(store.genre)),
+                ...getGenreBorderStyle(getGenreColor(store.genre)),
+                ...getGenreTextStyle(getGenreColor(store.genre)),
+              }}
+              className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreBackgroundClass(getGenreColor(store.genre))} ${getGenreTextClass(getGenreColor(store.genre))} ${getGenreBorderClass(getGenreColor(store.genre))}`}
+            >
               {store.genreLabel}
             </span>
             {showDistance && store.distance !== undefined && (

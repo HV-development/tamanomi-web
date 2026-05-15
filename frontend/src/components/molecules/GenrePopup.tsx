@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/atoms/Button"
-import { getGenreColor } from "@/utils/genre-colors"
+import { getGenreBackgroundClass, getGenreBackgroundStyle, getGenreBorderClass, getGenreBorderStyle, getGenreCheckBgClass, getGenreCheckBgStyle, getGenreColorByName, getGenreHoverClass, getGenreHoverStyle, getGenreTextClass, getGenreTextStyle } from "@/utils/genre-colors"
 import { cn } from "@/lib/utils"
 
 interface GenrePopupProps {
@@ -19,6 +19,40 @@ interface Genre {
   sortOrder: number
 }
 
+let genreCache: Genre[] | null = null
+let genreFetchPromise: Promise<Genre[]> | null = null
+
+async function loadGenres(): Promise<Genre[]> {
+  if (genreCache) return genreCache
+  if (genreFetchPromise) return genreFetchPromise
+
+  genreFetchPromise = fetch('/api/genres', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error('ジャンル一覧の取得に失敗しました')
+      }
+
+      const data = await response.json()
+      const genresArray = Array.isArray(data) ? data : (data.genres || [])
+      const sortedGenres = genresArray
+        .filter((g: Genre) => g && g.id && g.name)
+        .sort((a: Genre, b: Genre) => (a.sortOrder || 0) - (b.sortOrder || 0))
+
+      genreCache = sortedGenres
+      return sortedGenres
+    })
+    .finally(() => {
+      genreFetchPromise = null
+    })
+
+  return genreFetchPromise
+}
+
 export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onClear }: GenrePopupProps) {
   const [genres, setGenres] = useState<Genre[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -28,40 +62,41 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
   useEffect(() => {
     if (!isOpen) return
 
+    let cancelled = false
+
     const fetchGenres = async () => {
+      if (genreCache) {
+        setGenres(genreCache)
+        setError(null)
+        setIsLoading(false)
+        return
+      }
+
       setIsLoading(true)
       setError(null)
 
       try {
-        const response = await fetch('/api/genres', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('ジャンル一覧の取得に失敗しました')
+        const loadedGenres = await loadGenres()
+        if (!cancelled) {
+          setGenres(loadedGenres)
         }
-
-        const data = await response.json()
-        const genresArray = Array.isArray(data) ? data : (data.genres || [])
-        
-        // sortOrderでソート（管理画面に合わせる）
-        const sortedGenres = genresArray
-          .filter((g: Genre) => g && g.id && g.name)
-          .sort((a: Genre, b: Genre) => (a.sortOrder || 0) - (b.sortOrder || 0))
-        
-        setGenres(sortedGenres)
       } catch (err) {
         console.error('ジャンル一覧の取得エラー:', err)
-        setError('ジャンル一覧の取得に失敗しました')
+        if (!cancelled) {
+          setError('ジャンル一覧の取得に失敗しました')
+        }
       } finally {
-        setIsLoading(false)
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
     }
 
     fetchGenres()
+
+    return () => {
+      cancelled = true
+    }
   }, [isOpen])
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -135,14 +170,7 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                     const genreName = genre.name
                     const isSelected = selectedGenres.includes(genreId)
                     
-                    // ジャンル名から既存のカラー設定を取得（フォールバック用）
-                    const genreValue = genreName.toLowerCase().replace(/\s+/g, '-')
-                    const genreColors = getGenreColor(genreValue) || {
-                      bg: "bg-gray-200",
-                      text: "text-gray-800",
-                      border: "border-gray-300",
-                      hover: "hover:bg-gray-300"
-                    }
+                    const genreColors = getGenreColorByName(genreName)
 
                     return (
                       <button
@@ -151,14 +179,23 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                           (e.currentTarget as HTMLButtonElement).blur()
                           onGenreToggle(genreId)
                         }}
-                        className={`relative rounded-lg border-2 transition-all duration-200 active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${isSelected
-                            ? "border-green-700 bg-green-100 text-green-800 shadow-md"
-                            : "border-gray-300 bg-white text-gray-700"
+                        style={isSelected ? {
+                          ...getGenreBackgroundStyle(genreColors),
+                          ...getGenreBorderStyle(genreColors),
+                          ...getGenreHoverStyle(genreColors),
+                          ...getGenreTextStyle(genreColors),
+                        } : undefined}
+                        className={`relative rounded-lg border-2 transition-all duration-200 active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium focus:outline-none focus:ring-2 focus:ring-[#2B7A78] focus:border-[#2B7A78] ${isSelected
+                          ? `${getGenreBorderClass(genreColors)} ${getGenreBackgroundClass(genreColors)} ${getGenreTextClass(genreColors)} ${getGenreHoverClass(genreColors)} shadow-md`
+                          : "border-gray-300 bg-white text-gray-700"
                           }`}
                       >
                         {isSelected && (
                           <div className="absolute -top-1 -right-1">
-                            <div className={cn("w-4 h-4 rounded-full flex items-center justify-center", genreColors.text.replace('text-', 'bg-'))}>
+                            <div
+                              style={getGenreCheckBgStyle(genreColors)}
+                              className={cn("w-4 h-4 rounded-full flex items-center justify-center", getGenreCheckBgClass(genreColors))}
+                            >
                               <span className="text-white text-xs">✓</span>
                             </div>
                           </div>
