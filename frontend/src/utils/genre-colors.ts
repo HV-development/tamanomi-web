@@ -1,5 +1,6 @@
 // ジャンル別カラー設定
 import type { CSSProperties } from "react"
+
 export interface GenreColor {
   bg: string
   text: string
@@ -130,7 +131,7 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
   },
   udon: {
     bg: "#0088FF1A",
-    text: "#0088FF",  
+    text: "#0088FF",
     border: "#0088FF",
     hover: "#0088FF33",
     checkBg: "#0088FF"

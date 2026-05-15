@@ -58,7 +58,6 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
   const [isLoading, setIsLoading] = useState(() => genreCache === null)
   const [error, setError] = useState<string | null>(null)
 
-  // ジャンル一覧をAPIから取得
   useEffect(() => {
     if (!isOpen) return
 
@@ -98,13 +97,13 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
       cancelled = true
     }
   }, [isOpen])
+
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose()
     }
   }, [onClose])
 
-  // モーダルが開いている間、背後のスクロールを無効にする
   useEffect(() => {
     if (isOpen) {
       const originalOverflow = document.body.style.overflow
@@ -119,20 +118,18 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
 
   return (
     <>
-      {/* オーバーレイ */}
       <div
         className="fixed inset-0 bg-black bg-opacity-20 z-40"
         onClick={handleOverlayClick}
       ></div>
 
-      {/* ポップアップ */}
       <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-sm mx-auto max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-gray-900">ジャンルを選択</h3>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#2B7A78]"
               aria-label="閉じる"
             >
               ✕
@@ -156,20 +153,15 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
               </div>
             ) : (
               <>
-                {/* ジャンルヘッダー */}
                 <div className="mb-4">
                   <h4 className="text-md font-bold text-gray-800 mb-3">ジャンル</h4>
                 </div>
 
-                {/* ジャンル選択（管理画面に合わせて2カラムグリッド） */}
                 <div className="grid grid-cols-2 gap-3">
                   {genres.map((genre) => {
-                    // ジャンル名からジャンル値（value）を推測（既存のgetGenreColorとの互換性のため）
-                    // ジャンルIDを直接使用するように変更
                     const genreId = genre.id
                     const genreName = genre.name
                     const isSelected = selectedGenres.includes(genreId)
-                    
                     const genreColors = getGenreColorByName(genreName)
 
                     return (

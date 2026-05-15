@@ -6,7 +6,7 @@ import { FavoriteButton } from "@/components/atoms/FavoriteButton"
 import type { Store } from "@/types/store"
 import { getGenreBackgroundClass, getGenreBackgroundStyle, getGenreBorderClass, getGenreBorderStyle, getGenreColor, getGenreTextClass, getGenreTextStyle } from "@/utils/genre-colors"
 import { formatDistance } from "@/utils/location"
-import { useState, useRef, useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface StoreCardProps {
   store: Store
@@ -125,11 +125,6 @@ export function StoreCard({
       return
     }
 
-    // 画像エリアのクリックの場合は何もしない（写真切り替えのみ）
-    if (target.closest('.image-area')) {
-      return
-    }
-
     // デフォルトで店舗詳細を表示
     onStoreClick(store)
   }
@@ -229,10 +224,15 @@ export function StoreCard({
       </div>
 
       {/* 店舗写真カルーセル / デフォルト画像 */}
-      <div className="relative overflow-hidden image-area">
+      <div className="relative overflow-hidden">
         {shouldShowPlaceholder ? (
-          <div
-            className="w-full aspect-[4/3] md:aspect-[16/9] rounded-lg overflow-hidden bg-white flex items-center justify-center"
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              onCouponsClick(store.id)
+            }}
+            className="w-full aspect-[4/3] md:aspect-[16/9] rounded-lg overflow-hidden bg-white flex items-center justify-center cursor-pointer relative"
             aria-label="店舗画像"
           >
             <Image
@@ -241,7 +241,7 @@ export function StoreCard({
               fill
               className="object-contain p-4"
             />
-          </div>
+          </button>
         ) : (
           <>
             <div
@@ -253,7 +253,7 @@ export function StoreCard({
             >
               <Image
                 src={images[currentImageIndex] || store.thumbnailUrl!}
-                alt={`${store.name} 画像 ${currentImageIndex + 1}`}
+                alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
                 fill
                 className="object-cover transition-opacity duration-300 pointer-events-none"
                 onError={() => setIsImageError(true)}
