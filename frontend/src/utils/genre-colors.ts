@@ -16,13 +16,13 @@ export const GENRE_COLORS: Record<string, GenreColor> = {
     hover: "#EB740433",
     checkBg: "#EB7404"
   },
-  creative: {
-    bg: "#E043A11A",
-    text: "#E043A1",
-    border: "#E043A1",
-    hover: "#E043A133",
-    checkBg: "#E043A1"
-  },
+  // creative: {
+  //   bg: "#E043A11A",
+  //   text: "#E043A1",
+  //   border: "#E043A1",
+  //   hover: "#E043A133",
+  //   checkBg: "#E043A1"
+  // },
   japanese: {
     bg: "#049A2A1A",
     text: "#049A2A",

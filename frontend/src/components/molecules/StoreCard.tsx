@@ -32,6 +32,7 @@ export function StoreCard({
   const [isImageError, setIsImageError] = useState(false)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
+  const genreColors = getGenreColor(store.genre)
 
   // 店舗に紐付く画像のみを使用（サンプル画像は除外）
   const images = Array.from(
@@ -157,11 +158,11 @@ export function StoreCard({
           <div className="flex items-center gap-2">
             <span
               style={{
-                ...getGenreBackgroundStyle(getGenreColor(store.genre)),
-                ...getGenreBorderStyle(getGenreColor(store.genre)),
-                ...getGenreTextStyle(getGenreColor(store.genre)),
+                ...getGenreBackgroundStyle(genreColors),
+                ...getGenreBorderStyle(genreColors),
+                ...getGenreTextStyle(genreColors),
               }}
-              className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreBackgroundClass(getGenreColor(store.genre))} ${getGenreTextClass(getGenreColor(store.genre))} ${getGenreBorderClass(getGenreColor(store.genre))}`}
+              className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium border ${getGenreBackgroundClass(genreColors)} ${getGenreTextClass(genreColors)} ${getGenreBorderClass(genreColors)}`}
             >
               {store.genreLabel}
             </span>
