@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Phone, Clock, MapPin } from "lucide-react"
 import { FavoriteButton } from "@/components/atoms/FavoriteButton"
 import type { Store } from "@/types/store"
-import { getGenreBackgroundClass, getGenreBackgroundStyle, getGenreBorderClass, getGenreBorderStyle, getGenreColor, getGenreTextClass, getGenreTextStyle } from "@/utils/genre-colors"
+import { getGenreBackgroundClass, getGenreBackgroundStyle, getGenreBorderClass, getGenreBorderStyle, getGenreColorByName, getGenreTextClass, getGenreTextStyle } from "@/utils/genre-colors"
 import { formatDistance } from "@/utils/location"
 import { useEffect, useRef, useState } from "react"
 
@@ -32,7 +32,7 @@ export function StoreCard({
   const [isImageError, setIsImageError] = useState(false)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
-  const genreColors = getGenreColor(store.genre)
+  const genreColors = getGenreColorByName(store.genreLabel)
 
   // 店舗に紐付く画像のみを使用（サンプル画像は除外）
   const images = Array.from(
@@ -122,6 +122,11 @@ export function StoreCard({
     // ボタンクリックの場合は何もしない
     const target = e.target as HTMLElement
     if (target.closest('button')) {
+      return
+    }
+
+    // 画像エリアのクリックの場合は何もしない（写真切り替えのみ）
+    if (target.closest('.image-area')) {
       return
     }
 
@@ -224,7 +229,7 @@ export function StoreCard({
       </div>
 
       {/* 店舗写真カルーセル / デフォルト画像 */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden image-area">
         {shouldShowPlaceholder ? (
           <button
             onClick={(e) => {
