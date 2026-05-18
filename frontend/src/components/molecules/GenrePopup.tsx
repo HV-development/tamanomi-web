@@ -177,9 +177,9 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                           ...getGenreHoverStyle(genreColors),
                           ...getGenreTextStyle(genreColors),
                         } : undefined}
-                        className={`relative rounded-lg border-2 transition-all duration-200 active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium focus:outline-none focus:ring-2 focus:ring-[#2B7A78] focus:border-[#2B7A78] ${isSelected
+                        className={`relative rounded-lg border-2 transition-all duration-200 active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium focus:outline-none focus:ring-2 focus:ring-[#2B7A78] ${isSelected
                           ? `${getGenreBorderClass(genreColors)} ${getGenreBackgroundClass(genreColors)} ${getGenreTextClass(genreColors)} ${getGenreHoverClass(genreColors)} shadow-md`
-                          : "border-gray-300 bg-white text-gray-700"
+                          : "border-gray-300 bg-white text-gray-700 focus:border-[#2B7A78]"
                           }`}
                       >
                         {isSelected && (
