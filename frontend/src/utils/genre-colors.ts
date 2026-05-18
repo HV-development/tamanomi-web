@@ -236,3 +236,8 @@ export function getGenreHoverStyle(color: GenreColor): CSSProperties | undefined
     ? undefined
     : ({ ['--genre-hover-bg' as string]: color.hover } as CSSProperties)
 }
+
+export function getGenreColorClasses(genre: string): string {
+  const colors = getGenreColor(genre)
+  return `${getGenreBackgroundClass(colors)} ${getGenreTextClass(colors)} ${getGenreBorderClass(colors)}`.trim()
+}
