@@ -258,7 +258,7 @@ export function StoreCard({
             >
               <Image
                 src={images[currentImageIndex] || store.thumbnailUrl!}
-                alt={`${store.name} ${currentImageIndex === 0 ? '外観' : currentImageIndex === 1 ? '店内' : '料理'}`}
+                alt={`${store.name} 画像 ${currentImageIndex + 1}`}
                 fill
                 className="object-cover transition-opacity duration-300 pointer-events-none"
                 onError={() => setIsImageError(true)}
