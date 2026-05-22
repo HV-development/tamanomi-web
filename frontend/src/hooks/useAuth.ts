@@ -97,11 +97,12 @@ export function useAuth() {
                         const result = await fetchUserMe();
                         
                         if (result.data) {
+                            const userData = result.data as User & { plan?: Plan; paymentHistory?: PaymentHistory[] };
                             setIsAuthenticated(true);
                             setUser(result.data);
-                            setPlan(result.data.plan);
+                            setPlan(userData.plan);
                             fetchUsageHistory();
-                            setPaymentHistory(result.data.paymentHistory || []);
+                            setPaymentHistory(userData.paymentHistory || []);
                         } else {
                             setIsAuthenticated(false);
                         }
@@ -147,6 +148,17 @@ export function useAuth() {
         setPaymentHistory([]);
     };
 
+    const refreshUser = useCallback(async () => {
+        const result = await fetchUserMe();
+        if (result.data) {
+            const userData = result.data as User & { plan?: Plan; paymentHistory?: PaymentHistory[] };
+            setUser(result.data);
+            setPlan(userData.plan);
+            setPaymentHistory(userData.paymentHistory || []);
+        }
+        return result.data;
+    }, [fetchUserMe]);
+
     return {
         isAuthenticated,
         isLoading,
@@ -159,5 +171,6 @@ export function useAuth() {
         logout,
         fetchUsageHistory,
         fetchPaymentHistory,
+        refreshUser,
     };
 }
