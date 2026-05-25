@@ -983,8 +983,7 @@ export const useAppHandlers = (
             navigation.navigateToMyPage("withdrawal-complete")
         } catch (error) {
             console.error('退会処理エラー:', error)
-            // エラーメッセージを表示（必要に応じてモーダルなどで表示）
-            alert(error instanceof Error ? error.message : '退会処理に失敗しました')
+            navigation.navigateToMyPage("withdrawal-failed")
         } finally {
             auth.setIsLoading(false)
         }

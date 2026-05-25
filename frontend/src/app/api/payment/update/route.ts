@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       const errorData = await response.json().catch(() => ({}))
       console.error('Payment update API error:', errorData)
       return createNoCacheResponse(
-        { error: errorData.message || errorData.error || '継続課金変更に失敗しました' },
+        { error: errorData.error?.message || errorData.message || '継続課金変更に失敗しました' },
         { status: response.status }
       )
     }

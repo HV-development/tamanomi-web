@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/atoms/Button"
-import { getGenreColor } from "@/utils/genre-colors"
+import { getGenreBackgroundClass, getGenreBackgroundStyle, getGenreBorderClass, getGenreBorderStyle, getGenreCheckBgClass, getGenreCheckBgStyle, getGenreColorByName, getGenreHoverClass, getGenreHoverStyle, getGenreTextClass, getGenreTextStyle } from "@/utils/genre-colors"
 import { cn } from "@/lib/utils"
 
 interface GenrePopupProps {
@@ -19,57 +19,91 @@ interface Genre {
   sortOrder: number
 }
 
+let genreCache: Genre[] | null = null
+let genreFetchPromise: Promise<Genre[]> | null = null
+
+async function loadGenres(): Promise<Genre[]> {
+  if (genreCache) return genreCache
+  if (genreFetchPromise) return genreFetchPromise
+
+  genreFetchPromise = fetch('/api/genres', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error('ジャンル一覧の取得に失敗しました')
+      }
+
+      const data = await response.json()
+      const genresArray = Array.isArray(data) ? data : (data.genres || [])
+      const sortedGenres = genresArray
+        .filter((g: Genre) => g && g.id && g.name)
+        .sort((a: Genre, b: Genre) => (a.sortOrder || 0) - (b.sortOrder || 0))
+
+      genreCache = sortedGenres
+      return sortedGenres
+    })
+    .finally(() => {
+      genreFetchPromise = null
+    })
+
+  return genreFetchPromise
+}
+
 export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onClear }: GenrePopupProps) {
   const [genres, setGenres] = useState<Genre[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(() => genreCache === null)
   const [error, setError] = useState<string | null>(null)
 
-  // ジャンル一覧をAPIから取得
   useEffect(() => {
     if (!isOpen) return
 
+    let cancelled = false
+
     const fetchGenres = async () => {
+      if (genreCache) {
+        setGenres(genreCache)
+        setError(null)
+        setIsLoading(false)
+        return
+      }
+
       setIsLoading(true)
       setError(null)
 
       try {
-        const response = await fetch('/api/genres', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('ジャンル一覧の取得に失敗しました')
+        const loadedGenres = await loadGenres()
+        if (!cancelled) {
+          setGenres(loadedGenres)
         }
-
-        const data = await response.json()
-        const genresArray = Array.isArray(data) ? data : (data.genres || [])
-        
-        // sortOrderでソート（管理画面に合わせる）
-        const sortedGenres = genresArray
-          .filter((g: Genre) => g && g.id && g.name)
-          .sort((a: Genre, b: Genre) => (a.sortOrder || 0) - (b.sortOrder || 0))
-        
-        setGenres(sortedGenres)
       } catch (err) {
         console.error('ジャンル一覧の取得エラー:', err)
-        setError('ジャンル一覧の取得に失敗しました')
+        if (!cancelled) {
+          setError('ジャンル一覧の取得に失敗しました')
+        }
       } finally {
-        setIsLoading(false)
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
     }
 
     fetchGenres()
+
+    return () => {
+      cancelled = true
+    }
   }, [isOpen])
+
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose()
     }
   }, [onClose])
 
-  // モーダルが開いている間、背後のスクロールを無効にする
   useEffect(() => {
     if (isOpen) {
       const originalOverflow = document.body.style.overflow
@@ -84,20 +118,18 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
 
   return (
     <>
-      {/* オーバーレイ */}
       <div
         className="fixed inset-0 bg-black bg-opacity-20 z-40"
         onClick={handleOverlayClick}
       ></div>
 
-      {/* ポップアップ */}
       <div className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 bg-white rounded-2xl shadow-xl z-50 max-w-sm mx-auto max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-gray-900">ジャンルを選択</h3>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#2B7A78]"
               aria-label="閉じる"
             >
               ✕
@@ -121,28 +153,16 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
               </div>
             ) : (
               <>
-                {/* ジャンルヘッダー */}
                 <div className="mb-4">
                   <h4 className="text-md font-bold text-gray-800 mb-3">ジャンル</h4>
                 </div>
 
-                {/* ジャンル選択（管理画面に合わせて2カラムグリッド） */}
                 <div className="grid grid-cols-2 gap-3">
                   {genres.map((genre) => {
-                    // ジャンル名からジャンル値（value）を推測（既存のgetGenreColorとの互換性のため）
-                    // ジャンルIDを直接使用するように変更
                     const genreId = genre.id
                     const genreName = genre.name
                     const isSelected = selectedGenres.includes(genreId)
-                    
-                    // ジャンル名から既存のカラー設定を取得（フォールバック用）
-                    const genreValue = genreName.toLowerCase().replace(/\s+/g, '-')
-                    const genreColors = getGenreColor(genreValue) || {
-                      bg: "bg-gray-200",
-                      text: "text-gray-800",
-                      border: "border-gray-300",
-                      hover: "hover:bg-gray-300"
-                    }
+                    const genreColors = getGenreColorByName(genreName)
 
                     return (
                       <button
@@ -151,14 +171,23 @@ export function GenrePopup({ isOpen, selectedGenres, onGenreToggle, onClose, onC
                           (e.currentTarget as HTMLButtonElement).blur()
                           onGenreToggle(genreId)
                         }}
-                        className={`relative rounded-lg border-2 transition-all duration-200 active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium ${isSelected
-                            ? "border-green-700 bg-green-100 text-green-800 shadow-md"
-                            : "border-gray-300 bg-white text-gray-700"
+                        style={isSelected ? {
+                          ...getGenreBackgroundStyle(genreColors),
+                          ...getGenreBorderStyle(genreColors),
+                          ...getGenreHoverStyle(genreColors),
+                          ...getGenreTextStyle(genreColors),
+                        } : undefined}
+                        className={`relative rounded-lg border-2 transition-all duration-200 active:scale-[0.98] text-center w-full text-sm py-3 px-2 min-h-[44px] flex items-center justify-center font-medium focus:outline-none focus:ring-2 focus:ring-[#2B7A78] ${isSelected
+                          ? `${getGenreBorderClass(genreColors)} ${getGenreBackgroundClass(genreColors)} ${getGenreTextClass(genreColors)} ${getGenreHoverClass(genreColors)} shadow-md`
+                          : "border-gray-300 bg-white text-gray-700 focus:border-[#2B7A78]"
                           }`}
                       >
                         {isSelected && (
                           <div className="absolute -top-1 -right-1">
-                            <div className={cn("w-4 h-4 rounded-full flex items-center justify-center", genreColors.text.replace('text-', 'bg-'))}>
+                            <div
+                              style={getGenreCheckBgStyle(genreColors)}
+                              className={cn("w-4 h-4 rounded-full flex items-center justify-center", getGenreCheckBgClass(genreColors))}
+                            >
                               <span className="text-white text-xs">✓</span>
                             </div>
                           </div>
