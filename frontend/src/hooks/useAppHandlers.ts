@@ -23,6 +23,7 @@ export const useAppHandlers = (
     router: AppRouterInstance,
     state: AppState
 ): AppHandlers => {
+
     const authHandlers = useAuthHandlers(dispatch, auth, navigation, router, state)
     const withdrawalHandlers = useWithdrawalHandlers(dispatch, auth, navigation)
     const couponHandlers = useCouponHandlers(dispatch, auth, navigation, router, state)

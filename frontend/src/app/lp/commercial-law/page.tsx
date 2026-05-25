@@ -23,7 +23,7 @@ const commercialLawData: CommercialLawItem[] = [
   },
   {
     label: '運営委託先',
-    value: '会社名: サイテックアイ株式会社\n代表者: 大澤 佳加\nURL: https://www.psytec-ai.com/\n住所: 〒761-8064 高松市上之町2丁目8番27\n電話番号: 087-899-6513'
+    value: '会社名: サイテックアイ株式会社\n代表者: 善生 佳加\nURL: https://www.psytec-ai.com/\n住所: 〒761-8064 高松市上之町2丁目8番27\n電話番号: 087-899-6512'
   },
   {
     label: '所在地',
@@ -31,7 +31,7 @@ const commercialLawData: CommercialLawItem[] = [
   },
   {
     label: 'お問い合わせ',
-    value: '以下のお問い合わせフォームよりご連絡ください。\n\n※お問い合わせいただいた内容には、遅滞なく電子メールにてご返信いたします。\nhttps://www.tamanomi.com/lp/contact\n電話番号: 087-899-6513'
+    value: '以下のお問い合わせフォームよりご連絡ください。\n\n※お問い合わせいただいた内容には、遅滞なく電子メールにてご返信いたします。\nメールアドレス: saitama.info@tamanomi.com\n電話番号: 087-899-6512'
   },
   {
     label: '販売価格',

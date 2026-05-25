@@ -7,6 +7,7 @@ import { User } from "lucide-react"
 import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
 import { WithdrawalComplete } from "@/components/molecules/WithdrawalComplete"
+import { WithdrawalFailed } from "@/components/molecules/WithdrawalFailed"
 import type { User as UserType, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 import { appConfig } from '@/config/appConfig'
 import { SkeletonMyPage } from "../skeletons/MypageSkeleton"
@@ -36,6 +37,7 @@ interface MyPageContainerProps {
   | "plan-management"
   | "withdrawal"
   | "withdrawal-complete"
+  | "withdrawal-failed"
   | "store-introduction"
   onViewChange: (view: string) => void
   onEditProfile: () => void
@@ -570,7 +572,7 @@ const MyPageSubView = React.memo(({
   currentUserRank
 }: {
   currentView: string
-  user: UserType
+  user?: UserType
   usageHistory: UsageHistory[]
   paymentHistory: PaymentHistory[]
   onViewChange: (view: string) => void
@@ -593,6 +595,7 @@ const MyPageSubView = React.memo(({
 }) => {
   switch (currentView) {
     case "profile-edit":
+      if (!user) return <SkeletonMyPage />
       return (
         <LazyFallback>
           <LazyProfileEditLayout
@@ -687,6 +690,24 @@ const MyPageSubView = React.memo(({
           <div className="flex-1 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
               <WithdrawalComplete onBackToTop={onWithdrawComplete} withdrawalScheduledDate={user?.withdrawalScheduledDate} />
+            </div>
+          </div>
+        </div>
+      )
+    case "withdrawal-failed":
+      return (
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+          <div className="bg-white border-b border-gray-200 px-4 py-4">
+            <div className="flex items-center justify-center">
+              <Logo size="lg" onClick={onLogoClick} />
+            </div>
+          </div>
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
+              <WithdrawalFailed
+                onRetry={onWithdraw}
+                onBackToTop={() => onViewChange("main")}
+              />
             </div>
           </div>
         </div>
