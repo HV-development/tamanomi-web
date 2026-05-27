@@ -22,14 +22,15 @@ const banners: BannerItem[] = [
     linkUrl: "https://www.tamanomi.com/lp/merchant",
     alt: "掲載店募集"
   },
+  // 2026/5/31 キャンペーン終了に伴い非表示
+  // {
+  //   id: "banner-2",
+  //   imageUrl: "/saitama-app-benefits-user.png",
+  //   linkUrl: "https://www.home.saitama-tsunagu.com/",
+  //   alt: "さいたま市みんなのアプリ（ユーザー特典）"
+  // },
   {
     id: "banner-2",
-    imageUrl: "/saitama-app-benefits-user.png",
-    linkUrl: "https://www.home.saitama-tsunagu.com/",
-    alt: "さいたま市みんなのアプリ（ユーザー特典）"
-  },
-  {
-    id: "banner-3",
     imageUrl: "/instagram-official-user.png",
     linkUrl: "https://www.instagram.com/tamanomi.saitama?igsh=dTdnb2gxNGFnOWs=",
     alt: "公式 Instagram たまのみ部がゆく"
