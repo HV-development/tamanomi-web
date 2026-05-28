@@ -30,7 +30,7 @@ const banners: BannerItem[] = [
   //   alt: "さいたま市みんなのアプリ（ユーザー特典）"
   // },
   {
-    id: "banner-2",
+    id: "banner-3",
     imageUrl: "/instagram-official-user.png",
     linkUrl: "https://www.instagram.com/tamanomi.saitama?igsh=dTdnb2gxNGFnOWs=",
     alt: "公式 Instagram たまのみ部がゆく"
