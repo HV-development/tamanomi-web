@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback } from "react"
+import React, { useCallback, useRef } from "react"
 import type { AppAction } from '@hv-development/schemas'
 import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
@@ -10,11 +10,16 @@ export const useWithdrawalHandlers = (
     auth: ReturnType<typeof useAuth>,
     navigation: ReturnType<typeof useNavigation>,
 ) => {
+    const isSubmittingRef = useRef(false)
+
     const handleWithdraw = useCallback(() => {
         navigation.navigateToMyPage("withdrawal")
     }, [navigation])
 
     const handleWithdrawConfirm = useCallback(async () => {
+        if (isSubmittingRef.current) return
+        isSubmittingRef.current = true
+
         try {
             auth.setIsLoading(true)
 
@@ -119,6 +124,7 @@ export const useWithdrawalHandlers = (
             alert(error instanceof Error ? error.message : '退会処理に失敗しました')
         } finally {
             auth.setIsLoading(false)
+            isSubmittingRef.current = false
         }
     }, [auth, navigation])
 
