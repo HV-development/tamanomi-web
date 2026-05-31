@@ -461,9 +461,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           onBlur={() => handleFieldBlur("saitamaAppId")}
           error={errors.saitamaAppId || undefined}
         />
-        <p className="mt-1 text-sm text-gray-500">
-          さいたま市みんなのアプリユーザー特典をご利用の方は、アプリのユーザーIDをコピーして貼り付けてください
-        </p>
+        {/*
+          2026/5/31 キャンペーン終了に伴い非表示
+          <p className="mt-1 text-sm text-gray-500">
+            さいたま市みんなのアプリユーザー特典をご利用の方は、アプリのユーザーIDをコピーして貼り付けてください
+          </p>
+        */}
       </div>
 
       {/* パスワード */}

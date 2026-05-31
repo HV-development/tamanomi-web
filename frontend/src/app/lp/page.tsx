@@ -12,11 +12,12 @@ const bannerItems = [
     linkUrl: 'https://www.tamanomi.com/lp/merchant',
     alt: '掲載店募集'
   },
-  {
-    imageUrl: '/lp/images/saitama-app-benefits-lp.webp',
-    linkUrl: 'https://www.home.saitama-tsunagu.com/',
-    alt: 'さいたま市みんなのアプリ（ユーザー特典）'
-  },
+  // 2026/5/31 キャンペーン終了に伴い非表示
+  // {
+  //   imageUrl: '/lp/images/saitama-app-benefits-lp.webp',
+  //   linkUrl: 'https://www.home.saitama-tsunagu.com/',
+  //   alt: 'さいたま市みんなのアプリ（ユーザー特典）'
+  // },
   {
     imageUrl: '/lp/images/instagram-official-lp.png',
     linkUrl: 'https://www.instagram.com/tamanomi.saitama?igsh=dTdnb2gxNGFnOWs=',
@@ -2160,4 +2161,3 @@ export default function LPPage() {
     </div>
   )
 }
-
