@@ -1,15 +1,29 @@
 "use client"
 
+import { useState } from "react"
 import { AlertTriangle } from "lucide-react"
 import { Button } from "@/components/atoms/Button"
 
 interface WithdrawalConfirmationProps {
-  onConfirm: () => void
+  onConfirm: () => void | Promise<void>
   onCancel: () => void
   isLoading?: boolean
 }
 
 export function WithdrawalConfirmation({ onConfirm, onCancel, isLoading = false }: WithdrawalConfirmationProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const disabled = isLoading || isSubmitting
+
+  const handleConfirm = async () => {
+    if (disabled) return
+    setIsSubmitting(true)
+    try {
+      await onConfirm()
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* メインメッセージカード */}
@@ -47,11 +61,11 @@ export function WithdrawalConfirmation({ onConfirm, onCancel, isLoading = false 
         {/* ボタン */}
         <div className="space-y-3">
           <Button
-            onClick={onConfirm}
-            disabled={isLoading}
+            onClick={handleConfirm}
+            disabled={disabled}
             className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base font-medium rounded-xl"
           >
-            {isLoading ? "退会処理中..." : "解約する"}
+            {disabled ? "退会処理中..." : "解約する"}
           </Button>
 
           <Button
