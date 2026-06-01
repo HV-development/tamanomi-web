@@ -9,7 +9,7 @@ import {
   TamanomiUserRegistrationRequestSchema,
   type TamanomiUserRegistrationRequest,
 } from "@hv-development/schemas"
-import { z, ZodError } from "zod"
+import { z } from "zod"
 
 const tamanomiEmailOnlyFallbackSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
@@ -52,39 +52,35 @@ export function EmailRegistrationForm({
   const validateField = (fieldName: keyof TamanomiUserRegistrationRequest, value: string) => {
     const shape = preRegisterFormSchema.shape[fieldName as keyof typeof preRegisterFormSchema.shape]
     if (!shape) return
-    try {
-      shape.parse(value)
+    const result = shape.safeParse(value)
+    if (result.success) {
       setErrors((prev) => {
         const next = { ...prev }
         delete next[fieldName]
         return next
       })
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const msg = error.issues[0]?.message || "入力エラーです"
-        setErrors((prev) => ({ ...prev, [fieldName]: msg }))
-      }
+    } else {
+      const msg = result.error.issues[0]?.message || "入力エラーです"
+      setErrors((prev) => ({ ...prev, [fieldName]: msg }))
     }
   }
 
   const validateForm = (): boolean => {
-    try {
-      preRegisterFormSchema.parse(formData)
+    const result = preRegisterFormSchema.safeParse(formData)
+    if (result.success) {
       setErrors({})
       return true
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const newErrors: Partial<Record<keyof TamanomiUserRegistrationRequest, string>> = {}
-        for (const issue of error.issues) {
-          const fieldName = issue.path[0] as keyof TamanomiUserRegistrationRequest | undefined
-          if (fieldName === "email" || fieldName === "campaignCode" || fieldName === "referrerUserId") {
-            newErrors[fieldName] = issue.message
-          }
-        }
-        setErrors(newErrors)
-      }
-      return false
     }
+
+    const newErrors: Partial<Record<keyof TamanomiUserRegistrationRequest, string>> = {}
+    for (const issue of result.error.issues) {
+      const fieldName = issue.path[0] as keyof TamanomiUserRegistrationRequest | undefined
+      if (fieldName === "email" || fieldName === "campaignCode" || fieldName === "referrerUserId") {
+        newErrors[fieldName] = issue.message
+      }
+    }
+    setErrors(newErrors)
+    return false
   }
 
   const handleEmailChange = (value: string) => {
@@ -114,7 +110,7 @@ export function EmailRegistrationForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6">
       <div className="text-center mb-6">
         <h3 className="text-lg font-bold text-gray-900 mb-3">メールアドレス認証</h3>
         <div className="text-gray-600 space-y-2">
