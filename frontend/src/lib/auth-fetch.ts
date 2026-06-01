@@ -6,6 +6,23 @@ import { createNoCacheResponse } from '@/lib/response-utils'
 import { setTokenCookies, isSecureRequest, type TokenPair } from '@/lib/token-cookie'
 import type { HeaderOptions } from '@/lib/header-utils'
 
+const TRANSIENT_STATUS = 503
+const TRANSIENT_BACKOFFS_MS = [500, 1000, 2000]
+
+/**
+ * 503（DB起動待ち等の一時的エラー）の場合のみ短いバックオフで再試行する。
+ * ログアウト判定（401/403）には影響しない。
+ */
+async function fetchWithTransientRetry(doFetch: () => Promise<Response>): Promise<Response> {
+  let response = await doFetch()
+  for (const delay of TRANSIENT_BACKOFFS_MS) {
+    if (response.status !== TRANSIENT_STATUS) break
+    await new Promise((resolve) => setTimeout(resolve, delay))
+    response = await doFetch()
+  }
+  return response
+}
+
 export interface AuthFetchResult {
   response: NextResponse
   /** リフレッシュが実行されて成功したかどうか */
@@ -26,13 +43,15 @@ export async function authenticatedFetch(
   url: string,
   options: RequestInit & { headerOptions?: HeaderOptions } = {}
 ): Promise<AuthFetchResult> {
-  const response = await secureFetchWithCommonHeaders(request, url, {
-    ...options,
-    headerOptions: {
-      requireAuth: true,
-      ...options.headerOptions,
-    },
-  })
+  const response = await fetchWithTransientRetry(() =>
+    secureFetchWithCommonHeaders(request, url, {
+      ...options,
+      headerOptions: {
+        requireAuth: true,
+        ...options.headerOptions,
+      },
+    })
+  )
 
   if (response.status !== 401 && response.status !== 403) {
     const data = await response.json()
@@ -57,18 +76,22 @@ export async function authenticatedFetch(
   }
 
   const refreshUrl = buildApiUrl('/refresh')
-  const refreshResponse = await secureFetchWithCommonHeaders(request, refreshUrl, {
-    method: 'POST',
-    headerOptions: { requireAuth: false },
-    body: JSON.stringify({ refreshToken }),
-  })
+  const refreshResponse = await fetchWithTransientRetry(() =>
+    secureFetchWithCommonHeaders(request, refreshUrl, {
+      method: 'POST',
+      headerOptions: { requireAuth: false },
+      body: JSON.stringify({ refreshToken }),
+    })
+  )
 
   if (!refreshResponse.ok) {
+    const status = refreshResponse.status === 503 ? 503 : 401
+    const error =
+      status === 503
+        ? 'サーバーが混み合っています。しばらくしてから再試行してください。'
+        : '認証トークンが無効です。再度ログインしてください。'
     return {
-      response: createNoCacheResponse(
-        { error: '認証トークンが無効です。再度ログインしてください。' },
-        { status: 401 }
-      ),
+      response: createNoCacheResponse({ error }, { status }),
       refreshed: false,
     }
   }
