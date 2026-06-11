@@ -43,19 +43,38 @@ export function ProfileEditContainer({ user, onSubmit, onCancel, onWithdraw, onL
             {/* 退会セクション */}
             <div className="bg-white rounded-2xl shadow-xl p-4">
               <button
-                onClick={onWithdraw}
-                className="w-full flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 hover:border-red-300 transition-all duration-200 group"
+                onClick={user.accountStatus !== 'withdrawing' ? onWithdraw : undefined}
+                disabled={user.accountStatus === 'withdrawing'}
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all duration-200 group ${
+                  user.accountStatus === 'withdrawing'
+                    ? 'bg-gray-50 border-gray-200 cursor-not-allowed opacity-60'
+                    : 'bg-red-50 hover:bg-red-100 border-red-200 hover:border-red-300'
+                }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-100 group-hover:bg-red-200 rounded-lg transition-colors duration-200">
-                    <UserX className="w-5 h-5 text-red-600 group-hover:text-red-700 transition-colors duration-200" />
+                  <div className={`p-2 rounded-lg transition-colors duration-200 ${
+                    user.accountStatus === 'withdrawing' ? 'bg-gray-100' : 'bg-red-100 group-hover:bg-red-200'
+                  }`}>
+                    <UserX className={`w-5 h-5 transition-colors duration-200 ${
+                      user.accountStatus === 'withdrawing' ? 'text-gray-400' : 'text-red-600 group-hover:text-red-700'
+                    }`} />
                   </div>
                   <div className="text-left">
-                    <div className="font-medium text-red-700 group-hover:text-red-800 transition-colors duration-200">退会</div>
-                    <div className="text-sm text-red-600 group-hover:text-red-700 transition-colors duration-200">サービスからの退会</div>
+                    <div className={`font-medium transition-colors duration-200 ${
+                      user.accountStatus === 'withdrawing' ? 'text-gray-400' : 'text-red-700 group-hover:text-red-800'
+                    }`}>
+                      {user.accountStatus === 'withdrawing' ? '退会（退会処理済みのため利用不可）' : '退会'}
+                    </div>
+                    <div className={`text-sm transition-colors duration-200 ${
+                      user.accountStatus === 'withdrawing' ? 'text-gray-400' : 'text-red-600 group-hover:text-red-700'
+                    }`}>
+                      {user.accountStatus === 'withdrawing' ? '退会手続きは完了しています' : 'サービスからの退会'}
+                    </div>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-red-400 group-hover:text-red-600 group-hover:translate-x-1 transition-all duration-200" />
+                <ChevronRight className={`w-5 h-5 transition-all duration-200 ${
+                  user.accountStatus === 'withdrawing' ? 'text-gray-300' : 'text-red-400 group-hover:text-red-600 group-hover:translate-x-1'
+                }`} />
               </button>
             </div>
           </div>

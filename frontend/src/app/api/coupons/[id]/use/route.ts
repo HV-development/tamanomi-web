@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { authenticatedFetch } from '@/lib/auth-fetch'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -23,33 +23,15 @@ export async function POST(
 
     const fullUrl = buildApiUrl(`/coupons/${id}/use`)
 
-    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+    const { response } = await authenticatedFetch(request, fullUrl, {
       method: 'POST',
       headerOptions: {
-        requireAuth: true, // 認証が必要
+        requireAuth: true,
       },
       body: JSON.stringify({ shopId }),
     })
 
-    // 認証エラーの場合は401を返す
-    if (response.status === 401) {
-      return createNoCacheResponse(
-        { error: '認証が必要です' },
-        { status: 401 }
-      )
-    }
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ [coupons/[id]/use] Backend API error:', data)
-      return createNoCacheResponse(
-        { error: data.message || data.error?.message || 'クーポンの使用に失敗しました' },
-        { status: response.status }
-      )
-    }
-    
-    return createNoCacheResponse(data)
+    return response
 
   } catch (error) {
     console.error('❌ [coupons/[id]/use] Route error:', error)
