@@ -30,10 +30,34 @@ export const useCouponHandlers = (
             }
             couponFetchingStoreId = storeId
 
-            dispatch({ type: 'SET_SELECTED_STORE', payload: store })
-            dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
-
             try {
+                if (auth.isAuthenticated) {
+                    const authResponse = await fetch('/api/user/me', {
+                        credentials: 'include',
+                        cache: 'no-store',
+                    })
+
+                    // 401のみログアウト対象とする（リフレッシュ失敗時はauthenticatedFetchが401に正規化する。
+                    // 403は権限系エラーの可能性があるためログアウトさせない）
+                    if (authResponse.status === 401) {
+                        await auth.logout()
+                        dispatch({ type: 'RESET_LOGIN_STATE' })
+                        dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
+                        dispatch({ type: 'SET_SELECTED_STORE', payload: null })
+                        alert('ログイン状態を確認できなかったため、ログアウトしました。再度ログインしてください。')
+                        navigation.navigateToView("home")
+                        return
+                    }
+
+                    if (!authResponse.ok) {
+                        alert('ログイン状態を確認できませんでした。時間をおいて再度お試しください。')
+                        return
+                    }
+                }
+
+                dispatch({ type: 'SET_SELECTED_STORE', payload: store })
+                dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
+
                 const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
 
                 const response = await fetch(url, {
@@ -90,7 +114,7 @@ export const useCouponHandlers = (
                 couponFetchingStoreId = null
             }
         }
-    }, [state.stores, dispatch])
+    }, [auth, navigation, state.stores, dispatch])
 
     const handleUseCoupon = useCallback((couponId: string) => {
         if (!auth.isAuthenticated) {
@@ -125,6 +149,17 @@ export const useCouponHandlers = (
             })
 
             if (!response.ok) {
+                // 401のみログアウト対象（403は権限系エラーの可能性があるため通常のエラー処理に流す）
+                if (response.status === 401) {
+                    await auth.logout()
+                    dispatch({ type: 'RESET_LOGIN_STATE' })
+                    dispatch({ type: 'SET_SELECTED_COUPON', payload: null })
+                    dispatch({ type: 'SET_SELECTED_STORE', payload: null })
+                    alert('ログイン状態を確認できなかったため、ログアウトしました。再度ログインしてください。')
+                    navigation.navigateToView("home")
+                    return
+                }
+
                 let errorMessage = 'クーポンの使用に失敗しました'
                 try {
                     const error = await response.json()
@@ -149,7 +184,7 @@ export const useCouponHandlers = (
             console.error('クーポン使用エラー:', error)
             alert(error instanceof Error ? error.message : 'クーポンの使用中にエラーが発生しました')
         }
-    }, [navigation, dispatch, state.selectedCoupon, state.selectedStore])
+    }, [auth, navigation, dispatch, state.selectedCoupon, state.selectedStore])
 
     const handleCouponListClose = useCallback(() => {
         couponFetchingStoreId = null

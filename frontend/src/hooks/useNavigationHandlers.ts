@@ -42,12 +42,37 @@ export const useNavigationHandlers = (
         }
     }, [filters, dispatch])
 
-    const handleTabChange = useCallback((tab: string) => {
+    const handleTabChange = useCallback(async (tab: string) => {
         if (tab === "mypage") {
             if (!auth.isAuthenticated) {
                 dispatch({ type: 'RESET_LOGIN_STATE' })
                 navigation.navigateToView("login")
             } else {
+                try {
+                    const response = await fetch('/api/user/me', {
+                        credentials: 'include',
+                        cache: 'no-store',
+                    })
+
+                    // 401のみログアウト対象とする（リフレッシュ失敗時はauthenticatedFetchが401に正規化する。
+                    // 403は権限系エラーの可能性があるためログアウトさせない）
+                    if (response.status === 401) {
+                        await auth.logout()
+                        dispatch({ type: 'RESET_LOGIN_STATE' })
+                        navigation.navigateToView("login")
+                        return
+                    }
+
+                    if (!response.ok) {
+                        alert('ログイン状態を確認できませんでした。時間をおいて再度お試しください。')
+                        return
+                    }
+                } catch (error) {
+                    console.error('ログイン状態の確認に失敗しました:', error)
+                    alert('ログイン状態を確認できませんでした。通信環境をご確認ください。')
+                    return
+                }
+
                 navigation.navigateToView("mypage", tab)
                 navigation.navigateToMyPage("main")
             }
@@ -67,7 +92,7 @@ export const useNavigationHandlers = (
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [auth.isAuthenticated, navigation, router])
+    }, [auth, dispatch, navigation, router])
 
     const handleShowStoreOnHome = useCallback(() => {
         navigation.navigateToView("home", "home")

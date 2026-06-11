@@ -13,12 +13,6 @@ export async function GET(request: NextRequest) {
       method: 'GET',
     })
 
-    const cloned = response.clone()
-    try {
-      const body = await cloned.json()
-      console.log('🔍 [user/me] accountStatus:', body.accountStatus, 'keys:', Object.keys(body).join(','))
-    } catch (e) { console.log('🔍 [user/me] clone error:', e) }
-
     return response
   } catch (error) {
     console.error('❌ [user/me] Route error:', error)
