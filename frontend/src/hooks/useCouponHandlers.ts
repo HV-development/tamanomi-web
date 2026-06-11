@@ -30,10 +30,32 @@ export const useCouponHandlers = (
             }
             couponFetchingStoreId = storeId
 
-            dispatch({ type: 'SET_SELECTED_STORE', payload: store })
-            dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
-
             try {
+                if (auth.isAuthenticated) {
+                    const authResponse = await fetch('/api/user/me', {
+                        credentials: 'include',
+                        cache: 'no-store',
+                    })
+
+                    if (authResponse.status === 401 || authResponse.status === 403) {
+                        await auth.logout()
+                        dispatch({ type: 'RESET_LOGIN_STATE' })
+                        dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
+                        dispatch({ type: 'SET_SELECTED_STORE', payload: null })
+                        alert('退会処理が完了したため、ログアウトしました')
+                        navigation.navigateToView("home")
+                        return
+                    }
+
+                    if (!authResponse.ok) {
+                        alert('ログイン状態を確認できませんでした。時間をおいて再度お試しください。')
+                        return
+                    }
+                }
+
+                dispatch({ type: 'SET_SELECTED_STORE', payload: store })
+                dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: true })
+
                 const url = `/api/coupons?shopId=${storeId}&status=approved&isPublic=true&limit=100`
 
                 const response = await fetch(url, {
@@ -90,7 +112,7 @@ export const useCouponHandlers = (
                 couponFetchingStoreId = null
             }
         }
-    }, [state.stores, dispatch])
+    }, [auth, navigation, state.stores, dispatch])
 
     const handleUseCoupon = useCallback((couponId: string) => {
         if (!auth.isAuthenticated) {
