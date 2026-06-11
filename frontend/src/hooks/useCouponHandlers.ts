@@ -42,7 +42,7 @@ export const useCouponHandlers = (
                         dispatch({ type: 'RESET_LOGIN_STATE' })
                         dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
                         dispatch({ type: 'SET_SELECTED_STORE', payload: null })
-                        alert('退会処理が完了したため、ログアウトしました')
+                        alert('ログイン状態を確認できなかったため、ログアウトしました。再度ログインしてください。')
                         navigation.navigateToView("home")
                         return
                     }
@@ -147,9 +147,12 @@ export const useCouponHandlers = (
             })
 
             if (!response.ok) {
-                if (response.status === 401) {
+                if (response.status === 401 || response.status === 403) {
                     await auth.logout()
-                    alert('退会処理が完了したため、ログアウトしました')
+                    dispatch({ type: 'RESET_LOGIN_STATE' })
+                    dispatch({ type: 'SET_SELECTED_COUPON', payload: null })
+                    dispatch({ type: 'SET_SELECTED_STORE', payload: null })
+                    alert('ログイン状態を確認できなかったため、ログアウトしました。再度ログインしてください。')
                     navigation.navigateToView("home")
                     return
                 }
