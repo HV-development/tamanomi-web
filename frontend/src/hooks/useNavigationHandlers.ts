@@ -54,7 +54,9 @@ export const useNavigationHandlers = (
                         cache: 'no-store',
                     })
 
-                    if (response.status === 401 || response.status === 403) {
+                    // 401のみログアウト対象とする（リフレッシュ失敗時はauthenticatedFetchが401に正規化する。
+                    // 403は権限系エラーの可能性があるためログアウトさせない）
+                    if (response.status === 401) {
                         await auth.logout()
                         dispatch({ type: 'RESET_LOGIN_STATE' })
                         navigation.navigateToView("login")

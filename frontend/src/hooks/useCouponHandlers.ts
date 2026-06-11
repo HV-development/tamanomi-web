@@ -37,7 +37,9 @@ export const useCouponHandlers = (
                         cache: 'no-store',
                     })
 
-                    if (authResponse.status === 401 || authResponse.status === 403) {
+                    // 401のみログアウト対象とする（リフレッシュ失敗時はauthenticatedFetchが401に正規化する。
+                    // 403は権限系エラーの可能性があるためログアウトさせない）
+                    if (authResponse.status === 401) {
                         await auth.logout()
                         dispatch({ type: 'RESET_LOGIN_STATE' })
                         dispatch({ type: 'SET_COUPON_LIST_OPEN', payload: false })
@@ -147,7 +149,8 @@ export const useCouponHandlers = (
             })
 
             if (!response.ok) {
-                if (response.status === 401 || response.status === 403) {
+                // 401のみログアウト対象（403は権限系エラーの可能性があるため通常のエラー処理に流す）
+                if (response.status === 401) {
                     await auth.logout()
                     dispatch({ type: 'RESET_LOGIN_STATE' })
                     dispatch({ type: 'SET_SELECTED_COUPON', payload: null })
