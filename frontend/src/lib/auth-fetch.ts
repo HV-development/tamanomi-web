@@ -3,7 +3,7 @@ import { buildApiUrl } from '@/lib/api-config'
 import { getRefreshToken } from '@/lib/auth-header'
 import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
-import { setTokenCookies, isSecureRequest, type TokenPair } from '@/lib/token-cookie'
+import { clearTokenCookies, setTokenCookies, isSecureRequest, type TokenPair } from '@/lib/token-cookie'
 import type { HeaderOptions } from '@/lib/header-utils'
 
 const TRANSIENT_STATUS = 503
@@ -66,11 +66,13 @@ export async function authenticatedFetch(
 
   const refreshToken = getRefreshToken(request)
   if (!refreshToken) {
+    const nextResponse = createNoCacheResponse(
+      { error: '認証が必要です' },
+      { status: 401 }
+    )
+    clearTokenCookies(nextResponse, isSecureRequest(request))
     return {
-      response: createNoCacheResponse(
-        { error: '認証が必要です' },
-        { status: 401 }
-      ),
+      response: nextResponse,
       refreshed: false,
     }
   }
@@ -90,8 +92,12 @@ export async function authenticatedFetch(
       status === 503
         ? 'サーバーが混み合っています。しばらくしてから再試行してください。'
         : '認証トークンが無効です。再度ログインしてください。'
+    const nextResponse = createNoCacheResponse({ error }, { status })
+    if (status === 401) {
+      clearTokenCookies(nextResponse, isSecureRequest(request))
+    }
     return {
-      response: createNoCacheResponse({ error }, { status }),
+      response: nextResponse,
       refreshed: false,
     }
   }

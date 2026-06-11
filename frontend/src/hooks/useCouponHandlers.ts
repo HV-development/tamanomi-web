@@ -125,6 +125,13 @@ export const useCouponHandlers = (
             })
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    await auth.logout()
+                    alert('退会処理が完了したため、ログアウトしました')
+                    navigation.navigateToView("home")
+                    return
+                }
+
                 let errorMessage = 'クーポンの使用に失敗しました'
                 try {
                     const error = await response.json()
@@ -149,7 +156,7 @@ export const useCouponHandlers = (
             console.error('クーポン使用エラー:', error)
             alert(error instanceof Error ? error.message : 'クーポンの使用中にエラーが発生しました')
         }
-    }, [navigation, dispatch, state.selectedCoupon, state.selectedStore])
+    }, [auth, navigation, dispatch, state.selectedCoupon, state.selectedStore])
 
     const handleCouponListClose = useCallback(() => {
         couponFetchingStoreId = null
