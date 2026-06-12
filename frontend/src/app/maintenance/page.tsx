@@ -29,29 +29,19 @@ export default function MaintenancePage() {
           />
         </div>
         
-        {/* サービス説明 */}
-        <div 
-          className="opacity-0 animate-fade-in mb-8"
-          style={{ animationDelay: '0.5s' }}
-        >
-          <p className="text-base md:text-lg text-[#007D4F]/80 leading-relaxed">
-            たまのみは さいたま市内の飲食店で<br />
-            毎日1軒1杯無料で ドリンクを飲める<br />
-            クーポンサービスです
-          </p>
-        </div>
-        
         {/* メッセージ */}
         <div 
           className="opacity-0 animate-fade-in"
-          style={{ animationDelay: '0.8s' }}
+          style={{ animationDelay: '0.5s' }}
         >
-          <p className="text-sm md:text-base text-[#007D4F]/80 mb-2">
-            ユーザー新規登録・利用開始は
-          </p>
-          <h1 className="text-xl md:text-3xl font-bold text-[#007D4F] mb-4 tracking-wide">
-            令和8年1月20日（火）スタート！
+          <h1 className="text-2xl md:text-3xl font-medium text-[#007D4F] mb-4 tracking-wide">
+            ただいまメンテナンス中です
           </h1>
+
+          <p className="text-base md:text-lg text-[#007D4F]/70 mt-6 leading-relaxed">
+            ご不便をおかけして申し訳ございません。<br />
+            しばらくお待ちください。
+          </p>
           
           {/* 装飾的なライン */}
           <div className="flex items-center justify-center gap-4 mt-8">
@@ -64,16 +54,16 @@ export default function MaintenancePage() {
         {/* サブテキスト */}
         <p 
           className="mt-8 text-sm text-[#007D4F]/60 opacity-0 animate-fade-in"
-          style={{ animationDelay: '1.1s' }}
+          style={{ animationDelay: '0.8s' }}
         >
-          Coming Soon
+          Under Maintenance
         </p>
       </div>
       
       {/* フッター */}
       <footer 
         className="absolute bottom-8 text-xs text-[#007D4F]/40 opacity-0 animate-fade-in"
-        style={{ animationDelay: '1.3s' }}
+        style={{ animationDelay: '1s' }}
       >
         © {new Date().getFullYear()} たまのみ
       </footer>
@@ -108,4 +98,3 @@ export default function MaintenancePage() {
     </main>
   )
 }
-
