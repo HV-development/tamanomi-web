@@ -8,13 +8,24 @@ import type { HeaderOptions } from '@/lib/header-utils'
 
 const TRANSIENT_STATUS = 503
 const TRANSIENT_BACKOFFS_MS = [500, 1000, 2000]
+const IDEMPOTENT_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
+
+/** GET/HEAD/OPTIONS のみ再送安全とみなす（fetchの既定メソッドはGET） */
+function isIdempotentMethod(method?: string): boolean {
+  return IDEMPOTENT_METHODS.has((method ?? 'GET').toUpperCase())
+}
 
 /**
  * 503（DB起動待ち等の一時的エラー）の場合のみ短いバックオフで再試行する。
- * ログアウト判定（401/403）には影響しない。
+ * - retry=false（非冪等なPOST等）の場合は再送せず、副作用の二重実行を防ぐ。
+ * - ログアウト判定（401/403）には影響しない。
  */
-async function fetchWithTransientRetry(doFetch: () => Promise<Response>): Promise<Response> {
+async function fetchWithTransientRetry(
+  doFetch: () => Promise<Response>,
+  { retry = true }: { retry?: boolean } = {}
+): Promise<Response> {
   let response = await doFetch()
+  if (!retry) return response
   for (const delay of TRANSIENT_BACKOFFS_MS) {
     if (response.status !== TRANSIENT_STATUS) break
     await new Promise((resolve) => setTimeout(resolve, delay))
@@ -43,18 +54,20 @@ export async function authenticatedFetch(
   url: string,
   options: RequestInit & { headerOptions?: HeaderOptions } = {}
 ): Promise<AuthFetchResult> {
-  const response = await fetchWithTransientRetry(() =>
-    secureFetchWithCommonHeaders(request, url, {
-      ...options,
-      headerOptions: {
-        requireAuth: true,
-        ...options.headerOptions,
-      },
-    })
+  const response = await fetchWithTransientRetry(
+    () =>
+      secureFetchWithCommonHeaders(request, url, {
+        ...options,
+        headerOptions: {
+          requireAuth: true,
+          ...options.headerOptions,
+        },
+      }),
+    { retry: isIdempotentMethod(options.method) }
   )
 
   if (response.status !== 401 && response.status !== 403) {
-    const data = await response.json()
+    const data = await response.json().catch(() => ({}))
     return {
       response: createNoCacheResponse(
         response.ok ? data : { error: data.message || data.error?.message || 'リクエストに失敗しました' },
@@ -78,13 +91,13 @@ export async function authenticatedFetch(
   }
 
   const refreshUrl = buildApiUrl('/refresh')
-  const refreshResponse = await fetchWithTransientRetry(() =>
-    secureFetchWithCommonHeaders(request, refreshUrl, {
-      method: 'POST',
-      headerOptions: { requireAuth: false },
-      body: JSON.stringify({ refreshToken }),
-    })
-  )
+  // refresh はリフレッシュトークンを消費するPOSTのため503でも再送しない
+  // （消費済みトークンの再送による誤ログアウトを防ぐ）。503時は下で503を返す。
+  const refreshResponse = await secureFetchWithCommonHeaders(request, refreshUrl, {
+    method: 'POST',
+    headerOptions: { requireAuth: false },
+    body: JSON.stringify({ refreshToken }),
+  })
 
   if (!refreshResponse.ok) {
     const status = refreshResponse.status === 503 ? 503 : 401
@@ -117,7 +130,7 @@ export async function authenticatedFetch(
     },
   })
 
-  const retryData = await retryResponse.json()
+  const retryData = await retryResponse.json().catch(() => ({}))
 
   if (!retryResponse.ok) {
     return {
