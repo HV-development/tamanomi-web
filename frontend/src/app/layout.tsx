@@ -42,7 +42,7 @@ const rubik = Rubik({
 
 export const metadata: Metadata = {
   title: 'たまのみ - 毎日1杯無料で乾杯',
-  description: '毎日一軒ごとにドリンク一杯が無料に！さいたま市の飲食店で使えるちょっとお得な"Welcomeドリンク"サービスたまのみをご利用ください。',
+  description: 'たまのみアプリで、さいたま市内の対象飲食店のドリンク無料クーポンを毎日チェック・利用。お近くの対象店舗の検索やクーポンの利用はこちらから。',
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },

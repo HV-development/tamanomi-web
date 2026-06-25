@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { authenticatedFetch } from '@/lib/auth-fetch'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -38,34 +38,15 @@ export async function POST(request: NextRequest) {
       backendRequestBody.companyName = companyName
     }
 
-    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+    const { response } = await authenticatedFetch(request, fullUrl, {
       method: 'POST',
       headerOptions: {
-        requireAuth: true, // 認証が必要（デフォルト）
+        requireAuth: true,
       },
       body: JSON.stringify(backendRequestBody),
     })
 
-    // 認証エラーの場合は401を返す
-    if (response.status === 401) {
-      return createNoCacheResponse(
-        { error: '認証が必要です' },
-        { status: 401 }
-      )
-    }
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      console.error('Payment register API error:', errorData)
-      return createNoCacheResponse(
-        { error: errorData.message || 'カード登録の準備に失敗しました' },
-        { status: response.status }
-      )
-    }
-
-    const data = await response.json()
-
-    return createNoCacheResponse(data)
+    return response
   } catch (error) {
     console.error('Payment register API fetch error:', error)
     return createNoCacheResponse(
