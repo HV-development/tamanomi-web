@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import React, { useState } from 'react'
+import { Info } from "lucide-react"
 import type { Coupon } from '@/types/coupon'
 import { getDefaultCouponImage } from "@/utils/coupon-image"
 
@@ -10,12 +11,16 @@ interface CouponConfirmationPageProps {
   onConfirm: () => void
   onCancel: () => void
   currentUserRank?: string | null
+  isPaused?: boolean
+  onChangePayment?: () => void
 }
 
 export default function CouponConfirmationPage({
   coupon,
   onConfirm,
   onCancel,
+  isPaused = false,
+  onChangePayment,
 }: CouponConfirmationPageProps) {
   // 全ての背景色をブロンズ・非会員色に統一
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
@@ -24,10 +29,12 @@ export default function CouponConfirmationPage({
   if (!coupon) return null
 
   const handleShowToStaff = () => {
+    if (isPaused) return
     setIsRotated(true)
   }
 
   const handleUse = () => {
+    if (isPaused) return
     onConfirm()
   }
 
@@ -95,47 +102,77 @@ export default function CouponConfirmationPage({
       {/* ユーザー向け利用ボタン */}
       <div className="bg-white p-4 border-t border-gray-200">
         <div className="w-full max-w-xs mx-auto">
-          <div className="space-y-3">
-            {!isRotated ? (
-              <>
-                <p className="text-sm text-gray-700 text-center mb-2">
-                  店員の方に画面をお見せください
+          {isPaused ? (
+            <div className="space-y-3">
+              <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  ご登録のお支払いカードで決済ができなかったため、クーポンをご利用いただけません。
                 </p>
-                {coupon.drinkType === 'alcohol' && (
-                  <p className="text-red-600 font-medium text-sm text-center mb-2">
-                    ※20歳未満の方はアルコールは飲めません
+              </div>
+              <button
+                onClick={onChangePayment}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-bold text-base transition-colors shadow-md hover:shadow-lg"
+              >
+                支払い方法を変更する
+              </button>
+              <button
+                disabled
+                aria-disabled="true"
+                className="w-full bg-gray-300 text-gray-500 py-4 px-4 rounded-xl font-bold text-lg cursor-not-allowed"
+              >
+                利用する
+              </button>
+              <button
+                onClick={onCancel}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium text-base transition-colors border border-gray-300"
+              >
+                キャンセル
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {!isRotated ? (
+                <>
+                  <p className="text-sm text-gray-700 text-center mb-2">
+                    店員の方に画面をお見せください
                   </p>
-                )}
-                <button
-                  onClick={handleShowToStaff}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
-                >
-                  店員に見せる
-                </button>
-                <button
-                  onClick={onCancel}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium text-base transition-colors border border-gray-300"
-                >
-                  キャンセル
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleUse}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
-                >
-                  利用する
-                </button>
-                <button
-                  onClick={onCancel}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium text-base transition-colors border border-gray-300"
-                >
-                  キャンセル
-                </button>
-              </>
-            )}
-          </div>
+                  {coupon.drinkType === 'alcohol' && (
+                    <p className="text-red-600 font-medium text-sm text-center mb-2">
+                      ※20歳未満の方はアルコールは飲めません
+                    </p>
+                  )}
+                  <button
+                    onClick={handleShowToStaff}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
+                  >
+                    店員に見せる
+                  </button>
+                  <button
+                    onClick={onCancel}
+                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium text-base transition-colors border border-gray-300"
+                  >
+                    キャンセル
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleUse}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
+                  >
+                    利用する
+                  </button>
+                  <button
+                    onClick={onCancel}
+                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium text-base transition-colors border border-gray-300"
+                  >
+                    キャンセル
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

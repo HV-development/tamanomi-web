@@ -374,22 +374,29 @@ const MenuButtons = React.memo(({
   accountStatus?: string
 }) => {
   const isWithdrawing = accountStatus === 'withdrawing'
+  const isPaused = plan?.status === 'paused'
   const planMenuLabel = plan ? "プランの変更" : "プラン登録"
-  
+  const planMenuDisabled = isWithdrawing || isPaused
+  const planMenuDisplay = isWithdrawing
+    ? <span>プランの変更<br /><span className="text-xs">（退会処理済みのため利用不可）</span></span>
+    : isPaused
+      ? <span>プランの変更<br /><span className="text-xs">（お支払い一時停止中のため利用不可）</span></span>
+      : planMenuLabel
+
   return (
     <div className="space-y-3">
       {onStoreIntroduction && (
-        <MenuButton 
-          onClick={onStoreIntroduction} 
-          icon={Store} 
-          label={hasStoreIntroduction ? "店舗紹介（変更）" : "店舗紹介"} 
+        <MenuButton
+          onClick={onStoreIntroduction}
+          icon={Store}
+          label={hasStoreIntroduction ? "店舗紹介（変更）" : "店舗紹介"}
         />
       )}
       {appConfig.myPageSettings.showProfile && (
         <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
       )}
       {appConfig.myPageSettings.showPlanManagement && (
-        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={isWithdrawing ? <span>プランの変更<br /><span className="text-xs">（退会処理済みのため利用不可）</span></span> : planMenuLabel} disabled={isWithdrawing} />
+        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={planMenuDisplay} disabled={planMenuDisabled} />
       )}
       {appConfig.myPageSettings.showPlanManagement && plan && onChangePaymentMethod && (
         <MenuButton onClick={onChangePaymentMethod} icon={Wallet} label={isWithdrawing ? <span>支払方法の変更<br /><span className="text-xs">（退会処理済みのため利用不可）</span></span> : "支払方法の変更"} disabled={isWithdrawing} />
