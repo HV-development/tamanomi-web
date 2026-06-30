@@ -788,6 +788,14 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
 
     // プラン変更画面の場合
     if (myPageView === "plan-change") {
+      // paused ユーザーは直リンク・状態復元で来てもプラン変更できないため、
+      // 支払い方法変更画面へ強制リダイレクト（メニュー導線のガードに加える二重防御）
+      if (plan?.status === 'paused') {
+        if (typeof window !== 'undefined') {
+          window.location.href = '/payment-method-change'
+        }
+        return null
+      }
       if (!plan) {
         return (
           <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
@@ -830,7 +838,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       return (
         <PlanManagementContainer
           plan={plan}
-          onChangePlan={() => onMyPageViewChange("plan-change")}
+          onChangePlan={handlers.handleChangePlan}
           onCancelSubscription={onCancelSubscription}
           onChangePaymentMethod={onChangePaymentMethod}
           hasPaymentMethod={hasPaymentMethod}
