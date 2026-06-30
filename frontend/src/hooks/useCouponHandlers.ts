@@ -168,9 +168,9 @@ export const useCouponHandlers = (
                     errorBody = {}
                 }
 
-                // 支払いが一時停止中（バックエンドから直接 403 を受領した場合のフォールバック）
+                // 支払いが一時停止中（バックエンドから直接 409 を受領した場合のフォールバック）
                 if (
-                    response.status === 403 &&
+                    response.status === 409 &&
                     typeof errorBody.error === 'object' &&
                     errorBody.error?.code === 'SUBSCRIPTION_PAUSED'
                 ) {
