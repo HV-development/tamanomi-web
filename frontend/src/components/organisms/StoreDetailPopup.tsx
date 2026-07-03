@@ -12,13 +12,16 @@ interface StoreDetailPopupProps {
   onClose: () => void
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
+  /** 支払い一時停止中で「今すぐクーポンGET」を無効化するか */
+  isCouponDisabled?: boolean
 }
 
 export function StoreDetailPopup({
   isOpen,
   store,
   onClose,
-  onCouponsClick
+  onCouponsClick,
+  isCouponDisabled = false,
 }: StoreDetailPopupProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isImageError, setIsImageError] = useState(false)
@@ -384,7 +387,13 @@ export function StoreDetailPopup({
               <div className="pt-2">
                 <button
                   onClick={() => onCouponsClick(store.id)}
-                  className="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
+                  disabled={isCouponDisabled}
+                  aria-disabled={isCouponDisabled}
+                  className={
+                    isCouponDisabled
+                      ? "w-full flex items-center justify-center bg-gray-300 text-gray-500 py-3 px-4 rounded-xl font-medium cursor-not-allowed"
+                      : "w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
+                  }
                 >
                   <span className="font-medium">今すぐクーポンGET</span>
                 </button>

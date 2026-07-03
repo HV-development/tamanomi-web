@@ -23,8 +23,13 @@ export const usePlanHandlers = (
     }, [navigation, router, auth])
 
     const handleChangePlan = useCallback(() => {
+        // 支払いが一時停止中の場合はプラン変更ではなく支払い方法変更に誘導
+        if (auth.plan?.status === 'paused') {
+            router.push('/payment-method-change')
+            return
+        }
         navigation.navigateToMyPage("plan-change")
-    }, [navigation])
+    }, [navigation, router, auth.plan])
 
     const handlePlanChangeSubmit = useCallback(async (planId: string, alsoChangePaymentMethod?: boolean) => {
         try {

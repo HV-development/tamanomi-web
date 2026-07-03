@@ -55,6 +55,13 @@ export function usePlanRegistration() {
     try {
       const userData = await fetchCurrentUser()
 
+      // 支払いが一時停止中のユーザーはプラン登録画面を使わせない
+      // （新規登録ではなく支払い方法変更で再開すべきため、専用画面へリダイレクト）
+      if (userData.plan?.status === 'paused') {
+        router.replace('/payment-method-change')
+        return userData
+      }
+
       if (userData.email) {
         setEmail(userData.email)
       } else {
@@ -78,7 +85,7 @@ export function usePlanRegistration() {
       setError(err instanceof Error ? err.message : 'ユーザー情報の取得中にエラーが発生しました。')
       return null
     }
-  }, [])
+  }, [router])
 
   // --- プラン一覧取得 ---
   const loadPlans = useCallback(async (explicitLinkedState?: boolean | null) => {

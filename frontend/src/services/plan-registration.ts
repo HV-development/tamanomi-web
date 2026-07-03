@@ -9,6 +9,9 @@ export interface UserData {
   email?: string
   saitamaAppLinked?: boolean
   userCards?: unknown[]
+  plan?: {
+    status?: string
+  } | null
 }
 
 export interface CardRegisterResponse {

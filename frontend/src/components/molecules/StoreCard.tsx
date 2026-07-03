@@ -17,6 +17,8 @@ interface StoreCardProps {
   className?: string
   /** クーポン/店舗チェックボタンの並び方（お気に入りは縦、それ以外は既存の横並び） */
   actionsLayout?: "horizontal" | "vertical"
+  /** 支払い一時停止中で「今すぐクーポンGET」を無効化するか */
+  isCouponDisabled?: boolean
 }
 
 export function StoreCard({
@@ -27,6 +29,7 @@ export function StoreCard({
   showDistance = false,
   className = "",
   actionsLayout = "horizontal",
+  isCouponDisabled = false,
 }: StoreCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isImageError, setIsImageError] = useState(false)
@@ -235,10 +238,15 @@ export function StoreCard({
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              onCouponsClick(store.id)
+              if (isCouponDisabled) {
+                // 支払い一時停止中はクーポン一覧を開かず、店舗詳細を表示する
+                onStoreClick(store)
+              } else {
+                onCouponsClick(store.id)
+              }
             }}
             className="w-full aspect-[4/3] md:aspect-[16/9] rounded-lg overflow-hidden bg-white flex items-center justify-center cursor-pointer relative"
-            aria-label="店舗画像"
+            aria-label={isCouponDisabled ? "店舗詳細を表示" : "店舗画像"}
           >
             <Image
               src="/store-default.svg"
@@ -294,10 +302,16 @@ export function StoreCard({
         >
           <button
             onClick={() => onCouponsClick(store.id)}
+            disabled={isCouponDisabled}
+            aria-disabled={isCouponDisabled}
             className={
-              actionsLayout === "vertical"
-                ? "w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg font-medium"
-                : "flex-1 max-[400px]:w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg font-medium"
+              isCouponDisabled
+                ? (actionsLayout === "vertical"
+                  ? "w-full flex items-center justify-center bg-gray-300 text-gray-500 py-3 px-4 rounded-2xl font-medium cursor-not-allowed"
+                  : "flex-1 max-[400px]:w-full flex items-center justify-center bg-gray-300 text-gray-500 py-3 px-4 rounded-2xl font-medium cursor-not-allowed")
+                : (actionsLayout === "vertical"
+                  ? "w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg font-medium"
+                  : "flex-1 max-[400px]:w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg font-medium")
             }
           >
             <span>今すぐクーポンGET</span>

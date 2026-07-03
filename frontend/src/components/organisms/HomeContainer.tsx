@@ -24,24 +24,27 @@ interface HomeContainerProps {
   currentLocation?: { latitude: number; longitude: number } | null
   // 初期ローディング状態
   isInitialLoading?: boolean
+  /** 支払い一時停止中で「今すぐクーポンGET」を無効化するか */
+  isCouponDisabled?: boolean
 }
 
-export function HomeContainer({ 
+export function HomeContainer({
   selectedGenres: _selectedGenres, // eslint-disable-line @typescript-eslint/no-unused-vars
-  selectedEvents, 
-  selectedAreas, 
-  isNearbyFilter, 
-  isFavoritesFilter, 
-  stores, 
-  onStoreClick, 
-  onFavoriteToggle, 
-  onCouponsClick, 
-  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100", 
-  loadMoreRef, 
-  isLoadingMore = false, 
-  bottomError = null, 
+  selectedEvents,
+  selectedAreas,
+  isNearbyFilter,
+  isFavoritesFilter,
+  stores,
+  onStoreClick,
+  onFavoriteToggle,
+  onCouponsClick,
+  backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
+  loadMoreRef,
+  isLoadingMore = false,
+  bottomError = null,
   currentLocation,
-  isInitialLoading = false
+  isInitialLoading = false,
+  isCouponDisabled = false,
 }: HomeContainerProps) {
   // 店舗データをフィルタリング
   const filteredStores = useMemo(() => {
@@ -130,6 +133,7 @@ export function HomeContainer({
           emptyEmoji="🔍"
           showEmptyMessage={!isInitialLoading && stores !== undefined && stores.length === 0}
           isLoading={isInitialLoading}
+          isCouponDisabled={isCouponDisabled}
         />
 
         {/* 追加ロード時のローディング表示 */}
