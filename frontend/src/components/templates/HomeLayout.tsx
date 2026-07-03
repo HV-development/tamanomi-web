@@ -21,6 +21,8 @@ import { CouponListPopup } from "../molecules/CouponListPopup"
 import { CouponUsedSuccessModal } from "../molecules/CouponUsedSuccessModal"
 import { LoginRequiredModal } from "../molecules/LoginRequiredModal"
 import { PlanRequiredModal } from "../molecules/PlanRequiredModal"
+import { SubscriptionPausedModal } from "../molecules/SubscriptionPausedModal"
+import { PausedNoticeBanner } from "../molecules/PausedNoticeBanner"
 import { EmailChangeSuccessModal } from "../organisms/EmailChangeSuccessModal"
 import { StoreDetailPopup } from "@/components/organisms/StoreDetailPopup"
 import { Logo } from "../atoms/Logo"
@@ -430,6 +432,11 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const isPlanRequiredModalOpen = state.isPlanRequiredModalOpen
   const onPlanRequiredModalClose = handlers.handlePlanRequiredModalClose
   const onPlanRequiredModalRegister = handlers.handlePlanRequiredModalRegister
+  const isSubscriptionPausedModalOpen = state.isSubscriptionPausedModalOpen
+  const subscriptionPausedModalMode = state.subscriptionPausedModalMode
+  const onSubscriptionPausedModalClose = handlers.handleSubscriptionPausedModalClose
+  const onSubscriptionPausedModalChangePayment = handlers.handleSubscriptionPausedModalChangePayment
+  const isPlanPaused = auth.plan?.status === 'paused'
   const onProfileEditSubmit = handlers.handleProfileEditSubmit
   const onEmailChangeSubmit = handlers.handleEmailChangeSubmit
   const onPasswordChangeSubmit = handlers.handlePasswordChangeSubmit
@@ -712,6 +719,8 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         coupon={selectedCoupon}
         onConfirm={onConfirmCoupon}
         onCancel={onCancelCoupon}
+        isPaused={isPlanPaused}
+        onChangePayment={onSubscriptionPausedModalChangePayment}
       />
     )
   }
@@ -779,6 +788,14 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
 
     // プラン変更画面の場合
     if (myPageView === "plan-change") {
+      // paused ユーザーは直リンク・状態復元で来てもプラン変更できないため、
+      // 支払い方法変更画面へ強制リダイレクト（メニュー導線のガードに加える二重防御）
+      if (plan?.status === 'paused') {
+        if (typeof window !== 'undefined') {
+          window.location.href = '/payment-method-change'
+        }
+        return null
+      }
       if (!plan) {
         return (
           <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
@@ -821,7 +838,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       return (
         <PlanManagementContainer
           plan={plan}
-          onChangePlan={() => onMyPageViewChange("plan-change")}
+          onChangePlan={handlers.handleChangePlan}
           onCancelSubscription={onCancelSubscription}
           onChangePaymentMethod={onChangePaymentMethod}
           hasPaymentMethod={hasPaymentMethod}
@@ -1071,6 +1088,12 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         }}
       />
 
+      {/* 支払い一時停止中バナー（home 最上部に常時表示） */}
+      <PausedNoticeBanner
+        isVisible={isPlanPaused}
+        onChangePayment={onSubscriptionPausedModalChangePayment}
+      />
+
       <div className="flex-1 overflow-hidden">
         <HomeContainer
           selectedGenres={selectedGenres}
@@ -1089,6 +1112,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
           backgroundColorClass={backgroundColorClass}
           currentLocation={state.currentLocation}
           isInitialLoading={isSearchMode ? isSearching : isInitialStoresLoading}
+          isCouponDisabled={isPlanPaused}
         />
       </div>
 
@@ -1100,6 +1124,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
         onStoreClick={onStoreClick}
+        isCouponDisabled={isPlanPaused}
       />
 
       {/* 閲覧履歴ポップアップ */}
@@ -1110,6 +1135,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
         onStoreClick={onStoreClick}
+        isCouponDisabled={isPlanPaused}
       />
 
       <StoreDetailPopup
@@ -1122,6 +1148,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         }}
         onFavoriteToggle={onFavoriteToggle}
         onCouponsClick={onCouponsClick}
+        isCouponDisabled={isPlanPaused}
       />
 
       {/* クーポン関連ポップアップ */}
@@ -1166,6 +1193,14 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
         isOpen={isPlanRequiredModalOpen}
         onClose={onPlanRequiredModalClose}
         onRegisterPlan={onPlanRequiredModalRegister}
+      />
+
+      {/* 支払い一時停止中モーダル */}
+      <SubscriptionPausedModal
+        isOpen={isSubscriptionPausedModalOpen}
+        mode={subscriptionPausedModalMode}
+        onClose={onSubscriptionPausedModalClose}
+        onChangePayment={onSubscriptionPausedModalChangePayment}
       />
 
       {/* メールアドレス変更成功モーダル */}

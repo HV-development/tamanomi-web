@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useCallback, useRef, useEffect } from "react"
-import type { AppAction, AppState, Store } from '@hv-development/schemas'
+import type { AppState, Store } from '@hv-development/schemas'
+import type { AppActionExt } from './useAppReducer'
 import type { useAuth } from './useAuth'
 import type { useNavigation } from './useNavigation'
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
@@ -9,7 +10,7 @@ import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.
 let couponFetchingStoreId: string | null = null
 
 export const useCouponHandlers = (
-    dispatch: React.Dispatch<AppAction>,
+    dispatch: React.Dispatch<AppActionExt>,
     auth: ReturnType<typeof useAuth>,
     navigation: ReturnType<typeof useNavigation>,
     router: AppRouterInstance,
@@ -127,6 +128,16 @@ export const useCouponHandlers = (
             return
         }
 
+        // paused は CouponListPopup の disable では拾えない経路（状態取得前に開いていた / 途中で paused 化）
+        // への二重防御。API 側 (409 SUBSCRIPTION_PAUSED) でも止まるが、ここで先に遮断する。
+        if (auth.plan.status === 'paused') {
+            dispatch({
+                type: 'SET_SUBSCRIPTION_PAUSED_MODAL',
+                payload: { open: true, mode: 'preCheck' },
+            })
+            return
+        }
+
         const coupon = state.storeCoupons.find((c) => c.id === couponId)
         if (coupon) {
             dispatch({ type: 'SET_SELECTED_COUPON', payload: coupon })
@@ -160,17 +171,37 @@ export const useCouponHandlers = (
                     return
                 }
 
-                let errorMessage = 'クーポンの使用に失敗しました'
+                let errorBody: { error?: { code?: string; message?: string } | string; message?: string } = {}
                 try {
-                    const error = await response.json()
-                    if (error.error?.message) {
-                        errorMessage = error.error.message
-                    } else if (error.message) {
-                        errorMessage = error.message
-                    } else if (error.error) {
-                        errorMessage = error.error
-                    }
+                    errorBody = await response.json()
                 } catch {
+                    errorBody = {}
+                }
+
+                // 支払いが一時停止中（バックエンドから直接 409 を受領した場合のフォールバック）
+                if (
+                    response.status === 409 &&
+                    typeof errorBody.error === 'object' &&
+                    errorBody.error?.code === 'SUBSCRIPTION_PAUSED'
+                ) {
+                    dispatch({
+                        type: 'SET_SUBSCRIPTION_PAUSED_MODAL',
+                        payload: { open: true, mode: 'apiError' },
+                    })
+                    dispatch({ type: 'SET_SELECTED_COUPON', payload: null })
+                    dispatch({ type: 'SET_SELECTED_STORE', payload: null })
+                    navigation.navigateToView("home")
+                    return
+                }
+
+                let errorMessage = 'クーポンの使用に失敗しました'
+                if (typeof errorBody.error === 'object' && errorBody.error?.message) {
+                    errorMessage = errorBody.error.message
+                } else if (errorBody.message) {
+                    errorMessage = errorBody.message
+                } else if (typeof errorBody.error === 'string') {
+                    errorMessage = errorBody.error
+                } else {
                     errorMessage = `クーポンの使用に失敗しました (HTTP ${response.status})`
                 }
                 alert(errorMessage)
@@ -244,6 +275,21 @@ export const useCouponHandlers = (
         router.push('/plan-registration')
     }, [dispatch, router])
 
+    const handleSubscriptionPausedModalClose = useCallback(() => {
+        dispatch({
+            type: 'SET_SUBSCRIPTION_PAUSED_MODAL',
+            payload: { open: false, mode: 'preCheck' },
+        })
+    }, [dispatch])
+
+    const handleSubscriptionPausedModalChangePayment = useCallback(() => {
+        dispatch({
+            type: 'SET_SUBSCRIPTION_PAUSED_MODAL',
+            payload: { open: false, mode: 'preCheck' },
+        })
+        router.push('/payment-method-change')
+    }, [dispatch, router])
+
     return {
         handleCouponsClick,
         handleUseCoupon,
@@ -259,5 +305,7 @@ export const useCouponHandlers = (
         handleLoginRequiredModalLogin,
         handlePlanRequiredModalClose,
         handlePlanRequiredModalRegister,
+        handleSubscriptionPausedModalClose,
+        handleSubscriptionPausedModalChangePayment,
     }
 }
