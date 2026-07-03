@@ -42,33 +42,27 @@ export const useWithdrawalHandlers = (
             const runningId = userData.userPlan?.paygentRunningId || userData.plan?.paygentRunningId
             const userPlanId = userData.userPlan?.id
 
-            if (!runningId) {
-                if (!userPlanId) {
-                    const withdrawResponse = await fetch('/api/user/withdraw', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({}),
-                        credentials: 'include',
-                    })
-
-                    if (!withdrawResponse.ok) {
-                        const errorData = await withdrawResponse.json().catch(() => ({}))
-                        throw new Error(errorData.error?.message || errorData.message || '退会処理に失敗しました')
-                    }
-
-                    await auth.refreshUser()
-                    navigation.navigateToMyPage("withdrawal-complete")
-                    return
+            if (!userPlanId) {
+                // データ不整合防御: Paygent 継続課金が生きているのに UserPlan が取れないケース。
+                // このまま /api/user/withdraw に落とすと Paygent 側の課金が止まらず、
+                // 退会後も課金され続ける最悪状態になるため、ユーザーに再読み込みを促す。
+                if (runningId) {
+                    throw new Error(
+                        'ユーザープラン情報を取得できませんでした。マイページを再読み込みしてから再度お試しください。'
+                    )
                 }
 
-                const deleteResponse = await fetch(`/api/user-plans/${userPlanId}`, {
-                    method: 'DELETE',
+                // Paygent 未登録 & UserPlan なし → アカウント全体の退会
+                const withdrawResponse = await fetch('/api/user/withdraw', {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}),
+                    credentials: 'include',
                 })
 
-                if (!deleteResponse.ok) {
-                    const errorData = await deleteResponse.json().catch(() => ({}))
-                    throw new Error(errorData.message || errorData.error?.message || '退会処理に失敗しました')
+                if (!withdrawResponse.ok) {
+                    const errorData = await withdrawResponse.json().catch(() => ({}))
+                    throw new Error(errorData.error?.message || errorData.message || '退会処理に失敗しました')
                 }
 
                 await auth.refreshUser()
@@ -76,47 +70,19 @@ export const useWithdrawalHandlers = (
                 return
             }
 
-            const nextBillingDate = userData.userPlan?.nextBillingDate || userData.plan?.nextBillingDate
-
-            if (!nextBillingDate) {
-                throw new Error('次回課金日が見つかりません')
-            }
-
-            const formatDate = (date: Date | string): string => {
-                const d = typeof date === 'string' ? new Date(date) : date
-                const year = d.getFullYear()
-                const month = String(d.getMonth() + 1).padStart(2, '0')
-                const day = String(d.getDate()).padStart(2, '0')
-                return `${year}${month}${day}`
-            }
-
-            const endScheduled = formatDate(nextBillingDate)
-
-            if (!userPlanId) {
-                throw new Error(
-                    'ユーザープラン情報を取得できませんでした。マイページを再読み込みしてから再度お試しください。'
-                )
-            }
-
-            const response = await fetch('/api/payment/update', {
-                method: 'POST',
+            // userPlan あり: バックエンド deleteUserPlan で Paygent 電文283 送信 + DB 更新
+            // paygentRunningId 有無に関わらず一本化（バックエンドが Paygent 未登録は自動スキップ）
+            // 当日退会でも P050 が発生しない（電文283 は end_scheduled パラメータなし）
+            const deleteResponse = await fetch(`/api/user-plans/${userPlanId}`, {
+                method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userPlanId,
-                    customerId: user.paymentCard?.paygentCustomerId,
-                    customerCardId: user.paymentCard?.paygentCustomerCardId,
-                    runningId: runningId,
-                    endScheduled: endScheduled,
-                    description: '退会処理',
-                }),
             })
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                throw new Error(errorData.error || errorData.message || '退会処理に失敗しました')
+            if (!deleteResponse.ok) {
+                const errorData = await deleteResponse.json().catch(() => ({}))
+                throw new Error(errorData.message || errorData.error?.message || '退会処理に失敗しました')
             }
 
-            await response.json()
             await auth.refreshUser()
             navigation.navigateToMyPage("withdrawal-complete")
         } catch (error) {
