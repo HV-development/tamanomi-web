@@ -121,12 +121,14 @@ export const useVerifyOtpPage = () => {
 
       // トークンはCookieに保存されているため、プラン登録状況を確認
       let hasPlan = false
+      let isCancelledOnly = false
       try {
         const userResponse = await fetch('/api/user/me')
 
         if (userResponse.ok) {
           const userData = await userResponse.json()
           hasPlan = userData.plan !== null && userData.plan !== undefined
+          isCancelledOnly = userData.hasOnlyCancelledPlans === true
         }
       } catch {
         // エラー処理
@@ -134,8 +136,9 @@ export const useVerifyOtpPage = () => {
 
       // リダイレクト先を決定
       // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
+      // cancelled のみのユーザーは home のバナーで再契約誘導するため、plan-registration に強制遷移しない
       let targetPath: string
-      if (!hasPlan) {
+      if (!hasPlan && !isCancelledOnly) {
         targetPath = '/plan-registration'
       } else {
         targetPath = '/home'

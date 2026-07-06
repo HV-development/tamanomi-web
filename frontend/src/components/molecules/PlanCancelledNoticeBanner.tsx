@@ -20,7 +20,9 @@ export function PlanCancelledNoticeBanner({ isVisible, onRegisterPlan }: PlanCan
               プランのご登録をお願いします
             </p>
             <p className="text-sm text-gray-700 leading-snug mt-1">
-              ご登録のお支払いカードで決済ができなかったため、現在ご契約中のプランがございません。引き続きクーポンをご利用いただくには、再度プランをご登録ください。
+              ご登録のお支払いカードで決済ができなかったため、現在ご契約中のプランがございません。
+              <br />
+              再度プランをご登録ください。
             </p>
             <button
               onClick={onRegisterPlan}
