@@ -12,6 +12,7 @@ export interface UserData {
   plan?: {
     status?: string
   } | null
+  hasOnlyCancelledPlans?: boolean
 }
 
 export interface CardRegisterResponse {

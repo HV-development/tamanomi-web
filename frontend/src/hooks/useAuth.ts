@@ -6,6 +6,7 @@ export function useAuth() {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState<User | undefined>(undefined);
     const [plan, setPlan] = useState<Plan | undefined>(undefined);
+    const [hasOnlyCancelledPlans, setHasOnlyCancelledPlans] = useState<boolean>(false);
     const [usageHistory, setUsageHistory] = useState<UsageHistory[]>([]);
     const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
     const hasInitialized = useRef(false);
@@ -95,12 +96,13 @@ export function useAuth() {
                 const initAuth = async () => {
                     try {
                         const result = await fetchUserMe();
-                        
+
                         if (result.data) {
-                            const userData = result.data as User & { plan?: Plan; paymentHistory?: PaymentHistory[] };
+                            const userData = result.data as User & { plan?: Plan; paymentHistory?: PaymentHistory[]; hasOnlyCancelledPlans?: boolean };
                             setIsAuthenticated(true);
                             setUser(result.data);
                             setPlan(userData.plan);
+                            setHasOnlyCancelledPlans(userData.hasOnlyCancelledPlans === true);
                             fetchUsageHistory();
                             setPaymentHistory(userData.paymentHistory || []);
                         } else {
@@ -119,10 +121,17 @@ export function useAuth() {
         }
     }, [fetchUsageHistory, fetchUserMe]);
 
-    const login = (userData: User, planData: Plan | undefined, usage: UsageHistory[], payment: PaymentHistory[]) => {
+    const login = (
+        userData: User,
+        planData: Plan | undefined,
+        usage: UsageHistory[],
+        payment: PaymentHistory[],
+        hasOnlyCancelledPlansValue: boolean = false,
+    ) => {
         setIsAuthenticated(true);
         setUser(userData);
         setPlan(planData);
+        setHasOnlyCancelledPlans(hasOnlyCancelledPlansValue);
         setUsageHistory(usage);
         setPaymentHistory(payment);
     };
@@ -144,6 +153,7 @@ export function useAuth() {
         setIsAuthenticated(false);
         setUser(undefined);
         setPlan(undefined);
+        setHasOnlyCancelledPlans(false);
         setUsageHistory([]);
         setPaymentHistory([]);
     };
@@ -151,9 +161,10 @@ export function useAuth() {
     const refreshUser = useCallback(async () => {
         const result = await fetchUserMe();
         if (result.data) {
-            const userData = result.data as User & { plan?: Plan; paymentHistory?: PaymentHistory[] };
+            const userData = result.data as User & { plan?: Plan; paymentHistory?: PaymentHistory[]; hasOnlyCancelledPlans?: boolean };
             setUser(result.data);
             setPlan(userData.plan);
+            setHasOnlyCancelledPlans(userData.hasOnlyCancelledPlans === true);
             setPaymentHistory(userData.paymentHistory || []);
         }
         return result.data;
@@ -164,6 +175,7 @@ export function useAuth() {
         isLoading,
         user,
         plan,
+        hasOnlyCancelledPlans,
         usageHistory,
         paymentHistory,
         setIsLoading,

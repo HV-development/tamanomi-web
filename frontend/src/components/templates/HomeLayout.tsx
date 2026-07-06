@@ -23,6 +23,7 @@ import { LoginRequiredModal } from "../molecules/LoginRequiredModal"
 import { PlanRequiredModal } from "../molecules/PlanRequiredModal"
 import { SubscriptionPausedModal } from "../molecules/SubscriptionPausedModal"
 import { PausedNoticeBanner } from "../molecules/PausedNoticeBanner"
+import { PlanCancelledNoticeBanner } from "../molecules/PlanCancelledNoticeBanner"
 import { EmailChangeSuccessModal } from "../organisms/EmailChangeSuccessModal"
 import { StoreDetailPopup } from "@/components/organisms/StoreDetailPopup"
 import { Logo } from "../atoms/Logo"
@@ -437,6 +438,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const onSubscriptionPausedModalClose = handlers.handleSubscriptionPausedModalClose
   const onSubscriptionPausedModalChangePayment = handlers.handleSubscriptionPausedModalChangePayment
   const isPlanPaused = auth.plan?.status === 'paused'
+  const isPlanCancelled = auth.hasOnlyCancelledPlans === true
   const onProfileEditSubmit = handlers.handleProfileEditSubmit
   const onEmailChangeSubmit = handlers.handleEmailChangeSubmit
   const onPasswordChangeSubmit = handlers.handlePasswordChangeSubmit
@@ -1092,6 +1094,12 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       <PausedNoticeBanner
         isVisible={isPlanPaused}
         onChangePayment={onSubscriptionPausedModalChangePayment}
+      />
+
+      {/* 契約プランなしバナー（決済失敗で cancelled になったユーザー向け） */}
+      <PlanCancelledNoticeBanner
+        isVisible={isPlanCancelled}
+        onRegisterPlan={onPlanRequiredModalRegister}
       />
 
       <div className="flex-1 overflow-hidden">
