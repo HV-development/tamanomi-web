@@ -79,8 +79,13 @@ export const useWithdrawalHandlers = (
             })
 
             if (!deleteResponse.ok) {
-                const errorData = await deleteResponse.json().catch(() => ({}))
-                throw new Error(errorData.message || errorData.error?.message || '退会処理に失敗しました')
+                const errorData: { error?: { message?: string } | string; message?: string } =
+                    await deleteResponse.json().catch(() => ({}))
+                const errorMessage =
+                    (typeof errorData.error === 'object' ? errorData.error?.message : errorData.error) ||
+                    errorData.message ||
+                    '退会処理に失敗しました'
+                throw new Error(errorMessage)
             }
 
             await auth.refreshUser()
