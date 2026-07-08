@@ -121,17 +121,11 @@ export function useAuth() {
         }
     }, [fetchUsageHistory, fetchUserMe]);
 
-    const login = (
-        userData: User,
-        planData: Plan | undefined,
-        usage: UsageHistory[],
-        payment: PaymentHistory[],
-        hasOnlyCancelledPlansValue: boolean = false,
-    ) => {
+    const login = (userData: User, planData: Plan | undefined, usage: UsageHistory[], payment: PaymentHistory[]) => {
         setIsAuthenticated(true);
         setUser(userData);
         setPlan(planData);
-        setHasOnlyCancelledPlans(hasOnlyCancelledPlansValue);
+        setHasOnlyCancelledPlans((userData as User & { hasOnlyCancelledPlans?: boolean }).hasOnlyCancelledPlans === true);
         setUsageHistory(usage);
         setPaymentHistory(payment);
     };
