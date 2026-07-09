@@ -21,9 +21,14 @@ export function PaymentHistoryList({
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
   const formatDate = (date: Date | string) => {
-    // receivedTime はJSTの日時をそのままUTCフィールドに保持しているため、
-    // ブラウザのタイムゾーンに依存させず、UTC値のまま（＝JSTの表記のまま）描画する。
+    // ⚠️ デプロイ順序依存: このUTC描画が正しいのは API #392 (tamanomi-api) 適用後のみ。
+    //   - API #392 適用後: paidAt は「JSTの日時をそのままUTCフィールドに保持」した値。
+    //     → getUTC* でそのまま描画する（＝JSTの表記になる）のが正しい。
+    //   - API #392 適用前(現行): paidAt = createdAt(本物のUTC)。
+    //     この描画だと早朝(JST 9時前)の決済が前日にズレるため、必ず API #392 → 本フロント の順でデプロイすること。
     const d = new Date(date)
+    // receivedTime が null の行は paidAt が空文字 "" で返り、new Date("") が Invalid Date になるため防御する
+    if (Number.isNaN(d.getTime())) return "-"
     const year = d.getUTCFullYear()
     const month = d.getUTCMonth() + 1
     const day = d.getUTCDate()
