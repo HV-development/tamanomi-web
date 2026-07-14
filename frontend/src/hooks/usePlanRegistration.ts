@@ -47,6 +47,7 @@ export function usePlanRegistration() {
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const [hasPaymentMethod, setHasPaymentMethod] = useState<boolean>(false)
   const [isPaymentMethodChangeOnly, setIsPaymentMethodChangeOnly] = useState<boolean>(false)
+  const [isNewSignupFlow, setIsNewSignupFlow] = useState<boolean>(false)
   const [userId, setUserId] = useState<string>('')
   const router = useRouter()
 
@@ -114,6 +115,10 @@ export function usePlanRegistration() {
 
     if (urlParams.get('saitamaAppLinked') === 'true') {
       setSaitamaAppLinked(true)
+    }
+
+    if (urlParams.get('flow') === 'signup') {
+      setIsNewSignupFlow(true)
     }
 
     refreshUserInfo()
@@ -254,12 +259,14 @@ export function usePlanRegistration() {
   const processCreditCard = async (
     currentEmail: string,
     planId: string | undefined,
+    campaignCode?: string,
   ) => {
     const customerId = generateCustomerId(currentEmail)
     const data = await registerCreditCard({
       customerId,
       userEmail: currentEmail,
       planId,
+      campaignCode,
     })
 
     const { redirectUrl, params } = data
@@ -287,7 +294,11 @@ export function usePlanRegistration() {
   }
 
   // --- メインハンドラ ---
-  const handlePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType) => {
+  const handlePaymentMethodRegister = async (
+    planId: string,
+    paymentMethod: PaymentMethodType,
+    campaignCode?: string,
+  ) => {
     if (isLoading) return
 
     try {
@@ -355,7 +366,7 @@ export function usePlanRegistration() {
           await processPayPay(currentUserId, planId, paymentAmount)
         }
       } else {
-        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId)
+        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId, campaignCode)
       }
     } catch (err) {
       console.error('▲ERROR [handlePaymentMethodRegister]:', err)
@@ -397,6 +408,7 @@ export function usePlanRegistration() {
     saitamaAppLinked,
     hasPaymentMethod,
     isPaymentMethodChangeOnly,
+    isNewSignupFlow,
     handlePaymentMethodRegister,
     handleSaitamaAppLinked,
     handleCancel,
