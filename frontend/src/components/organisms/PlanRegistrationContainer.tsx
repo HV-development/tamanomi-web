@@ -36,12 +36,9 @@ export function PlanRegistrationContainer({
 }: PlanRegistrationContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
-      {/* ヘッダー */}
-      <HeaderLogo
-        onLogoClick={onLogoClick}
-        showBackButton={!isNewSignupFlow}
-        onBackClick={onCancel}
-      />
+      {!isNewSignupFlow && (
+        <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
+      )}
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex items-center justify-center p-4">
