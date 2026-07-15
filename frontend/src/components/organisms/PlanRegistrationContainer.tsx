@@ -17,6 +17,7 @@ interface PlanRegistrationContainerProps {
   onSaitamaAppLinked?: () => void
   hasPaymentMethod?: boolean
   isPaymentMethodChangeOnly?: boolean
+  accountStatus?: string | null
 }
 
 export function PlanRegistrationContainer({
@@ -31,11 +32,14 @@ export function PlanRegistrationContainer({
   onSaitamaAppLinked,
   hasPaymentMethod,
   isPaymentMethodChangeOnly,
+  accountStatus,
 }: PlanRegistrationContainerProps) {
+  const isPendingAccount = accountStatus === 'pending'
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
-      {/* ヘッダー */}
-      <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
+      {!isPendingAccount && (
+        <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
+      )}
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex items-center justify-center p-4">

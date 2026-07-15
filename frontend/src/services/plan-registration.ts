@@ -7,6 +7,7 @@ import { ApiClient } from '@/lib/api-client'
 export interface UserData {
   id?: string
   email?: string
+  status?: string
   saitamaAppLinked?: boolean
   userCards?: unknown[]
   plan?: {
