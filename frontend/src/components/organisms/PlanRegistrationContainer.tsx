@@ -6,7 +6,7 @@ import type { PaymentMethodType } from '@hv-development/schemas'
 import { PlanListResponse } from '@hv-development/schemas'
 
 interface PlanRegistrationContainerProps {
-  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string) => void
+  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean
@@ -17,7 +17,6 @@ interface PlanRegistrationContainerProps {
   onSaitamaAppLinked?: () => void
   hasPaymentMethod?: boolean
   isPaymentMethodChangeOnly?: boolean
-  accountStatus?: string | null
 }
 
 export function PlanRegistrationContainer({
@@ -32,14 +31,11 @@ export function PlanRegistrationContainer({
   onSaitamaAppLinked,
   hasPaymentMethod,
   isPaymentMethodChangeOnly,
-  accountStatus,
 }: PlanRegistrationContainerProps) {
-  const isPendingAccount = accountStatus === 'pending'
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
-      {!isPendingAccount && (
-        <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
-      )}
+      {/* ヘッダー */}
+      <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
 
       {/* メインコンテンツ */}
       <div className="flex-1 flex items-center justify-center p-4">

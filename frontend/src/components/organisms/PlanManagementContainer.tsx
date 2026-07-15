@@ -1,7 +1,7 @@
 "use client"
 
 import { HeaderLogo } from "../atoms/HeaderLogo"
-import { PlanManagement, type PlanManagementCampaignInfo } from "@/components/molecules/PlanManagement"
+import { PlanManagement } from "@/components/molecules/PlanManagement"
 import type { Plan } from "@/types/user"
 
 interface PlanManagementContainerProps {
@@ -13,7 +13,6 @@ interface PlanManagementContainerProps {
   onBack: () => void
   onLogoClick: () => void
   backgroundColorClass?: string
-  campaignInfo?: PlanManagementCampaignInfo | null
 }
 
 export function PlanManagementContainer({
@@ -25,7 +24,6 @@ export function PlanManagementContainer({
   onBack,
   onLogoClick,
   backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100",
-  campaignInfo,
 }: PlanManagementContainerProps) {
   return (
     <div className={`min-h-screen ${backgroundColorClass}`}>
@@ -33,13 +31,12 @@ export function PlanManagementContainer({
       <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onBack} />
 
       <div className="p-4 max-w-md mx-auto">
-        <PlanManagement
-          plan={plan}
-          onChangePlan={onChangePlan}
+        <PlanManagement 
+          plan={plan} 
+          onChangePlan={onChangePlan} 
           onCancelSubscription={onCancelSubscription}
           onChangePaymentMethod={onChangePaymentMethod}
           hasPaymentMethod={hasPaymentMethod}
-          campaignInfo={campaignInfo}
         />
       </div>
     </div>

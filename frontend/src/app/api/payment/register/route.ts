@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { customerId, planId, customerFamilyName, customerName, companyName, campaignCode } = body
+    const { customerId, planId, customerFamilyName, customerName, companyName } = body
 
 
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
@@ -36,10 +36,6 @@ export async function POST(request: NextRequest) {
 
     if (companyName) {
       backendRequestBody.companyName = companyName
-    }
-
-    if (campaignCode) {
-      backendRequestBody.campaignCode = campaignCode
     }
 
     const response = await secureFetchWithCommonHeaders(request, fullUrl, {

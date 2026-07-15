@@ -47,7 +47,6 @@ export function usePlanRegistration() {
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const [hasPaymentMethod, setHasPaymentMethod] = useState<boolean>(false)
   const [isPaymentMethodChangeOnly, setIsPaymentMethodChangeOnly] = useState<boolean>(false)
-  const [accountStatus, setAccountStatus] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>('')
   const router = useRouter()
 
@@ -75,7 +74,6 @@ export function usePlanRegistration() {
       }
 
       setSaitamaAppLinked(userData.saitamaAppLinked === true)
-      setAccountStatus(userData.status ?? null)
 
       const hasCard = userData.userCards && Array.isArray(userData.userCards) && userData.userCards.length > 0
       setHasPaymentMethod(!!hasCard)
@@ -256,14 +254,12 @@ export function usePlanRegistration() {
   const processCreditCard = async (
     currentEmail: string,
     planId: string | undefined,
-    campaignCode?: string,
   ) => {
     const customerId = generateCustomerId(currentEmail)
     const data = await registerCreditCard({
       customerId,
       userEmail: currentEmail,
       planId,
-      campaignCode,
     })
 
     const { redirectUrl, params } = data
@@ -291,11 +287,7 @@ export function usePlanRegistration() {
   }
 
   // --- メインハンドラ ---
-  const handlePaymentMethodRegister = async (
-    planId: string,
-    paymentMethod: PaymentMethodType,
-    campaignCode?: string,
-  ) => {
+  const handlePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType) => {
     if (isLoading) return
 
     try {
@@ -363,7 +355,7 @@ export function usePlanRegistration() {
           await processPayPay(currentUserId, planId, paymentAmount)
         }
       } else {
-        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId, campaignCode)
+        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId)
       }
     } catch (err) {
       console.error('▲ERROR [handlePaymentMethodRegister]:', err)
@@ -405,7 +397,6 @@ export function usePlanRegistration() {
     saitamaAppLinked,
     hasPaymentMethod,
     isPaymentMethodChangeOnly,
-    accountStatus,
     handlePaymentMethodRegister,
     handleSaitamaAppLinked,
     handleCancel,
