@@ -47,7 +47,7 @@ export function usePlanRegistration() {
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const [hasPaymentMethod, setHasPaymentMethod] = useState<boolean>(false)
   const [isPaymentMethodChangeOnly, setIsPaymentMethodChangeOnly] = useState<boolean>(false)
-  const [isNewSignupFlow, setIsNewSignupFlow] = useState<boolean>(false)
+  const [accountStatus, setAccountStatus] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>('')
   const router = useRouter()
 
@@ -75,6 +75,7 @@ export function usePlanRegistration() {
       }
 
       setSaitamaAppLinked(userData.saitamaAppLinked === true)
+      setAccountStatus(userData.status ?? null)
 
       const hasCard = userData.userCards && Array.isArray(userData.userCards) && userData.userCards.length > 0
       setHasPaymentMethod(!!hasCard)
@@ -115,10 +116,6 @@ export function usePlanRegistration() {
 
     if (urlParams.get('saitamaAppLinked') === 'true') {
       setSaitamaAppLinked(true)
-    }
-
-    if (urlParams.get('flow') === 'signup') {
-      setIsNewSignupFlow(true)
     }
 
     refreshUserInfo()
@@ -408,7 +405,7 @@ export function usePlanRegistration() {
     saitamaAppLinked,
     hasPaymentMethod,
     isPaymentMethodChangeOnly,
-    isNewSignupFlow,
+    accountStatus,
     handlePaymentMethodRegister,
     handleSaitamaAppLinked,
     handleCancel,

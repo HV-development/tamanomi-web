@@ -12,7 +12,7 @@ export default function PlanRegistrationPage() {
     saitamaAppLinked,
     hasPaymentMethod,
     isPaymentMethodChangeOnly,
-    isNewSignupFlow,
+    accountStatus,
     handlePaymentMethodRegister,
     handleSaitamaAppLinked,
     handleCancel,
@@ -43,7 +43,7 @@ export default function PlanRegistrationPage() {
       onSaitamaAppLinked={handleSaitamaAppLinked}
       hasPaymentMethod={hasPaymentMethod}
       isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
-      isNewSignupFlow={isNewSignupFlow}
+      accountStatus={accountStatus}
     />
   )
 }

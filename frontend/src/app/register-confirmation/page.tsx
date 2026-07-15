@@ -184,9 +184,9 @@ export default function RegisterConfirmationPage() {
           // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
           // window.location.hrefを使用して強制的に遷移
           if (typeof window !== 'undefined') {
-            window.location.href = '/plan-registration?flow=signup'
+            window.location.href = '/plan-registration'
           } else {
-            router.push('/plan-registration?flow=signup')
+            router.push('/plan-registration')
           }
         }
       } else {
@@ -224,9 +224,9 @@ export default function RegisterConfirmationPage() {
     // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
     // window.location.hrefを使用して強制的に遷移
     if (typeof window !== 'undefined') {
-      window.location.href = '/plan-registration?flow=signup&saitamaAppLinked=true'
+      window.location.href = '/plan-registration?saitamaAppLinked=true'
     } else {
-      router.push('/plan-registration?flow=signup&saitamaAppLinked=true')
+      router.push('/plan-registration?saitamaAppLinked=true')
     }
   }
 
@@ -235,9 +235,9 @@ export default function RegisterConfirmationPage() {
     // さいたま市アプリ連携なしでプラン登録画面に遷移
     // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
     if (typeof window !== 'undefined') {
-      window.location.href = '/plan-registration?flow=signup'
+      window.location.href = '/plan-registration'
     } else {
-      router.push('/plan-registration?flow=signup')
+      router.push('/plan-registration')
     }
   }
 
