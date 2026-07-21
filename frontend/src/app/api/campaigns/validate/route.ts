@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { campaignValidateRequestSchema } from '@hv-development/schemas'
 import { buildApiUrl } from '@/lib/api-config'
 import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
 import { createNoCacheResponse } from '@/lib/response-utils'
@@ -6,16 +7,34 @@ import { createNoCacheResponse } from '@/lib/response-utils'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
+  let body: unknown
   try {
-    const body = await request.json()
-    const { code } = body
+    body = await request.json()
+  } catch {
+    return createNoCacheResponse(
+      {
+        valid: false,
+        reason: 'MALFORMED_REQUEST',
+        message: 'リクエスト形式が不正です',
+      },
+      { status: 400 }
+    )
+  }
 
-    if (!code || typeof code !== 'string') {
-      return createNoCacheResponse(
-        { error: 'コードを入力してください' },
-        { status: 400 }
-      )
-    }
+  const parseResult = campaignValidateRequestSchema.safeParse(body)
+  if (!parseResult.success) {
+    return createNoCacheResponse(
+      {
+        valid: false,
+        reason: 'MISSING_CODE',
+        message: 'コードを入力してください',
+      },
+      { status: 400 }
+    )
+  }
+
+  try {
+    const { code } = parseResult.data
 
     const fullUrl = buildApiUrl('/campaigns/validate')
 
@@ -37,7 +56,11 @@ export async function POST(request: NextRequest) {
     const data = await response.json().catch(() => ({}))
 
     if (!response.ok) {
-      return createNoCacheResponse(data, { status: response.status })
+      console.error('❌ [campaigns/validate] Backend API error:', data)
+      return createNoCacheResponse(
+        { error: data.message || data.error?.message || 'キャンペーンコードの検証に失敗しました' },
+        { status: response.status }
+      )
     }
 
     return createNoCacheResponse(data)
