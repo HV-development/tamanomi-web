@@ -121,7 +121,8 @@ export function PlanRegistrationForm({
     }
 
     if (selectedPlan || isPaymentMethodChangeOnly) {
-      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod, appliedCampaign?.code)
+      const campaignCode = selectedPlanData?.is_subscription ? appliedCampaign?.code : undefined
+      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod, campaignCode)
     }
   }
 

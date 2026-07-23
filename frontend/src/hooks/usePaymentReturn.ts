@@ -137,12 +137,7 @@ export const usePaymentReturn = () => {
 
         // セキュリティ改善：sessionStorageの使用を廃止（削除処理も不要）
 
-        // 処理完了
-        setIsProcessing(false)
-        hasProcessedRef.current = true
-        isProcessingRef.current = false
-
-        // キャンペーン適用チェック（プラン新規登録時のみ）
+        // isProcessing 解除前にキャンペーン適用有無を確定させて画面のチラつきを防ぐ。
         let hasCampaign = false
         if (!isPaymentMethodChange) {
           try {
@@ -165,6 +160,10 @@ export const usePaymentReturn = () => {
             // キャンペーン取得失敗は無視して通常フローへ
           }
         }
+
+        setIsProcessing(false)
+        hasProcessedRef.current = true
+        isProcessingRef.current = false
 
         // キャンペーン適用時は自動遷移しない（ユーザーがボタンを押すまで待機）
         if (hasCampaign) {
