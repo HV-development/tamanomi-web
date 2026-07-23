@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     if (response.status === 401) {
       return createNoCacheResponse(
-        { error: '認証が必要です' },
+        { error: { code: 'UNAUTHORIZED', message: '認証が必要です。再ログインしてください' } },
         { status: 401 }
       )
     }
@@ -58,7 +58,15 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       console.error('❌ [campaigns/validate] Backend API error:', data)
       return createNoCacheResponse(
-        { error: data.message || data.error?.message || 'キャンペーンコードの検証に失敗しました' },
+        {
+          error: {
+            code: data.error?.code || 'CAMPAIGN_VALIDATE_FAILED',
+            message:
+              data.error?.message ||
+              data.message ||
+              'キャンペーンコードの検証に失敗しました',
+          },
+        },
         { status: response.status }
       )
     }
@@ -67,7 +75,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Campaign validate API fetch error:', error)
     return createNoCacheResponse(
-      { error: 'キャンペーンコードの検証中にエラーが発生しました' },
+      { error: { code: 'INTERNAL_ERROR', message: 'キャンペーンコードの検証中にエラーが発生しました' } },
       { status: 500 }
     )
   }
