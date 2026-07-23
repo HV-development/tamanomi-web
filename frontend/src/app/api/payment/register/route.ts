@@ -38,8 +38,11 @@ export async function POST(request: NextRequest) {
       backendRequestBody.companyName = companyName
     }
 
-    if (campaignCode) {
-      backendRequestBody.campaignCode = campaignCode
+    // 多層防御: backend でも trim するが、BFF 側で早期に前後空白を弾く
+    const trimmedCampaignCode = typeof campaignCode === 'string' ? campaignCode.trim() : undefined
+
+    if (trimmedCampaignCode) {
+      backendRequestBody.campaignCode = trimmedCampaignCode
     }
 
     const response = await secureFetchWithCommonHeaders(request, fullUrl, {

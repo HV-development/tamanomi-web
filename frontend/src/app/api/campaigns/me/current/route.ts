@@ -23,7 +23,11 @@ export async function GET(request: NextRequest) {
     const data = await response.json().catch(() => ({}))
 
     if (!response.ok) {
-      return createNoCacheResponse(data, { status: response.status })
+      console.error('❌ [campaigns/me/current] Backend API error:', data)
+      return createNoCacheResponse(
+        { error: data.message || data.error?.message || 'キャンペーン情報の取得に失敗しました' },
+        { status: response.status }
+      )
     }
 
     return createNoCacheResponse(data)
