@@ -2,24 +2,13 @@
 
 import { useRouter } from 'next/navigation'
 import type { CampaignInfo } from '@/hooks/usePaymentReturn'
+import { formatJstDate, computeFreePeriodEnd } from '@/lib/date-utils'
 
 interface PaymentReturnContainerProps {
   isProcessing: boolean
   error: string | null
   isPaymentMethodChangeOnly: boolean
   campaignInfo?: CampaignInfo | null
-}
-
-function formatJstDate(iso: string): string {
-  const d = new Date(iso)
-  const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000 - d.getTimezoneOffset() * 60 * 1000)
-  return `${jst.getUTCFullYear()}/${jst.getUTCMonth() + 1}/${jst.getUTCDate()}`
-}
-
-function computeFreePeriodEnd(firstBillingDateIso: string): string {
-  const d = new Date(firstBillingDateIso)
-  d.setUTCDate(d.getUTCDate() - 1)
-  return formatJstDate(d.toISOString())
 }
 
 export function PaymentReturnContainer({
