@@ -12,6 +12,7 @@ import { FadeInComponent } from "@/components/atoms/ProgressiveLoader"
 import { PlanListResponse } from '@hv-development/schemas'
 import type { PaymentMethodType } from '@hv-development/schemas'
 import { ApiClient } from '@/lib/api-client';
+import { useCampaignAvailability } from '@/hooks/useCampaignAvailability'
 
 interface PlanRegistrationFormProps {
   onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string) => void
@@ -80,6 +81,7 @@ export function PlanRegistrationForm({
   const [allPlansDisplayed, setAllPlansDisplayed] = useState(false)
   const [appliedCampaign, setAppliedCampaign] = useState<AppliedCampaign | null>(null)
   const displayedPlansCount = useRef(0)
+  const hasActiveCampaign = useCampaignAvailability(!isPaymentMethodChangeOnly)
 
   // 選択中のプランがサブスクリプションプランかを判定
   const selectedPlanData = plans.find(p => p.id === selectedPlan)
@@ -200,7 +202,7 @@ export function PlanRegistrationForm({
       )}
 
       {/* キャンペーンコード入力カード */}
-      {!isPaymentMethodChangeOnly && (
+      {!isPaymentMethodChangeOnly && hasActiveCampaign && (
         <CampaignCodeCard
           appliedCampaign={appliedCampaign}
           onApplied={setAppliedCampaign}
