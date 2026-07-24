@@ -6,7 +6,7 @@ import type { PaymentMethodType } from '@hv-development/schemas'
 import { PlanListResponse } from '@hv-development/schemas'
 
 interface PlanRegistrationContainerProps {
-  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType) => void
+  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean

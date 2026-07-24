@@ -256,12 +256,14 @@ export function usePlanRegistration() {
   const processCreditCard = async (
     currentEmail: string,
     planId: string | undefined,
+    campaignCode?: string,
   ) => {
     const customerId = generateCustomerId(currentEmail)
     const data = await registerCreditCard({
       customerId,
       userEmail: currentEmail,
       planId,
+      campaignCode,
     })
 
     const { redirectUrl, params } = data
@@ -289,7 +291,11 @@ export function usePlanRegistration() {
   }
 
   // --- メインハンドラ ---
-  const handlePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType) => {
+  const handlePaymentMethodRegister = async (
+    planId: string,
+    paymentMethod: PaymentMethodType,
+    campaignCode?: string,
+  ) => {
     if (isLoading) return
 
     try {
@@ -357,7 +363,7 @@ export function usePlanRegistration() {
           await processPayPay(currentUserId, planId, paymentAmount)
         }
       } else {
-        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId)
+        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId, campaignCode)
       }
     } catch (err) {
       console.error('▲ERROR [handlePaymentMethodRegister]:', err)

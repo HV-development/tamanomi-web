@@ -16,6 +16,7 @@ import { PlanManagementContainer
 
  } from "../organisms/PlanManagementContainer"
 import { PlanChangeContainer } from "../organisms/PlanChangeContainer"
+import { useCurrentCampaign } from "@/hooks/useCurrentCampaign"
 import { StoreIntroductionForm } from "../organisms/StoreIntroductionForm"
 import { CouponListPopup } from "../molecules/CouponListPopup"
 import { CouponUsedSuccessModal } from "../molecules/CouponUsedSuccessModal"
@@ -107,6 +108,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
   const lastSyncedStoresLengthRef = useRef(0)
   const currentView = navigation.currentView
   const myPageView = navigation.myPageView
+  const campaignInfo = useCurrentCampaign(myPageView === "plan-management")
   const isAuthenticated = auth.isAuthenticated
   const isLoading = auth.isLoading
   const signupData = state.signupData
@@ -847,6 +849,7 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
           onBack={() => onMyPageViewChange("main")}
           onLogoClick={onLogoClick}
           backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
+          campaignInfo={campaignInfo}
         />
       )
     }
