@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react"
 
+// fail-open: API 失敗時は表示のまま。
+// キャンペーン開催中に誤って非表示にすると、コード入力欄が無いまま登録完走して
+// 無料期間なしで即時課金される (返金・問い合わせ対応の実害)。
+// 逆方向 (0 件なのに表示) の失敗コストはサーバー側 validate で弾かれるだけなので許容。
 export function useCampaignAvailability(enabled: boolean): boolean {
-  const [hasActive, setHasActive] = useState<boolean>(false)
+  const [hasActive, setHasActive] = useState<boolean>(true)
 
   useEffect(() => {
     if (!enabled) {
@@ -17,7 +21,7 @@ export function useCampaignAvailability(enabled: boolean): boolean {
         if (!res.ok) return
         const data = await res.json()
         if (cancelled) return
-        setHasActive(data?.hasActive === true)
+        setHasActive(data?.hasActive !== false)
       } catch {
         return
       }
