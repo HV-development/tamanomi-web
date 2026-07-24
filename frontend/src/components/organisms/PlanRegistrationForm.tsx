@@ -4,6 +4,7 @@ import { CreditCard, AlertCircle, CheckCircle, Smartphone, QrCode } from "lucide
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { PlanCard } from "@/components/molecules/PlanCard"
+import { CampaignCodeCard, type AppliedCampaign } from "@/components/molecules/CampaignCodeCard"
 import { Button } from "@/components/atoms/Button"
 import { Input } from "@/components/atoms/Input"
 import { Modal } from "@/components/atoms/Modal"
@@ -13,7 +14,7 @@ import type { PaymentMethodType } from '@hv-development/schemas'
 import { ApiClient } from '@/lib/api-client';
 
 interface PlanRegistrationFormProps {
-  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType) => void
+  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string) => void
   onCancel: () => void
   isLoading?: boolean
   plans: PlanListResponse['plans']
@@ -77,6 +78,7 @@ export function PlanRegistrationForm({
   const [modalMessage, setModalMessage] = useState<string>("")
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodType>('CreditCard')
   const [allPlansDisplayed, setAllPlansDisplayed] = useState(false)
+  const [appliedCampaign, setAppliedCampaign] = useState<AppliedCampaign | null>(null)
   const displayedPlansCount = useRef(0)
 
   // 選択中のプランがサブスクリプションプランかを判定
@@ -119,7 +121,8 @@ export function PlanRegistrationForm({
     }
 
     if (selectedPlan || isPaymentMethodChangeOnly) {
-      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod)
+      const campaignCode = selectedPlanData?.is_subscription ? appliedCampaign?.code : undefined
+      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod, campaignCode)
     }
   }
 
@@ -196,6 +199,15 @@ export function PlanRegistrationForm({
         </div>
       )}
 
+      {/* キャンペーンコード入力カード */}
+      {!isPaymentMethodChangeOnly && (
+        <CampaignCodeCard
+          appliedCampaign={appliedCampaign}
+          onApplied={setAppliedCampaign}
+          onCleared={() => setAppliedCampaign(null)}
+        />
+      )}
+
       {/* 連携完了表示（連携済みまたは連携したIDがある場合、支払い方法変更のみの場合は非表示） */}
       {!isPaymentMethodChangeOnly && (saitamaAppLinked || linkedSaitamaAppId) && (
         <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
@@ -231,16 +243,20 @@ export function PlanRegistrationForm({
             const isSaitamaLinked = saitamaAppLinked || linkedSaitamaAppId;
             const saitamaDiscountPrice = 480; // さいたま市アプリ連携時の価格
             
+            const campaignActive = appliedCampaign !== null && plan.is_subscription
+
             // さいたま市アプリ連携済みで、通常価格が980円の場合
             if (isSaitamaLinked && plan.price === 980) {
+              const effectiveOriginal = `¥${saitamaDiscountPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`
+              const campaignPrice = `¥0/最初の${appliedCampaign?.freeDays ?? 30}日間`
               return (
                 <PlanFadeIn key={plan.id} delay={index * 100} onDisplayed={handlePlanDisplayed}>
                   <PlanCard
                     title={plan.name}
                     description={plan.description || ''}
                     features={plan.plan_content?.features || []}
-                    price={`¥${saitamaDiscountPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
-                    originalPrice={`¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
+                    price={campaignActive ? campaignPrice : effectiveOriginal}
+                    originalPrice={campaignActive ? effectiveOriginal : `¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
                     badge={plan.status === 'active' ? 'さいたま市アプリ連携でお得' : undefined}
                     isSelected={selectedPlan === plan.id}
                     onSelect={() => handlePlanSelect(plan.id)}
@@ -248,15 +264,17 @@ export function PlanRegistrationForm({
                 </PlanFadeIn>
               );
             }
-            
+
+            const normalPrice = `¥${displayPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`
+            const campaignPrice = `¥0/最初の${appliedCampaign?.freeDays ?? 30}日間`
             return (
               <PlanFadeIn key={plan.id} delay={index * 100} onDisplayed={handlePlanDisplayed}>
                 <PlanCard
                   title={plan.name}
                   description={plan.description || ''}
                   features={plan.plan_content?.features || []}
-                  price={`¥${displayPrice.toLocaleString()}${plan.is_subscription ? '/月' : ''}`}
-                  originalPrice={hasDiscount ? `¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}` : undefined}
+                  price={campaignActive ? campaignPrice : normalPrice}
+                  originalPrice={campaignActive ? normalPrice : (hasDiscount ? `¥${plan.price.toLocaleString()}${plan.is_subscription ? '/月' : ''}` : undefined)}
                   badge={plan.status === 'active' ? '利用可能' : undefined}
                   isSelected={selectedPlan === plan.id}
                   onSelect={() => handlePlanSelect(plan.id)}
