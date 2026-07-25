@@ -157,6 +157,13 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  const hasAccessToken =
+    request.cookies.get(COOKIE_NAMES.ACCESS_TOKEN)?.value ||
+    request.cookies.get(COOKIE_NAMES.HOST_ACCESS_TOKEN)?.value
+  const hasRefreshToken =
+    request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value ||
+    request.cookies.get(COOKIE_NAMES.HOST_REFRESH_TOKEN)?.value
+
   // アプリの保護ページはCookieが無ければログインへ
   const protectedPaths = [
     '/home',
@@ -165,27 +172,46 @@ export async function middleware(request: NextRequest) {
     '/payment-method-change',
     '/usage-guide',
   ]
+  const isProtected = protectedPaths.some(p => pathname === p || pathname.startsWith(`${p}/`))
 
-  if (protectedPaths.some(p => pathname === p || pathname.startsWith(`${p}/`))) {
-    const hasAccessToken =
-      request.cookies.get(COOKIE_NAMES.ACCESS_TOKEN)?.value ||
-      request.cookies.get(COOKIE_NAMES.HOST_ACCESS_TOKEN)?.value
-    const hasRefreshToken =
-      request.cookies.get(COOKIE_NAMES.REFRESH_TOKEN)?.value ||
-      request.cookies.get(COOKIE_NAMES.HOST_REFRESH_TOKEN)?.value
+  if (isProtected && !hasAccessToken && !hasRefreshToken) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    url.searchParams.set('session', 'expired')
+    const redirectResponse = NextResponse.redirect(url)
+    redirectResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+    redirectResponse.headers.set('Pragma', 'no-cache')
+    redirectResponse.headers.set('Expires', '0')
+    return redirectResponse
+  }
 
-    if (!hasAccessToken && !hasRefreshToken) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/login'
-      url.searchParams.set('session', 'expired')
-      const redirectResponse = NextResponse.redirect(url)
-      redirectResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
-      redirectResponse.headers.set('Pragma', 'no-cache')
-      redirectResponse.headers.set('Expires', '0')
-      return redirectResponse
+  const pendingGuardedPaths = ['/', '/home', '/mypage', '/payment-method-change', '/usage-guide']
+  const isPendingGuarded = pendingGuardedPaths.some(p =>
+    pathname === p || (p !== '/' && pathname.startsWith(`${p}/`))
+  )
+  if (isPendingGuarded && (hasAccessToken || hasRefreshToken)) {
+    try {
+      const meUrl = new URL('/api/user/me', request.nextUrl.origin)
+      const meResponse = await fetch(meUrl, {
+        headers: { cookie: request.headers.get('cookie') ?? '' },
+        cache: 'no-store',
+      })
+      if (meResponse.ok) {
+        const me = (await meResponse.json()) as { accountStatus?: string }
+        if (me.accountStatus === 'pending') {
+          const url = request.nextUrl.clone()
+          url.pathname = '/plan-registration'
+          url.search = ''
+          const redirectResponse = NextResponse.redirect(url)
+          redirectResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+          redirectResponse.headers.set('Pragma', 'no-cache')
+          redirectResponse.headers.set('Expires', '0')
+          return redirectResponse
+        }
+      }
+    } catch (err) {
+      console.warn('[middleware] pending guard fetch failed', err)
     }
-    // 署名検証・リフレッシュはAPI層（authenticatedFetch）で実施。
-    // ここではいずれかのトークンCookieが存在すれば通過させる。
   }
 
   const response = NextResponse.next()
