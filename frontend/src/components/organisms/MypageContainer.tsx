@@ -8,6 +8,7 @@ import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
 import { WithdrawalComplete } from "@/components/molecules/WithdrawalComplete"
 import { WithdrawalFailed } from "@/components/molecules/WithdrawalFailed"
+import type { PlanManagementCampaignInfo } from "@/components/molecules/PlanManagement"
 import type { User as UserType, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 import { appConfig } from '@/config/appConfig'
 import { SkeletonMyPage } from "../skeletons/MypageSkeleton"
@@ -70,6 +71,7 @@ interface MyPageContainerProps {
   newEmail?: string
   currentUserRank?: string | null
   isEmailChangeSuccessModalOpen?: boolean
+  campaignInfo?: PlanManagementCampaignInfo | null
 }
 
 // ランク計算用のカスタムフック
@@ -453,6 +455,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   newEmail = "",
   currentUserRank,
   isEmailChangeSuccessModalOpen = false,
+  campaignInfo = null,
 }: MyPageContainerProps) {
   // 背景色をメモ化
   const backgroundColorClass = useMemo(() =>
@@ -495,6 +498,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
       passwordChangeError={passwordChangeError}
       newEmail={newEmail}
       currentUserRank={currentUserRank}
+      campaignInfo={campaignInfo}
     />
   }
 
@@ -576,7 +580,8 @@ const MyPageSubView = React.memo(({
   passwordChangeStep,
   passwordChangeError,
   newEmail,
-  currentUserRank
+  currentUserRank,
+  campaignInfo
 }: {
   currentView: string
   user?: UserType
@@ -599,6 +604,7 @@ const MyPageSubView = React.memo(({
   passwordChangeError: string | null
   newEmail: string
   currentUserRank: string | null | undefined
+  campaignInfo?: PlanManagementCampaignInfo | null
 }) => {
   switch (currentView) {
     case "profile-edit":
@@ -683,6 +689,7 @@ const MyPageSubView = React.memo(({
             onLogoClick={onLogoClick}
             isLoading={false}
             backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
+            campaignInfo={campaignInfo}
           />
         </LazyFallback>
       )

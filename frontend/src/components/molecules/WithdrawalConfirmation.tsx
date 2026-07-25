@@ -3,14 +3,16 @@
 import { useState } from "react"
 import { AlertTriangle } from "lucide-react"
 import { Button } from "@/components/atoms/Button"
+import type { PlanManagementCampaignInfo } from "@/components/molecules/PlanManagement"
 
 interface WithdrawalConfirmationProps {
   onConfirm: () => void | Promise<void>
   onCancel: () => void
   isLoading?: boolean
+  campaignInfo?: PlanManagementCampaignInfo | null
 }
 
-export function WithdrawalConfirmation({ onConfirm, onCancel, isLoading = false }: WithdrawalConfirmationProps) {
+export function WithdrawalConfirmation({ onConfirm, onCancel, isLoading = false, campaignInfo = null }: WithdrawalConfirmationProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const disabled = isLoading || isSubmitting
 
@@ -52,8 +54,15 @@ export function WithdrawalConfirmation({ onConfirm, onCancel, isLoading = false 
             <div className="font-bold text-red-900 mb-2">重要なご注意事項</div>
             <ul className="space-y-2">
               <li>1. 退会後にデータを復旧することはできません。再度ご利用いただく場合は、新規登録が必要となります。</li>
-              <li>2. 退会手続き後も、ご契約期間の終了日まではサービスをご利用いただけます。</li>
+              {campaignInfo ? (
+                <li>2. 退会手続き後は、キャンペーンの無料期間は終了し、サービスをご利用いただけません。</li>
+              ) : (
+                <li>2. 退会手続き後も、ご契約期間の終了日まではサービスをご利用いただけます。</li>
+              )}
               <li>3. 契約期間終了後は自動的にアカウントが無効になります。</li>
+              {campaignInfo && (
+                <li>4. 退会手続き後も、約1年間は無料キャンペーンが適用されません。</li>
+              )}
             </ul>
           </div>
         </div>
