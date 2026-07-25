@@ -206,7 +206,6 @@ export function PlanRegistrationForm({
         <CampaignCodeCard
           appliedCampaign={appliedCampaign}
           onApplied={setAppliedCampaign}
-          onCleared={() => setAppliedCampaign(null)}
         />
       )}
 
@@ -299,12 +298,30 @@ export function PlanRegistrationForm({
               </div>
               <div className="mb-3">
                 <div className="flex flex-col items-center">
-                  <span className="text-sm line-through text-gray-500 mb-1">
-                    ¥980/月
-                  </span>
-                  <p className="text-3xl font-bold text-blue-600 mb-1">
-                    ¥480/月
-                  </p>
+                  {appliedCampaign ? (
+                    <>
+                      <span className="text-sm line-through text-gray-500 mb-1">
+                        ¥480/月
+                      </span>
+                      <div className="flex items-end gap-1 mb-1">
+                        <p className="text-3xl font-bold text-blue-600 leading-none">
+                          ¥0
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          /最初の{appliedCampaign.freeDays}日間
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-sm line-through text-gray-500 mb-1">
+                        ¥980/月
+                      </span>
+                      <p className="text-3xl font-bold text-blue-600 mb-1">
+                        ¥480/月
+                      </p>
+                    </>
+                  )}
                   <p className="text-gray-700 text-sm font-medium">
                     さいたま市みんなのアプリ連携で
                   </p>

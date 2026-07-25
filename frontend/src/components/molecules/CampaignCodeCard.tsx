@@ -14,7 +14,6 @@ export interface AppliedCampaign {
 interface CampaignCodeCardProps {
   appliedCampaign: AppliedCampaign | null
   onApplied: (campaign: AppliedCampaign) => void
-  onCleared: () => void
 }
 
 interface ValidateSuccessResponse {
@@ -33,7 +32,7 @@ type ValidateResponse = ValidateSuccessResponse | ValidateFailureResponse
 
 const CODE_PATTERN = /^[a-z0-9]{6,20}$/
 
-export function CampaignCodeCard({ appliedCampaign, onApplied, onCleared }: CampaignCodeCardProps) {
+export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCardProps) {
   const [code, setCode] = useState<string>("")
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [isApplying, setIsApplying] = useState<boolean>(false)
@@ -96,12 +95,6 @@ export function CampaignCodeCard({ appliedCampaign, onApplied, onCleared }: Camp
     }
   }
 
-  const handleClear = () => {
-    setCode("")
-    setErrorMessage("")
-    onCleared()
-  }
-
   return (
     <div className="w-full rounded-2xl border border-[#d9d9d9] bg-white p-6 space-y-4">
       <div className="space-y-3">
@@ -145,8 +138,8 @@ export function CampaignCodeCard({ appliedCampaign, onApplied, onCleared }: Camp
           {isApplied ? (
             <button
               type="button"
-              onClick={handleClear}
-              className="shrink-0 rounded-lg border border-[#049a2a] bg-[#f0fdf4] px-2 py-3 text-sm font-semibold text-[#049a2a]"
+              disabled
+              className="shrink-0 cursor-not-allowed rounded-lg border border-[#049a2a] bg-[#f0fdf4] px-2 py-3 text-sm font-semibold text-[#049a2a]"
             >
               適用済み
             </button>
