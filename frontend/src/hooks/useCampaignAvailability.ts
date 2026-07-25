@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import type { CampaignAvailabilityResponse } from "@hv-development/schemas"
 
 // fail-open: API 失敗時は表示のまま。
 // キャンペーン開催中に誤って非表示にすると、コード入力欄が無いまま登録完走して
@@ -19,9 +20,9 @@ export function useCampaignAvailability(enabled: boolean): boolean {
       try {
         const res = await fetch('/api/campaigns/available', { credentials: 'include' })
         if (!res.ok) return
-        const data = await res.json()
+        const data = (await res.json()) as CampaignAvailabilityResponse
         if (cancelled) return
-        setHasActive(data?.hasActive !== false)
+        setHasActive(data.hasActive !== false)
       } catch {
         return
       }
