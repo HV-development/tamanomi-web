@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       backendRequestBody.campaignCode = trimmedCampaignCode
     }
 
-    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+    const { response } = await authenticatedFetch(request, fullUrl, {
       method: 'POST',
       headerOptions: {
         requireAuth: true,
