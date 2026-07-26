@@ -16,7 +16,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { id: userPlanId } = await params
     if (!userPlanId) {
       return createNoCacheResponse(
-        { success: false, message: 'ユーザープランIDが指定されていません' },
+        { error: 'ユーザープランIDが指定されていません' },
         { status: 400 }
       )
     }
@@ -34,7 +34,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     console.error('❌ [user-plans/:id] DELETE error:', error)
     return createNoCacheResponse(
-      { success: false, message: 'ユーザープランの解約中にエラーが発生しました' },
+      { error: 'ユーザープランの解約中にエラーが発生しました' },
       { status: 500 }
     )
   }

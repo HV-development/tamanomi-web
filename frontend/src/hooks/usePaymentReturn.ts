@@ -3,12 +3,22 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+export interface CampaignInfo {
+  freeDaysApplied: number
+  firstBillingDate: string
+  appliedAt: string
+  campaignName: string
+  planName: string
+  planPrice: number
+}
+
 export const usePaymentReturn = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isProcessing, setIsProcessing] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isPaymentMethodChangeOnly, setIsPaymentMethodChangeOnly] = useState(false)
+  const [campaignInfo, setCampaignInfo] = useState<CampaignInfo | null>(null)
   const hasProcessedRef = useRef(false)
   const isProcessingRef = useRef(false)
 
@@ -127,10 +137,38 @@ export const usePaymentReturn = () => {
 
         // セキュリティ改善：sessionStorageの使用を廃止（削除処理も不要）
 
-        // 処理完了
+        // isProcessing 解除前にキャンペーン適用有無を確定させて画面のチラつきを防ぐ。
+        let hasCampaign = false
+        if (!isPaymentMethodChange) {
+          try {
+            const campaignResponse = await fetch('/api/campaigns/me/current', { credentials: 'include' })
+            if (campaignResponse.ok) {
+              const data = await campaignResponse.json()
+              if (data?.hasActiveCampaign && data.application) {
+                hasCampaign = true
+                setCampaignInfo({
+                  freeDaysApplied: data.application.freeDaysApplied,
+                  firstBillingDate: data.application.firstBillingDate,
+                  appliedAt: data.application.appliedAt,
+                  campaignName: data.application.campaign?.name ?? '',
+                  planName: data.application.plan?.name ?? '',
+                  planPrice: data.application.plan?.price ?? 0,
+                })
+              }
+            }
+          } catch {
+            // キャンペーン取得失敗は無視して通常フローへ
+          }
+        }
+
         setIsProcessing(false)
         hasProcessedRef.current = true
         isProcessingRef.current = false
+
+        // キャンペーン適用時は自動遷移しない（ユーザーがボタンを押すまで待機）
+        if (hasCampaign) {
+          return
+        }
 
         // 2秒後にリダイレクト
         setTimeout(() => {
@@ -157,6 +195,7 @@ export const usePaymentReturn = () => {
     isProcessing,
     error,
     isPaymentMethodChangeOnly,
+    campaignInfo,
   }
 }
 

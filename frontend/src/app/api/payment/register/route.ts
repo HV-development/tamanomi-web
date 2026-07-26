@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { customerId, planId, customerFamilyName, customerName, companyName } = body
+    const { customerId, planId, customerFamilyName, customerName, companyName, campaignCode } = body
 
 
     // API_BASE_URLから末尾の/api/v1を削除（重複を防ぐ）
@@ -38,7 +38,14 @@ export async function POST(request: NextRequest) {
       backendRequestBody.companyName = companyName
     }
 
-    const { response } = await authenticatedFetch(request, fullUrl, {
+    // 多層防御: backend でも trim するが、BFF 側で早期に前後空白を弾く
+    const trimmedCampaignCode = typeof campaignCode === 'string' ? campaignCode.trim() : undefined
+
+    if (trimmedCampaignCode) {
+      backendRequestBody.campaignCode = trimmedCampaignCode
+    }
+
+    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
       method: 'POST',
       headerOptions: {
         requireAuth: true,

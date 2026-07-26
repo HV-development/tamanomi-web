@@ -47,6 +47,7 @@ export function usePlanRegistration() {
   const [saitamaAppLinked, setSaitamaAppLinked] = useState<boolean | null>(null)
   const [hasPaymentMethod, setHasPaymentMethod] = useState<boolean>(false)
   const [isPaymentMethodChangeOnly, setIsPaymentMethodChangeOnly] = useState<boolean>(false)
+  const [accountStatus, setAccountStatus] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>('')
   const router = useRouter()
 
@@ -54,6 +55,13 @@ export function usePlanRegistration() {
   const refreshUserInfo = useCallback(async (): Promise<UserData | null> => {
     try {
       const userData = await fetchCurrentUser()
+
+      // 支払いが一時停止中のユーザーはプラン登録画面を使わせない
+      // （新規登録ではなく支払い方法変更で再開すべきため、専用画面へリダイレクト）
+      if (userData.plan?.status === 'paused') {
+        router.replace('/payment-method-change')
+        return userData
+      }
 
       if (userData.email) {
         setEmail(userData.email)
@@ -67,6 +75,7 @@ export function usePlanRegistration() {
       }
 
       setSaitamaAppLinked(userData.saitamaAppLinked === true)
+      setAccountStatus(userData.status ?? null)
 
       const hasCard = userData.userCards && Array.isArray(userData.userCards) && userData.userCards.length > 0
       setHasPaymentMethod(!!hasCard)
@@ -78,7 +87,7 @@ export function usePlanRegistration() {
       setError(err instanceof Error ? err.message : 'ユーザー情報の取得中にエラーが発生しました。')
       return null
     }
-  }, [])
+  }, [router])
 
   // --- プラン一覧取得 ---
   const loadPlans = useCallback(async (explicitLinkedState?: boolean | null) => {
@@ -122,6 +131,19 @@ export function usePlanRegistration() {
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)
   }, [email, refreshUserInfo])
+
+  // pending ユーザーが /plan-registration からブラウザバックで離脱するのを防ぐ
+  useEffect(() => {
+    if (!isClient || accountStatus !== 'pending') return
+    if (typeof window === 'undefined') return
+
+    window.history.pushState(null, '', window.location.href)
+    const handlePopState = () => {
+      window.history.pushState(null, '', window.location.href)
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [isClient, accountStatus])
 
   // --- saitamaAppLinked 未確定時にユーザー情報取得 ---
   useEffect(() => {
@@ -247,12 +269,14 @@ export function usePlanRegistration() {
   const processCreditCard = async (
     currentEmail: string,
     planId: string | undefined,
+    campaignCode?: string,
   ) => {
     const customerId = generateCustomerId(currentEmail)
     const data = await registerCreditCard({
       customerId,
       userEmail: currentEmail,
       planId,
+      campaignCode,
     })
 
     const { redirectUrl, params } = data
@@ -280,7 +304,11 @@ export function usePlanRegistration() {
   }
 
   // --- メインハンドラ ---
-  const handlePaymentMethodRegister = async (planId: string, paymentMethod: PaymentMethodType) => {
+  const handlePaymentMethodRegister = async (
+    planId: string,
+    paymentMethod: PaymentMethodType,
+    campaignCode?: string,
+  ) => {
     if (isLoading) return
 
     try {
@@ -348,7 +376,7 @@ export function usePlanRegistration() {
           await processPayPay(currentUserId, planId, paymentAmount)
         }
       } else {
-        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId)
+        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId, campaignCode)
       }
     } catch (err) {
       console.error('▲ERROR [handlePaymentMethodRegister]:', err)
@@ -390,6 +418,7 @@ export function usePlanRegistration() {
     saitamaAppLinked,
     hasPaymentMethod,
     isPaymentMethodChangeOnly,
+    accountStatus,
     handlePaymentMethodRegister,
     handleSaitamaAppLinked,
     handleCancel,
