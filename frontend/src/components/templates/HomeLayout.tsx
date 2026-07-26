@@ -870,13 +870,16 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
       )
     }
 
+    const safeMyPageView: Exclude<MyPageViewType, "withdrawal-failed"> =
+      myPageView === "withdrawal-failed" ? "main" : myPageView
+
     return (
       <MyPageLayout
         user={user}
         plan={plan}
         usageHistory={usageHistory}
         paymentHistory={paymentHistory}
-        currentView={myPageView}
+        currentView={safeMyPageView}
         onViewChange={(view: string) => onMyPageViewChange(view as MyPageViewType)}
         onEditProfile={onEditProfile}
         onChangeEmail={onChangeEmail}

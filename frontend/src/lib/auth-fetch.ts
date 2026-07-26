@@ -41,6 +41,38 @@ export interface AuthFetchResult {
 }
 
 /**
+ * バックエンドのエラー本文を、消費側の参照パターン（`error.message` / `error.code` /
+ * トップレベル `message` / 文字列 `error`）すべてに後方互換な形へ正規化する。
+ * 移行前は各ルートが `{ error: { code, message } }` を返していたため、
+ * authenticatedFetch でもネスト構造を維持してメッセージ欠落を防ぐ。
+ */
+function buildErrorBody(
+  data: Record<string, unknown>,
+  fallbackMessage: string,
+): { error: { code?: string; message: string }; message: string } {
+  const nested = (data?.error ?? null) as { code?: string; message?: string } | string | null
+  let code: string | undefined
+  let message: string | undefined
+
+  if (typeof nested === 'string') {
+    message = nested
+  } else if (nested && typeof nested === 'object') {
+    code = nested.code
+    message = nested.message
+  }
+
+  const resolvedMessage =
+    message ||
+    (typeof data?.message === 'string' ? (data.message as string) : undefined) ||
+    fallbackMessage
+
+  return {
+    error: { code, message: resolvedMessage },
+    message: resolvedMessage,
+  }
+}
+
+/**
  * 認証付きfetch + 自動リフレッシュ（サーバーサイドAPI Route用）
  *
  * 1. 認証ヘッダー付きでバックエンドAPIにリクエスト
@@ -70,7 +102,7 @@ export async function authenticatedFetch(
     const data = await response.json().catch(() => ({}))
     return {
       response: createNoCacheResponse(
-        response.ok ? data : { error: data.message || data.error?.message || 'リクエストに失敗しました' },
+        response.ok ? data : buildErrorBody(data, 'リクエストに失敗しました'),
         { status: response.status }
       ),
       refreshed: false,
@@ -80,7 +112,7 @@ export async function authenticatedFetch(
   const refreshToken = getRefreshToken(request)
   if (!refreshToken) {
     const nextResponse = createNoCacheResponse(
-      { error: '認証が必要です' },
+      buildErrorBody({ message: '認証が必要です', error: { code: 'UNAUTHORIZED', message: '認証が必要です' } }, '認証が必要です'),
       { status: 401 }
     )
     clearTokenCookies(nextResponse, isSecureRequest(request))
@@ -105,7 +137,13 @@ export async function authenticatedFetch(
       status === 503
         ? 'サーバーが混み合っています。しばらくしてから再試行してください。'
         : '認証トークンが無効です。再度ログインしてください。'
-    const nextResponse = createNoCacheResponse({ error }, { status })
+    const nextResponse = createNoCacheResponse(
+      buildErrorBody(
+        { message: error, error: { code: status === 503 ? 'SERVICE_UNAVAILABLE' : 'UNAUTHORIZED', message: error } },
+        error,
+      ),
+      { status },
+    )
     if (status === 401) {
       clearTokenCookies(nextResponse, isSecureRequest(request))
     }
@@ -135,7 +173,7 @@ export async function authenticatedFetch(
   if (!retryResponse.ok) {
     return {
       response: createNoCacheResponse(
-        { error: retryData.message || retryData.error?.message || 'リクエストに失敗しました' },
+        buildErrorBody(retryData, 'リクエストに失敗しました'),
         { status: retryResponse.status }
       ),
       refreshed: false,

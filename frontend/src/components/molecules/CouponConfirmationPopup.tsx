@@ -18,11 +18,9 @@ export function CouponConfirmationPopup({ isOpen, coupon, onConfirm, onCancel }:
 
   if (!isOpen || !coupon) return null
 
-  const handleConfirm = () => {
-    // クリック内で初期化し、自動再生ブロックを回避
-    initializeAudio()
-    playCouponSound()
-    // 既存の処理を実行
+  const handleConfirm = async () => {
+    await initializeAudio()
+    await playCouponSound()
     onConfirm()
   }
 

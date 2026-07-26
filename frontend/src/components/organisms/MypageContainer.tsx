@@ -38,7 +38,6 @@ interface MyPageContainerProps {
   | "plan-management"
   | "withdrawal"
   | "withdrawal-complete"
-  | "withdrawal-failed"
   | "store-introduction"
   onViewChange: (view: string) => void
   onEditProfile: () => void
@@ -704,24 +703,6 @@ const MyPageSubView = React.memo(({
           <div className="flex-1 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
               <WithdrawalComplete onBackToTop={onWithdrawComplete} withdrawalScheduledDate={user?.withdrawalScheduledDate} />
-            </div>
-          </div>
-        </div>
-      )
-    case "withdrawal-failed":
-      return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-          <div className="bg-white border-b border-gray-200 px-4 py-4">
-            <div className="flex items-center justify-center">
-              <Logo size="lg" onClick={onLogoClick} />
-            </div>
-          </div>
-          <div className="flex-1 flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-              <WithdrawalFailed
-                onRetry={onWithdraw}
-                onBackToTop={() => onViewChange("main")}
-              />
             </div>
           </div>
         </div>
