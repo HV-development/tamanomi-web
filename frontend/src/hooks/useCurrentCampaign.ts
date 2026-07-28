@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import type { PlanManagementCampaignInfo } from "@/components/molecules/PlanManagement"
+import { isCampaignFreePeriodActive } from "@/lib/date-utils"
 
 export function useCurrentCampaign(enabled: boolean): PlanManagementCampaignInfo | null {
   const [campaignInfo, setCampaignInfo] = useState<PlanManagementCampaignInfo | null>(null)
@@ -18,7 +19,11 @@ export function useCurrentCampaign(enabled: boolean): PlanManagementCampaignInfo
         if (!res.ok) return
         const data = await res.json()
         if (cancelled) return
-        if (data?.hasActiveCampaign && data.application) {
+        if (
+          data?.hasActiveCampaign &&
+          data.application &&
+          isCampaignFreePeriodActive(data.application.firstBillingDate)
+        ) {
           setCampaignInfo({
             freeDaysApplied: data.application.freeDaysApplied,
             firstBillingDate: data.application.firstBillingDate,

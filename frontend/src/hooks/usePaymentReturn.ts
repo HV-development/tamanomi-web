@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { isCampaignFreePeriodActive } from '@/lib/date-utils'
 
 export interface CampaignInfo {
   freeDaysApplied: number
@@ -144,7 +145,11 @@ export const usePaymentReturn = () => {
             const campaignResponse = await fetch('/api/campaigns/me/current', { credentials: 'include' })
             if (campaignResponse.ok) {
               const data = await campaignResponse.json()
-              if (data?.hasActiveCampaign && data.application) {
+              if (
+                data?.hasActiveCampaign &&
+                data.application &&
+                isCampaignFreePeriodActive(data.application.firstBillingDate)
+              ) {
                 hasCampaign = true
                 setCampaignInfo({
                   freeDaysApplied: data.application.freeDaysApplied,
