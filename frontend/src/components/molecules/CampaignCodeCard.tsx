@@ -156,7 +156,9 @@ export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCar
         </div>
         <div className="flex justify-start">
           <a
-            href="/lp/faq"
+            href="https://receipt-quest.saitama-tsunagu.com/#tokten"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block border-b border-[#3273f6] pb-[2px] text-[10px] text-[#3273f6]"
           >
             キャンペーンについてはこちら
