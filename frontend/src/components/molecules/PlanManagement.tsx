@@ -4,7 +4,7 @@ import { Crown, Settings } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import type { Plan } from "../../types/user"
-import { formatJstYmd, computeFreePeriodEndYmd } from "@/lib/date-utils"
+import { formatJstYmd, computeFreePeriodEndYmd, isFutureBillingDate } from "@/lib/date-utils"
 
 export interface PlanManagementCampaignInfo {
   freeDaysApplied: number
@@ -86,7 +86,7 @@ export function PlanManagement({ plan, onChangePlan, onChangePaymentMethod, hasP
 
               <div className="space-y-2 text-sm text-green-800">
                 <div>開始日：{formatDate(plan.startDate)}</div>
-                {plan.nextBillingDate && (
+                {isFutureBillingDate(plan.nextBillingDate) && (
                   <div>次回請求日：{formatDate(plan.nextBillingDate)}</div>
                 )}
               </div>
