@@ -120,7 +120,7 @@ export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCar
                 onChange={(e) => handleChange(e.target.value)}
                 placeholder="キャンペーンコード"
                 disabled={isApplied || isApplying}
-                className="min-w-0 flex-1 bg-transparent text-sm sm:text-base font-medium text-black placeholder:text-[#9aa39a] focus:outline-none disabled:cursor-not-allowed"
+                className="min-w-0 flex-1 bg-transparent text-base font-medium text-black placeholder:text-[#9aa39a] focus:outline-none disabled:cursor-not-allowed"
                 inputMode="text"
                 autoComplete="off"
                 autoCapitalize="off"
