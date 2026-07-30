@@ -50,9 +50,11 @@ export const useLoginPage = () => {
         if (response.ok) {
           const userData = await response.json()
           const hasPlan = userData.plan !== null && userData.plan !== undefined
+          // cancelled のみのユーザーは home のバナーで再契約誘導するため、plan-registration に強制遷移しない
+          const isCancelledOnly = userData.hasOnlyCancelledPlans === true
 
           let targetPath: string
-          if (!hasPlan) {
+          if (!hasPlan && !isCancelledOnly) {
             // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
             targetPath = '/plan-registration'
           } else {

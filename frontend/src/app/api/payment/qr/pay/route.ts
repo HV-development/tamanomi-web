@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { buildApiUrl } from '@/lib/api-config'
-import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { authenticatedFetch } from '@/lib/auth-fetch'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic'
@@ -11,28 +11,15 @@ export async function POST(request: NextRequest) {
 
     const fullUrl = buildApiUrl('/payment/qr/pay')
 
-    const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+    const { response } = await authenticatedFetch(request, fullUrl, {
       method: 'POST',
       headerOptions: {
-        requireAuth: true, // 決済は認証が必要
+        requireAuth: true,
       },
       body: JSON.stringify(body),
     })
 
-    const responseData = await response.json().catch(() => ({}))
-
-    if (!response.ok) {
-      console.error('QR payment API error response:', {
-        status: response.status,
-        errorData: responseData,
-      })
-      return createNoCacheResponse(
-        { error: { code: responseData.code || 'API_ERROR', message: responseData.message || 'イオンペイ決済の申込に失敗しました' } },
-        { status: response.status },
-      )
-    }
-
-    return createNoCacheResponse(responseData)
+    return response
   } catch (error) {
     console.error('QR payment API error:', error)
     return createNoCacheResponse(

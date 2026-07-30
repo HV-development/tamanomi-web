@@ -2,8 +2,6 @@
 
 import Image from "next/image"
 import { CreditCard } from "lucide-react"
-import { format } from "date-fns"
-import { ja } from "date-fns/locale"
 import type { PaymentHistory } from "@/types/user"
 
 interface PaymentHistoryListProps {
@@ -22,8 +20,19 @@ export function PaymentHistoryList({
   // 全ての背景色をブロンズ・非会員色に統一
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
 
-  const formatDate = (date: Date) => {
-    return format(date, "yyyy年M月d日 HH:mm", { locale: ja })
+  const formatDate = (date: Date | string) => {
+    // ⚠️ デプロイ順序依存: このUTC描画が正しいのは API #392 (tamanomi-api) 適用後のみ。
+    //   - API #392 適用後: paidAt は「JSTの日時をそのままUTCフィールドに保持」した値。
+    //     → getUTC* でそのまま描画する（＝JSTの表記になる）のが正しい。
+    //   - API #392 適用前(現行): paidAt = createdAt(本物のUTC)。
+    //     この描画だと早朝(JST 9時前)の決済が前日にズレるため、必ず API #392 → 本フロント の順でデプロイすること。
+    const d = new Date(date)
+    // receivedTime が null の行は paidAt が空文字 "" で返り、new Date("") が Invalid Date になるため防御する
+    if (Number.isNaN(d.getTime())) return "-"
+    const year = d.getUTCFullYear()
+    const month = d.getUTCMonth() + 1
+    const day = d.getUTCDate()
+    return `${year}年${month}月${day}日`
   }
 
   const formatPaymentId = (paymentId: string) => {
@@ -75,7 +84,7 @@ export function PaymentHistoryList({
               <CreditCard className="w-8 h-8 text-green-600" />
             </div>
             <div className="text-green-700 text-lg font-medium mb-2">まだ決済履歴がありません</div>
-            <div className="text-green-600 text-sm">プランに登録すると履歴がここに表示されます</div>
+            <div className="text-green-600 text-sm">決済が完了すると履歴がここに表示されます</div>
           </div>
         </div>
       </div>
@@ -122,7 +131,7 @@ export function PaymentHistoryList({
                 {/* 決済ID */}
                 <div className="mb-4">
                   <div className="text-green-600 font-medium mb-2">決済ID</div>
-                  <div className="font-bold text-xl text-gray-900">
+                  <div className="font-bold text-base text-gray-900">
                     {formatPaymentId(item.paymentId)}
                   </div>
                 </div>

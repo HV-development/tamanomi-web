@@ -1,7 +1,22 @@
 import type { AppState, AppAction } from '@hv-development/schemas'
 
+// schemas を変更せずに paused モーダル用の state/action をローカルで拡張する
+export type SubscriptionPausedModalMode = 'preCheck' | 'apiError'
+
+export type AppStateExt = AppState & {
+    isSubscriptionPausedModalOpen: boolean
+    subscriptionPausedModalMode: SubscriptionPausedModalMode
+}
+
+export type AppActionExt =
+    | AppAction
+    | {
+        type: 'SET_SUBSCRIPTION_PAUSED_MODAL'
+        payload: { open: boolean; mode: SubscriptionPausedModalMode }
+    }
+
 // 初期状態
-export const initialState: AppState = {
+export const initialState: AppStateExt = {
     stores: [],
     notifications: [],
     isDataLoaded: true,
@@ -34,10 +49,12 @@ export const initialState: AppState = {
     isLocationLoading: false,
     locationError: null,
     isSearchPopupOpen: false,
+    isSubscriptionPausedModalOpen: false,
+    subscriptionPausedModalMode: 'preCheck',
 }
 
 // リデューサー（簡略化）
-export function appReducer(state: AppState, action: AppAction): AppState {
+export function appReducer(state: AppStateExt, action: AppActionExt): AppStateExt {
     switch (action.type) {
         case 'SET_STORES':
             return { ...state, stores: action.payload }
@@ -59,6 +76,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, isLoginRequiredModalOpen: action.payload }
         case 'SET_PLAN_REQUIRED_MODAL_OPEN':
             return { ...state, isPlanRequiredModalOpen: action.payload }
+        case 'SET_SUBSCRIPTION_PAUSED_MODAL':
+            return {
+                ...state,
+                isSubscriptionPausedModalOpen: action.payload.open,
+                subscriptionPausedModalMode: action.payload.mode,
+            }
         case 'SET_STORE_DETAIL_POPUP_OPEN':
             return { ...state, isStoreDetailPopupOpen: action.payload }
         case 'SET_FAVORITES_OPEN':

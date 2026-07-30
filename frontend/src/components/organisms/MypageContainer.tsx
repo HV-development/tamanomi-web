@@ -8,6 +8,7 @@ import { Logo } from "../atoms/Logo"
 import { getNextRankInfo, getMonthsToNextRank, RANK_INFO } from "@/utils/rank-calculator"
 import { WithdrawalComplete } from "@/components/molecules/WithdrawalComplete"
 import { WithdrawalFailed } from "@/components/molecules/WithdrawalFailed"
+import type { PlanManagementCampaignInfo } from "@/components/molecules/PlanManagement"
 import type { User as UserType, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 import { appConfig } from '@/config/appConfig'
 import { SkeletonMyPage } from "../skeletons/MypageSkeleton"
@@ -37,7 +38,6 @@ interface MyPageContainerProps {
   | "plan-management"
   | "withdrawal"
   | "withdrawal-complete"
-  | "withdrawal-failed"
   | "store-introduction"
   onViewChange: (view: string) => void
   onEditProfile: () => void
@@ -70,6 +70,7 @@ interface MyPageContainerProps {
   newEmail?: string
   currentUserRank?: string | null
   isEmailChangeSuccessModalOpen?: boolean
+  campaignInfo?: PlanManagementCampaignInfo | null
 }
 
 // ランク計算用のカスタムフック
@@ -374,22 +375,29 @@ const MenuButtons = React.memo(({
   accountStatus?: string
 }) => {
   const isWithdrawing = accountStatus === 'withdrawing'
+  const isPaused = plan?.status === 'paused'
   const planMenuLabel = plan ? "プランの変更" : "プラン登録"
-  
+  const planMenuDisabled = isWithdrawing || isPaused
+  const planMenuDisplay = isWithdrawing
+    ? <span>プランの変更<br /><span className="text-xs">（退会処理済みのため利用不可）</span></span>
+    : isPaused
+      ? <span>プランの変更<br /><span className="text-xs">（お支払い一時停止中のため利用不可）</span></span>
+      : planMenuLabel
+
   return (
     <div className="space-y-3">
       {onStoreIntroduction && (
-        <MenuButton 
-          onClick={onStoreIntroduction} 
-          icon={Store} 
-          label={hasStoreIntroduction ? "店舗紹介（変更）" : "店舗紹介"} 
+        <MenuButton
+          onClick={onStoreIntroduction}
+          icon={Store}
+          label={hasStoreIntroduction ? "店舗紹介（変更）" : "店舗紹介"}
         />
       )}
       {appConfig.myPageSettings.showProfile && (
         <MenuButton onClick={onEditProfile} icon={SquarePen} label="プロフィール編集" />
       )}
       {appConfig.myPageSettings.showPlanManagement && (
-        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={isWithdrawing ? <span>プランの変更<br /><span className="text-xs">（退会処理済みのため利用不可）</span></span> : planMenuLabel} disabled={isWithdrawing} />
+        <MenuButton onClick={onViewPlan} icon={RefreshCw} label={planMenuDisplay} disabled={planMenuDisabled} />
       )}
       {appConfig.myPageSettings.showPlanManagement && plan && onChangePaymentMethod && (
         <MenuButton onClick={onChangePaymentMethod} icon={Wallet} label={isWithdrawing ? <span>支払方法の変更<br /><span className="text-xs">（退会処理済みのため利用不可）</span></span> : "支払方法の変更"} disabled={isWithdrawing} />
@@ -446,6 +454,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
   newEmail = "",
   currentUserRank,
   isEmailChangeSuccessModalOpen = false,
+  campaignInfo = null,
 }: MyPageContainerProps) {
   // 背景色をメモ化
   const backgroundColorClass = useMemo(() =>
@@ -488,6 +497,7 @@ export const MyPageContainer = React.memo(function MyPageContainer({
       passwordChangeError={passwordChangeError}
       newEmail={newEmail}
       currentUserRank={currentUserRank}
+      campaignInfo={campaignInfo}
     />
   }
 
@@ -569,7 +579,8 @@ const MyPageSubView = React.memo(({
   passwordChangeStep,
   passwordChangeError,
   newEmail,
-  currentUserRank
+  currentUserRank,
+  campaignInfo
 }: {
   currentView: string
   user?: UserType
@@ -592,6 +603,7 @@ const MyPageSubView = React.memo(({
   passwordChangeError: string | null
   newEmail: string
   currentUserRank: string | null | undefined
+  campaignInfo?: PlanManagementCampaignInfo | null
 }) => {
   switch (currentView) {
     case "profile-edit":
@@ -676,6 +688,7 @@ const MyPageSubView = React.memo(({
             onLogoClick={onLogoClick}
             isLoading={false}
             backgroundColorClass="bg-gradient-to-br from-green-50 to-green-100"
+            campaignInfo={campaignInfo}
           />
         </LazyFallback>
       )
@@ -690,24 +703,6 @@ const MyPageSubView = React.memo(({
           <div className="flex-1 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
               <WithdrawalComplete onBackToTop={onWithdrawComplete} withdrawalScheduledDate={user?.withdrawalScheduledDate} />
-            </div>
-          </div>
-        </div>
-      )
-    case "withdrawal-failed":
-      return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-          <div className="bg-white border-b border-gray-200 px-4 py-4">
-            <div className="flex items-center justify-center">
-              <Logo size="lg" onClick={onLogoClick} />
-            </div>
-          </div>
-          <div className="flex-1 flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-              <WithdrawalFailed
-                onRetry={onWithdraw}
-                onBackToTop={() => onViewChange("main")}
-              />
             </div>
           </div>
         </div>

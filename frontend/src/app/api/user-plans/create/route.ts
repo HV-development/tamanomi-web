@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { buildApiUrl } from '@/lib/api-config';
-import { secureFetchWithCommonHeaders } from '@/lib/fetch-utils'
+import { authenticatedFetch } from '@/lib/auth-fetch'
 import { createNoCacheResponse } from '@/lib/response-utils'
 
 export const dynamic = 'force-dynamic';
@@ -25,10 +25,10 @@ export async function POST(request: NextRequest) {
     const fullUrl = buildApiUrl('/plans/user-plans');
 
     try {
-      const response = await secureFetchWithCommonHeaders(request, fullUrl, {
+      const { response } = await authenticatedFetch(request, fullUrl, {
         method: 'POST',
         headerOptions: {
-          requireAuth: true, // 認証が必要
+          requireAuth: true,
         },
         body: JSON.stringify({
           plan_id: planId,
@@ -37,43 +37,8 @@ export async function POST(request: NextRequest) {
         signal: controller.signal,
       })
 
-      // 認証エラーの場合は401を返す
-      if (response.status === 401) {
-        return createNoCacheResponse(
-          { success: false, message: '認証が必要です' },
-          { status: 401 }
-        );
-      };
-
       clearTimeout(timeoutId);
-
-      // レスポンスのステータスをチェック
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-
-        // エラーメッセージを返す
-        let errorMessage = 'プラン登録に失敗しました';
-        
-        if (response.status === 401) {
-          errorMessage = '認証エラー: ログインしてください';
-        } else if (response.status === 404) {
-          errorMessage = '指定されたプランが見つかりません';
-        } else if (errorData.error?.message) {
-          errorMessage = errorData.error.message;
-        }
-
-        return createNoCacheResponse(
-          {
-            success: false,
-            message: errorMessage,
-            error: errorData,
-          },
-          { status: response.status }
-        );
-      }
-
-      const data = await response.json();
-      return createNoCacheResponse(data, { status: response.status });
+      return response
     } catch (fetchError) {
       clearTimeout(timeoutId);
       throw fetchError;

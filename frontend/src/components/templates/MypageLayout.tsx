@@ -1,6 +1,7 @@
 import { MyPageContainer } from "../organisms/MypageContainer"
 import type { User, Plan, UsageHistory, PaymentHistory } from "@/types/user"
 import type { ProfileEditFormData } from "@/types/forms"
+import type { PlanManagementCampaignInfo } from "@/components/molecules/PlanManagement"
 
 interface MyPageLayoutProps {
   user?: User
@@ -17,7 +18,6 @@ interface MyPageLayoutProps {
   | "plan-management"
   | "withdrawal"
   | "withdrawal-complete"
-  | "withdrawal-failed"
   | "store-introduction"
   onViewChange: (view: string) => void
   onEditProfile: () => void
@@ -50,6 +50,7 @@ interface MyPageLayoutProps {
   newEmail?: string
   currentUserRank?: string | null
   isEmailChangeSuccessModalOpen?: boolean
+  campaignInfo?: PlanManagementCampaignInfo | null
 }
 
 export function MyPageLayout({
@@ -89,6 +90,7 @@ export function MyPageLayout({
   currentUserRank,
   isEmailChangeSuccessModalOpen,
   hasStoreIntroduction,
+  campaignInfo,
 }: MyPageLayoutProps) {
   return (
     <MyPageContainer
@@ -128,6 +130,7 @@ export function MyPageLayout({
       newEmail={newEmail}
       currentUserRank={currentUserRank}
       isEmailChangeSuccessModalOpen={isEmailChangeSuccessModalOpen}
+      campaignInfo={campaignInfo}
     />
   )
 }

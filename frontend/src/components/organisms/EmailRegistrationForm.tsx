@@ -23,6 +23,15 @@ const tamanomiEmailOnlyFallbackSchema = z.object({
 const preRegisterFormSchema =
   TamanomiUserRegistrationRequestSchema ?? tamanomiEmailOnlyFallbackSchema
 
+const EMAIL_FORMAT_ERROR = "メールアドレスの形式が正しくありません"
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const getEmailFormatError = (value: string): string | null => {
+  const trimmed = value.trim()
+  if (!trimmed) return "メールアドレスを入力してください"
+  return emailPattern.test(trimmed) ? null : EMAIL_FORMAT_ERROR
+}
+
 interface EmailRegistrationFormProps {
   initialEmail?: string
   onSubmit: (data: TamanomiUserRegistrationRequest) => void
@@ -50,9 +59,17 @@ export function EmailRegistrationForm({
   }, [initialEmail])
 
   const validateField = (fieldName: keyof TamanomiUserRegistrationRequest, value: string) => {
+    if (fieldName === "email") {
+      const emailError = getEmailFormatError(value)
+      if (emailError) {
+        setErrors((prev) => ({ ...prev, email: emailError }))
+        return
+      }
+    }
+
     const shape = preRegisterFormSchema.shape[fieldName as keyof typeof preRegisterFormSchema.shape]
     if (!shape) return
-    const result = shape.safeParse(value)
+    const result = shape.safeParse(fieldName === "email" ? value.trim() : value)
     if (result.success) {
       setErrors((prev) => {
         const next = { ...prev }
@@ -66,7 +83,18 @@ export function EmailRegistrationForm({
   }
 
   const validateForm = (): boolean => {
-    const result = preRegisterFormSchema.safeParse(formData)
+    const emailError = getEmailFormatError(formData.email)
+    if (emailError) {
+      setErrors((prev) => ({ ...prev, email: emailError }))
+      return false
+    }
+
+    const validationData = {
+      ...formData,
+      email: formData.email.trim(),
+    }
+
+    const result = preRegisterFormSchema.safeParse(validationData)
     if (result.success) {
       setErrors({})
       return true

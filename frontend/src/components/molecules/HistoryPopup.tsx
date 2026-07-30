@@ -12,9 +12,11 @@ interface HistoryPopupProps {
   onFavoriteToggle: (storeId: string) => void
   onCouponsClick: (storeId: string) => void
   onStoreClick: (store: Store) => void
+  /** 支払い一時停止中で「今すぐクーポンGET」を無効化するか */
+  isCouponDisabled?: boolean
 }
 
-export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCouponsClick, onStoreClick }: HistoryPopupProps) {
+export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCouponsClick, onStoreClick, isCouponDisabled = false }: HistoryPopupProps) {
   // モーダルが開いている間、背後のスクロールを無効にする
   useEffect(() => {
     if (isOpen) {
@@ -67,6 +69,7 @@ export function HistoryPopup({ isOpen, stores, onClose, onFavoriteToggle, onCoup
               actionsLayout="vertical"
               emptyMessage="まだ閲覧履歴がありません"
               emptyEmoji="📋"
+              isCouponDisabled={isCouponDisabled}
             />
           </div>
         </div>

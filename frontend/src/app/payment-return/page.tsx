@@ -5,13 +5,14 @@ import { usePaymentReturn } from '@/hooks/usePaymentReturn'
 import { PaymentReturnContainer } from '@/components/organisms/PaymentReturnContainer'
 
 function PaymentReturnContent() {
-  const { isProcessing, error, isPaymentMethodChangeOnly } = usePaymentReturn()
+  const { isProcessing, error, isPaymentMethodChangeOnly, campaignInfo } = usePaymentReturn()
 
   return (
     <PaymentReturnContainer
       isProcessing={isProcessing}
       error={error}
       isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
+      campaignInfo={campaignInfo}
     />
   )
 }

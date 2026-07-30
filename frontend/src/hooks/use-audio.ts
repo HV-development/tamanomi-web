@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { Howl } from "howler";
+import { Howl, Howler } from "howler";
 
 declare global {
   interface Window {
@@ -7,117 +7,114 @@ declare global {
   }
 }
 
-// グローバルな音声インスタンス（コンポーネントの再レンダリングに影響されない）
-let globalCouponSound: Howl | null = null as Howl | null;
+let globalCouponSound: Howl | null = null;
 let globalAudioContext: AudioContext | null = null;
 let isGlobalAudioReady = false;
+
+const createAudioContext = (): AudioContext | null => {
+  if (typeof window === "undefined") return null;
+
+  const AudioContextClass =
+    window.AudioContext ||
+    window.webkitAudioContext ||
+    AudioContext;
+
+  return new AudioContextClass();
+};
+
+const resumeAudioContexts = async () => {
+  const contexts = [globalAudioContext, Howler.ctx].filter(
+    (context): context is AudioContext => Boolean(context)
+  );
+
+  await Promise.all(
+    contexts.map(async (context) => {
+      if (context.state === "suspended") {
+        await context.resume().catch(() => undefined);
+      }
+    })
+  );
+};
+
+const ensureCouponSound = () => {
+  if (globalCouponSound) return globalCouponSound;
+
+  Howler.autoUnlock = true;
+
+  globalCouponSound = new Howl({
+    src: ["/audio/tama_voice_export.mp3"],
+    volume: 0.7,
+    preload: true,
+    html5: true,
+    onload: () => {
+      isGlobalAudioReady = true;
+    },
+    onloaderror: () => {
+      isGlobalAudioReady = false;
+    },
+    onunlock: () => {
+      isGlobalAudioReady = globalCouponSound?.state() === "loaded";
+    },
+  });
+
+  if (globalCouponSound.state() === "loaded") {
+    isGlobalAudioReady = true;
+  }
+
+  return globalCouponSound;
+};
 
 export const useCouponAudio = () => {
   const initializationRef = useRef(false);
 
-  // オーディオコンテキストを初期化
-  const initializeAudio = useCallback(() => {
-    // 既に初期化済みの場合はスキップ
-    if (initializationRef.current && globalCouponSound && isGlobalAudioReady) {
-      return;
-    }
-    
+  const initializeAudio = useCallback(async () => {
+    if (typeof window === "undefined") return false;
+
     try {
-      // AudioContextを作成（ユーザーインタラクション内で実行）
       if (!globalAudioContext) {
-        const AudioContextClass =
-          window.AudioContext ||
-          (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext ||
-          AudioContext;
-        globalAudioContext = new AudioContextClass();
+        globalAudioContext = createAudioContext();
       }
-      
-      // AudioContextを再開
-      if (globalAudioContext?.state === 'suspended') {
-        globalAudioContext.resume();
-      }
-      
-      // Howlインスタンスを作成
-      if (!globalCouponSound) {
-        globalCouponSound = new Howl({
-          src: ['/audio/tama_voice_export.mp3'],
-          volume: 0.7,
-          preload: true,
-          html5: true,
-          onload: () => {
-            isGlobalAudioReady = true;
-          },
-          onloaderror: () => {
-            isGlobalAudioReady = false;
-          },
-          onplay: () => {
-          },
-          onplayerror: () => {
-          }
-        });
-      }
-      
+
+      const sound = ensureCouponSound();
+      await resumeAudioContexts();
+
       initializationRef.current = true;
+      return Boolean(sound);
     } catch {
+      return false;
     }
-  }, [])
+  }, []);
 
-  const playCouponSound = useCallback(() => {
-    const playWithRetry = () => {
-      const sound = globalCouponSound
-      if (!sound) return
-      // 再生エラー時は一度だけ再開してリトライ
-      sound.off('playerror')
-      sound.once('playerror', () => {
-        globalAudioContext?.resume().then(() => {
-          sound.play()
-        })
-      })
-      sound.play()
-    }
-
-    // オーディオが初期化されていない場合は初期化
-    if (!globalCouponSound) {
-      initializeAudio()
-      if (globalCouponSound) {
-        if (isGlobalAudioReady) {
-          playWithRetry()
-        } else {
-          (globalCouponSound as Howl).once('load', playWithRetry)
-        }
-      }
-      return
-    }
-    
-    if (!isGlobalAudioReady) {
-      // ロード完了後に一度だけ再生する
-      (globalCouponSound as Howl).once('load', playWithRetry)
-      return
-    }
-    
+  const playCouponSound = useCallback(async () => {
     try {
-      // AudioContextの状態を確認
-      if (globalAudioContext && globalAudioContext.state === 'suspended') {
-        globalAudioContext.resume().then(() => {
-          playWithRetry()
-        });
+      if (!globalCouponSound) {
+        await initializeAudio();
       } else {
-        // 直接再生
-        playWithRetry()
+        await resumeAudioContexts();
       }
+
+      const sound = globalCouponSound;
+      if (!sound) return;
+
+      sound.off("playerror");
+      sound.once("playerror", async () => {
+        await resumeAudioContexts();
+        sound.play();
+      });
+
+      sound.play();
     } catch {
     }
-  }, [initializeAudio])
+  }, [initializeAudio]);
 
-  // クリーンアップは行わない（グローバルインスタンスのため）
   useEffect(() => {
     return () => {
-    }
-  }, [])
+    };
+  }, []);
 
-  return { 
-    playCouponSound, 
-    initializeAudio, 
-    isAudioReady: isGlobalAudioReady 
-  }
-}
+  return {
+    playCouponSound,
+    initializeAudio,
+    isAudioReady: isGlobalAudioReady,
+  };
+};

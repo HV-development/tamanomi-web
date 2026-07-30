@@ -8,13 +8,24 @@ import type { HeaderOptions } from '@/lib/header-utils'
 
 const TRANSIENT_STATUS = 503
 const TRANSIENT_BACKOFFS_MS = [500, 1000, 2000]
+const IDEMPOTENT_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
+
+/** GET/HEAD/OPTIONS のみ再送安全とみなす（fetchの既定メソッドはGET） */
+function isIdempotentMethod(method?: string): boolean {
+  return IDEMPOTENT_METHODS.has((method ?? 'GET').toUpperCase())
+}
 
 /**
  * 503（DB起動待ち等の一時的エラー）の場合のみ短いバックオフで再試行する。
- * ログアウト判定（401/403）には影響しない。
+ * - retry=false（非冪等なPOST等）の場合は再送せず、副作用の二重実行を防ぐ。
+ * - ログアウト判定（401/403）には影響しない。
  */
-async function fetchWithTransientRetry(doFetch: () => Promise<Response>): Promise<Response> {
+async function fetchWithTransientRetry(
+  doFetch: () => Promise<Response>,
+  { retry = true }: { retry?: boolean } = {}
+): Promise<Response> {
   let response = await doFetch()
+  if (!retry) return response
   for (const delay of TRANSIENT_BACKOFFS_MS) {
     if (response.status !== TRANSIENT_STATUS) break
     await new Promise((resolve) => setTimeout(resolve, delay))
@@ -27,6 +38,38 @@ export interface AuthFetchResult {
   response: NextResponse
   /** リフレッシュが実行されて成功したかどうか */
   refreshed: boolean
+}
+
+/**
+ * バックエンドのエラー本文を、消費側の参照パターン（`error.message` / `error.code` /
+ * トップレベル `message` / 文字列 `error`）すべてに後方互換な形へ正規化する。
+ * 移行前は各ルートが `{ error: { code, message } }` を返していたため、
+ * authenticatedFetch でもネスト構造を維持してメッセージ欠落を防ぐ。
+ */
+function buildErrorBody(
+  data: Record<string, unknown>,
+  fallbackMessage: string,
+): { error: { code?: string; message: string }; message: string } {
+  const nested = (data?.error ?? null) as { code?: string; message?: string } | string | null
+  let code: string | undefined
+  let message: string | undefined
+
+  if (typeof nested === 'string') {
+    message = nested
+  } else if (nested && typeof nested === 'object') {
+    code = nested.code
+    message = nested.message
+  }
+
+  const resolvedMessage =
+    message ||
+    (typeof data?.message === 'string' ? (data.message as string) : undefined) ||
+    fallbackMessage
+
+  return {
+    error: { code, message: resolvedMessage },
+    message: resolvedMessage,
+  }
 }
 
 /**
@@ -43,21 +86,23 @@ export async function authenticatedFetch(
   url: string,
   options: RequestInit & { headerOptions?: HeaderOptions } = {}
 ): Promise<AuthFetchResult> {
-  const response = await fetchWithTransientRetry(() =>
-    secureFetchWithCommonHeaders(request, url, {
-      ...options,
-      headerOptions: {
-        requireAuth: true,
-        ...options.headerOptions,
-      },
-    })
+  const response = await fetchWithTransientRetry(
+    () =>
+      secureFetchWithCommonHeaders(request, url, {
+        ...options,
+        headerOptions: {
+          requireAuth: true,
+          ...options.headerOptions,
+        },
+      }),
+    { retry: isIdempotentMethod(options.method) }
   )
 
   if (response.status !== 401 && response.status !== 403) {
-    const data = await response.json()
+    const data = await response.json().catch(() => ({}))
     return {
       response: createNoCacheResponse(
-        response.ok ? data : { error: data.message || data.error?.message || 'リクエストに失敗しました' },
+        response.ok ? data : buildErrorBody(data, 'リクエストに失敗しました'),
         { status: response.status }
       ),
       refreshed: false,
@@ -67,7 +112,7 @@ export async function authenticatedFetch(
   const refreshToken = getRefreshToken(request)
   if (!refreshToken) {
     const nextResponse = createNoCacheResponse(
-      { error: '認証が必要です' },
+      buildErrorBody({ message: '認証が必要です', error: { code: 'UNAUTHORIZED', message: '認証が必要です' } }, '認証が必要です'),
       { status: 401 }
     )
     clearTokenCookies(nextResponse, isSecureRequest(request))
@@ -78,13 +123,13 @@ export async function authenticatedFetch(
   }
 
   const refreshUrl = buildApiUrl('/refresh')
-  const refreshResponse = await fetchWithTransientRetry(() =>
-    secureFetchWithCommonHeaders(request, refreshUrl, {
-      method: 'POST',
-      headerOptions: { requireAuth: false },
-      body: JSON.stringify({ refreshToken }),
-    })
-  )
+  // refresh はリフレッシュトークンを消費するPOSTのため503でも再送しない
+  // （消費済みトークンの再送による誤ログアウトを防ぐ）。503時は下で503を返す。
+  const refreshResponse = await secureFetchWithCommonHeaders(request, refreshUrl, {
+    method: 'POST',
+    headerOptions: { requireAuth: false },
+    body: JSON.stringify({ refreshToken }),
+  })
 
   if (!refreshResponse.ok) {
     const status = refreshResponse.status === 503 ? 503 : 401
@@ -92,7 +137,13 @@ export async function authenticatedFetch(
       status === 503
         ? 'サーバーが混み合っています。しばらくしてから再試行してください。'
         : '認証トークンが無効です。再度ログインしてください。'
-    const nextResponse = createNoCacheResponse({ error }, { status })
+    const nextResponse = createNoCacheResponse(
+      buildErrorBody(
+        { message: error, error: { code: status === 503 ? 'SERVICE_UNAVAILABLE' : 'UNAUTHORIZED', message: error } },
+        error,
+      ),
+      { status },
+    )
     if (status === 401) {
       clearTokenCookies(nextResponse, isSecureRequest(request))
     }
@@ -117,12 +168,12 @@ export async function authenticatedFetch(
     },
   })
 
-  const retryData = await retryResponse.json()
+  const retryData = await retryResponse.json().catch(() => ({}))
 
   if (!retryResponse.ok) {
     return {
       response: createNoCacheResponse(
-        { error: retryData.message || retryData.error?.message || 'リクエストに失敗しました' },
+        buildErrorBody(retryData, 'リクエストに失敗しました'),
         { status: retryResponse.status }
       ),
       refreshed: false,
