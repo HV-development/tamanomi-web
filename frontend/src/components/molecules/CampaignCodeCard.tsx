@@ -30,7 +30,7 @@ interface ValidateFailureResponse {
 
 type ValidateResponse = ValidateSuccessResponse | ValidateFailureResponse
 
-const CODE_PATTERN = /^[a-z0-9]{6,20}$/
+const CODE_PATTERN = /^[a-z0-9]{4,20}$/
 
 export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCardProps) {
   const [code, setCode] = useState<string>("")
@@ -53,7 +53,7 @@ export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCar
       return
     }
     if (!CODE_PATTERN.test(normalized)) {
-      setErrorMessage("6〜20文字の英小文字・半角数字で入力してください")
+      setErrorMessage("4〜20文字の英小文字・半角数字で入力してください")
       return
     }
 
@@ -108,7 +108,7 @@ export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCar
 
       <div className="space-y-1.5">
         <div className="flex items-start gap-2">
-          <div className="flex-1 space-y-1.5">
+          <div className="flex-1 min-w-0 space-y-1.5">
             <div
               className={`relative flex h-10 items-center rounded-[10px] border px-3 ${
                 isApplied ? "border-[#049a2a] bg-white" : "border-[#d9d9d9] bg-white"
@@ -120,7 +120,7 @@ export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCar
                 onChange={(e) => handleChange(e.target.value)}
                 placeholder="キャンペーンコード"
                 disabled={isApplied || isApplying}
-                className="flex-1 bg-transparent text-base font-medium text-black placeholder:text-[#9aa39a] focus:outline-none disabled:cursor-not-allowed"
+                className="min-w-0 flex-1 bg-transparent text-base font-medium text-black placeholder:text-[#9aa39a] focus:outline-none disabled:cursor-not-allowed"
                 inputMode="text"
                 autoComplete="off"
                 autoCapitalize="off"

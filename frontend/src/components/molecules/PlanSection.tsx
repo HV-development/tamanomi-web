@@ -4,6 +4,7 @@ import { Crown, Calendar } from "lucide-react"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
 import { StatusBadge } from "@/components/atoms/StatusBadge"
+import { isFutureBillingDate } from "@/lib/date-utils"
 import type { Plan } from "@/types/user"
 
 interface PlanSectionProps {
@@ -46,7 +47,7 @@ export function PlanSection({ plan, onChangePlan, onCancelSubscription, classNam
             <span>開始日: {formatDate(plan.startDate)}</span>
           </div>
 
-          {plan.nextBillingDate && (
+          {isFutureBillingDate(plan.nextBillingDate) && (
             <div className="flex items-center gap-2 text-sm text-green-600 mt-1">
               <Calendar className="w-4 h-4" />
               <span>次回請求日: {formatDate(plan.nextBillingDate)}</span>
