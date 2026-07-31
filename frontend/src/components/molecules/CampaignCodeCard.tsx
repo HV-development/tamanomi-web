@@ -30,7 +30,7 @@ interface ValidateFailureResponse {
 
 type ValidateResponse = ValidateSuccessResponse | ValidateFailureResponse
 
-const CODE_PATTERN = /^[a-z0-9]{6,20}$/
+const CODE_PATTERN = /^[a-z0-9]{4,20}$/
 
 export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCardProps) {
   const [code, setCode] = useState<string>("")
@@ -53,7 +53,7 @@ export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCar
       return
     }
     if (!CODE_PATTERN.test(normalized)) {
-      setErrorMessage("6〜20文字の英小文字・半角数字で入力してください")
+      setErrorMessage("4〜20文字の英小文字・半角数字で入力してください")
       return
     }
 
