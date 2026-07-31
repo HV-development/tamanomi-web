@@ -108,7 +108,7 @@ export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCar
 
       <div className="space-y-1.5">
         <div className="flex items-start gap-2">
-          <div className="flex-1 space-y-1.5">
+          <div className="flex-1 min-w-0 space-y-1.5">
             <div
               className={`relative flex h-10 items-center rounded-[10px] border px-3 ${
                 isApplied ? "border-[#049a2a] bg-white" : "border-[#d9d9d9] bg-white"
@@ -120,7 +120,7 @@ export function CampaignCodeCard({ appliedCampaign, onApplied }: CampaignCodeCar
                 onChange={(e) => handleChange(e.target.value)}
                 placeholder="キャンペーンコード"
                 disabled={isApplied || isApplying}
-                className="flex-1 bg-transparent text-base font-medium text-black placeholder:text-[#9aa39a] focus:outline-none disabled:cursor-not-allowed"
+                className="min-w-0 flex-1 bg-transparent text-base font-medium text-black placeholder:text-[#9aa39a] focus:outline-none disabled:cursor-not-allowed"
                 inputMode="text"
                 autoComplete="off"
                 autoCapitalize="off"
