@@ -17,6 +17,12 @@ interface BannerCarouselProps {
 
 const banners: BannerItem[] = [
   {
+    id: "banner-4",
+    imageUrl: "/campaign-receipt-quest-user.webp",
+    linkUrl: "https://receipt-quest.saitama-tsunagu.com/#tokten",
+    alt: "たまのみ30日間無料キャンペーン（クーポンコード5959）"
+  },
+  {
     id: "banner-1",
     imageUrl: "/merchant-recruitment-user.jpg",
     linkUrl: "https://www.tamanomi.com/lp/merchant",
@@ -89,7 +95,7 @@ export function BannerCarousel({ className = "" }: BannerCarouselProps) {
       {/* バナー表示エリア（横長 3:1 固定） */}
       <div className="relative w-full aspect-[3/1] overflow-hidden">
         {/* バナー画像 */}
-        <div 
+        <div
           className="absolute inset-0 cursor-pointer transition-all duration-500"
           onClick={handleBannerClick}
         >
@@ -97,7 +103,7 @@ export function BannerCarousel({ className = "" }: BannerCarouselProps) {
             src={currentBanner.imageUrl}
             alt={currentBanner.alt}
             fill
-            className="object-cover"
+            className="object-fill"
           />
         </div>
 
