@@ -8,6 +8,11 @@ import { useRouter } from 'next/navigation'
 // カルーセル用バナー画像とリンク先（ユーザー画面 BannerCarousel とリンク先を揃える）
 const bannerItems = [
   {
+    imageUrl: '/lp/images/campaign-receipt-quest-lp.webp',
+    linkUrl: 'https://receipt-quest.saitama-tsunagu.com/#tokten',
+    alt: 'たまのみ30日間無料キャンペーン（クーポンコード5959）'
+  },
+  {
     imageUrl: '/lp/images/merchant-recruitment-lp.webp',
     linkUrl: 'https://www.tamanomi.com/lp/merchant',
     alt: '掲載店募集'

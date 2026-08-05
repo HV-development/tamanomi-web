@@ -17,6 +17,12 @@ interface BannerCarouselProps {
 
 const banners: BannerItem[] = [
   {
+    id: "banner-4",
+    imageUrl: "/campaign-receipt-quest-user.webp",
+    linkUrl: "https://receipt-quest.saitama-tsunagu.com/#tokten",
+    alt: "たまのみ30日間無料キャンペーン（クーポンコード5959）"
+  },
+  {
     id: "banner-1",
     imageUrl: "/merchant-recruitment-user.jpg",
     linkUrl: "https://www.tamanomi.com/lp/merchant",
