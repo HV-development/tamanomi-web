@@ -17,7 +17,7 @@ interface PlanRegistrationContainerProps {
   onSaitamaAppLinked?: () => void
   hasPaymentMethod?: boolean
   isPaymentMethodChangeOnly?: boolean
-  accountStatus?: string | null
+  entryFlow?: string | null
 }
 
 export function PlanRegistrationContainer({
@@ -32,13 +32,24 @@ export function PlanRegistrationContainer({
   onSaitamaAppLinked,
   hasPaymentMethod,
   isPaymentMethodChangeOnly,
-  accountStatus,
+  entryFlow,
 }: PlanRegistrationContainerProps) {
-  const isPendingAccount = accountStatus === 'pending'
+  // 新規登録の途中はヘッダーを出さない（先方要望）。ログイン直後は履歴が浅くブラウザバックで
+  // 抜けられないため、離脱手段として Home ボタンを戻るの位置に置く。
+  const isSignupFlow = entryFlow === 'signup'
+  const isLoginFlow = entryFlow === 'login'
+
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
-      {!isPendingAccount && (
-        <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
+      {!isSignupFlow && (
+        <HeaderLogo
+          onLogoClick={onLogoClick}
+          showBackButton={!isLoginFlow}
+          onBackClick={onCancel}
+          showHomeButton={isLoginFlow}
+          onHomeClick={onLogoClick}
+          homeButtonPosition="left"
+        />
       )}
 
       {/* メインコンテンツ */}

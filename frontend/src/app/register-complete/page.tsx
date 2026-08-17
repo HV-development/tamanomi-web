@@ -28,9 +28,9 @@ export default function RegisterCompletePage() {
     const saitamaAppLinked = urlParams.get('saitamaAppLinked') === 'true'
     
     if (saitamaAppLinked) {
-      router.push('/plan-registration?saitamaAppLinked=true')
+      router.push('/plan-registration?flow=signup&saitamaAppLinked=true')
     } else {
-      router.push('/plan-registration')
+      router.push('/plan-registration?flow=signup')
     }
   }
 

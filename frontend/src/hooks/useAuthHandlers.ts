@@ -107,7 +107,7 @@ export const useAuthHandlers = (
             // cancelled のみのユーザーは home のバナーで再契約誘導するため、plan-registration に強制遷移しない
             let targetPath: string
             if (!hasPlan && !isCancelledOnly) {
-                targetPath = '/plan-registration'
+                targetPath = '/plan-registration?flow=login'
             } else {
                 targetPath = '/home'
             }
