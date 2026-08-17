@@ -132,19 +132,6 @@ export function usePlanRegistration() {
     return () => window.removeEventListener('focus', handleFocus)
   }, [email, refreshUserInfo])
 
-  // pending ユーザーが /plan-registration からブラウザバックで離脱するのを防ぐ
-  useEffect(() => {
-    if (!isClient || accountStatus !== 'pending') return
-    if (typeof window === 'undefined') return
-
-    window.history.pushState(null, '', window.location.href)
-    const handlePopState = () => {
-      window.history.pushState(null, '', window.location.href)
-    }
-    window.addEventListener('popstate', handlePopState)
-    return () => window.removeEventListener('popstate', handlePopState)
-  }, [isClient, accountStatus])
-
   // --- saitamaAppLinked 未確定時にユーザー情報取得 ---
   useEffect(() => {
     if (isClient && saitamaAppLinked === null) {
