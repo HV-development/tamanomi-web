@@ -15,7 +15,7 @@ import { ApiClient } from '@/lib/api-client';
 import { useCampaignAvailability } from '@/hooks/useCampaignAvailability'
 
 interface PlanRegistrationFormProps {
-  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string) => void
+  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string, campaignFreeDays?: number) => void
   onCancel: () => void
   isLoading?: boolean
   plans: PlanListResponse['plans']
@@ -123,8 +123,10 @@ export function PlanRegistrationForm({
     }
 
     if (selectedPlan || isPaymentMethodChangeOnly) {
-      const campaignCode = selectedPlanData?.is_subscription ? appliedCampaign?.code : undefined
-      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod, campaignCode)
+      const isCampaignApplied = Boolean(selectedPlanData?.is_subscription && appliedCampaign)
+      const campaignCode = isCampaignApplied ? appliedCampaign?.code : undefined
+      const campaignFreeDays = isCampaignApplied ? appliedCampaign?.freeDays : undefined
+      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod, campaignCode, campaignFreeDays)
     }
   }
 

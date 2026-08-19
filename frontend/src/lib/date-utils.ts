@@ -12,6 +12,12 @@ const jstJapaneseDateFormatter = new Intl.DateTimeFormat('ja-JP', {
   day: 'numeric',
 })
 
+const jstMonthDayFormatter = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  month: 'long',
+  day: 'numeric',
+})
+
 const jstIsoDateFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Tokyo',
   year: 'numeric',
@@ -55,4 +61,21 @@ export function computeFreePeriodEndYmd(firstBillingDateIso: string): string {
   const d = new Date(firstBillingDateIso)
   d.setUTCDate(d.getUTCDate() - 1)
   return formatJstYmd(d.toISOString())
+}
+
+/**
+ * 無料期間終了後の初回課金日ラベル（例: 9月18日）。
+ * 加算式は API 側の初回課金日算出（カード登録日 + freeDays）と揃えている。
+ */
+export function computeCampaignNextBillingLabel(freeDays: number): string {
+  const target = new Date(Date.now() + freeDays * 24 * 60 * 60 * 1000)
+  return jstMonthDayFormatter.format(target)
+}
+
+/** YYYYMMDD 形式の日付を「9月18日」形式にする。 */
+export function formatCompactYmdToMonthDay(compactYmd: string): string {
+  const year = Number(compactYmd.slice(0, 4))
+  const month = Number(compactYmd.slice(4, 6))
+  const day = Number(compactYmd.slice(6, 8))
+  return jstMonthDayFormatter.format(new Date(Date.UTC(year, month - 1, day, 12)))
 }

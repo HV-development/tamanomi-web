@@ -8,6 +8,7 @@ import type {
   PaymentMethodType,
 } from '@hv-development/schemas'
 import { isFutureExecutedDate } from '@/utils/application-date'
+import { computeCampaignNextBillingLabel, formatCompactYmdToMonthDay } from '@/lib/date-utils'
 import { setCookie } from '@/lib/cookie'
 import {
   fetchCurrentUser,
@@ -172,24 +173,59 @@ export function usePlanRegistration() {
     plan: PlanResponse & { first_executed_date?: string | null },
     paymentAmount: number,
     paymentMethod: PaymentMethodType,
+    campaignFreeDays?: number,
   ): boolean => {
-    const isFutureDate = isFutureExecutedDate(plan.first_executed_date)
+    if (paymentMethod !== 'CreditCard') {
+      const confirmMessage = paymentMethod === 'AeonPay'
+        ? 'イオンペイで決済を行います。よろしいですか？'
+        : 'PayPayで決済を行います。よろしいですか？'
 
-    let confirmMessage: string
-    if (paymentMethod === 'CreditCard') {
-      confirmMessage = isFutureDate
-        ? 'カード登録を行います。よろしいですか？'
-        : 'カード登録と同時に初回決済を行います。よろしいですか？'
-    } else if (paymentMethod === 'AeonPay') {
-      confirmMessage = 'イオンペイで決済を行います。よろしいですか？'
-    } else {
-      confirmMessage = 'PayPayで決済を行います。よろしいですか？'
+      return window.confirm(
+        `プラン「${plan.name}」\n` +
+        `決済金額: ¥${paymentAmount.toLocaleString()}\n\n` +
+        confirmMessage,
+      )
     }
 
+    const amount = paymentAmount.toLocaleString()
+
+    if (campaignFreeDays != null && campaignFreeDays > 0) {
+      return window.confirm(
+        `${campaignFreeDays}日間無料でお試しいただけます。\n` +
+        `本日のお支払い：0円\n` +
+        `次回のお支払い：${computeCampaignNextBillingLabel(campaignFreeDays)} ${amount}円\n` +
+        `無料期間中の解約：0円\n` +
+        `※アプリからいつでも解約できます`,
+      )
+    }
+
+    const isFutureDate = isFutureExecutedDate(plan.first_executed_date)
+    const billingDateLabel = isFutureDate && plan.first_executed_date
+      ? formatCompactYmdToMonthDay(plan.first_executed_date)
+      : ''
+
+    if (plan.is_subscription) {
+      const paymentLine = isFutureDate
+        ? `カード登録完了後、${billingDateLabel}に初回の月額料金${amount}円が決済されます。`
+        : `カード登録完了後、初回の月額料金${amount}円が決済され、\nすぐにサービスをご利用いただけます。`
+
+      return window.confirm(
+        `月額${amount}円で、対象店舗のお得なサービスを\n何度でもご利用いただけます。\n\n` +
+        `【月額料金】\n${amount}円（税込）\n\n` +
+        `${paymentLine}\n\n` +
+        `登録後はいつでも解約できます。\n月額プランに登録しますか？`,
+      )
+    }
+
+    const paymentLine = isFutureDate
+      ? `カード登録完了後、${billingDateLabel}に料金${amount}円が決済されます。`
+      : `カード登録完了後、料金${amount}円が決済され、\nすぐにサービスをご利用いただけます。`
+
     return window.confirm(
-      `プラン「${plan.name}」\n` +
-      `決済金額: ¥${paymentAmount.toLocaleString()}\n\n` +
-      confirmMessage,
+      `${amount}円で、対象店舗のお得なサービスを\nご利用いただけます。\n\n` +
+      `【料金】\n${amount}円（税込）\n\n` +
+      `${paymentLine}\n\n` +
+      `プランに登録しますか？`,
     )
   }
 
@@ -308,6 +344,7 @@ export function usePlanRegistration() {
     planId: string,
     paymentMethod: PaymentMethodType,
     campaignCode?: string,
+    campaignFreeDays?: number,
   ) => {
     if (isLoading) return
 
@@ -342,7 +379,7 @@ export function usePlanRegistration() {
           return
         }
 
-        if (!confirmPayment(planWithDate, paymentAmount, paymentMethod)) {
+        if (!confirmPayment(planWithDate, paymentAmount, paymentMethod, campaignFreeDays)) {
           setIsLoading(false)
           return
         }
