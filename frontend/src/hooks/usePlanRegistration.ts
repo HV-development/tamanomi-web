@@ -19,6 +19,11 @@ import {
 } from '@/services/plan-registration'
 import type { UserData } from '@/services/plan-registration'
 
+export type PlanRegistrationCampaign = {
+  code: string
+  freeDays: number
+}
+
 function generateCustomerId(emailStr: string): string {
   let hash = 0
   for (let i = 0; i < emailStr.length; i++) {
@@ -173,7 +178,7 @@ export function usePlanRegistration() {
     plan: PlanResponse & { first_executed_date?: string | null },
     paymentAmount: number,
     paymentMethod: PaymentMethodType,
-    campaignFreeDays?: number,
+    campaign?: PlanRegistrationCampaign,
   ): boolean => {
     if (paymentMethod !== 'CreditCard') {
       const confirmMessage = paymentMethod === 'AeonPay'
@@ -189,23 +194,24 @@ export function usePlanRegistration() {
 
     const amount = paymentAmount.toLocaleString()
 
-    if (campaignFreeDays != null && campaignFreeDays > 0) {
+    // freeDays は schemas 側で 1 以上が保証されるため、キャンペーン適用時は必ず無料期間がある
+    if (campaign) {
       return window.confirm(
-        `${campaignFreeDays}日間無料でお試しいただけます。\n` +
+        `${campaign.freeDays}日間無料でお試しいただけます。\n` +
         `本日のお支払い：0円\n` +
-        `次回のお支払い：${computeCampaignNextBillingLabel(campaignFreeDays)} ${amount}円\n` +
+        `次回のお支払い：${computeCampaignNextBillingLabel(campaign.freeDays)} ${amount}円\n` +
         `無料期間中の解約：0円\n` +
         `※アプリからいつでも解約できます`,
       )
     }
 
-    const isFutureDate = isFutureExecutedDate(plan.first_executed_date)
-    const billingDateLabel = isFutureDate && plan.first_executed_date
+    const billingDateLabel = isFutureExecutedDate(plan.first_executed_date) && plan.first_executed_date
       ? formatCompactYmdToMonthDay(plan.first_executed_date)
       : ''
+    const hasBillingDate = billingDateLabel !== ''
 
     if (plan.is_subscription) {
-      const paymentLine = isFutureDate
+      const paymentLine = hasBillingDate
         ? `カード登録完了後、${billingDateLabel}に初回の月額料金${amount}円が決済されます。`
         : `カード登録完了後、初回の月額料金${amount}円が決済され、\nすぐにサービスをご利用いただけます。`
 
@@ -217,7 +223,7 @@ export function usePlanRegistration() {
       )
     }
 
-    const paymentLine = isFutureDate
+    const paymentLine = hasBillingDate
       ? `カード登録完了後、${billingDateLabel}に料金${amount}円が決済されます。`
       : `カード登録完了後、料金${amount}円が決済され、\nすぐにサービスをご利用いただけます。`
 
@@ -343,8 +349,7 @@ export function usePlanRegistration() {
   const handlePaymentMethodRegister = async (
     planId: string,
     paymentMethod: PaymentMethodType,
-    campaignCode?: string,
-    campaignFreeDays?: number,
+    campaign?: PlanRegistrationCampaign,
   ) => {
     if (isLoading) return
 
@@ -379,7 +384,7 @@ export function usePlanRegistration() {
           return
         }
 
-        if (!confirmPayment(planWithDate, paymentAmount, paymentMethod, campaignFreeDays)) {
+        if (!confirmPayment(planWithDate, paymentAmount, paymentMethod, campaign)) {
           setIsLoading(false)
           return
         }
@@ -413,7 +418,7 @@ export function usePlanRegistration() {
           await processPayPay(currentUserId, planId, paymentAmount)
         }
       } else {
-        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId, campaignCode)
+        await processCreditCard(currentEmail, isChangeOnly ? undefined : planId, campaign?.code)
       }
     } catch (err) {
       console.error('▲ERROR [handlePaymentMethodRegister]:', err)

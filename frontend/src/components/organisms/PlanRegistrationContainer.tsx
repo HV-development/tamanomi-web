@@ -4,9 +4,10 @@ import { HeaderLogo } from "../atoms/HeaderLogo"
 import { PlanRegistrationForm } from "./PlanRegistrationForm"
 import type { PaymentMethodType } from '@hv-development/schemas'
 import { PlanListResponse } from '@hv-development/schemas'
+import type { PlanRegistrationCampaign } from '@/hooks/usePlanRegistration'
 
 interface PlanRegistrationContainerProps {
-  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string, campaignFreeDays?: number) => void
+  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaign?: PlanRegistrationCampaign) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean
