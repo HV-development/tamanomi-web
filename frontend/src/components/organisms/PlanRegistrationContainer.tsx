@@ -5,6 +5,8 @@ import { PlanRegistrationForm } from "./PlanRegistrationForm"
 import type { PaymentMethodType } from '@hv-development/schemas'
 import { PlanListResponse } from '@hv-development/schemas'
 
+export type PlanRegistrationEntryFlow = 'signup'
+
 interface PlanRegistrationContainerProps {
   onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string) => void
   onCancel: () => void
@@ -17,7 +19,7 @@ interface PlanRegistrationContainerProps {
   onSaitamaAppLinked?: () => void
   hasPaymentMethod?: boolean
   isPaymentMethodChangeOnly?: boolean
-  entryFlow?: string | null
+  entryFlow?: PlanRegistrationEntryFlow | null
 }
 
 export function PlanRegistrationContainer({
@@ -34,22 +36,13 @@ export function PlanRegistrationContainer({
   isPaymentMethodChangeOnly,
   entryFlow,
 }: PlanRegistrationContainerProps) {
-  // 新規登録の途中はヘッダーを出さない（先方要望）。ログイン直後は履歴が浅くブラウザバックで
-  // 抜けられないため、離脱手段として Home ボタンを戻るの位置に置く。
+  // 新規登録の途中は離脱を促さないためヘッダーを出さない（先方要望）
   const isSignupFlow = entryFlow === 'signup'
-  const isLoginFlow = entryFlow === 'login'
 
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
       {!isSignupFlow && (
-        <HeaderLogo
-          onLogoClick={onLogoClick}
-          showBackButton={!isLoginFlow}
-          onBackClick={onCancel}
-          showHomeButton={isLoginFlow}
-          onHomeClick={onLogoClick}
-          homeButtonPosition="left"
-        />
+        <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
       )}
 
       {/* メインコンテンツ */}
@@ -66,6 +59,7 @@ export function PlanRegistrationContainer({
               onSaitamaAppLinked={onSaitamaAppLinked}
               hasPaymentMethod={hasPaymentMethod}
               isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
+              isSignupFlow={isSignupFlow}
             />
           </div>
         </div>

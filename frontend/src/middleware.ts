@@ -188,7 +188,7 @@ export async function middleware(request: NextRequest) {
   // プラン未登録ユーザーはマイページから退会できる必要があるため、支払い方法変更のみ遮断する。
   const pendingGuardedPaths = ['/payment-method-change']
   const isPendingGuarded = pendingGuardedPaths.some(p =>
-    pathname === p || (p !== '/' && pathname.startsWith(`${p}/`))
+    pathname === p || pathname.startsWith(`${p}/`)
   )
   if (isPendingGuarded && (hasAccessToken || hasRefreshToken)) {
     try {

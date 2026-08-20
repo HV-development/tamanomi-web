@@ -40,7 +40,9 @@ export const useWithdrawalHandlers = (
             const userData = await userMeResponse.json()
 
             const runningId = userData.userPlan?.paygentRunningId || userData.plan?.paygentRunningId
-            const userPlanId = userData.userPlan?.id
+            // /users/me の userPlan は active/withdrawing/paused のみ。カード登録画面まで
+            // 進んで離脱した pending の UserPlan は pendingUserPlanId で返る。
+            const userPlanId = userData.userPlan?.id ?? userData.pendingUserPlanId
 
             if (!userPlanId) {
                 // データ不整合防御: Paygent 継続課金が生きているのに UserPlan が取れないケース。

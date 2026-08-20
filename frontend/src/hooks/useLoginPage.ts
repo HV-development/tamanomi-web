@@ -56,7 +56,7 @@ export const useLoginPage = () => {
           let targetPath: string
           if (!hasPlan && !isCancelledOnly) {
             // Cookieベースのセッション管理に変更したため、sessionStorageは使用しない
-            targetPath = '/plan-registration?flow=login'
+            targetPath = '/plan-registration'
           } else {
             targetPath = '/home'
           }
