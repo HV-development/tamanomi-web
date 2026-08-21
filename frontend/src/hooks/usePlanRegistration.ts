@@ -217,6 +217,7 @@ export function usePlanRegistration() {
         : `カード登録完了後、初回の月額料金${amount}円が決済され、\nすぐにサービスをご利用いただけます。`
 
       return window.confirm(
+        `プラン「${plan.name}」\n\n` +
         `月額${amount}円で、対象店舗のお得なサービスを\n何度でもご利用いただけます。\n\n` +
         `【月額料金】\n${amount}円（税込）\n\n` +
         `${paymentLine}\n\n` +
@@ -229,6 +230,7 @@ export function usePlanRegistration() {
       : `カード登録完了後、料金${amount}円が決済され、\nすぐにサービスをご利用いただけます。`
 
     return window.confirm(
+      `プラン「${plan.name}」\n\n` +
       `${amount}円で、対象店舗のお得なサービスを\nご利用いただけます。\n\n` +
       `【料金】\n${amount}円（税込）\n\n` +
       `${paymentLine}\n\n` +
