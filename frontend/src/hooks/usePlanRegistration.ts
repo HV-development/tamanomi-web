@@ -201,7 +201,8 @@ export function usePlanRegistration() {
         `本日のお支払い：0円\n` +
         `次回のお支払い：${computeCampaignNextBillingLabel(campaign.freeDays)} ${amount}円\n` +
         `無料期間中の解約：0円\n` +
-        `※アプリからいつでも解約できます`,
+        `※アプリからいつでも解約できます\n\n` +
+        `無料お試しを開始しますか？`,
       )
     }
 
