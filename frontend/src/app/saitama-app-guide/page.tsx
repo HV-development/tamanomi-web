@@ -3,18 +3,30 @@
 import { ArrowLeft, AlertCircle, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ApiClient } from "../../lib/api-client"
 import { Modal } from "../../components/atoms/Modal"
 
 export default function SaitamaAppGuidePage() {
   const router = useRouter()
+  const [isSignupFlow, setIsSignupFlow] = useState<boolean>(false)
   const [saitamaAppId, setSaitamaAppId] = useState<string>("")
   const [isLinking, setIsLinking] = useState<boolean>(false)
   const [linkError, setLinkError] = useState<string>("")
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [grantedPoints, setGrantedPoints] = useState<number>(0)
+
+  useEffect(() => {
+    setIsSignupFlow(new URLSearchParams(window.location.search).get('flow') === 'signup')
+  }, [])
+
+  const buildPlanRegistrationHref = (extraParams?: Record<string, string>) => {
+    const params = new URLSearchParams(extraParams)
+    if (isSignupFlow) params.set('flow', 'signup')
+    const query = params.toString()
+    return query ? `/plan-registration?${query}` : '/plan-registration'
+  }
 
   const handleLinkSaitamaApp = async () => {
     if (!saitamaAppId || saitamaAppId.trim() === "") {
@@ -55,7 +67,7 @@ export default function SaitamaAppGuidePage() {
   const handleCloseModal = () => {
     setShowSuccessModal(false)
     // プラン登録画面に戻る（再レンダリングを促すためにタイムスタンプを追加）
-    router.push('/plan-registration?refresh=' + Date.now())
+    router.push(buildPlanRegistrationHref({ refresh: String(Date.now()) }))
   }
 
   return (
@@ -64,7 +76,7 @@ export default function SaitamaAppGuidePage() {
         {/* ヘッダー */}
         <div className="mb-8 text-center">
           <Link 
-            href="/plan-registration"
+            href={buildPlanRegistrationHref()}
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -220,7 +232,7 @@ export default function SaitamaAppGuidePage() {
         {/* フッター */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
           <Link 
-            href="/plan-registration"
+            href={buildPlanRegistrationHref()}
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
           >
             <ArrowLeft className="w-4 h-4" />
