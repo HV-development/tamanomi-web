@@ -13,9 +13,10 @@ import { PlanListResponse } from '@hv-development/schemas'
 import type { PaymentMethodType } from '@hv-development/schemas'
 import { ApiClient } from '@/lib/api-client';
 import { useCampaignAvailability } from '@/hooks/useCampaignAvailability'
+import type { PlanRegistrationCampaign } from '@/hooks/usePlanRegistration'
 
 interface PlanRegistrationFormProps {
-  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string) => void
+  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaign?: PlanRegistrationCampaign) => void
   onCancel: () => void
   isLoading?: boolean
   plans: PlanListResponse['plans']
@@ -123,8 +124,10 @@ export function PlanRegistrationForm({
     }
 
     if (selectedPlan || isPaymentMethodChangeOnly) {
-      const campaignCode = selectedPlanData?.is_subscription ? appliedCampaign?.code : undefined
-      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod, campaignCode)
+      const campaign = selectedPlanData?.is_subscription && appliedCampaign
+        ? { code: appliedCampaign.code, freeDays: appliedCampaign.freeDays }
+        : undefined
+      onPaymentMethodRegister(selectedPlan, selectedPaymentMethod, campaign)
     }
   }
 
