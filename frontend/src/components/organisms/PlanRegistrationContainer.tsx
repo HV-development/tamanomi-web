@@ -4,9 +4,12 @@ import { HeaderLogo } from "../atoms/HeaderLogo"
 import { PlanRegistrationForm } from "./PlanRegistrationForm"
 import type { PaymentMethodType } from '@hv-development/schemas'
 import { PlanListResponse } from '@hv-development/schemas'
+import type { PlanRegistrationCampaign } from '@/hooks/usePlanRegistration'
+
+export type PlanRegistrationEntryFlow = 'signup'
 
 interface PlanRegistrationContainerProps {
-  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaignCode?: string) => void
+  onPaymentMethodRegister: (planId: string, paymentMethod: PaymentMethodType, campaign?: PlanRegistrationCampaign) => void
   onCancel: () => void
   onLogoClick: () => void
   isLoading?: boolean
@@ -17,7 +20,7 @@ interface PlanRegistrationContainerProps {
   onSaitamaAppLinked?: () => void
   hasPaymentMethod?: boolean
   isPaymentMethodChangeOnly?: boolean
-  accountStatus?: string | null
+  entryFlow?: PlanRegistrationEntryFlow | null
 }
 
 export function PlanRegistrationContainer({
@@ -32,12 +35,14 @@ export function PlanRegistrationContainer({
   onSaitamaAppLinked,
   hasPaymentMethod,
   isPaymentMethodChangeOnly,
-  accountStatus,
+  entryFlow,
 }: PlanRegistrationContainerProps) {
-  const isPendingAccount = accountStatus === 'pending'
+  // 新規登録の途中は離脱を促さないためヘッダーを出さない（先方要望）
+  const isSignupFlow = entryFlow === 'signup'
+
   return (
     <div className={`min-h-screen ${backgroundColorClass} flex flex-col`}>
-      {!isPendingAccount && (
+      {!isSignupFlow && (
         <HeaderLogo onLogoClick={onLogoClick} showBackButton={true} onBackClick={onCancel} />
       )}
 
@@ -55,6 +60,7 @@ export function PlanRegistrationContainer({
               onSaitamaAppLinked={onSaitamaAppLinked}
               hasPaymentMethod={hasPaymentMethod}
               isPaymentMethodChangeOnly={isPaymentMethodChangeOnly}
+              isSignupFlow={isSignupFlow}
             />
           </div>
         </div>
