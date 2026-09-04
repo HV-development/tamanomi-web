@@ -56,9 +56,11 @@ export default function MerchantApplyPage() {
 
   const handleInputChange = (field: keyof MerchantApplyFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-    
-    // リアルタイムバリデーション
-    validateField(field, value)
+
+    // 入力途中に確定エラーを出さないよう、解除のみ即時反映する
+    if (errors[field] && !getFieldError(field, value)) {
+      clearFieldError(field)
+    }
   }
 
   const handleBlur = (field: keyof MerchantApplyFormData) => {
@@ -75,11 +77,6 @@ export default function MerchantApplyPage() {
   }
 
   const getFieldError = (field: keyof MerchantApplyFormData, value: string): string | null => {
-    if (field === 'address2') {
-      // address2は任意項目なので、バリデーション不要
-      return null
-    }
-
     // accountEmailは独自のスキーマ、それ以外はMerchantFormSchemaでバリデーション
     const fieldSchema = field === 'accountEmail'
       ? accountEmailSchema
@@ -656,9 +653,18 @@ export default function MerchantApplyPage() {
                 id="address2"
                 value={formData.address2 || ''}
                 onChange={(e) => handleInputChange('address2', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                onBlur={() => handleBlur('address2')}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                  errors.address2 ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="〇〇ビル 3F"
+                maxLength={255}
               />
+              <div className="mt-1">
+                {errors.address2 && (
+                  <p className="text-sm text-red-600">{errors.address2}</p>
+                )}
+              </div>
             </div>
 
             </div>
