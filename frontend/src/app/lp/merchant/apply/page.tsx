@@ -50,6 +50,9 @@ export default function MerchantApplyPage() {
   const [isSearchingAddress, setIsSearchingAddress] = useState(false)
   const [serverError, setServerError] = useState<string>('')
   const [isSuccess, setIsSuccess] = useState(false)
+  const [agreedToRegistration, setAgreedToRegistration] = useState(false)
+  const [agreedToLeadTime, setAgreedToLeadTime] = useState(false)
+  const [agreementError, setAgreementError] = useState('')
 
   const handleInputChange = (field: keyof MerchantApplyFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -63,67 +66,53 @@ export default function MerchantApplyPage() {
     validateField(field, value)
   }
 
+  const clearFieldError = (field: keyof MerchantApplyFormData) => {
+    setErrors((prev) => {
+      const newErrors = { ...prev }
+      delete newErrors[field]
+      return newErrors
+    })
+  }
+
   const validateField = (field: keyof MerchantApplyFormData, value: string) => {
-    try {
-      if (field === 'accountEmail') {
-        // accountEmailは独自のスキーマでバリデーション
-        accountEmailSchema.parse(value)
-      } else if (field === 'address2') {
-        // address2は任意項目なので、バリデーション不要
-        setErrors((prev) => {
-          const newErrors = { ...prev }
-          delete newErrors[field]
-          return newErrors
-        })
-        return
-      } else {
-        // その他のフィールドはMerchantFormSchemaでバリデーション
-        const fieldSchema = MerchantFormSchema.shape[field as keyof typeof MerchantFormSchema.shape]
-        if (fieldSchema) {
-          fieldSchema.parse(value)
-        }
-      }
-      
-      // バリデーション成功 - エラーをクリア
-      setErrors((prev) => {
-        const newErrors = { ...prev }
-        delete newErrors[field]
-        return newErrors
-      })
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        // エラーメッセージを設定
-        const errorMessage = error.errors[0]?.message || '入力エラーです'
-        setErrors((prev) => ({ ...prev, [field]: errorMessage }))
-      }
+    if (field === 'address2') {
+      // address2は任意項目なので、バリデーション不要
+      clearFieldError(field)
+      return
     }
+
+    // accountEmailは独自のスキーマ、それ以外はMerchantFormSchemaでバリデーション
+    const fieldSchema = field === 'accountEmail'
+      ? accountEmailSchema
+      : MerchantFormSchema.shape[field as keyof typeof MerchantFormSchema.shape]
+
+    if (!fieldSchema) {
+      clearFieldError(field)
+      return
+    }
+
+    const result = fieldSchema.safeParse(value)
+    if (result.success) {
+      clearFieldError(field)
+      return
+    }
+
+    setErrors((prev) => ({ ...prev, [field]: result.error.errors[0]?.message || '入力エラーです' }))
   }
 
   const handleAddressSearch = async () => {
     const cleanedPostalCode = formData.postalCode.replace(/-/g, '')
     
     // スキーマベースのバリデーションを使用
-    try {
-      const postalCodeSchema = MerchantFormSchema.shape.postalCode
-      postalCodeSchema.parse(cleanedPostalCode)
-      
-      // バリデーション成功 - エラーをクリア
-      setErrors(prev => {
-        const newErrors = { ...prev }
-        delete newErrors.postalCode
-        return newErrors
-      })
-    } catch (error) {
-      // バリデーションエラーが発生した場合
-      if (error instanceof z.ZodError) {
-        const errorMessage = error.errors[0]?.message || '郵便番号の形式が正しくありません'
-        setErrors(prev => ({
-          ...prev,
-          postalCode: errorMessage
-        }))
-      }
+    const postalCodeResult = MerchantFormSchema.shape.postalCode.safeParse(cleanedPostalCode)
+    if (!postalCodeResult.success) {
+      setErrors(prev => ({
+        ...prev,
+        postalCode: postalCodeResult.error.errors[0]?.message || '郵便番号の形式が正しくありません'
+      }))
       return
     }
+    clearFieldError('postalCode')
 
     setIsSearchingAddress(true)
 
@@ -164,41 +153,55 @@ export default function MerchantApplyPage() {
     }
   }
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
+  const validateForm = (): FormErrors | null => {
+    const result = CreateMerchantSchema.safeParse({
+      ...formData,
+      applications: ['たまのみ'] // デフォルト値
+    })
 
-    try {
-      // CreateMerchantSchemaを使用してバリデーション
-      CreateMerchantSchema.parse({
-        ...formData,
-        applications: ['たまのみ'] // デフォルト値
-      })
-      return true
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        // zodのエラーをFormErrorsに変換
-        error.errors.forEach((err) => {
-          const field = err.path[0]
-          if (field && typeof field === 'string') {
-            newErrors[field] = err.message
-          }
-        })
-      }
-      setErrors(newErrors)
-      return false
+    if (result.success) {
+      return null
     }
+
+    const newErrors: FormErrors = {}
+    result.error.errors.forEach((err) => {
+      const field = err.path[0]
+      if (field && typeof field === 'string') {
+        newErrors[field] = err.message
+      }
+    })
+    setErrors(newErrors)
+    return newErrors
+  }
+
+  // 画面上いちばん上にあるエラー項目へスクロールする（DOM の並び順＝表示順）
+  const scrollToFirstError = (fieldErrors: FormErrors) => {
+    const errorFields = new Set(Object.keys(fieldErrors))
+    if (errorFields.size === 0) {
+      return
+    }
+
+    const firstErrorElement = Array.from(
+      document.querySelectorAll<HTMLElement>('input[id], select[id], textarea[id]')
+    ).find((element) => errorFields.has(element.id))
+
+    firstErrorElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!validateForm()) {
-      // 最初のエラーフィールドにスクロール
-      const firstErrorField = Object.keys(errors)[0]
-      const element = document.getElementById(firstErrorField)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
+
+    const isAgreed = agreedToRegistration && agreedToLeadTime
+    setAgreementError(isAgreed ? '' : '上記2項目にご同意ください')
+
+    const formErrors = validateForm()
+    if (formErrors) {
+      // エラー表示が描画されると各項目の位置がずれるため、描画完了後にスクロールする
+      requestAnimationFrame(() => scrollToFirstError(formErrors))
+      return
+    }
+
+    if (!isAgreed) {
       return
     }
 
@@ -640,6 +643,54 @@ export default function MerchantApplyPage() {
               />
             </div>
 
+            </div>
+
+            {/* 同意事項 */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                ご確認事項 <span className="text-red-600">*</span>
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <input
+                    type="checkbox"
+                    id="agreedToRegistration"
+                    checked={agreedToRegistration}
+                    onChange={(e) => {
+                      setAgreedToRegistration(e.target.checked)
+                      if (e.target.checked && agreedToLeadTime) {
+                        setAgreementError('')
+                      }
+                    }}
+                    className="mt-1 h-4 w-4 flex-shrink-0 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
+                  />
+                  <label htmlFor="agreedToRegistration" className="ml-2 text-sm text-gray-700 cursor-pointer">
+                    たまのみ加盟店としてサービスを開始するため、申込み後に店舗情報及びクーポン情報の登録が必要であることを確認しました。
+                  </label>
+                </div>
+
+                <div className="flex items-start">
+                  <input
+                    type="checkbox"
+                    id="agreedToLeadTime"
+                    checked={agreedToLeadTime}
+                    onChange={(e) => {
+                      setAgreedToLeadTime(e.target.checked)
+                      if (e.target.checked && agreedToRegistration) {
+                        setAgreementError('')
+                      }
+                    }}
+                    className="mt-1 h-4 w-4 flex-shrink-0 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
+                  />
+                  <label htmlFor="agreedToLeadTime" className="ml-2 text-sm text-gray-700 cursor-pointer">
+                    お申し込み後1週間程度で、登録作業を行う予定です。
+                  </label>
+                </div>
+              </div>
+
+              {agreementError && (
+                <p className="mt-3 text-sm text-red-600">{agreementError}</p>
+              )}
             </div>
 
             {/* 注意事項 */}
