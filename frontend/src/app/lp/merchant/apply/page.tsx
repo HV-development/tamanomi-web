@@ -689,7 +689,7 @@ export default function MerchantApplyPage() {
                     className="mt-1 h-4 w-4 flex-shrink-0 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
                   />
                   <label htmlFor="agreedToRegistration" className="ml-2 text-sm text-gray-700 cursor-pointer">
-                    たまのみ加盟店としてサービスを開始するため、申込み後に店舗情報及びクーポン情報の登録が必要であることを確認しました。
+                    たまのみ加盟店としてサービスを開始するため、申込み後に店舗情報およびクーポン情報の登録が必要であることを確認しました。
                   </label>
                 </div>
 
@@ -707,7 +707,7 @@ export default function MerchantApplyPage() {
                     className="mt-1 h-4 w-4 flex-shrink-0 text-green-600 focus:ring-green-500 border-gray-300 rounded cursor-pointer"
                   />
                   <label htmlFor="agreedToLeadTime" className="ml-2 text-sm text-gray-700 cursor-pointer">
-                    お申し込み後1週間程度で、登録作業を行う予定です。
+                    申込み登録完了後1週間程度で、登録作業を行う予定です。
                   </label>
                 </div>
               </div>
