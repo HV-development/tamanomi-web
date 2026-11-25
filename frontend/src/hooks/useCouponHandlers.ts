@@ -17,6 +17,8 @@ export const useCouponHandlers = (
     state: AppState
 ) => {
     const latestState = useRef(state)
+    // クーポン使用の送信中フラグ。state の更新を待つと続けてのタップに間に合わないため ref で持つ
+    const isConfirmingCoupon = useRef(false)
 
     useEffect(() => {
         latestState.current = state
@@ -150,6 +152,11 @@ export const useCouponHandlers = (
         if (!state.selectedCoupon || !state.selectedStore) {
             return
         }
+        // 送信中の二度押しは送らない（送ると API が 2 回目を ALREADY_USED_TODAY で返し、成功と一緒にエラーが出る）
+        if (isConfirmingCoupon.current) {
+            return
+        }
+        isConfirmingCoupon.current = true
 
         try {
             const response = await fetch(`/api/coupons/${state.selectedCoupon.id}/use`, {
@@ -214,6 +221,8 @@ export const useCouponHandlers = (
         } catch (error) {
             console.error('クーポン使用エラー:', error)
             alert(error instanceof Error ? error.message : 'クーポンの使用中にエラーが発生しました')
+        } finally {
+            isConfirmingCoupon.current = false
         }
     }, [auth, navigation, dispatch, state.selectedCoupon, state.selectedStore])
 

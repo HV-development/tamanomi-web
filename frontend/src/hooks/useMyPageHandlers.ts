@@ -103,39 +103,17 @@ export const useMyPageHandlers = (
         dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
 
         try {
-            let response: Response
-            let data: { isFavorite?: boolean; error?: { message?: string }; message?: string }
-            try {
-                response = await fetch(`/api/favorites/${storeId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({}),
-                    credentials: 'include',
-                })
+            const response = await fetch(`/api/favorites/${storeId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({}),
+                credentials: 'include',
+            })
 
-                data = await response.json()
+            const data: { isFavorite?: boolean; error?: { message?: string }; message?: string } = await response.json().catch(() => ({}))
 
-                if (!response.ok) {
-                    if (response.status === 401 || response.status === 403) {
-                        auth.logout()
-
-                        try {
-                            const { addFavoriteToStorage, removeFavoriteFromStorage } = await import('@/lib/favorites-storage')
-                            if (currentIsFavorite) {
-                                removeFavoriteFromStorage(storeId)
-                            } else {
-                                addFavoriteToStorage(storeId)
-                            }
-                        } catch (storageError) {
-                            console.error('セッションストレージへの保存エラー:', storageError)
-                        }
-                        return
-                    }
-
-                    dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
-                    throw new Error(data.error?.message || data.message || 'お気に入りの登録/削除に失敗しました')
-                }
-            } catch {
+            // ログアウトするのは認証が切れたとき（401・403）だけ。それ以外の失敗は下の catch で表示を元に戻す
+            if (response.status === 401 || response.status === 403) {
                 auth.logout()
 
                 try {
@@ -149,6 +127,10 @@ export const useMyPageHandlers = (
                     console.error('セッションストレージへの保存エラー:', storageError)
                 }
                 return
+            }
+
+            if (!response.ok) {
+                throw new Error(data.error?.message || data.message || 'お気に入りの登録/削除に失敗しました')
             }
 
             if (data.isFavorite !== undefined) {
@@ -185,10 +167,6 @@ export const useMyPageHandlers = (
             }
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'お気に入りの登録/削除に失敗しました'
-
-            if (errorMessage.includes('無効なトークン') || errorMessage.includes('認証')) {
-                return
-            }
 
             dispatch({ type: 'TOGGLE_FAVORITE', payload: storeId })
             console.error('お気に入り登録/削除エラー:', errorMessage)

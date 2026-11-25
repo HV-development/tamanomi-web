@@ -374,11 +374,17 @@ export function HomeLayout({ onMount }: HomeLayoutProps) {
           }
         }
       }
+      // 店舗一覧はページごとに読むので、お気に入りにはまだ読み込んでいない店舗もある。
+      // その場合はお気に入りの一覧（そこから開いた店舗詳細）の店舗を渡す
+      if (!storeOverride && !state.stores.find((s) => s.id === storeId)) {
+        storeOverride = apiFavoriteStores.find((s) => s.id === storeId)
+          ?? (selectedStore?.id === storeId ? selectedStore : undefined)
+      }
       await (handlers as { handleCouponsClick: (storeId: string, storeOverride?: Store) => Promise<void> }).handleCouponsClick(storeId, storeOverride)
     } finally {
       setIsLoadingCoupons(false)
     }
-  }, [handlers, isSearchMode, searchKeyword, searchResults, state.stores, dispatch])
+  }, [handlers, isSearchMode, searchKeyword, searchResults, state.stores, dispatch, apiFavoriteStores, selectedStore])
   const onMyPageViewChange = navigation.navigateToMyPage
   const onEditProfile = handlers.handleEditProfile
   const onChangeEmail = handlers.handleChangeEmail

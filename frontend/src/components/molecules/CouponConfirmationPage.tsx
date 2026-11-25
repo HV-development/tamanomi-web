@@ -1,14 +1,14 @@
 "use client"
 
 import Image from "next/image"
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Info } from "lucide-react"
 import type { Coupon } from '@/types/coupon'
 import { getDefaultCouponImage } from "@/utils/coupon-image"
 
 interface CouponConfirmationPageProps {
   coupon: Coupon | null
-  onConfirm: () => void
+  onConfirm: () => void | Promise<void>
   onCancel: () => void
   currentUserRank?: string | null
   isPaused?: boolean
@@ -25,6 +25,9 @@ export default function CouponConfirmationPage({
   // 全ての背景色をブロンズ・非会員色に統一
   const backgroundColorClass = "bg-gradient-to-br from-green-50 to-green-100"
   const [isRotated, setIsRotated] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  // 表示の切り替えより先に続けてのタップが来ても止められるよう、ref でも持つ
+  const isSubmittingRef = useRef(false)
 
   if (!coupon) return null
 
@@ -33,9 +36,16 @@ export default function CouponConfirmationPage({
     setIsRotated(true)
   }
 
-  const handleUse = () => {
-    if (isPaused) return
-    onConfirm()
+  const handleUse = async () => {
+    if (isPaused || isSubmittingRef.current) return
+    isSubmittingRef.current = true
+    setIsSubmitting(true)
+    try {
+      await onConfirm()
+    } finally {
+      isSubmittingRef.current = false
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -159,13 +169,16 @@ export default function CouponConfirmationPage({
                 <>
                   <button
                     onClick={handleUse}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg"
+                    disabled={isSubmitting}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold text-lg transition-colors shadow-md hover:shadow-lg disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none disabled:cursor-not-allowed"
                   >
-                    利用する
+                    {isSubmitting ? "処理中..." : "利用する"}
                   </button>
+                  {/* 送信は取り消せないため、送信中はキャンセルも押せないようにする */}
                   <button
                     onClick={onCancel}
-                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium text-base transition-colors border border-gray-300"
+                    disabled={isSubmitting}
+                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium text-base transition-colors border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     キャンセル
                   </button>
